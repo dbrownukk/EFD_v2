@@ -29,11 +29,11 @@ public class Site {
 	@ReferenceView("Simple")
     private  LivelihoodZone livelihoodzone;
 
-    @Column(name="LocationDistrict",length=255) @Required
+    @Column(name="LocationDistrict",length=25) @Required
     private String locationdistrict;
  
     
-    @Column(name="SubDistrict",length=250)
+    @Column(name="SubDistrict",length=25)
     private String subdistrict;
     
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
@@ -42,7 +42,7 @@ public class Site {
     private  Project project;
 	
 
-    @Column(name="GPSLocation",length=250)
+    @Column(name="GPSLocation",length=25)
     private String gpslocation;
 
 
