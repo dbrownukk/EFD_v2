@@ -1,28 +1,36 @@
 package reasyst.efd;
 
 import javax.persistence.*;
+
 import org.openxava.annotations.*;
-
-
 import org.hibernate.annotations.GenericGenerator;
-import org.openxava.annotations.*;
 
-@Entity 
+/* @View(members="[isocountrycode,description]") */ 
+
+@Entity
+
+/*
+@Table(name="Country")
+*/
 
 public class Country {
-	
-    @Id
-    @Hidden // The property is not shown to the user. It's an internal identifier
-    @GeneratedValue(generator="system-uuid") // Universally Unique Identifier (1)
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
-    @Column(name="ISCountry",length=32,unique=true)
-    private String idcountry;
- 
-    @Column(name="ISOCountryCode",length=2,unique=true) @Required
-    private String isocountrycode;
 
-    @Column(name="CountryName",length=42,unique=true) @Required
-    private String description;
+	@Id
+	@Hidden // The property is not shown to the user. It's an internal
+			// identifier
+	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
+												// (1)
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@Column(name = "IDCountry", length = 32, unique = true)
+	private String idcountry;
+
+	@Column(name = "ISOCountryCode", length = 2, unique = true)
+	@Required
+	private String isocountrycode;
+
+	@Column(name = "CountryName", length = 42, unique = true)
+	@Required
+	private String countryname;
 
 	public String getIdcountry() {
 		return idcountry;
@@ -40,19 +48,14 @@ public class Country {
 		this.isocountrycode = isocountrycode;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getCountryname() {
+		return countryname;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setCountryname(String countryname) {
+		this.countryname = countryname;
 	}
 
 
 
-
-
-
-
-	
 }
