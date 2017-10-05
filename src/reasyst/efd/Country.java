@@ -9,9 +9,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 
-/*
+
 @Table(name="Country")
-*/
+
 
 public class Country {
 
