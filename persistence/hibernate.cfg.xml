@@ -10,5 +10,5 @@ store, and usually match wiht the main datasource of application defined in
 persistence.xml.
  -->	
 <hibernate-configuration>
-	<session-factory>		<!-- Tomcat + Mysql -->		<property name="hibernate.connection.datasource">java:comp/env/jdbc/EFD_v2DS</property>		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />		<property name="hibernate.jdbc.use_get_generated_keys">false</property>				<property name="hibernate.show_sql">false</property>						<!-- GalleryImage is needed only if you uses IMAGES_GALLERY/GALERIA_IMAGENES stereotype -->		<mapping resource="GalleryImage.hbm.xml"/>			</session-factory>
+	<session-factory>		<!-- Tomcat + Mysql -->		<property name="hibernate.connection.datasource">java:comp/env/jdbc/EFD_v2DS</property>		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />		<property name="hibernate.jdbc.use_get_generated_keys">false</property>						<property name="hibernate.show_sql">false</property>						<!-- GalleryImage is needed only if you uses IMAGES_GALLERY/GALERIA_IMAGENES stereotype -->		<mapping resource="GalleryImage.hbm.xml"/>			</session-factory>
 	</hibernate-configuration>

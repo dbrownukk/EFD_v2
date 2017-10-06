@@ -1,21 +1,22 @@
 package reasyst.efd;
-
-import java.util.List;
-
+import java.util.*;
 import javax.persistence.*;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.openxava.annotations.*;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.*;
-import org.openxava.annotations.*;
-
-import antlr.collections.*;
-
 @Entity 
+
 @Views({
-	 @View(name="Simple", members="country, lzname;"),
+	 @View(members="Livelihood Zone [lzname;country;lzzonemap]"+"projects"),
+	 @View(name="SimpleLZ", members="lzname, country, lzzonemap;")
 	})
 
+
+@Tab ( editors ="List, Cards", properties="lzname,country,lzzonemap") // removes graph option
 
 @Table(name="LivelihoodZone")
 
@@ -31,6 +32,7 @@ public class LivelihoodZone {
 	
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
+	@ReferenceView("SimpleCountry")
 	@JoinColumn(name="LZCountry")	
 	@DescriptionsList
     private  Country country;
@@ -41,21 +43,21 @@ public class LivelihoodZone {
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
     
-    @ManyToMany
+    @NewAction("")   /* removes new button from list or collection */
+    @ManyToMany @CollectionView("SimpleProject") 
     @JoinTable(name="ProjectLZ",
     		joinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"),
     	      inverseJoinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"))
 
     
-    private List<Project> projects;
-    
-    
-	public List<Project> getProjects() {
-		return projects;
+    private Collection<Project> projects;
+
+	public String getLzid() {
+		return lzid;
 	}
 
-	public void setProjects(List<Project> projects) {
-		this.projects = projects;
+	public void setLzid(String lzid) {
+		this.lzid = lzid;
 	}
 
 	public Country getCountry() {
@@ -64,14 +66,6 @@ public class LivelihoodZone {
 
 	public void setCountry(Country country) {
 		this.country = country;
-	}
-
-	public String getLzid() {
-		return lzid;
-	}
-
-	public void setLzid(String lzid) {
-		this.lzid = lzid;
 	}
 
 	public String getLzname() {
@@ -89,6 +83,19 @@ public class LivelihoodZone {
 	public void setLzzonemap(String lzzonemap) {
 		this.lzzonemap = lzzonemap;
 	}
+
+	public Collection<Project> getProjects() {
+		return projects;
+	}
+
+	public void setProjects(Collection<Project> projects) {
+		this.projects = projects;
+	}
+
+
+    
+    
+	
     
     
     

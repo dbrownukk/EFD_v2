@@ -1,17 +1,22 @@
 package reasyst.efd;
 import java.util.*;
-import java.util.List;
-
 import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
-import antlr.collections.*;
-
-@View(members="projecttitle,pdate;livelihoodzones")
 
 @Entity 
+
+
+
+@Views({
+	@View(members="Project [projecttitle;pdate]"+"livelihoodzones"),
+	 @View(name="SimpleProject", members="projecttitle;pdate")
+	})
+
+@Tab ( editors ="List, Cards", properties="projecttitle,pdate") // removes graph option
+
 @Table(name="Project")
 public class Project {
 	
@@ -24,24 +29,25 @@ public class Project {
  
     @Column(name="ProjectTitle",length=255,unique=true) @Required
     private String projecttitle;
+    
 
     @Stereotype("DATETIME")
     @Column(name="PDate") @Required
     private java.util.Date pdate;
     
     
-    
-    @ManyToMany(mappedBy="projects")
-    private List<LivelihoodZone> livelihoodzones;
+    @NewAction("")
+    @ManyToMany(mappedBy="projects") @CollectionView("SimpleLZ") 
+    private Collection<LivelihoodZone> livelihoodzones; 
     
     
 
 
-	public List<LivelihoodZone> getLivelihoodzones() {
+	public Collection<LivelihoodZone> getLivelihoodzones() {
 		return livelihoodzones;
 	}
 
-	public void setLivelihoodzones(List<LivelihoodZone> livelihoodzones) {
+	public void setLivelihoodzones(Collection<LivelihoodZone> livelihoodzones) {
 		this.livelihoodzones = livelihoodzones;
 	}
 

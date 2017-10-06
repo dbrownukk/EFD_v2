@@ -5,13 +5,18 @@ import javax.persistence.*;
 import org.openxava.annotations.*;
 import org.hibernate.annotations.GenericGenerator;
 
-/* @View(members="[isocountrycode,description]") */ 
 
 @Entity
 
-
 @Table(name="Country")
 
+@Tab ( editors ="List, Cards", rowStyles=@RowStyle(style="row-highlight", property="type", value="steady")
+	,properties="isocountrycode, description") // removes graph option
+
+@Views({
+@View(members= "Country [isocountrycode, description]"),   // Put box around default detail screen 
+@View(name="SimpleCountry",members="description")
+})
 
 public class Country {
 
@@ -28,9 +33,9 @@ public class Country {
 	@Required
 	private String isocountrycode;
 
-	@Column(name = "CountryName", length = 42, unique = true)
+	@Column(name = "CountryName", length = 45, unique = true)
 	@Required
-	private String countryname;
+	private String description;
 
 	public String getIdcountry() {
 		return idcountry;
@@ -48,13 +53,15 @@ public class Country {
 		this.isocountrycode = isocountrycode;
 	}
 
-	public String getCountryname() {
-		return countryname;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setCountryname(String countryname) {
-		this.countryname = countryname;
+	public void setDescription(String description) {
+		this.description = description;
 	}
+
+
 
 
 
