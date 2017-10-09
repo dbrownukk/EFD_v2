@@ -1,0 +1,9 @@
+/*
+David Brown
+9/10/17
+Technical project notes as they occur
+*/
+
+1. Build.xml - use updateSchema to update the physical database schema from the OX defined in Java classes
+  Check in physical schema for sizes,PK, FK, NN
+  
