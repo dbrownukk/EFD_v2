@@ -9,7 +9,8 @@ import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
 
-@View(members="livelihoodzone;locationdistrict,subdistrict,gpslocation;project")
+@View(members="Site [locationdistrict,subdistrict,gpslocation];"
+		+ "livelihoodzone;project")
 @Entity 
 
 @Table(name="Site")
@@ -21,38 +22,43 @@ public class Site {
     @GeneratedValue(generator="system-uuid") // Universally Unique Identifier (1)
     @GenericGenerator(name="system-uuid", strategy = "uuid")
     @Column(name="LocationID",length=32,unique=true)
-    private String lzid;
-	
-	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
-	        optional=false)
-	@JoinColumn(name="LZ")
-	@ReferenceView("Simple")
-    private  LivelihoodZone livelihoodzone;
+    private String locationid;
 
     @Column(name="LocationDistrict",length=25) @Required
     private String locationdistrict;
- 
+
+    @Column(name="GPSLocation",length=25)
+    private String gpslocation;
+    
+	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
+	        optional=false)
+	@JoinColumn(name="LZ")
+	@ReferenceView("SimpleLZ")
+    private  LivelihoodZone livelihoodzone;
     
     @Column(name="SubDistrict",length=25)
     private String subdistrict;
     
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
+	@ReferenceView("SimpleProject")
 	@JoinColumn(name="Project")
     private  Project project;
 	
 
-    @Column(name="GPSLocation",length=25)
-    private String gpslocation;
 
 
-	public String getLzid() {
-		return lzid;
+
+
+
+
+	public String getLocationid() {
+		return locationid;
 	}
 
 
-	public void setLzid(String lzid) {
-		this.lzid = lzid;
+	public void setLocationid(String locationid) {
+		this.locationid = locationid;
 	}
 
 

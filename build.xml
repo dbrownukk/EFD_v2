@@ -63,7 +63,7 @@
 	</target>	
 	-->
 	<target name="updateSchema">
-		<ant antfile="/Users/David/Desktop/openxava-5.7.1/workspace/OpenXava/build.xml" target="updateSchemaJPA">			
+		<ant antfile="../OpenXava/build.xml" target="updateSchemaJPA">			
 			<property name="persistence.unit" value="junit"/>
 			<property name="schema.path" value="/Users/David/Desktop/openxava-5.6.1/workspace/OpenXava/lib/mysql-connector-java-5.1.42-bin.jar"/>
 		</ant>
