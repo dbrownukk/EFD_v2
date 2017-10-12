@@ -11,8 +11,9 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	@View(members="Project [projecttitle;pdate]"+"livelihoodzones"),
-	 @View(name="SimpleProject", members="projecttitle;pdate")
+	@View(members="Project [projecttitle,pdate]"+"livelihoodzones"),
+	 @View(name="SimpleProject", members="projecttitle,pdate"),
+	@View(name="NewlineProject", members="projecttitle;pdate")
 	})
 
 @Tab ( editors ="List, Cards", properties="projecttitle,pdate") // removes graph option

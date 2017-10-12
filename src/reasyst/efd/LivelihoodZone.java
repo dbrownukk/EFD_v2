@@ -8,15 +8,16 @@ import org.openxava.annotations.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-@Entity 
 
 @Views({
-	 @View(members="Livelihood Zone [lzname;country;lzzonemap]"+"projects"),
-	 @View(name="SimpleLZ", members="lzname, country, lzzonemap;")
+	 @View(members="Livelihood Zone [lzname;country,lzzonemap]"+"projects"),
+	 @View(name="SimpleLZ", members="lzname,country")
 	})
 
 
-@Tab ( editors ="List, Cards", properties="lzname,country,lzzonemap") // removes graph option
+@Entity
+
+// @Tab ( editors ="List, Cards", properties="lzname,country,lzzonemap") // removes graph option
 
 @Table(name="LivelihoodZone")
 
@@ -44,7 +45,7 @@ public class LivelihoodZone {
     private String lzzonemap;
     
     @NewAction("")   /* removes new button from list or collection */
-    @ManyToMany @CollectionView("SimpleProject") 
+    @ManyToMany(cascade=CascadeType.REMOVE) @CollectionView("SimpleProject") 
     @JoinTable(name="ProjectLZ",
     		joinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"),
     	      inverseJoinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"))

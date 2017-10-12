@@ -12,12 +12,14 @@ import org.openxava.annotations.*;
 
 
 
-//@Views({
-//	@View(members="Project [projecttitle;pdate]"+"livelihoodzones"),
-//	 @View(name="SimpleProject", members="projecttitle;pdate")
-//	})
+@Views({
+	@View(members="Community [# cinterviewdate,cinterviewsequence;"
+			+ "civf,civm,civparticipants,interviewers, site, project]"),
+	 @View(name="SimpleCommunity", members="cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
+	 @View(name="OriginalCommunity", members="site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")
+})
 
-//@Tab ( editors ="List, Cards", properties="projecttitle,pdate") // removes graph option
+@Tab ( editors ="List, Cards", properties="site.locationdistrict,project.projecttitle,cinterviewdate,cinterviewsequence") // removes graph option
 
 @Table(name="Community")
 public class Community {
@@ -29,19 +31,28 @@ public class Community {
     @Column(name="CID",length=32,unique=true)
     private String communityid;
  
-	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
+    
+    
+	@ManyToOne(fetch=FetchType.LAZY, // This is FK to Site == Location
 	        optional=false)
-	// @ReferenceView("SimpleSite")
+	@ReferenceView("NewlineSite")
 	@JoinColumn(name="CLocation")	
 	private  Site site;
 	
-	
+
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
-	// @ReferenceView("SimpleProject")
+	@ReferenceView("NewlineProject")
 	@JoinColumn(name="CProject")	
 	private  Project project;
 	
+	public Project getProject() {
+		return project;
+	}
+
+	public void setProject(Project project) {
+		this.project = project;
+	}
 	
 	@Column(name="CInterviewSequence") @Required
     private Integer cinterviewsequence;
@@ -54,7 +65,7 @@ public class Community {
 	    private String interviewers;
 	  
 	  @Column(name="CIVParticipants")
-	    private Integer civparticpants;
+	    private Integer civparticipants;
 	
 	  @Column(name="CIVM")
 	    private Integer civm;
@@ -78,13 +89,7 @@ public class Community {
 		this.site = site;
 	}
 
-	public Project getProject() {
-		return project;
-	}
 
-	public void setProject(Project project) {
-		this.project = project;
-	}
 
 	public Integer getCinterviewsequence() {
 		return cinterviewsequence;
@@ -110,12 +115,14 @@ public class Community {
 		this.interviewers = interviewers;
 	}
 
-	public Integer getCivparticpants() {
-		return civparticpants;
+
+
+	public Integer getCivparticipants() {
+		return civparticipants;
 	}
 
-	public void setCivparticpants(Integer civparticpants) {
-		this.civparticpants = civparticpants;
+	public void setCivparticipants(Integer civparticipants) {
+		this.civparticipants = civparticipants;
 	}
 
 	public Integer getCivm() {
@@ -133,17 +140,6 @@ public class Community {
 	public void setCivf(Integer civf) {
 		this.civf = civf;
 	}
-    
- 
-    
-    
-
-
-
-
-
-    
-    
     
     
 }

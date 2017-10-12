@@ -8,9 +8,14 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
+@Views({
+	 @View(members="Site [locationdistrict,subdistrict,gpslocation,livelihoodzone];"),
+	 @View(name="SimpleSite", members="locationdistrict,subdistrict,gpslocation,livelihoodzone;"),
+	 @View(name="NewlineSite", members="locationdistrict;subdistrict;gpslocation;livelihoodzone;")
+	})
 
-@View(members="Site [locationdistrict,subdistrict,gpslocation];"
-		+ "livelihoodzone;project")
+
+
 @Entity 
 
 @Table(name="Site")
@@ -30,20 +35,17 @@ public class Site {
     @Column(name="GPSLocation",length=25)
     private String gpslocation;
     
+    
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
 	@JoinColumn(name="LZ")
-	@ReferenceView("SimpleLZ")
+	@DescriptionsList(descriptionProperties="lzname")
     private  LivelihoodZone livelihoodzone;
     
     @Column(name="SubDistrict",length=25)
     private String subdistrict;
     
-	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
-	        optional=false)
-	@ReferenceView("SimpleProject")
-	@JoinColumn(name="Project")
-    private  Project project;
+
 	
 
 
@@ -92,14 +94,6 @@ public class Site {
 	}
 
 
-	public Project getProject() {
-		return project;
-	}
-
-
-	public void setProject(Project project) {
-		this.project = project;
-	}
 
 
 	public String getGpslocation() {
