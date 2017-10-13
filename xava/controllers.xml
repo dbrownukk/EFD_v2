@@ -22,4 +22,10 @@
 	</controller>    
     -->
     
+   <controller name="Spreadsheet">
+		<extends controller="TypicalRealExcel"/>
+		<extends controller="CRUD"/>
+	 <action name="scenario" mode="detail" by-default="if-possible" class="org.openxava.actions.CreateXlsFileAction" />
+	</controller>
+    
 </controllers>
