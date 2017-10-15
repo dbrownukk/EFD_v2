@@ -1,4 +1,4 @@
-package reasyst.efd;
+package efd.model;
 
 import javax.persistence.*;
 

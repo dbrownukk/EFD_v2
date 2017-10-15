@@ -65,7 +65,7 @@
 	<target name="updateSchema">
 		<ant antfile="../OpenXava/build.xml" target="updateSchemaJPA">			
 			<property name="persistence.unit" value="junit"/>
-			<property name="schema.path" value="/Users/David/Desktop/openxava-5.6.1/workspace/OpenXava/lib/mysql-connector-java-5.1.42-bin.jar"/>
+			<property name="schema.path" value="C:\Users\David\Desktop\openxava-5.7.1\tomcat\lib\mysql-connector-java-5.1.42-bin.jar"/>
 		</ant>
 	</target>
 	
