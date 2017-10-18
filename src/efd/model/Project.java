@@ -12,11 +12,11 @@ import org.openxava.annotations.*;
 
 @Views({
 	@View(members="Project [projecttitle,pdate]"+"livelihoodzones"),
-	 @View(name="SimpleProject", members="projecttitle,pdate"),
+	 @View(name="SimpleProject", members="projecttitle,pdate,Project.Spreadsheet()"),
 	@View(name="NewlineProject", members="projecttitle;pdate")
 	})
 
-@Tab ( editors ="List, Cards", properties="projecttitle,pdate") // removes graph option
+@Tab ( editors ="List, Cards") // removes graph option
 
 @Table(name="Project")
 public class Project {
@@ -37,7 +37,7 @@ public class Project {
     private java.util.Date pdate;
     
     
-    @NewAction("")
+    /* @NewAction("") */
     @ManyToMany(mappedBy="projects") @CollectionView("SimpleLZ") 
     private Collection<LivelihoodZone> livelihoodzones; 
     

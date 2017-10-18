@@ -13,19 +13,17 @@
     	    scope="global"/>    
     -->
     
-    <!-- Controller:
-    <controller name="Teacher">
-    	<extends controller="Typical"/>
-    	<action name="new" icon="library-plus" keystroke="Control N"
-        	class="actions.CreateTeacher">
-    	</action>
-	</controller>    
-    -->
     
    <controller name="Spreadsheet">
 		<extends controller="TypicalRealExcel"/>
-		<extends controller="CRUD"/>
-	 <action name="scenario" mode="detail" by-default="if-possible" class="org.openxava.actions.CreateXlsFileAction" />
+		
+	 <action name="scenario" 
+	 		mode="detail" 
+	 		by-default="if-possible" 
+	 		class="org.openxava.actions.CreateXlsFileAction"
+	        image="excel.gif"
+            icon="file-excel"
+             />
 	</controller>
     
 </controllers>

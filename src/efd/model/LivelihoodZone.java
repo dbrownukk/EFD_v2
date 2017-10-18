@@ -44,7 +44,7 @@ public class LivelihoodZone {
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
     
-    @NewAction("")   /* removes new button from list or collection */
+    /* @NewAction("")    removes new button from list or collection */
     @ManyToMany(cascade=CascadeType.REMOVE) @CollectionView("SimpleProject") 
     @JoinTable(name="ProjectLZ",
     		joinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"),

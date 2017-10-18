@@ -37,6 +37,10 @@ public class Country {
 	@Required
 	private String description;
 
+	
+	
+	
+	
 	public String getIdcountry() {
 		return idcountry;
 	}
