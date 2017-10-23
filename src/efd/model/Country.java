@@ -10,7 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Table(name="Country")
 
-@Tab ( editors ="List, Cards", rowStyles=@RowStyle(style="row-highlight", property="type", value="steady")
+@Tab ( editors ="List, Cards", rowStyles=@RowStyle(style="highlight", property="type", value="steady")
 	,properties="isocountrycode, description") // removes graph option
 
 @Views({

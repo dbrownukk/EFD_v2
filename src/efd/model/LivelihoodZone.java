@@ -10,7 +10,7 @@ import javax.persistence.Table;
 
 
 @Views({
-	 @View(members="Livelihood Zone [lzname;country,lzzonemap]"+"projects"),
+	 @View(members="Livelihood[lzname;country,lzzonemap]"+"projects"),
 	 @View(name="SimpleLZ", members="lzname,country")
 	})
 
@@ -33,7 +33,6 @@ public class LivelihoodZone {
 	
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
-	@ReferenceView("SimpleCountry")
 	@JoinColumn(name="LZCountry")	
 	@DescriptionsList
     private  Country country;
@@ -44,14 +43,21 @@ public class LivelihoodZone {
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
     
-    /* @NewAction("")    removes new button from list or collection */
-    @ManyToMany(cascade=CascadeType.REMOVE) @CollectionView("SimpleProject") 
-    @JoinTable(name="ProjectLZ",
+    /* @NewAction("")    removes new button from list or collection 
+    @ManyToMany(cascade=CascadeType.PERSIST ) //@CollectionView("SimpleProject") 
+ 
+    @JoinTable(name="projectlz",
     		joinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"),
     	      inverseJoinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"))
-
     
-    private Collection<Project> projects;
+    private Set<Project> projects;
+    
+    */
+    
+    @ManyToMany(mappedBy="livelihoodzones") // @CollectionView("SimpleLZ") 
+    private Set<Project> projects;
+    
+    
 
 	public String getLzid() {
 		return lzid;
@@ -85,13 +91,15 @@ public class LivelihoodZone {
 		this.lzzonemap = lzzonemap;
 	}
 
-	public Collection<Project> getProjects() {
+	public Set<Project> getProjects() {
 		return projects;
 	}
 
-	public void setProjects(Collection<Project> projects) {
+	public void setProjects(Set<Project> projects) {
 		this.projects = projects;
 	}
+
+	
 
 
     

@@ -20,7 +20,7 @@
 	 <action name="scenario" 
 	 		mode="detail" 
 	 		by-default="if-possible" 
-	 		class="org.openxava.actions.CreateXlsFileAction"
+	 		class="efd.actions.CreateXlsFileAction"
 	        image="excel.gif"
             icon="file-excel"
              />
