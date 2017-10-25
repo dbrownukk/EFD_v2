@@ -7,14 +7,14 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
-
+/*
 @Views({
 	 @View(members="Site [locationdistrict,subdistrict,gpslocation,livelihoodzone];"),
 	 @View(name="SimpleSite", members="locationdistrict,subdistrict,gpslocation,livelihoodzone;"),
 	 @View(name="NewlineSite", members="locationdistrict;subdistrict;gpslocation;livelihoodzone;")
 	})
 
-
+*/
 
 @Entity 
 
@@ -32,6 +32,9 @@ public class Site {
     @Column(name="LocationDistrict",length=25) @Required
     private String locationdistrict;
 
+    @Column(name="SubDistrict",length=25)
+    private String subdistrict;
+    
     @Column(name="GPSLocation",length=25)
     private String gpslocation;
     
@@ -42,8 +45,7 @@ public class Site {
 	@DescriptionsList(descriptionProperties="lzname")
     private  LivelihoodZone livelihoodzone;
     
-    @Column(name="SubDistrict",length=25)
-    private String subdistrict;
+
     
 
 	

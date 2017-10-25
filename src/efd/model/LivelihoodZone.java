@@ -5,14 +5,11 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-
 @Views({
-	 @View(members="Livelihood[lzname;country,lzzonemap]"+"projects"),
-	 @View(name="SimpleLZ", members="lzname,country")
+	 @View(members="Livelihood[lzname;country,lzzonemap]"+"project"),
+	 @View(name="SimpleLZ", members="lzname,country,locationdistrict")
 	})
+
 
 
 @Entity
@@ -43,22 +40,15 @@ public class LivelihoodZone {
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
     
-    /* @NewAction("")    removes new button from list or collection 
-    @ManyToMany(cascade=CascadeType.PERSIST ) //@CollectionView("SimpleProject") 
- 
-    @JoinTable(name="projectlz",
-    		joinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"),
-    	      inverseJoinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"))
-    
-    private Set<Project> projects;
-    
-    */
-    
-    @ManyToMany(mappedBy="livelihoodzones") // @CollectionView("SimpleLZ") 
-    private Set<Project> projects;
-    
-    
+    @ManyToMany(mappedBy="livelihoodzone") // @CollectionView("SimpleLZ") 
+    private Collection<Project> project;
 
+    
+    @OneToMany(mappedBy="livelihoodzone")
+    private Collection<Site> site;
+    
+    /* Get / set */
+    
 	public String getLzid() {
 		return lzid;
 	}
@@ -91,13 +81,21 @@ public class LivelihoodZone {
 		this.lzzonemap = lzzonemap;
 	}
 
-	public Set<Project> getProjects() {
-		return projects;
+	public Collection<Project> getProject() {
+		return project;
 	}
 
-	public void setProjects(Set<Project> projects) {
-		this.projects = projects;
+	public void setProject(Collection<Project> project) {
+		this.project = project;
 	}
+
+
+
+
+
+
+
+
 
 	
 

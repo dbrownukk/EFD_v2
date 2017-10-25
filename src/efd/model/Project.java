@@ -11,7 +11,7 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	@View(members="Project[projecttitle,pdate]"+"livelihoodzones"),
+	@View(members="Project[projecttitle,pdate]"+"livelihoodzone"),
 	@View(name="SimpleProject", members="projecttitle,pdate,Project.Spreadsheet()"),
 	@View(name="NewlineProject", members="projecttitle;pdate")
 	})
@@ -36,15 +36,16 @@ public class Project {
     @Column(name="PDate") @Required
     private java.util.Date pdate;
     
-    @ManyToMany(cascade=CascadeType.ALL ) //@CollectionView("SimpleProject") 
+    @NewAction("ManyToMany.new")
+    @ManyToMany
     @JoinTable(name="projectlz",
     		joinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"),
     	      inverseJoinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"))
-    private Set<LivelihoodZone> livelihoodzones;
+    private Collection<LivelihoodZone> livelihoodzone;
 
 
-    /* getters/setters */
-    
+
+
 	public String getProjectid() {
 		return projectid;
 	}
@@ -75,14 +76,25 @@ public class Project {
 	}
 
 
-	public Set<LivelihoodZone> getLivelihoodzones() {
-		return livelihoodzones;
+	public Collection<LivelihoodZone> getLivelihoodzone() {
+		return livelihoodzone;
 	}
 
 
-	public void setLivelihoodzones(Set<LivelihoodZone> livelihoodzones) {
-		this.livelihoodzones = livelihoodzones;
+	public void setLivelihoodzone(Collection<LivelihoodZone> livelihoodzone) {
+		this.livelihoodzone = livelihoodzone;
 	}
+
+
+
+    
+    
+    
+    /* getters/setters */
+    
+	
+
+
     
     
         
