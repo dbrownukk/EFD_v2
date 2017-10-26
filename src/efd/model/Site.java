@@ -43,7 +43,7 @@ public class Site {
 	        optional=false)
 	@JoinColumn(name="LZ")
 	@DescriptionsList(descriptionProperties="lzname")
-    private  LivelihoodZone livelihoodzone;
+    private  LivelihoodZone livelihoodZone;
     
 
     
@@ -66,13 +66,13 @@ public class Site {
 	}
 
 
-	public LivelihoodZone getLivelihoodzone() {
-		return livelihoodzone;
+	public LivelihoodZone getLivelihoodZone() {
+		return livelihoodZone;
 	}
 
 
-	public void setLivelihoodzone(LivelihoodZone livelihoodzone) {
-		this.livelihoodzone = livelihoodzone;
+	public void setLivelihoodZone(LivelihoodZone livelihoodZone) {
+		this.livelihoodZone = livelihoodZone;
 	}
 
 

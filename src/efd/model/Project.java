@@ -11,12 +11,12 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	@View(members="Project[projecttitle,pdate]"+"livelihoodzone"),
+	//@View(members="Project[projecttitle,pdate]"),
 	@View(name="SimpleProject", members="projecttitle,pdate,Project.Spreadsheet()"),
 	@View(name="NewlineProject", members="projecttitle;pdate")
 	})
 
-@Tab ( editors ="List, Cards") // removes graph option
+@Tab ( properties="projecttitle;pdate",editors ="List, Cards") // removes graph option
 
 @Table(name="Project")
 public class Project {
@@ -36,14 +36,21 @@ public class Project {
     @Column(name="PDate") @Required
     private java.util.Date pdate;
     
+    
+    /*
     @NewAction("ManyToMany.new")
     @ManyToMany
     @JoinTable(name="projectlz",
     		joinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"),
     	      inverseJoinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"))
-    private Collection<LivelihoodZone> livelihoodzone;
-
-
+    @ListProperties("lzname;country,lzzonemap")
+    private Collection<LivelihoodZone> livelihoodZone;
+    
+    */
+    @NewAction("ManyToMany.new")
+    @OneToMany(mappedBy="project")
+    @ListProperties("this.projectLZ.livelihoodZone.lzname")
+    private Collection<ProjectLZ> projectLZ;
 
 
 	public String getProjectid() {
@@ -76,19 +83,29 @@ public class Project {
 	}
 
 
-	public Collection<LivelihoodZone> getLivelihoodzone() {
-		return livelihoodzone;
+	public Collection<ProjectLZ> getProjectLZ() {
+		return projectLZ;
 	}
 
 
-	public void setLivelihoodzone(Collection<LivelihoodZone> livelihoodzone) {
-		this.livelihoodzone = livelihoodzone;
+	public void setProjectLZ(Collection<ProjectLZ> projectLZ) {
+		this.projectLZ = projectLZ;
 	}
+
+
+
+
+
 
 
 
     
-    
+
+
+
+	
+
+
     
     /* getters/setters */
     

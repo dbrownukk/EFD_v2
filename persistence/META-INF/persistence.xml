@@ -52,7 +52,7 @@
 
 
     <persistence-unit name="junit">
-    	<provider>org.hibernate.ejb.HibernatePersistence</provider>
+    	<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
 		<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
 		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

@@ -6,7 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
 @Views({
-	 @View(members="Livelihood[lzname;country,lzzonemap]"+"project"),
+	 @View(members="Livelihood[lzname;country,lzzonemap]"+"site"),
 	 @View(name="SimpleLZ", members="lzname,country,locationdistrict")
 	})
 
@@ -40,70 +40,86 @@ public class LivelihoodZone {
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
     
-    @ManyToMany(mappedBy="livelihoodzone") // @CollectionView("SimpleLZ") 
+    /*
+    @ManyToMany(mappedBy="livelihoodZone") 
     private Collection<Project> project;
+    */
+
+    @OneToMany(mappedBy="livelihoodZone")
+    private Collection<Site> site;
 
     
-    @OneToMany(mappedBy="livelihoodzone")
-    private Collection<Site> site;
-    
-    /* Get / set */
-    
+    @OneToMany(mappedBy="livelihoodZone")
+    private Collection<ProjectLZ> projectLZ;
+
+
 	public String getLzid() {
 		return lzid;
 	}
+
 
 	public void setLzid(String lzid) {
 		this.lzid = lzid;
 	}
 
+
 	public Country getCountry() {
 		return country;
 	}
+
 
 	public void setCountry(Country country) {
 		this.country = country;
 	}
 
+
 	public String getLzname() {
 		return lzname;
 	}
+
 
 	public void setLzname(String lzname) {
 		this.lzname = lzname;
 	}
 
+
 	public String getLzzonemap() {
 		return lzzonemap;
 	}
+
 
 	public void setLzzonemap(String lzzonemap) {
 		this.lzzonemap = lzzonemap;
 	}
 
-	public Collection<Project> getProject() {
-		return project;
-	}
 
-	public void setProject(Collection<Project> project) {
-		this.project = project;
+	public Collection<Site> getSite() {
+		return site;
 	}
 
 
+	public void setSite(Collection<Site> site) {
+		this.site = site;
+	}
 
 
+	public Collection<ProjectLZ> getProjectLZ() {
+		return projectLZ;
+	}
 
 
-
+	public void setProjectLZ(Collection<ProjectLZ> projectLZ) {
+		this.projectLZ = projectLZ;
+	}
 
 
 	
 
 
-    
+    /* Get / set */
     
 	
-    
+
     
     
 }
