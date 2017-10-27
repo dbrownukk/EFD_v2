@@ -11,7 +11,7 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	//@View(members="Project[projecttitle,pdate]"),
+	@View(members="Project[projecttitle,pdate]"),
 	@View(name="SimpleProject", members="projecttitle,pdate,Project.Spreadsheet()"),
 	@View(name="NewlineProject", members="projecttitle;pdate")
 	})

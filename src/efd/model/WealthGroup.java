@@ -1,7 +1,6 @@
 package efd.model;
 
 
-import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
@@ -11,11 +10,11 @@ import org.openxava.annotations.*;
 
 @Entity 
 
-@Views({
-	@View(members="Wealth Group[# community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent]")
+//@Views({
+//	@View(members="Wealth Group[# community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent]")
 	// @View(name="SimpleCommunity", members="cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
 	// @View(name="OriginalCommunity", members="site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")
-})
+//})
 
 // @Tab ( editors ="List, Cards", properties="community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent") // removes graph option
 
@@ -34,8 +33,9 @@ public class WealthGroup {
 	        optional=false)
 	//@ReferenceView("SimpleCommunity")
 	@JoinColumn(name="CommunityID")	
-	@DescriptionsList(descriptionProperties="site.locationdistrict,project.projecttitle,cinterviewdate")
-    private  Community community;
+	@DescriptionsList(descriptionProperties="site.locationdistrict")
+    
+	private  Community community;
     
 	@Column(name="WGName_Local", length=255)
     private String wgnamelocal ;
@@ -54,8 +54,7 @@ public class WealthGroup {
     private int wghhsize ;
 	
 	@Column(name="WGPercent") @Min(value=0) @Max(value=100)
-	
-    private int wgpercent ;
+	private int wgpercent ;
 
 	public String getWgid() {
 		return wgid;
@@ -120,6 +119,7 @@ public class WealthGroup {
 	public void setWgpercent(int wgpercent) {
 		this.wgpercent = wgpercent;
 	}
+
 	
 
 	

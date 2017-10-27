@@ -3,8 +3,6 @@ package efd.model;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.*;
-
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
@@ -21,11 +19,11 @@ import org.openxava.annotations.*;
 		"civf;" +
 		"civm;" +
 		"civparticipants;" +
-		"]"+
-				"site,projectlz"
+		"];"+
+				"site,Project[projectlz]"
 				),
 
-		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
+		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 
 		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers") })
 

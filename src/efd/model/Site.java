@@ -10,7 +10,7 @@ import org.openxava.annotations.*;
 
 @Views({
 	 @View(members="Site[locationdistrict,subdistrict,gpslocation,livelihoodZone]"),
-	 @View(name="SimpleSite", members="locationdistrict,subdistrict,gpslocation,livelihoodZone;"),
+	 @View(name="SimpleSite", members="locationdistrict;subdistrict;gpslocation;livelihoodZone"),
 	 @View(name="NewlineSite", members="locationdistrict;subdistrict;gpslocation;livelihoodZone;")
 	})
 
