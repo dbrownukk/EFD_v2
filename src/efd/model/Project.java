@@ -37,7 +37,7 @@ public class Project {
     private java.util.Date pdate;
     
     
-    /*
+    
     @NewAction("ManyToMany.new")
     @ManyToMany
     @JoinTable(name="projectlz",
@@ -45,17 +45,21 @@ public class Project {
     	      inverseJoinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"))
     @ListProperties("lzname;country,lzzonemap")
     private Collection<LivelihoodZone> livelihoodZone;
+
     
-    */
+
+    /*
     @NewAction("ManyToMany.new")
     @OneToMany(mappedBy="project")
     @ListProperties("this.projectLZ.livelihoodZone.lzname")
     private Collection<ProjectLZ> projectLZ;
+    */
 
-
+    /* getters/setters */
 	public String getProjectid() {
 		return projectid;
 	}
+
 
 
 	public void setProjectid(String projectid) {
@@ -63,9 +67,11 @@ public class Project {
 	}
 
 
+
 	public String getProjecttitle() {
 		return projecttitle;
 	}
+
 
 
 	public void setProjecttitle(String projecttitle) {
@@ -73,9 +79,11 @@ public class Project {
 	}
 
 
+
 	public java.util.Date getPdate() {
 		return pdate;
 	}
+
 
 
 	public void setPdate(java.util.Date pdate) {
@@ -83,31 +91,18 @@ public class Project {
 	}
 
 
-	public Collection<ProjectLZ> getProjectLZ() {
-		return projectLZ;
-	}
 
-
-	public void setProjectLZ(Collection<ProjectLZ> projectLZ) {
-		this.projectLZ = projectLZ;
+	public Collection<LivelihoodZone> getLivelihoodZone() {
+		return livelihoodZone;
 	}
 
 
 
-
-
-
-
-
+	public void setLivelihoodZone(Collection<LivelihoodZone> livelihoodZone) {
+		this.livelihoodZone = livelihoodZone;
+	}
     
 
-
-
-	
-
-
-    
-    /* getters/setters */
     
 	
 

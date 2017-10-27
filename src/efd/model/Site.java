@@ -7,14 +7,14 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
-/*
+
 @Views({
-	 @View(members="Site [locationdistrict,subdistrict,gpslocation,livelihoodzone];"),
-	 @View(name="SimpleSite", members="locationdistrict,subdistrict,gpslocation,livelihoodzone;"),
-	 @View(name="NewlineSite", members="locationdistrict;subdistrict;gpslocation;livelihoodzone;")
+	 @View(members="Site[locationdistrict,subdistrict,gpslocation,livelihoodZone]"),
+	 @View(name="SimpleSite", members="locationdistrict,subdistrict,gpslocation,livelihoodZone;"),
+	 @View(name="NewlineSite", members="locationdistrict;subdistrict;gpslocation;livelihoodZone;")
 	})
 
-*/
+
 
 @Entity 
 
@@ -44,16 +44,6 @@ public class Site {
 	@JoinColumn(name="LZ")
 	@DescriptionsList(descriptionProperties="lzname")
     private  LivelihoodZone livelihoodZone;
-    
-
-    
-
-	
-
-
-
-
-
 
 
 	public String getLocationid() {
@@ -63,16 +53,6 @@ public class Site {
 
 	public void setLocationid(String locationid) {
 		this.locationid = locationid;
-	}
-
-
-	public LivelihoodZone getLivelihoodZone() {
-		return livelihoodZone;
-	}
-
-
-	public void setLivelihoodZone(LivelihoodZone livelihoodZone) {
-		this.livelihoodZone = livelihoodZone;
 	}
 
 
@@ -96,8 +76,6 @@ public class Site {
 	}
 
 
-
-
 	public String getGpslocation() {
 		return gpslocation;
 	}
@@ -106,6 +84,17 @@ public class Site {
 	public void setGpslocation(String gpslocation) {
 		this.gpslocation = gpslocation;
 	}
+
+
+	public LivelihoodZone getLivelihoodZone() {
+		return livelihoodZone;
+	}
+
+
+	public void setLivelihoodZone(LivelihoodZone livelihoodZone) {
+		this.livelihoodZone = livelihoodZone;
+	}
+    
 
     
 

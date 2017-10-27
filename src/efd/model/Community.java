@@ -3,28 +3,33 @@ package efd.model;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.*;
 
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
 @Entity
 
-/*
- * @Views({
- * 
- * @View(members="Community [# cinterviewdate,cinterviewsequence;" +
- * "civf,civm,civparticipants,interviewers, site]"),
- * 
- * @View(name="SimpleCommunity",
- * members="cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
- * 
- * @View(name="OriginalCommunity", members=
- * "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")
- * })
- */
+@Views({
 
-																															// graph
-																															// option
+		@View(members = "Interview [" +
+		"cinterviewdate;" +
+		"cinterviewsequence;" + 
+		"interviewers;" +
+		"],"
+		+"Attendees[" +
+		"civf;" +
+		"civm;" +
+		"civparticipants;" +
+		"]"+
+				"site,projectlz"
+				),
+
+		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
+
+		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers") })
+
+
 
 @Table(name = "Community")
 public class Community {
@@ -38,13 +43,15 @@ public class Community {
 
 	@ManyToOne(fetch = FetchType.LAZY, // This is FK to Site == Location
 			optional = false)
+	@ReferenceView("SimpleSite")
 	@JoinColumn(name = "CLocation")
 	private Site site;
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
 	@JoinColumn(name = "CProject")
-	private Project project;
+	@DescriptionsList(descriptionProperties="projecttitle,pdate")
+	private Project projectlz;
 
 	@Column(name = "CInterviewSequence")
 	@Required
@@ -67,8 +74,6 @@ public class Community {
 	@Column(name = "CIVF")
 	private Integer civf;
 
-	/* get / set */
-
 	public String getCommunityid() {
 		return communityid;
 	}
@@ -85,14 +90,12 @@ public class Community {
 		this.site = site;
 	}
 
-
-
-	public Project getProject() {
-		return project;
+	public Project getProjectlz() {
+		return projectlz;
 	}
 
-	public void setProject(Project project) {
-		this.project = project;
+	public void setProjectlz(Project projectlz) {
+		this.projectlz = projectlz;
 	}
 
 	public Integer getCinterviewsequence() {
@@ -142,5 +145,10 @@ public class Community {
 	public void setCivf(Integer civf) {
 		this.civf = civf;
 	}
+
+	/* get / set */
+
+	
+	
 
 }
