@@ -8,7 +8,7 @@ import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
 @Entity
-
+@View(members="wgresourcesubtype;wgresourceunit;wgresourceamount;resourcesubtype")
 public class WGCharacteristicsResource {
 
 	

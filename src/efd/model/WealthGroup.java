@@ -10,13 +10,13 @@ import org.openxava.annotations.*;
 
 @Entity 
 
-//@Views({
-//	@View(members="Wealth Group[# community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent]")
-	// @View(name="SimpleCommunity", members="cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
-	// @View(name="OriginalCommunity", members="site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")
-//})
+@Views({
+	@View(members="Wealth Group[# community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent]"),
+	 @View(name="SimpleCommunity", members="cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
+	 @View(name="OriginalCommunity", members="site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")}
+)
 
-// @Tab ( editors ="List, Cards", properties="community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent") // removes graph option
+@Tab ( editors ="List, Cards", properties="community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent") // removes graph option
 
 @Table(name="WealthGroup")
 public class WealthGroup {

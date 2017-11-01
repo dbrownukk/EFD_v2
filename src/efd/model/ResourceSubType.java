@@ -9,6 +9,9 @@ import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
 @Entity
+
+@View(members="Resource Sub Type[resourcetype;resourcesubtypesynonym;resourcetypename;resourcesubtypeunit;resourcesubtypekcal]")
+
 public class ResourceSubType {
 
 	@Id

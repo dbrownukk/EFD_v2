@@ -17,7 +17,7 @@ If you want to add filters add them in filters.xml file in WEB-INF.
 	
 	<display-name>OpenXava Application</display-name>
 	
-	@listeners.xml@ 
+	 
 
 	<!-- Addons filters begin --> 
 	<filter>
@@ -48,7 +48,7 @@ If you want to add filters add them in filters.xml file in WEB-INF.
 	</filter-mapping>
 	<!-- Addons filters end -->		
 			
-	@filters.xml@
+	
 	
 	<servlet>
 		<servlet-name>images</servlet-name>
@@ -116,7 +116,7 @@ If you want to add filters add them in filters.xml file in WEB-INF.
 		<load-on-startup>12</load-on-startup>
 	</servlet>	
 		
-	@servlets.xml@
+	
 	
 	<servlet-mapping>
 		<servlet-name>naviox</servlet-name>
@@ -187,7 +187,7 @@ If you want to add filters add them in filters.xml file in WEB-INF.
 		<url-pattern>/dwr/*</url-pattern>
 	</servlet-mapping>	
 	
-@resources.xml@
+
 
 	<mime-mapping>
 		<extension>jnlp</extension>
