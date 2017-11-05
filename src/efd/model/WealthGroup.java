@@ -16,7 +16,7 @@ import org.openxava.annotations.*;
 	 @View(name="OriginalCommunity", members="site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")}
 )
 
-@Tab ( editors ="List, Cards", properties="community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent") // removes graph option
+@Tab ( editors ="List, Cards", properties="locationdistrict,community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent,cproject") // removes graph option
 
 @Table(name="WealthGroup")
 public class WealthGroup {
@@ -32,10 +32,11 @@ public class WealthGroup {
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
 	//@ReferenceView("SimpleCommunity")
+	
+	
 	@JoinColumn(name="CommunityID")	
 	@DescriptionsList(descriptionProperties="site.locationdistrict")
-    
-	private  Community community;
+    private  Community community;
     
 	@Column(name="WGName_Local", length=255)
     private String wgnamelocal ;

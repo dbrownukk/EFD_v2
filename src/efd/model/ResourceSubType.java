@@ -21,9 +21,8 @@ public class ResourceSubType {
 	@Column(name = "IDResourceSubType", length = 32, unique = true)
 	private String idresourcesubtype;
 	
-	@ManyToOne(fetch = FetchType.LAZY, // This is FK to Site == Location
+	@ManyToOne(fetch = FetchType.LAZY, 
 			optional = false)
-	// @ReferenceView("Simple")
 	@Required
 	@JoinColumn(name = "ReourceType")
 	@DescriptionsList(descriptionProperties="resourcetypename")

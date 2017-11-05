@@ -34,15 +34,31 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		int row;
 		int col;
 
-		/* Get EFD Project Deatils */
-		Project project = XPersistence.getManager().find(Project.class, getView().getValue("projectid"));
+		/* Get EFD Project Details */
+
+		/* Get WealthGroup data */
+		WealthGroup wealthgroup = XPersistence.getManager().find(WealthGroup.class, getView().getValue("wgid"));
+
+		/* Get Community Data */
+		Community community = XPersistence.getManager().find(Community.class,
+				wealthgroup.getCommunity().getCommunityid());
+		/* Get Project Data */
+		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
 
 		/* XLS File Name */
+		// JxlsWorkbook scenarioWB = new
+		// JxlsWorkbook(project.getProjecttitle());
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(project.getProjecttitle());
 		JxlsStyle boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
 		JxlsStyle boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);
 		JxlsStyle borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN,
 				BORDER_THIN, BORDER_THIN);
+		JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(LIGHT_GREEN).setTextColor(BLACK);
+		JxlsStyle datestyle = scenarioWB
+				.getDefaultDateStyle(); /*
+										 * seems to e a bug to stop setting
+										 * other params
+										 */
 
 		/* XLS Sheets */
 
@@ -63,7 +79,8 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 			i++;
 		}
 		while (j < 11) {
-			Interview.setValue(3, j, "", borderStyle); /* set borders for data input fields */
+			Interview.setValue(3, j, "",
+					borderStyle); /* set borders for data input fields */
 			Interview.setValue(5, j, "", borderStyle);
 			j += 2;
 		}
@@ -85,6 +102,30 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 
 		Interview.setValue(6, 8, "Women", boldRStyle);
 		Interview.setValue(6, 10, "Type of Year", boldRStyle);
+
+		/* Data */
+
+		Interview.setValue(3, 2, community.getCinterviewsequence(),
+				textstyle); /* Interview Number */
+		Interview.setValue(3, 4, community.getSite().getLocationdistrict(), textstyle); /* District */
+		Interview.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
+				textstyle); /* Livelihood Zone */
+		Interview.setValue(3, 8, community.getCivparticipants(),
+				textstyle); /* Number of Participants */
+		Interview.setValue(3, 10, wealthgroup.getWgnameeng(),
+				textstyle); /* Wealth Group */
+
+		Interview.setValue(5, 2, community.getCinterviewdate(), datestyle); /* Date */
+		Interview.setValue(5, 4, community.getSite().getSubdistrict(),
+				textstyle); /* Sub District */
+		Interview.setValue(5, 6, community.getInterviewers(), textstyle); /* Interviewers */
+		Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
+		Interview.setValue(5, 10, "NEED HH FIELD",
+				textstyle); /* Number in Household */
+
+		Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
+		Interview.setValue(7, 10, "NEED TYPE OF YEAR FIELD ",
+				textstyle); /* Type of Year */
 
 		/* Asset Sheet */
 
@@ -112,7 +153,8 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 					row = 17;
 				}
 
-				Asset.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Asset.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 				if (col == 5 && row > 16) {
 					row = 30;
@@ -151,7 +193,8 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		row = 5;
 		while (col < 14) {
 			while (row < 16) {
-				Crop.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Crop.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 
@@ -159,9 +202,8 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 			row = 5;
 		}
 
-		/* LS  Sheet */
+		/* LS Sheet */
 
-		
 		LS.setValue(2, 4, "Income Type i.e Milk", boldTopStyle);
 		LS.setValue(3, 4, "", boldTopStyle);
 		LS.setValue(4, 4, "Unit", boldTopStyle);
@@ -188,7 +230,8 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		row = 5;
 		while (col < 15) {
 			while (row < 16) {
-				LS.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				LS.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 
@@ -196,10 +239,8 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 			row = 5;
 		}
 
-		
-		/* EMP  Sheet */
+		/* EMP Sheet */
 
-		
 		Emp.setValue(2, 3, "Employment Type", boldTopStyle);
 		Emp.setValue(3, 3, "Number of People Working", boldTopStyle);
 		Emp.setValue(4, 3, "Frequency e.g. per week, Month", boldTopStyle);
@@ -225,17 +266,16 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Emp.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Emp.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
 			row = 4;
 		}
-		
-		
-		/* Transfer  Sheet */
 
-		
+		/* Transfer Sheet */
+
 		Transfer.setValue(2, 3, "Transfer Type", boldTopStyle);
 		Transfer.setValue(3, 3, "Unit", boldTopStyle);
 		Transfer.setValue(4, 3, "Quantity Received", boldTopStyle);
@@ -261,16 +301,16 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Transfer.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Transfer.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
 			row = 4;
 		}
-		
-		/* Wildfood  Sheet */
 
-		
+		/* Wildfood Sheet */
+
 		Wildfood.setValue(2, 3, "Wild Food Type", boldTopStyle);
 		Wildfood.setValue(3, 3, "Unit", boldTopStyle);
 		Wildfood.setValue(4, 3, "Quantity Received", boldTopStyle);
@@ -296,22 +336,21 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Wildfood.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Wildfood.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
 			row = 4;
 		}
-		
-		
-/* Food Purchase  Sheet */
 
-		
+		/* Food Purchase Sheet */
+
 		Foodpurchase.setValue(2, 3, "Food Type", boldTopStyle);
 		Foodpurchase.setValue(3, 3, "Unit", boldTopStyle);
 		Foodpurchase.setValue(4, 3, "Quantity Purchased", boldTopStyle);
 		Foodpurchase.setValue(5, 3, "Price Per Unit", boldTopStyle);
-	
+
 		i = 2;
 		while (i < 6) {
 			Foodpurchase.setColumnWidths(i, w); /* set col widths */
@@ -324,24 +363,24 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		row = 4;
 		while (col < 6) {
 			while (row < 16) {
-				Foodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Foodpurchase.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
 			row = 4;
 		}
-		
-/* Non Food Purchase  Sheet */
 
-		
+		/* Non Food Purchase Sheet */
+
 		Nonfoodpurchase.setValue(2, 3, "Item Purchased", boldTopStyle);
 		Nonfoodpurchase.setValue(3, 3, "Unit", boldTopStyle);
 		Nonfoodpurchase.setValue(4, 3, "Quantity Purchased", boldTopStyle);
 		Nonfoodpurchase.setValue(5, 3, "Price Per Unit", boldTopStyle);
-	
+
 		i = 2;
 		while (i < 6) {
-		Nonfoodpurchase.setColumnWidths(i, w); /* set col widths */
+			Nonfoodpurchase.setColumnWidths(i, w); /* set col widths */
 			i++;
 		}
 
@@ -351,15 +390,15 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		row = 4;
 		while (col < 6) {
 			while (row < 16) {
-				Nonfoodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Nonfoodpurchase.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
 			row = 4;
 		}
-       /* end XLS setup */		
-		
-		
+		/* end XLS setup */
+
 		return scenarioWB;
 
 	}

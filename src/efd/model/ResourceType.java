@@ -1,8 +1,7 @@
 package efd.model;
 
-import java.math.*;
-
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 
 import org.hibernate.annotations.*;
@@ -23,6 +22,7 @@ public class ResourceType {
 	@Column(name = "ResourceTypeName", length=255)  // ?? Should be a string ??
 	@Required
 	private String resourcetypename;
+	
 
 
 

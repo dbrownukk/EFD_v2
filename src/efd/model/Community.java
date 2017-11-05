@@ -12,7 +12,7 @@ import org.openxava.annotations.*;
 
 		@View(members = "Interview [" +
 		"cinterviewdate;" +
-		"cinterviewsequence;" + 
+		"cinterviewsequence;" +
 		"interviewers;" +
 		"],"
 		+"Attendees[" +

@@ -1,7 +1,10 @@
 package efd.model;
 
 
+import java.util.*;
+
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -45,6 +48,9 @@ public class Site {
 	@DescriptionsList(descriptionProperties="lzname")
     private  LivelihoodZone livelihoodZone;
 
+	@OneToMany(mappedBy="site", cascade=CascadeType.REMOVE)
+	   @ListProperties("cinterviewdate,cinterviewsequence,civf,civm")
+	    private Collection<Community> community;
 
 	public String getLocationid() {
 		return locationid;
@@ -93,6 +99,16 @@ public class Site {
 
 	public void setLivelihoodZone(LivelihoodZone livelihoodZone) {
 		this.livelihoodZone = livelihoodZone;
+	}
+
+
+	public Collection<Community> getCommunity() {
+		return community;
+	}
+
+
+	public void setCommunity(Collection<Community> community) {
+		this.community = community;
 	}
     
 

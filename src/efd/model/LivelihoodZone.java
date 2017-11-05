@@ -5,16 +5,17 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
+
 @Views({
-	 @View(members="Livelihood Zone[lzname;country,lzzonemap,site]"),
-	 @View(name="SimpleLZ", members="lzname,country,locationdistrict")
+	 @View(members="Livelihood Zone[lzname,country,lzzonemap,project,site]"),	
+	 @View(name="SimpleLZ", members="lzname;country;lzzonemap")
 	})
 
 
 
 @Entity
 
-// @Tab ( editors ="List, Cards", properties="lzname,country,lzzonemap") // removes graph option
+//@Tab ( editors ="List, Cards", properties="lzname,country") // DO NOT USE - Causes problems with Add
 
 @Table(name="LivelihoodZone")
 
@@ -39,15 +40,17 @@ public class LivelihoodZone {
 	
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
-    
-    
-    @ManyToMany(mappedBy="livelihoodZone") 
-    private Collection<Project> project;
+   
     
 
-    @OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.ALL)
+   @OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.REMOVE)
    @ListProperties("locationdistrict,subdistrict,gpslocation")
     private Collection<Site> site;
+
+    
+    @ManyToMany(mappedBy="livelihoodZone",cascade=CascadeType.REMOVE) 
+    @ListProperties("projecttitle,pdate")
+    private Collection<Project> project;
 
 
 	public String getLzid() {
@@ -90,16 +93,6 @@ public class LivelihoodZone {
 	}
 
 
-	public Collection<Project> getProject() {
-		return project;
-	}
-
-
-	public void setProject(Collection<Project> project) {
-		this.project = project;
-	}
-
-
 	public Collection<Site> getSite() {
 		return site;
 	}
@@ -109,13 +102,17 @@ public class LivelihoodZone {
 		this.site = site;
 	}
 
-    /*
-    @OneToMany(mappedBy="livelihoodZone")
-    private Collection<ProjectLZ> projectLZ;
-	*/
+
+	public Collection<Project> getProject() {
+		return project;
+	}
+
+
+	public void setProject(Collection<Project> project) {
+		this.project = project;
+	}
 
 	
-
 
 	
 

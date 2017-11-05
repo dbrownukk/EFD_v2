@@ -11,7 +11,7 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	@View(members="Project[projecttitle,pdate]"),
+	@View(members="Project[projecttitle,pdate];livelihoodZone;community"),
 	@View(name="SimpleProject", members="projecttitle,pdate,Project.Spreadsheet()"),
 	@View(name="NewlineProject", members="projecttitle;pdate")
 	})
@@ -39,74 +39,61 @@ public class Project {
     
     
     @NewAction("ManyToMany.new")
-    @ManyToMany
+    
+    @ManyToMany(cascade=CascadeType.REMOVE)
+    // @ManyToMany
     @JoinTable(name="projectlz",
     		joinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"),
     	      inverseJoinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"))
-    @ListProperties("lzname;country,lzzonemap")
+    @ListProperties("lzname,country.description,lzzonemap")
+    @CollectionView("SimpleLZ")
     private Collection<LivelihoodZone> livelihoodZone;
 
-    
+    @OneToMany(mappedBy="projectlz")
+    private Collection<Community> community;
 
-    /*
-    @NewAction("ManyToMany.new")
-    @OneToMany(mappedBy="project")
-    @ListProperties("this.projectLZ.livelihoodZone.lzname")
-    private Collection<ProjectLZ> projectLZ;
-    */
+	public Collection<Community> getCommunity() {
+	return community;
+}
 
-    /* getters/setters */
+public void setCommunity(Collection<Community> community) {
+	this.community = community;
+}
+
 	public String getProjectid() {
 		return projectid;
 	}
-
-
 
 	public void setProjectid(String projectid) {
 		this.projectid = projectid;
 	}
 
-
-
 	public String getProjecttitle() {
 		return projecttitle;
 	}
-
-
 
 	public void setProjecttitle(String projecttitle) {
 		this.projecttitle = projecttitle;
 	}
 
-
-
 	public java.util.Date getPdate() {
 		return pdate;
 	}
-
-
 
 	public void setPdate(java.util.Date pdate) {
 		this.pdate = pdate;
 	}
 
-
-
 	public Collection<LivelihoodZone> getLivelihoodZone() {
 		return livelihoodZone;
 	}
 
-
-
 	public void setLivelihoodZone(Collection<LivelihoodZone> livelihoodZone) {
 		this.livelihoodZone = livelihoodZone;
 	}
-    
 
-    
 	
-
-
+	
     
     
         
