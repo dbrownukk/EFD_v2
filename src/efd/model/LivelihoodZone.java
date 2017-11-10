@@ -12,10 +12,11 @@ import org.openxava.annotations.*;
 	})
 
 
+@Tab(properties="lzname,country.description,lzzonemap") // Mote - cannot add Site - it is a OneToMany
+
 
 @Entity
 
-//@Tab ( editors ="List, Cards", properties="lzname,country") // DO NOT USE - Causes problems with Add
 
 @Table(name="LivelihoodZone")
 

@@ -120,7 +120,7 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 				textstyle); /* Sub District */
 		Interview.setValue(5, 6, community.getInterviewers(), textstyle); /* Interviewers */
 		Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
-		Interview.setValue(5, 10, "NEED HH FIELD",
+		Interview.setValue(5, 10, wealthgroup.getWghhsize(),
 				textstyle); /* Number in Household */
 
 		Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */

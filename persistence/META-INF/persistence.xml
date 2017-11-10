@@ -10,7 +10,7 @@
     <!-- Tomcat + Hypersonic -->
     
         <persistence-unit name="default">
-    	<provider>org.hibernate.ejb.HibernatePersistence</provider>
+    	<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     	<non-jta-data-source>java:comp/env/jdbc/EFD_v2DS</non-jta-data-source>
     	<class>org.openxava.session.GalleryImage</class>
         <properties>

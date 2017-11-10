@@ -76,7 +76,10 @@ boolean scrollSupported = !(browser != null && (browser.indexOf("MSIE 6") >= 0 |
 String styleOverflow = org.openxava.web.Lists.getOverflow(browser, tab.getMetaProperties());
 boolean sortable = !Is.emptyString(collection) && view.isRepresentsSortableCollection();  
 boolean simple = sortable;
-if (simple) filter = false; 
+if (simple) filter = false;
+String groupBy = tab.getGroupBy();
+boolean grouping = !Is.emptyString(groupBy);
+if (grouping) action = null;
 %>
 
 <input type="hidden" name="xava_list<%=tab.getTabName()%>_filter_visible"/>
@@ -113,13 +116,55 @@ if (tab.isTitleVisible()) {
 <%
 }
 %>
-<% if (style.isShowRowCountOnTop()) { 
+<% if (style.isShowRowCountOnTop() && !grouping) { // && grouping 
 	totalSize = tab.getTotalSize();
 	int finalIndex = Math.min(totalSize, tab.getFinalIndex());
 %>
 <span class="<%=style.getHeaderListCount()%>">
 <%=XavaResources.getString(request, "header_list_count", new Integer(tab.getInitialIndex() + 1), new Integer(finalIndex), new Integer(totalSize))%>
 </span>
+<% } %>
+<% if (manager.getDialogLevel() == 0) { %>
+<select onchange="openxava.executeAction('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '', false, 'List.groupBy','property=' + this.value)">
+	<option value=""><%=grouping?XavaResources.getString("no_grouping"):XavaResources.getString("no_grouping") + "&nbsp;&nbsp;&#9662;&nbsp;"%></option>
+	<% 
+	for (MetaProperty property: tab.getMetaPropertiesBeforeGrouping()) {
+		String selected = "";
+		String handle = "";
+		if (groupBy.equals(property.getQualifiedName())) {
+			selected = "selected";
+			handle = "&nbsp;&nbsp;&#9662;&nbsp;";
+		}
+	%>
+	<option value="<%=property.getQualifiedName()%>" <%=selected%>><xava:message key="group_by"/> <%=property.getQualifiedLabel(request).toLowerCase()%><%=handle%></option>
+	<%
+		if (property.getType().isAssignableFrom(java.util.Date.class)) {
+			if (groupBy.equals(property.getQualifiedName() + "[month]")) {
+				selected = "selected";
+				handle = "&nbsp;&nbsp;&#9662;&nbsp;";
+			}
+			else {
+				selected = "";
+				handle = "";
+			}
+	%>
+	<option value="<%=property.getQualifiedName()%>[month]" <%=selected%>><xava:message key="group_by_month_of"/> <%=property.getQualifiedLabel(request).toLowerCase()%><%=handle%></option>
+	<%
+			if (groupBy.equals(property.getQualifiedName() + "[year]")) {
+				selected = "selected";
+				handle = "&nbsp;&nbsp;&#9662;&nbsp;";
+			}
+			else {
+				selected = "";
+				handle = "";
+			}
+	%>		
+	<option value="<%=property.getQualifiedName()%>[year]" <%=selected%>><xava:message key="group_by_year_of"/> <%=property.getQualifiedLabel(request).toLowerCase()%><%=handle%></option> 
+	<%		
+		}
+	} 
+	%>
+</select> 
 <% } %>
 </td></tr>
 </table>
@@ -246,6 +291,7 @@ while (it.hasNext()) {
 		   if (tab.isCustomizeAllowed()) {
 	%>
 	<span class="<xava:id name='<%="customize_" + id%>'/>" style="display: none;">
+	<xava:action action="List.changeColumnName" argv='<%="property="+property.getQualifiedName() + collectionArgv%>'/>
 	<a href="javascript:openxava.removeColumn('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '<xava:id name='<%=id%>'/>_col<%=columnIndex%>', '<%=tabObject%>')" title="<xava:message key='remove_column'/>">
 		<i class="mdi mdi-close-circle"></i>
 	</a>
@@ -421,12 +467,12 @@ for (int f=tab.getInitialIndex(); f<model.getRowCount() && f < finalIndex; f++) 
 	<i class="xava_handle mdi mdi-swap-vertical"></i>	
 	<%}%>	
 <%
-	if (!org.openxava.util.Is.emptyString(action)) { 
+	if (!org.openxava.util.Is.emptyString(action)) {  
 %>
 <xava:action action='<%=action%>' argv='<%="row=" + f + actionArgv%>'/>
 <%
 	}
-	if (style.isSeveralActionsPerRow()) 
+	if (style.isSeveralActionsPerRow() && !grouping)  
 	for (java.util.Iterator itRowActions = rowActions.iterator(); itRowActions.hasNext(); ) { 	
 		String rowAction = (String) itRowActions.next();		
 %>
@@ -699,10 +745,10 @@ else {
 <% } // of if (style.isChangingPageRowCountAllowed()) %>
 </td>
 <td style='text-align: right; vertical-align: middle' class='<%=style.getListInfoDetail()%>'>
-<% if (XavaPreferences.getInstance().isShowCountInList() && !style.isShowRowCountOnTop()) { %>
+<% if (XavaPreferences.getInstance().isShowCountInList() && !style.isShowRowCountOnTop() && !grouping) { %> 
 <xava:message key="list_count" intParam="<%=totalSize%>"/>
 <% } %>
-<% if (collection == null && style.isHideRowsAllowed()) { %>
+<% if (collection == null && style.isHideRowsAllowed() && !grouping) { %> 
 (<xava:link action="List.hideRows" argv="<%=collectionArgv%>"/>)
 <% } %>
 </td>

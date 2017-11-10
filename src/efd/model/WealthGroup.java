@@ -1,6 +1,5 @@
 package efd.model;
-
-
+import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
@@ -11,9 +10,11 @@ import org.openxava.annotations.*;
 @Entity 
 
 @Views({
-	@View(members="Wealth Group[# community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent]"),
+	 @View(members="Wealth Group[# community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent]"),
 	 @View(name="SimpleCommunity", members="cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
-	 @View(name="OriginalCommunity", members="site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")}
+	 @View(name="OriginalCommunity", members="site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
+	 @View(name="SimpleWealthGroup", members=",community")
+}
 )
 
 @Tab ( editors ="List, Cards", properties="locationdistrict,community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent,cproject") // removes graph option
@@ -32,12 +33,13 @@ public class WealthGroup {
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
 	//@ReferenceView("SimpleCommunity")
-	
-	
 	@JoinColumn(name="CommunityID")	
 	@DescriptionsList(descriptionProperties="site.locationdistrict")
     private  Community community;
     
+	@OneToMany
+	private Collection<WGCharacteristicsResource> wgcharacteristicsresource;
+	
 	@Column(name="WGName_Local", length=255)
     private String wgnamelocal ;
     
@@ -71,6 +73,14 @@ public class WealthGroup {
 
 	public void setCommunity(Community community) {
 		this.community = community;
+	}
+
+	public Collection<WGCharacteristicsResource> getWgcharacteristicsresource() {
+		return wgcharacteristicsresource;
+	}
+
+	public void setWgcharacteristicsresource(Collection<WGCharacteristicsResource> wgcharacteristicsresource) {
+		this.wgcharacteristicsresource = wgcharacteristicsresource;
 	}
 
 	public String getWgnamelocal() {
@@ -120,6 +130,8 @@ public class WealthGroup {
 	public void setWgpercent(int wgpercent) {
 		this.wgpercent = wgpercent;
 	}
+
+
 
 	
 

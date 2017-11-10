@@ -191,6 +191,16 @@
 	<%
 			}
 		}
+		
+		String[] jsFiles = request.getParameterValues("jsFiles");
+		if (jsFiles != null) {
+			for (int i = 0; i < jsFiles.length; i++) {
+				if (jsFiles[i].endsWith(".js")) {
+	%>
+	<script type="text/javascript" src="<%=contextPath%>/<%=jsFiles[i]%>?ox=<%=version%>"></script>				
+	<%			}
+			}
+		}	
 	%>	
 	<script type="text/javascript">
 		$ = jQuery;

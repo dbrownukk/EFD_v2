@@ -10,7 +10,12 @@ import org.openxava.annotations.*;
 
 @Entity
 
-@View(members="Resource Sub Type[resourcetype;resourcesubtypesynonym;resourcetypename;resourcesubtypeunit;resourcesubtypekcal]")
+
+
+@Views({
+	@View(members="resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal"),
+	 @View(name="SimpleSubtype", members="resourcetypename")
+	})
 
 public class ResourceSubType {
 
@@ -28,10 +33,14 @@ public class ResourceSubType {
 	@DescriptionsList(descriptionProperties="resourcetypename")
 	private ResourceType resourcetype;
 	
-	@Column(name = "ResourceSubTypeSynonym")  // ?? Should be a string not Int ??
-	private String resourcesubtypesynonym;
 	
-	@Column(name = "ResourceTypeName", length=255)  // ?? Should be a string ??
+	@ManyToOne
+    //	@Column(name = "ResourceSubTypeSynonym")  
+	//@ReferenceView("SimpleSubtype")
+	@DescriptionsList(descriptionProperties="resourcetypename")
+	private  ResourceSubType resourcesubtypesynonym;
+	
+	@Column(name = "ResourceTypeName", length=255)  // Should be ResourceSubTypeName?
 	@Required
 	private String resourcetypename;
 	
@@ -57,11 +66,11 @@ public class ResourceSubType {
 		this.resourcetype = resourcetype;
 	}
 
-	public String getResourcesubtypesynonym() {
+	public ResourceSubType getResourcesubtypesynonym() {
 		return resourcesubtypesynonym;
 	}
 
-	public void setResourcesubtypesynonym(String resourcesubtypesynonym) {
+	public void setResourcesubtypesynonym(ResourceSubType resourcesubtypesynonym) {
 		this.resourcesubtypesynonym = resourcesubtypesynonym;
 	}
 
@@ -90,7 +99,6 @@ public class ResourceSubType {
 	}
 
 
-	
 	
 	
 }

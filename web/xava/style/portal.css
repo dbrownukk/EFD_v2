@@ -145,6 +145,29 @@ TD.frame {
 	font-size: 10pt;
 }
 
+.ox-messages-wrapper, .ox-errors-wrapper {
+	position: fixed;
+	top: 32px;
+	z-index: 9999999;
+}
+
+.ox-messages-wrapper {
+	left: 32px;
+}
+
+.ox-errors-wrapper {
+	right: 32px;
+}
+
+.portlet-msg-error .mdi-close, .portlet-msg-alert .mdi-close,
+.portlet-msg-success .mdi-close, .portlet-msg-info .mdi-close
+{
+	color: black;
+	font-weight: bold;
+	float: right;
+	margin-left: 10px;
+}
+
 #xava_processing_layer {
 	position:absolute;
 	right: calc(50% - 120px);
@@ -941,6 +964,16 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
     display: none;
 }
 
+.list-title select:nth-of-type(2) {
+	padding-top: 10px;
+	float: right;
+	text-align-last: right;
+}
+
+.list-title select:nth-of-type(2) option {
+	text-align-last: left;
+}
+
 #list-title {
 	font-weight: bold;
 	position: relative;
@@ -1018,4 +1051,53 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
 	margin: 10px;
 	font-size: larger;
 	font-weight: bold;
+}
+
+.ui-tooltip, .arrow:after {
+	background: black !important;
+	border: 1px solid white;
+}
+
+.ui-tooltip {
+	padding: 10px 20px;
+	color: white !important;
+	border-radius: 4px;
+	font-weight: bold;
+	font-size: 12px;
+	box-shadow: 0 0 7px black;
+}
+
+.arrow {
+	width: 23px;
+	height: 26px;
+	overflow: hidden;
+	position: absolute;
+	left: 0px;
+	margin-left: -33px;
+	bottom: calc(30% - 5px);
+}
+
+.arrow.top {
+	top: 16px;
+	bottom: auto;
+}
+
+.arrow.left {
+	left: 10px;
+}
+
+.arrow:after {
+	content: "";
+	position: absolute;
+	left: 20px;
+	top: -2px;
+	width: 25px;
+	height: 25px;
+	box-shadow: 6px 5px 9px -9px black;
+	transform: rotate(135deg);
+}
+
+.arrow.top:after {
+	bottom: 20px;
+	top: auto;
 }

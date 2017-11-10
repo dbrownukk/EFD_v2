@@ -1,11 +1,11 @@
 package efd.model;
-
+import java.util.*;
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
+
+
 
 @Entity
 public class ResourceType {
@@ -23,6 +23,21 @@ public class ResourceType {
 	@Required
 	private String resourcetypename;
 	
+	@ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
+	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.REMOVE)
+	private Collection<ResourceSubType> resourcesubtype;
+
+
+
+	public Collection<ResourceSubType> getResourcesubtype() {
+		return resourcesubtype;
+	}
+
+
+
+	public void setResourcesubtype(Collection<ResourceSubType> resourcesubtype) {
+		this.resourcesubtype = resourcesubtype;
+	}
 
 
 
