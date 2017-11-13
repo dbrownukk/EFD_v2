@@ -21,13 +21,15 @@ public class ResourceType {
 	
 	@Column(name = "ResourceTypeName", length=255)  // ?? Should be a string ??
 	@Required
+	@DisplaySize(50)
 	private String resourcetypename;
 	
-	@ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
-	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.REMOVE)
+	
+	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.ALL)
+	// @ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
 	private Collection<ResourceSubType> resourcesubtype;
 
-
+		// get / set
 
 	public Collection<ResourceSubType> getResourcesubtype() {
 		return resourcesubtype;

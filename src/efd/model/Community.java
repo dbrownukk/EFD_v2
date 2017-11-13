@@ -6,6 +6,9 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
+import efd.actions.*;
+import efd.validations.*;
+
 @Entity
 
 @Views({
@@ -63,15 +66,27 @@ public class Community {
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
 
+	@ReadOnly    // Calculates total particpants as male + female - no need for setters
+	@Depends("civf,civm")
 	@Column(name = "CIVParticipants")
-	private Integer civparticipants;
+	// private Integer civparticipants;
+	
+	public Integer getCivparticipants() {
+		return civf+civm;
+	}
+
+	
 
 	@Column(name = "CIVM")
+	// @OnChange(ParticipantsRecalc.class)
 	private Integer civm;
 
 	@Column(name = "CIVF")
 	private Integer civf;
 
+	/* Dont autogen getters and setters as civparticipants is calulated */
+	
+	
 	public String getCommunityid() {
 		return communityid;
 	}
@@ -120,13 +135,6 @@ public class Community {
 		this.interviewers = interviewers;
 	}
 
-	public Integer getCivparticipants() {
-		return civparticipants;
-	}
-
-	public void setCivparticipants(Integer civparticipants) {
-		this.civparticipants = civparticipants;
-	}
 
 	public Integer getCivm() {
 		return civm;
@@ -143,6 +151,8 @@ public class Community {
 	public void setCivf(Integer civf) {
 		this.civf = civf;
 	}
+
+	
 
 	/* get / set */
 

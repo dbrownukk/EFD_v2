@@ -13,9 +13,11 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	@View(members="resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal"),
+	// @View(members="resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal"),
 	 @View(name="SimpleSubtype", members="resourcetypename")
 	})
+
+@Tab(properties="resourcetypename")
 
 public class ResourceSubType {
 
@@ -33,16 +35,14 @@ public class ResourceSubType {
 	@DescriptionsList(descriptionProperties="resourcetypename")
 	private ResourceType resourcetype;
 	
-	
-	@ManyToOne
-    //	@Column(name = "ResourceSubTypeSynonym")  
-	//@ReferenceView("SimpleSubtype")
-	@DescriptionsList(descriptionProperties="resourcetypename")
-	private  ResourceSubType resourcesubtypesynonym;
-	
-	@Column(name = "ResourceTypeName", length=255)  // Should be ResourceSubTypeName?
+	@Column(name = "ResourceTypeName", length=255)  // ? ResosurceSubTypeName ?
 	@Required
 	private String resourcetypename;
+	
+	@ManyToOne
+    //@Column(name = "ResourceSubTypeSynonym")  // Cannot define Column name in ManyToOne JPA 	
+	@DescriptionsList(descriptionProperties="resourcetypename")
+	private  ResourceSubType resourcesubtypesynonym;
 	
 	@Column(name = "ResourceSubTypeUnit")  // ?? Should be a string ??
 	private BigDecimal resourcesubtypeunit;
@@ -97,6 +97,10 @@ public class ResourceSubType {
 	public void setResourcesubtypekcal(int resourcesubtypekcal) {
 		this.resourcesubtypekcal = resourcesubtypekcal;
 	}
+
+	// getters and setters
+	
+
 
 
 	
