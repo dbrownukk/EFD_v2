@@ -9,25 +9,24 @@ import org.openxava.annotations.*;
 
 @Entity
 public class ResourceType {
-
+	//----------------------------------------------------------------------------------------------//
 	@Id
 	@Hidden // The property is not shown to the user. It's an internal identifier
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "IDResourceType", length = 32, unique = true)
 	private String idresourcetype;
-	
-
-	
+	//----------------------------------------------------------------------------------------------//
 	@Column(name = "ResourceTypeName", length=255)  // ?? Should be a string ??
 	@Required
 	@DisplaySize(50)
 	private String resourcetypename;
-	
-	
+	//----------------------------------------------------------------------------------------------//
+
 	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.ALL)
-	// @ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
+	@ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
 	private Collection<ResourceSubType> resourcesubtype;
+	//----------------------------------------------------------------------------------------------//
 
 		// get / set
 

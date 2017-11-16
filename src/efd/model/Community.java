@@ -1,6 +1,9 @@
 package efd.model;
 
+import java.util.*;
+
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import org.hibernate.annotations.*;
@@ -23,7 +26,9 @@ import efd.validations.*;
 		"civm;" +
 		"civparticipants;" +
 		"];"+
-				"site,Project[projectlz]"
+				"site,Project[projectlz];"+
+		"Community Year Notes{communityyearnotes},"
+		+ "Wealth Group{wealthgroup}"
 				),
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
@@ -50,9 +55,37 @@ public class Community {
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
-	@JoinColumn(name = "CProject")
 	@DescriptionsList(descriptionProperties="projecttitle,pdate")
+	@JoinColumn(name = "CProject")
 	private Project projectlz;
+    
+	
+	@OneToMany(mappedBy="community", cascade=CascadeType.REMOVE)
+	private Collection<WealthGroup> wealthgroup;
+	
+	public Collection<WealthGroup> getWealthgroup() {
+		return wealthgroup;
+	}
+
+	public void setWealthgroup(Collection<WealthGroup> wealthgroup) {
+		this.wealthgroup = wealthgroup;
+	}
+
+
+
+	@OneToMany(mappedBy="community", cascade=CascadeType.REMOVE)
+    private Collection<CommunityYearNotes> communityyearnotes;
+	
+	
+	public Collection<CommunityYearNotes> getCommunityyearnotes() {
+		return communityyearnotes;
+	}
+
+	public void setCommunityyearnotes(Collection<CommunityYearNotes> communityyearnotes) {
+		this.communityyearnotes = communityyearnotes;
+	}
+
+
 
 	@Column(name = "CInterviewSequence")
 	@Required
@@ -65,12 +98,11 @@ public class Community {
 
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
+	
 
 	@ReadOnly    // Calculates total particpants as male + female - no need for setters
 	@Depends("civf,civm")
 	@Column(name = "CIVParticipants")
-	// private Integer civparticipants;
-	
 	public Integer getCivparticipants() {
 		return civf+civm;
 	}
@@ -151,6 +183,9 @@ public class Community {
 	public void setCivf(Integer civf) {
 		this.civf = civf;
 	}
+
+
+
 
 	
 

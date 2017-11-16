@@ -17,7 +17,7 @@ import org.openxava.annotations.*;
 	 @View(name="SimpleSubtype", members="resourcetypename")
 	})
 
-@Tab(properties="resourcetypename")
+// @Tab(properties="resourcetypename")
 
 public class ResourceSubType {
 
@@ -44,10 +44,10 @@ public class ResourceSubType {
 	@DescriptionsList(descriptionProperties="resourcetypename")
 	private  ResourceSubType resourcesubtypesynonym;
 	
-	@Column(name = "ResourceSubTypeUnit")  // ?? Should be a string ??
+	@Column(name = "ResourceSubTypeUnit")  
 	private BigDecimal resourcesubtypeunit;
 	
-	@Column(name = "ResourceSubTypeKCal")  // ?? Should be a string ?
+	@Column(name = "ResourceSubTypeKCal")  
 	private int resourcesubtypekcal;
 
 	public String getIdresourcesubtype() {

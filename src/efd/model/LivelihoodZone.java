@@ -7,12 +7,14 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	 @View(members="Livelihood Zone[lzname,country,lzzonemap,project,site]"),	
+	 @View(members="Livelihood Zone[lzname,country,lzzonemap]"),
+	 @View(name="UpdateLZ", members="Livelihood Zone[lzname,country,lzzonemap,project,site]"),
+	 @View(name="CreateLZ", members="Livelihood Zone[lzname,country,lzzonemap]"),
 	 @View(name="SimpleLZ", members="lzname;country;lzzonemap")
 	})
 
 
-@Tab(properties="lzname,country.description,lzzonemap") // Mote - cannot add Site - it is a OneToMany
+@Tab(properties="lzname,country.description,lzzonemap") // Note - cannot add Site - it is a OneToMany
 
 
 @Entity
@@ -22,6 +24,8 @@ import org.openxava.annotations.*;
 
 public class LivelihoodZone {
 
+
+	
 	@Id
     @Hidden // The property is not shown to the user. It's an internal identifier
     @GeneratedValue(generator="system-uuid") // Universally Unique Identifier (1)
@@ -42,15 +46,19 @@ public class LivelihoodZone {
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
    
-    
+	  // @NewAction("LivelihoodZone.new")
+	  // @OnSelectElementAction("LivelihoodZone.update")
 
-   @OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.REMOVE)
+   
+   @OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.ALL)
    @ListProperties("locationdistrict,subdistrict,gpslocation")
+   
     private Collection<Site> site;
 
     
-    @ManyToMany(mappedBy="livelihoodZone",cascade=CascadeType.REMOVE) 
+    @ManyToMany(mappedBy="livelihoodZone",cascade=CascadeType.ALL) 
     @ListProperties("projecttitle,pdate")
+  
     private Collection<Project> project;
 
 

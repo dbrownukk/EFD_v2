@@ -25,5 +25,22 @@
             icon="file-excel"
              />
 	</controller>
-    
+	
+	<!--
+	<controller name="LivelihoodZone">
+		<extends controller="Typical"/>
+		<action  name="new" 
+			class="efd.actions.CreateLZ"
+			icon="library-plus"
+			keystroke="Control N">
+			<set property="restoreModel" value="true"/>	
+		</action>
+			<action  name="update" 
+			hidden="true"
+			class="efd.actions.UpdateLZ"
+			>
+		</action>			
+    </controller>
+    -->
+
 </controllers>

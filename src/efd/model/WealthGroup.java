@@ -6,6 +6,8 @@ import javax.validation.constraints.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
+import efd.validations.*;
+
 
 @Entity 
 
@@ -17,7 +19,9 @@ import org.openxava.annotations.*;
 }
 )
 
-@Tab ( editors ="List, Cards", properties="locationdistrict,community;wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent,cproject") // removes graph option
+@Tab ( editors ="List, Cards", properties="locationdistrict,"
+		+ "community;wgnamelocal,wgnameeng;wgorder,wgwives;"
+		+ "wghhsize,wgpercent+,cproject") // removes graph option
 
 @Table(name="WealthGroup")
 public class WealthGroup {
@@ -56,9 +60,21 @@ public class WealthGroup {
 	@Column(name="WGHHSize")
     private int wghhsize ;
 	
+	
 	@Column(name="WGPercent") @Min(value=0) @Max(value=100)
+	//@PropertyValidator(Valid100PerCent.class)
 	private int wgpercent ;
-
+	
+	
+/*    code to check 100% max
+	@PreUpdate
+	private void validate() throws Exception{
+		getView().
+		
+		
+	}
+	*/
+	
 	public String getWgid() {
 		return wgid;
 	}
