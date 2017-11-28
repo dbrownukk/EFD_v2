@@ -27,14 +27,15 @@ import efd.validations.*;
 		"civparticipants;" +
 		"];"+
 				"site,Project[projectlz];"+
-		"Community Year Notes{communityyearnotes},"
-		+ "Wealth Group{wealthgroup}"
+		"Community_year_notes{communityyearnotes},"
+		+ "Wealth_group{wealthgroup}"
 				),
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 
 		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers") })
 
+/* Note the use of underscore in labels - mapped in i18n file */
 
 
 @Table(name = "Community")

@@ -3,8 +3,6 @@
 	<name>EFD_v2</name>
 	<comment></comment>
 	<projects>
-		<project>OpenXava</project>
-		<project>Addons</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -26,4 +24,3 @@
 		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
 	</natures>
 </projectDescription>
-		
