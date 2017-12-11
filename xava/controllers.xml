@@ -13,6 +13,17 @@
     	    scope="global"/>    
     -->
     
+    <controller name="EFD">
+		<extends controller="Typical" excluded-actions="save"/>
+		
+	 <action name="save" 
+	 		image="save.gif"
+	 		mode="detail"
+			icon="content-save"
+			keystroke="Control S"	
+	 		class="efd.actions.MySaveAction"
+	 		/>
+	</controller> 
     
    <controller name="Spreadsheet">
 		<extends controller="TypicalRealExcel"/>

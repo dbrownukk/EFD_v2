@@ -16,20 +16,9 @@ import efd.validations.*;
 
 @Views({
 
-		@View(members = "Interview [" +
-		"cinterviewdate;" +
-		"cinterviewsequence;" +
-		"interviewers;" +
-		"],"
-		+"Attendees[" +
-		"civf;" +
-		"civm;" +
-		"civparticipants;" +
-		"];"+
-				"site,Project[projectlz];"+
-		"Community_year_notes{communityyearnotes},"
-		+ "Wealth_group{wealthgroup}"
-				),
+		@View(members = "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "];" + "site,Project[projectlz];"
+				+ "Community_year_notes{communityyearnotes}," + "Wealth_group{wealthgroup}"),
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 
@@ -37,33 +26,42 @@ import efd.validations.*;
 
 /* Note the use of underscore in labels - mapped in i18n file */
 
-
 @Table(name = "Community")
 public class Community {
+	// ----------------------------------------------------------------------------------------------//
 
 	@Id
-	@Hidden // The property is not shown to the user. It's an internal identifier
-	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
+	@Hidden // The property is not shown to the user. It's an internal
+			// identifier
+	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
+												// (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "CID", length = 32, unique = true)
 	private String communityid;
+	// ----------------------------------------------------------------------------------------------//
 
 	@ManyToOne(fetch = FetchType.LAZY, // This is FK to Site == Location
 			optional = false)
 	@ReferenceView("SimpleSite")
 	@JoinColumn(name = "CLocation")
 	private Site site;
+	// ----------------------------------------------------------------------------------------------//
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
-	@DescriptionsList(descriptionProperties="projecttitle,pdate")
+	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
 	@JoinColumn(name = "CProject")
 	private Project projectlz;
-    
-	
-	@OneToMany(mappedBy="community", cascade=CascadeType.REMOVE)
+	// ----------------------------------------------------------------------------------------------//
+
+	@OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
 	private Collection<WealthGroup> wealthgroup;
-	
+	// ----------------------------------------------------------------------------------------------//
+
+	@OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
+	private Collection<CommunityYearNotes> communityyearnotes;
+	// ----------------------------------------------------------------------------------------------//
+
 	public Collection<WealthGroup> getWealthgroup() {
 		return wealthgroup;
 	}
@@ -72,12 +70,6 @@ public class Community {
 		this.wealthgroup = wealthgroup;
 	}
 
-
-
-	@OneToMany(mappedBy="community", cascade=CascadeType.REMOVE)
-    private Collection<CommunityYearNotes> communityyearnotes;
-	
-	
 	public Collection<CommunityYearNotes> getCommunityyearnotes() {
 		return communityyearnotes;
 	}
@@ -85,8 +77,6 @@ public class Community {
 	public void setCommunityyearnotes(Collection<CommunityYearNotes> communityyearnotes) {
 		this.communityyearnotes = communityyearnotes;
 	}
-
-
 
 	@Column(name = "CInterviewSequence")
 	@Required
@@ -99,16 +89,14 @@ public class Community {
 
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
-	
 
-	@ReadOnly    // Calculates total particpants as male + female - no need for setters
+	@ReadOnly // Calculates total particpants as male + female - no need for
+				// setters
 	@Depends("civf,civm")
 	@Column(name = "CIVParticipants")
 	public Integer getCivparticipants() {
-		return civf+civm;
+		return civf + civm;
 	}
-
-	
 
 	@Column(name = "CIVM")
 	// @OnChange(ParticipantsRecalc.class)
@@ -118,8 +106,7 @@ public class Community {
 	private Integer civf;
 
 	/* Dont autogen getters and setters as civparticipants is calulated */
-	
-	
+
 	public String getCommunityid() {
 		return communityid;
 	}
@@ -168,7 +155,6 @@ public class Community {
 		this.interviewers = interviewers;
 	}
 
-
 	public Integer getCivm() {
 		return civm;
 	}
@@ -185,14 +171,6 @@ public class Community {
 		this.civf = civf;
 	}
 
-
-
-
-	
-
 	/* get / set */
-
-	
-	
 
 }

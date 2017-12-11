@@ -44,8 +44,8 @@ public class ResourceSubType {
 	@DescriptionsList(descriptionProperties="resourcetypename")
 	private  ResourceSubType resourcesubtypesynonym;
 	
-	@Column(name = "ResourceSubTypeUnit")  
-	private BigDecimal resourcesubtypeunit;
+	@Column(name = "ResourceSubTypeUnit", length=20)  
+	private String resourcesubtypeunit;
 	
 	@Column(name = "ResourceSubTypeKCal")  
 	private int resourcesubtypekcal;
@@ -82,11 +82,13 @@ public class ResourceSubType {
 		this.resourcetypename = resourcetypename;
 	}
 
-	public BigDecimal getResourcesubtypeunit() {
+
+
+	public String getResourcesubtypeunit() {
 		return resourcesubtypeunit;
 	}
 
-	public void setResourcesubtypeunit(BigDecimal resourcesubtypeunit) {
+	public void setResourcesubtypeunit(String resourcesubtypeunit) {
 		this.resourcesubtypeunit = resourcesubtypeunit;
 	}
 

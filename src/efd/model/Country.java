@@ -30,7 +30,7 @@ public class Country {
 	@Column(name = "IDCountry", length = 32, unique = true)
 	private String idcountry;
 
-	@Column(name = "ISOCountryCode", length = 2, unique = true)
+	@Column(name = "ISOCountryCode", length = 3, unique = true)
 	@Required
 	private String isocountrycode;
 

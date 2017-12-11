@@ -34,7 +34,7 @@ public class Project {
 
     @Stereotype("DATETIME")
     @Column(name="PDate") @Required
-    private java.util.Date pdate;
+    private Date pdate;
     
     
     
