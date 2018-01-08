@@ -11,47 +11,29 @@
     <!-- Session object:
     <object name="EFD_v2_activeYear" class="java.lang.Integer" value="2015" 
     	    scope="global"/>    
-    -->
-    
+	-->    
     <controller name="EFD">
-		<extends controller="Typical" excluded-actions="save"/>
-		
-	 <action name="save" 
-	 		image="save.gif"
-	 		mode="detail"
-			icon="content-save"
-			keystroke="Control S"	
-	 		class="efd.actions.MySaveAction"
-	 		/>
-	</controller> 
+		<extends controller="Typical"/>
+		</controller>
+	
+
     
    <controller name="Spreadsheet">
-		<extends controller="TypicalRealExcel"/>
-		
-	 <action name="scenario" 
-	 		mode="detail" 
-	 		by-default="if-possible" 
+   <extends controller="Typical"/>
+	 <action name="scenario"
+	 		mode="detail"
 	 		class="efd.actions.CreateXlsFileAction"
 	        image="excel.gif"
             icon="file-excel"
              />
 	</controller>
 	
-	<!--
-	<controller name="LivelihoodZone">
-		<extends controller="Typical"/>
-		<action  name="new" 
-			class="efd.actions.CreateLZ"
-			icon="library-plus"
-			keystroke="Control N">
-			<set property="restoreModel" value="true"/>	
-		</action>
-			<action  name="update" 
-			hidden="true"
-			class="efd.actions.UpdateLZ"
-			>
-		</action>			
-    </controller>
-    -->
-
+	<controller name="LivelihoodZone">		
+	<extends controller="Typical"/>
+		<action name="new LZ" image="new.gif" hidden="true" icon="library-plus"
+			class="efd.actions.NewLZ"/>
+			
+	</controller>
+	
+	
 </controllers>

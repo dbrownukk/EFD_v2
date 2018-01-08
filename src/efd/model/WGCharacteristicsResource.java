@@ -1,4 +1,5 @@
 package efd.model;
+
 import java.math.*;
 import javax.persistence.*;
 
@@ -9,50 +10,45 @@ import javax.persistence.Entity;
 
 @Entity
 
-// @View(members="Characteristics Resources[wealthgroup.wgnameeng;resourcesubtype;wgresourceunit;wgresourceamount]")
+@View(members = "Characteristics_Resources[resourcesubtype;wgresourceunit;wgresourceamount]")
 
+@Tab(rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), properties = "wealthgroup,self.resourcesubtype,wgresourceunit,wgresourceamount")
 
-//  @Tab(
-//	 rowStyles=@RowStyle(style="row-highlight", property="type", value="steady"),
-//	 properties="wealthgroup,self.resourcesubtype,wgresourceunit,wgresourceamount"
-//	)
-
-
-
+// @Embeddable
 public class WGCharacteristicsResource {
 
-	
 	@Id
-	@Hidden // The property is not shown to the user. It's an internal identifier
-	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
+	@Hidden // The property is not shown to the user. It's an internal
+			// identifier
+	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
+												// (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "IDWGResource", length = 32, unique = true)
 	private String idwgresource;
-	
-	
-	
-	@ManyToOne(fetch = FetchType.LAZY, 
-			optional = false)
-	@JoinColumn(name = "WGID")
+
+	@ManyToOne
+	@JoinColumn(name = "WGID", referencedColumnName = "WealthGroupID")
 	@Required
 	@NoFrame
-	@DescriptionsList(descriptionProperties="wgnameeng")
+	// @DescriptionsList(descriptionProperties="wgnameeng")
 	// @DescriptionsList(descriptionProperties="wgnameeng",showReferenceView=true)
 	// @ReferenceView("SimpleWealthGroup")
+
 	private WealthGroup wealthgroup;
 	
-	@ManyToOne(fetch = FetchType.LAZY, 
-			optional = false)
+	@AddAction("")
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "WGResourceSubType")
 	@Required
-	@DescriptionsList(descriptionProperties="resourcetype.resourcetypename, resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename, resourcetypename")
 	private ResourceSubType resourcesubtype;
-	
-	@Column(name = "WGResourceUnit",length = 255)    
+
+	@Column(name = "WGResourceUnit", length = 255)
 	private String wgresourceunit;
-	
+
 	@Stereotype("MONEY")
-	@Column(name = "WGResourceAmount")    
+	@Column(name = "WGResourceAmount")
 	private BigDecimal wgresourceamount;
 
 	public String getIdwgresource() {
@@ -94,7 +90,6 @@ public class WGCharacteristicsResource {
 	public void setWgresourceamount(BigDecimal wgresourceamount) {
 		this.wgresourceamount = wgresourceamount;
 	}
-
 
 
 

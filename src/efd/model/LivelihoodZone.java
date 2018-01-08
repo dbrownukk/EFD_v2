@@ -7,7 +7,7 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	 @View(members="Livelihood Zone[lzname,country,lzzonemap]"),
+	 @View(members="Livelihood_Zone[lzname;country;lzzonemap]"),
 	 @View(name="UpdateLZ", members="Livelihood Zone[lzname,country,lzzonemap,project,site]"),
 	 @View(name="CreateLZ", members="Livelihood Zone[lzname,country,lzzonemap]"),
 	 @View(name="SimpleLZ", members="lzname;country;lzzonemap")
@@ -19,8 +19,8 @@ import org.openxava.annotations.*;
 
 @Entity
 
+@Table(name = "LivelihoodZone",uniqueConstraints=@UniqueConstraint(columnNames={"LZName","LZCountry"}))
 
-@Table(name="LivelihoodZone")
 
 public class LivelihoodZone {
 
@@ -46,18 +46,16 @@ public class LivelihoodZone {
     @Column(name="LZZoneMap",length=250) 
     private String lzzonemap;
    
-	  // @NewAction("LivelihoodZone.new")
-	  // @OnSelectElementAction("LivelihoodZone.update")
 
    
-   @OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.ALL)
-   @ListProperties("locationdistrict,subdistrict,gpslocation")
+   //@OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.ALL)
+   //@ListProperties("locationdistrict,subdistrict,gpslocation")
    
-    private Collection<Site> site;
+    //private Collection<Site> site;
 
     
-    @ManyToMany(mappedBy="livelihoodZone",cascade=CascadeType.ALL) 
-    @ListProperties("projecttitle,pdate")
+    @ManyToMany(mappedBy="livelihoodZone") 
+    //@ListProperties("projecttitle,pdate")
   
     private Collection<Project> project;
 
@@ -72,7 +70,9 @@ public class LivelihoodZone {
 	}
 
 
-	public Country getCountry() {
+	
+	 public Country getCountry() {
+	 
 		return country;
 	}
 
@@ -102,14 +102,14 @@ public class LivelihoodZone {
 	}
 
 
-	public Collection<Site> getSite() {
-		return site;
-	}
+	//public Collection<Site> getSite() {
+		//return site;
+	//}
 
 
-	public void setSite(Collection<Site> site) {
-		this.site = site;
-	}
+	//public void setSite(Collection<Site> site) {
+		//this.site = site;
+	//}
 
 
 	public Collection<Project> getProject() {

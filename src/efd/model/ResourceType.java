@@ -17,13 +17,13 @@ public class ResourceType {
 	@Column(name = "IDResourceType", length = 32, unique = true)
 	private String idresourcetype;
 	//----------------------------------------------------------------------------------------------//
-	@Column(name = "ResourceTypeName", length=255)  // ?? Should be a string ??
+	@Column(name = "ResourceTypeName", length=255, unique=true)  // ?? Should be a string ??
 	@Required
 	@DisplaySize(50)
 	private String resourcetypename;
 	//----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.REMOVE)
 	@ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
 	private Collection<ResourceSubType> resourcesubtype;
 	//----------------------------------------------------------------------------------------------//

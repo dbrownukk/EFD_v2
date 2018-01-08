@@ -4,6 +4,7 @@ import java.math.*;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
@@ -13,12 +14,13 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	// @View(members="resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal"),
+	 @View(members="resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
 	 @View(name="SimpleSubtype", members="resourcetypename")
 	})
 
-// @Tab(properties="resourcetypename")
+//@Tab(properties="resourcetypename")
 
+@Table(name = "resourcesubtype",uniqueConstraints=@UniqueConstraint(columnNames={"ReourceType","ResourceTypeName"}))
 public class ResourceSubType {
 
 	@Id

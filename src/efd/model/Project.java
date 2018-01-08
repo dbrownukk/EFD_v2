@@ -1,64 +1,65 @@
 package efd.model;
+
+import java.text.*;
 import java.util.*;
 import javax.persistence.*;
 
+import org.apache.commons.lang.time.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
+import org.openxava.annotations.NewAction;
+import org.openxava.validators.*;
+import org.openxava.actions.*;
 
 
-@Entity 
+@Entity
 
+	//@Views({ @View(members = "Project[projecttitle,pdate,projectid];livelihoodZone;community"),
+	@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone"),
 
+		@View(name = "SimpleProject", members = "projecttitle,pdate,Project.Spreadsheet()"),
+		@View(name = "NewlineProject", members = "projecttitle;pdate") })
 
-@Views({
-	@View(members="Project[projecttitle,pdate];livelihoodZone;community"),
-	@View(name="SimpleProject", members="projecttitle,pdate,Project.Spreadsheet()"),
-	@View(name="NewlineProject", members="projecttitle;pdate")
-	})
+@Tab(properties = "projecttitle;pdate", editors = "List, Cards") // removes
+																	// graph
+																	// option
 
-@Tab ( properties="projecttitle;pdate",editors ="List, Cards") // removes graph option
-
-@Table(name="Project")
+@Table(name = "Project")
 public class Project {
+
+	@Id
+	@Hidden
+	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
+												// // (1)
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@Column(name = "ProjectID", length = 32, unique = true)
+	private String projectid;
+
+	@Column(name = "ProjectTitle", length = 255, unique = true)
+	@Required
+	private String projecttitle;
+
+	//@Stereotype("DATE")
+	//@Column(name = "PDate")
+	//@Required
+	//private Date pdate;
 	
-    @Id
-    @Hidden // The property is not shown to the user. It's an internal identifier
-    @GeneratedValue(generator="system-uuid") // Universally Unique Identifier (1)
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
-    @Column(name="ProjectID",length=32,unique=true)
-    private String projectid;
- 
-    @Column(name="ProjectTitle",length=255,unique=true) @Required
-    private String projecttitle;
-    
+	  @Stereotype("DATETIME")
+	    @Column(name="PDate") @Required
+	    private java.util.Date pdate;
+	
+	//@NewAction("ManyToMany.new")
+	@NewAction("LivelihoodZone.new LZ")
+	
+	
+	@ManyToMany(cascade = CascadeType.REMOVE)
+	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false))
+	@ListProperties("lzname,country.description,lzzonemap")
+	private Collection<LivelihoodZone> livelihoodZone;
 
-    @Stereotype("DATETIME")
-    @Column(name="PDate") @Required
-    private Date pdate;
-    
-    
-    
-    @NewAction("ManyToMany.new")
-    
-    @ManyToMany(cascade=CascadeType.REMOVE)
-    // @ManyToMany
-    @JoinTable(name="projectlz",
-    		joinColumns=@JoinColumn(name="Project", referencedColumnName="ProjectID"),
-    	      inverseJoinColumns=@JoinColumn(name="LZ", referencedColumnName="LZID"))
-    @ListProperties("lzname,country.description,lzzonemap")
-    @CollectionView("SimpleLZ")
-    private Collection<LivelihoodZone> livelihoodZone;
-
-    @OneToMany(mappedBy="projectlz")
-    private Collection<Community> community;
-
-	public Collection<Community> getCommunity() {
-	return community;
-}
-
-public void setCommunity(Collection<Community> community) {
-	this.community = community;
-}
+	@OneToMany(mappedBy = "projectlz")
+	@CollectionView("Communitynoproject")
+	private Collection<Community> community;
 
 	public String getProjectid() {
 		return projectid;
@@ -76,11 +77,11 @@ public void setCommunity(Collection<Community> community) {
 		this.projecttitle = projecttitle;
 	}
 
-	public java.util.Date getPdate() {
+	public Date getPdate() {
 		return pdate;
 	}
 
-	public void setPdate(java.util.Date pdate) {
+	public void setPdate(Date pdate) {
 		this.pdate = pdate;
 	}
 
@@ -92,10 +93,14 @@ public void setCommunity(Collection<Community> community) {
 		this.livelihoodZone = livelihoodZone;
 	}
 
-	
-	
-    
-    
-        
-    
+	public Collection<Community> getCommunity() {
+		return community;
+	}
+
+	public void setCommunity(Collection<Community> community) {
+		this.community = community;
+	}
+
+
+
 }

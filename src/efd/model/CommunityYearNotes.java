@@ -1,5 +1,7 @@
 package efd.model;
 
+import java.time.*;
+
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -34,10 +36,12 @@ public class CommunityYearNotes {
 	@Required
     private Community community;	
 	//----------------------------------------------------------------------------------------------//
-	@Stereotype("DATETIME")
+	@Stereotype("DATE")
 	@Column(name="Year", nullable=false)
 	@Required
-	 private java.util.Date year;
+	private java.util.Date year;
+	
+	
 	//----------------------------------------------------------------------------------------------//
 	@Stereotype("MEMO")
 	@Column(name="Notes",length=1023,nullable=false)
@@ -58,6 +62,8 @@ public class CommunityYearNotes {
 	public void setCommunity(Community community) {
 		this.community = community;
 	}
+
+
 
 	public java.util.Date getYear() {
 		return year;

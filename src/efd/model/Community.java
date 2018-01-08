@@ -6,6 +6,8 @@ import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.*;
+
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
@@ -16,9 +18,12 @@ import efd.validations.*;
 
 @Views({
 
-		@View(members = "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "];" + "site,Project[projectlz];"
-				+ "Community_year_notes{communityyearnotes}," + "Wealth_group{wealthgroup}"),
+		@View(members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," + "Project[projectlz];"
+				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
+		@View(name="Communitynoproject",members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," 
+				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 
@@ -53,57 +58,54 @@ public class Community {
 	@JoinColumn(name = "CProject")
 	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
-
-	@OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
+    @DetailAction(value="Spreadsheet.scenario")
+	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
+	//@CollectionView("SimpleWealthGroup")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
 	private Collection<CommunityYearNotes> communityyearnotes;
 	// ----------------------------------------------------------------------------------------------//
-
-	public Collection<WealthGroup> getWealthgroup() {
-		return wealthgroup;
-	}
-
-	public void setWealthgroup(Collection<WealthGroup> wealthgroup) {
-		this.wealthgroup = wealthgroup;
-	}
-
-	public Collection<CommunityYearNotes> getCommunityyearnotes() {
-		return communityyearnotes;
-	}
-
-	public void setCommunityyearnotes(Collection<CommunityYearNotes> communityyearnotes) {
-		this.communityyearnotes = communityyearnotes;
-	}
 
 	@Column(name = "CInterviewSequence")
 	@Required
 	private Integer cinterviewsequence;
+	// ----------------------------------------------------------------------------------------------//
 
-	@Stereotype("DATETIME")
+	@Stereotype("DATE")
 	@Column(name = "CInterviewDate")
 	@Required
 	private java.util.Date cinterviewdate;
+	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
+	// ----------------------------------------------------------------------------------------------//
 
 	@ReadOnly // Calculates total particpants as male + female - no need for
 				// setters
 	@Depends("civf,civm")
 	@Column(name = "CIVParticipants")
 	public Integer getCivparticipants() {
+		if (civf == null) {
+			civf = 0;
+		}
+		if (civm == null) {
+			civm = 0;
+		}
+
 		return civf + civm;
 	}
+	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "CIVM")
-	// @OnChange(ParticipantsRecalc.class)
 	private Integer civm;
+	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "CIVF")
 	private Integer civf;
+	// ----------------------------------------------------------------------------------------------//
 
 	/* Dont autogen getters and setters as civparticipants is calulated */
 
@@ -169,6 +171,22 @@ public class Community {
 
 	public void setCivf(Integer civf) {
 		this.civf = civf;
+	}
+
+	public Collection<WealthGroup> getWealthgroup() {
+		return wealthgroup;
+	}
+
+	public void setWealthgroup(Collection<WealthGroup> wealthgroup) {
+		this.wealthgroup = wealthgroup;
+	}
+
+	public Collection<CommunityYearNotes> getCommunityyearnotes() {
+		return communityyearnotes;
+	}
+
+	public void setCommunityyearnotes(Collection<CommunityYearNotes> communityyearnotes) {
+		this.communityyearnotes = communityyearnotes;
 	}
 
 	/* get / set */
