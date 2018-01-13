@@ -14,8 +14,8 @@ import org.openxava.actions.*;
 
 @Entity
 
-	//@Views({ @View(members = "Project[projecttitle,pdate,projectid];livelihoodZone;community"),
-	@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone"),
+	@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone;community"),
+	//@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone"),
 
 		@View(name = "SimpleProject", members = "projecttitle,pdate,Project.Spreadsheet()"),
 		@View(name = "NewlineProject", members = "projecttitle;pdate") })
@@ -38,17 +38,12 @@ public class Project {
 	@Column(name = "ProjectTitle", length = 255, unique = true)
 	@Required
 	private String projecttitle;
-
-	//@Stereotype("DATE")
-	//@Column(name = "PDate")
-	//@Required
-	//private Date pdate;
 	
-	  @Stereotype("DATETIME")
+	  @Stereotype("DATE")
 	    @Column(name="PDate") @Required
 	    private java.util.Date pdate;
 	
-	//@NewAction("ManyToMany.new")
+
 	@NewAction("LivelihoodZone.new LZ")
 	
 	

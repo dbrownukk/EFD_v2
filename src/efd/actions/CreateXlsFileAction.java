@@ -6,21 +6,28 @@ import java.util.*;
 
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
-import org.openxava.util.*;
+import org.openxava.model.*;
 import org.openxava.util.jxls.*;
 import org.openxava.web.servlets.*;
+import org.openxava.tab.*;
 
 import efd.model.*;
 
 public class CreateXlsFileAction extends ViewBaseAction implements IForwardAction, JxlsConstants { // 1
 
 	private String forwardURI = null;
-
-	public void execute() throws Exception {
+    public void execute() throws Exception {
 		try {
 			JxlsWorkbook scenario = createScenario();
 			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
 			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
+
+			/* Now to reset */
+			getView().setModelName("Community");
+			getView().clear();
+
+			// setControllers("Return");
+
 		} catch (Exception e) {
 			addError(e.getMessage());
 		}
@@ -33,6 +40,7 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		int w = 30;
 		int row;
 		int col;
+		
 
 		/* Get EFD Project Details */
 
@@ -42,12 +50,50 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		/* Get Community Data */
 		Community community = XPersistence.getManager().find(Community.class,
 				wealthgroup.getCommunity().getCommunityid());
+
 		/* Get Project Data */
 		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
 
+		/* Get Characteristic Resources */
+		//WGCharacteristicsResource wgharacteristicsresource =
+		//XPersistence.getManager().find(WGCharacteristicsResource.class
+		//,getView().getValue("wgid"));
+
+		Map[] participantKeys;
+		if (getView().getSubview("wgcharacteristicsresource").getCollectionTab().hasSelected()) {
+			participantKeys = getView().getSubview("wgcharacteristicsresource").getCollectionTab().getSelectedKeys();
+			} else {
+			participantKeys = getView().getSubview("wgcharacteristicsresource").getCollectionTab().getAllKeys();
+			}
+		
+		for (int id = 0; id < participantKeys.length; id++) { 
+			
+			WGCharacteristicsResource wgcharacteristicsresource = (WGCharacteristicsResource) MapFacade
+					.findEntity("wgcharacteristicsresource", participantKeys[id]);
+			System.out.println("in loop");
+			if (wgcharacteristicsresource != null) {
+				System.out.println(wgcharacteristicsresource.getWgresourceamount());
+			}
+		}
+		
+		
+		
+		
+		//Map values = new HashMap();
+		//Map[] rows = tab.getAllKeys();
+
+		//for (int id = 0; id < rows.length; id++) {
+			//Map key = rows[id];
+			//WGCharacteristicsResource wgharacteristicsresource 
+			//= (WGCharacteristicsResource) MapFacade.findEntity("WGCharacteristicsResource", key);
+			// User ToUser = RequestTo.getTouser();
+			// Bundle RequestType = RequestTo.getBundle();
+			// Timestamp StartDate = RequestTo.getTime();
+			// Timestamp EndDate = RequestTo.getDueby();
+
+		//}
+
 		/* XLS File Name */
-		// JxlsWorkbook scenarioWB = new
-		// JxlsWorkbook(project.getProjecttitle());
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(project.getProjecttitle());
 		JxlsStyle boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
 		JxlsStyle boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);

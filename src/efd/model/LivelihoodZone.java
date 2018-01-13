@@ -7,14 +7,14 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	 @View(members="Livelihood_Zone[lzname;country;lzzonemap]"),
-	 @View(name="UpdateLZ", members="Livelihood Zone[lzname,country,lzzonemap,project,site]"),
-	 @View(name="CreateLZ", members="Livelihood Zone[lzname,country,lzzonemap]"),
-	 @View(name="SimpleLZ", members="lzname;country;lzzonemap")
+	 @View(members="Livelihood_Zone[lzname;country;lzzonemap]"+"site"),
+	 @View(name="UpdateLZ", members="Livelihood Zone[lzname,country,project,site]"),
+	 @View(name="CreateLZ", members="Livelihood Zone[lzname,country]"),
+	 @View(name="SimpleLZ", members="lzname;country")
 	})
 
 
-@Tab(properties="lzname,country.description,lzzonemap") // Note - cannot add Site - it is a OneToMany
+@Tab(properties="lzname,country.description") // Note - cannot add Site - it is a OneToMany
 
 
 @Entity
@@ -43,15 +43,16 @@ public class LivelihoodZone {
     @Column(name="LZName",length=255) @Required
     private String lzname;
 	
-    @Column(name="LZZoneMap",length=250) 
-    private String lzzonemap;
-   
+    @Column(name="LZZoneMap") 
+    //private String lzzonemap;
+    @Stereotype("IMAGE")
+    private byte[] lzzonemap;
 
    
-   //@OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.ALL)
-   //@ListProperties("locationdistrict,subdistrict,gpslocation")
-   
-    //private Collection<Site> site;
+   @OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.ALL)
+   @ListProperties("locationdistrict,subdistrict,gpslocation")
+   @CollectionView("LZSite")
+   private Collection<Site> site;
 
     
     @ManyToMany(mappedBy="livelihoodZone") 
@@ -92,24 +93,27 @@ public class LivelihoodZone {
 	}
 
 
-	public String getLzzonemap() {
+
+
+
+	public byte[] getLzzonemap() {
 		return lzzonemap;
 	}
 
 
-	public void setLzzonemap(String lzzonemap) {
+	public void setLzzonemap(byte[] lzzonemap) {
 		this.lzzonemap = lzzonemap;
 	}
 
 
-	//public Collection<Site> getSite() {
-		//return site;
-	//}
+	public Collection<Site> getSite() {
+		return site;
+	}
 
 
-	//public void setSite(Collection<Site> site) {
+	public void setSite(Collection<Site> site) {
 		//this.site = site;
-	//}
+	}
 
 
 	public Collection<Project> getProject() {

@@ -19,12 +19,11 @@
 
     
    <controller name="Spreadsheet">
-   <extends controller="Typical"/>
-	 <action name="scenario"
+   <extends controller="TypicalRealExcel"/>
+	 <action name="Template Spreadsheet"
 	 		mode="detail"
+	 		by-default="if-possible"
 	 		class="efd.actions.CreateXlsFileAction"
-	        image="excel.gif"
-            icon="file-excel"
              />
 	</controller>
 	

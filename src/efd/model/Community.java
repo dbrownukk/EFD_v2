@@ -58,7 +58,7 @@ public class Community {
 	@JoinColumn(name = "CProject")
 	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
-    @DetailAction(value="Spreadsheet.scenario")
+    //@DetailAction(value="Spreadsheet.scenario")
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
 	//@CollectionView("SimpleWealthGroup")
 	private Collection<WealthGroup> wealthgroup;

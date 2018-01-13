@@ -12,12 +12,14 @@ import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
 @Views({
-	 @View(members="Site[locationdistrict,subdistrict,gpslocation,livelihoodZone]"),
+	 @View(members="Site[livelihoodZone,locationdistrict,subdistrict,gpslocation]"),
 	 @View(name="SimpleSite", members="locationdistrict;subdistrict;gpslocation;livelihoodZone"),
+	 @View(name="LZSite", members="locationdistrict;subdistrict;gpslocation"),
 	 @View(name="NewlineSite", members="locationdistrict;subdistrict;gpslocation;livelihoodZone;")
 	})
 
-
+@Tab ( editors ="List, Cards", rowStyles=@RowStyle(style="highlight", property="type", value="steady")
+,properties="livelihoodZone,locationdistrict,subdistrict,gpslocation") 
 
 @Entity 
 

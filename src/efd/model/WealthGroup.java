@@ -1,5 +1,6 @@
 package efd.model;
 
+import java.math.*;
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -7,7 +8,7 @@ import javax.validation.constraints.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
-@Views({ @View(members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
+@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
 		@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
 		@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
@@ -57,11 +58,13 @@ public class WealthGroup {
 	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "WGWives")
-	private int wgwives;
+	@Digits(integer=3,fraction=2)
+	private BigDecimal  wgwives;
 	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "WGHHSize")
-	private int wghhsize;
+	@Digits(integer=3,fraction=2)
+	private BigDecimal  wghhsize;
 	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "WGPercent")
@@ -119,19 +122,21 @@ public class WealthGroup {
 		this.wgorder = wgorder;
 	}
 
-	public int getWgwives() {
+
+
+	public BigDecimal getWgwives() {
 		return wgwives;
 	}
 
-	public void setWgwives(int wgwives) {
+	public void setWgwives(BigDecimal wgwives) {
 		this.wgwives = wgwives;
 	}
 
-	public int getWghhsize() {
+	public BigDecimal getWghhsize() {
 		return wghhsize;
 	}
 
-	public void setWghhsize(int wghhsize) {
+	public void setWghhsize(BigDecimal wghhsize) {
 		this.wghhsize = wghhsize;
 	}
 
