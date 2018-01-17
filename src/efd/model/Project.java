@@ -54,6 +54,8 @@ public class Project {
 
 	@OneToMany(mappedBy = "projectlz")
 	@CollectionView("Communitynoproject")
+	@OrderBy("cinterviewsequence")
+	@ListProperties("cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
 	private Collection<Community> community;
 
 	public String getProjectid() {

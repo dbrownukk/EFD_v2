@@ -14,7 +14,17 @@
 	-->    
     <controller name="EFD">
 		<extends controller="Typical"/>
-		</controller>
+		
+    <action name="save" mode="detail"
+      class="efd.actions.EFDSaveAction" 
+      by-default="if-possible"
+      image="save.gif"
+      icon="content-save"
+      keystroke="Control S"/>
+		
+		
+		
+	</controller>
 	
 
     
@@ -33,6 +43,18 @@
 			class="efd.actions.NewLZ"/>
 			
 	</controller>
+	
+	<controller name="Request">
+    <extends controller="TypicalRealExcel" excluded-actions="save"/> <!-- In order to have the standard actions -->
+    <action name="save" mode="detail"
+      class="efd.actions.EFDSaveAction" 
+      by-default="if-possible"
+      image="save.gif"
+      icon="content-save"
+      keystroke="Control S"/>
+
+</controller>
+	
 	
 	
 </controllers>

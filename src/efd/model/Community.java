@@ -31,6 +31,11 @@ import efd.validations.*;
 
 /* Note the use of underscore in labels - mapped in i18n file */
 
+//@Tab(properties="cinterviewsequence,locationdistrict,subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
+
+
+
+
 @Table(name = "Community")
 public class Community {
 	// ----------------------------------------------------------------------------------------------//
