@@ -50,9 +50,9 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		/* Get Community Data */
 		Community community = XPersistence.getManager().find(Community.class,
 				wealthgroup.getCommunity().getCommunityid());
-
+Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
 		/* Get Project Data */
-		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
+		
 
 		/* Get Characteristic Resources */
 		//WGCharacteristicsResource wgharacteristicsresource =

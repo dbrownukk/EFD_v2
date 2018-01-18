@@ -9,12 +9,12 @@ import javax.persistence.Entity;
 
 @Entity
 
-@View(members="Characteristics Resources[wealthgroup.wgnameeng;resourcesubtype;wgresourceunit;wgresourceamount]")
+@View(members="Characteristics Resources[resourcesubtype;wgresourceunit;wgresourceamount]")
 
 
 @Tab(
 	 rowStyles=@RowStyle(style="row-highlight", property="type", value="steady"),
-	 properties="wealthgroup,self.resourcesubtype,wgresourceunit,wgresourceamount"
+	 properties="wealthgroup,resourcesubtype,wgresourceunit,wgresourceamount"
 	)
 
 
@@ -36,7 +36,7 @@ public class WGCharacteristicsResource {
 	@JoinColumn(name = "WGID")
 	@Required
 	@NoFrame
-	@DescriptionsList(descriptionProperties="wgnameeng")
+	// @DescriptionsList(descriptionProperties="wgnameeng")
 	// @DescriptionsList(descriptionProperties="wgnameeng",showReferenceView=true)
 	// @ReferenceView("SimpleWealthGroup")
 	private WealthGroup wealthgroup;

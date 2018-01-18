@@ -31,7 +31,7 @@ import efd.validations.*;
 
 /* Note the use of underscore in labels - mapped in i18n file */
 
-//@Tab(properties="cinterviewsequence,locationdistrict,subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
+@Tab(properties="cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
 
 
 

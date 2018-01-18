@@ -8,9 +8,15 @@ import org.apache.commons.lang.time.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 import org.openxava.annotations.NewAction;
+import org.openxava.annotations.Tab;
 import org.openxava.validators.*;
 import org.openxava.actions.*;
 
+import org.openxava.jpa.*;
+import org.openxava.model.*;
+import org.openxava.util.jxls.*;
+import org.openxava.web.servlets.*;
+import org.openxava.tab.*;
 
 @Entity
 
@@ -26,7 +32,7 @@ import org.openxava.actions.*;
 
 @Table(name = "Project")
 public class Project {
-
+	
 	@Id
 	@Hidden
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
@@ -45,6 +51,7 @@ public class Project {
 	
 
 	@NewAction("LivelihoodZone.new LZ")
+	@AddAction("LivelihoodZone.add LZ")
 	
 	
 	@ManyToMany(cascade = CascadeType.REMOVE)
@@ -52,12 +59,16 @@ public class Project {
 	@ListProperties("lzname,country.description,lzzonemap")
 	private Collection<LivelihoodZone> livelihoodZone;
 
-	@OneToMany(mappedBy = "projectlz")
+	@OneToMany(mappedBy = "projectlz",cascade = CascadeType.ALL)
 	@CollectionView("Communitynoproject")
 	@OrderBy("cinterviewsequence")
 	@ListProperties("cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
 	private Collection<Community> community;
 
+	
+
+	
+	
 	public String getProjectid() {
 		return projectid;
 	}

@@ -18,12 +18,15 @@ import org.openxava.annotations.*;
 	 @View(name="NewlineSite", members="locationdistrict;subdistrict;gpslocation;livelihoodZone;")
 	})
 
-@Tab ( editors ="List, Cards", rowStyles=@RowStyle(style="highlight", property="type", value="steady")
-,properties="livelihoodZone,locationdistrict,subdistrict,gpslocation") 
+
+
+@Tab ( editors ="List, Cards", rowStyles=@RowStyle(style="row-highlight", property="type", value="steady")
+,properties="livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation", 
+defaultOrder="${livelihoodZone.lzname} asc,${locationdistrict} asc,${subdistrict} asc") 
 
 @Entity 
 
-@Table(name="Site")
+@Table(name="Site", uniqueConstraints=@UniqueConstraint(columnNames={"LZ","LocationDistrict","SubDistrict"}))
 
 public class Site {
 
@@ -92,6 +95,8 @@ public class Site {
 	public void setGpslocation(String gpslocation) {
 		this.gpslocation = gpslocation;
 	}
+
+
 
 
 	public LivelihoodZone getLivelihoodZone() {
