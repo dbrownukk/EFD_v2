@@ -55,9 +55,14 @@
 			class="efd.actions.NewLZ"/>
 		<action name="add LZ" hidden="true" icon="table-row-plus-after"
 			class="efd.actions.AddLZ"/>
+		
+	</controller>
+	
+	<controller name="Community">	
+	<extends controller="Typical"/>	
+		<action name="filteredSitesearch" hidden="true" image="search.gif"
+			class="efd.actions.FileteredSite"/>
 			
 	</controller>
-
-	
-	
+		
 </controllers>

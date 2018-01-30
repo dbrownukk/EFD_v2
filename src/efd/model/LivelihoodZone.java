@@ -49,9 +49,10 @@ public class LivelihoodZone {
     private byte[] lzzonemap;
 
    
-   @OneToMany(mappedBy="livelihoodZone", cascade=CascadeType.ALL)
+   @OneToMany(mappedBy="livelihoodZone")
    @ListProperties("locationdistrict,subdistrict,gpslocation")
    @CollectionView("LZSite")
+   // @AsEmbedded
    private Collection<Site> site;
 
     

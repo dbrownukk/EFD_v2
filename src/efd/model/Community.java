@@ -1,5 +1,6 @@
 package efd.model;
 
+import java.math.*;
 import java.util.*;
 
 import javax.persistence.*;
@@ -19,15 +20,17 @@ import efd.validations.*;
 @Views({
 
 		@View(members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," + "Project[projectlz];"
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," + "Project[projectlz],"+"wgpercenttotal;"
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 		@View(name="Communitynoproject",members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
 				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," 
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
+		@View(name = "FromWGCommunity", members = "projectlz, site"),
 
 		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers") })
+
 
 /* Note the use of underscore in labels - mapped in i18n file */
 
@@ -50,10 +53,14 @@ public class Community {
 	private String communityid;
 	// ----------------------------------------------------------------------------------------------//
 
-	@ManyToOne(fetch = FetchType.LAZY, // This is FK to Site == Location
-			optional = false)
-	@ReferenceView("SimpleSite")
-	@JoinColumn(name = "CLocation")
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@SearchAction("Community.filteredSitesearch")
+	@NoFrame(forViews="FromWGCommunity")
+	@ReferenceViews({
+		@ReferenceView(forViews="DEFAULT", value="SimpleSite"),
+		@ReferenceView(forViews="FromWGCommunity", value = "FromWealthGroup")	
+	})
+	@JoinColumn(name = "CLocation")	
 	private Site site;
 	// ----------------------------------------------------------------------------------------------//
 
@@ -65,7 +72,8 @@ public class Community {
 	// ----------------------------------------------------------------------------------------------//
     //@DetailAction(value="Spreadsheet.scenario")
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
-	//@CollectionView("SimpleWealthGroup")
+	@CollectionView("FromCommunity")
+	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
 
@@ -77,7 +85,7 @@ public class Community {
 	@Required
 	private Integer cinterviewsequence;
 	// ----------------------------------------------------------------------------------------------//
-
+	
 	@Stereotype("DATE")
 	@Column(name = "CInterviewDate")
 	@Required
@@ -86,8 +94,26 @@ public class Community {
 
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
+	
+	// ----------------------------------------------------------------------------------------------//
+	// Is total above 100% 
 	// ----------------------------------------------------------------------------------------------//
 
+	@Transient
+	@ReadOnly
+	//@Hidden
+	//@Max(100)
+	//@Depends("wgpercent")
+	public int getWgpercenttotal() {
+		int result = 0; 
+		for(WealthGroup wealthgroup: getWealthgroup() )
+		{
+			result += wealthgroup.getWgpercent();
+		}
+		return result;
+	}
+
+	// ----------------------------------------------------------------------------------------------//
 	@ReadOnly // Calculates total particpants as male + female - no need for
 				// setters
 	@Depends("civf,civm")
@@ -114,9 +140,15 @@ public class Community {
 
 	/* Dont autogen getters and setters as civparticipants is calulated */
 
+
+	
+
+	
+	
 	public String getCommunityid() {
 		return communityid;
 	}
+
 
 	public void setCommunityid(String communityid) {
 		this.communityid = communityid;

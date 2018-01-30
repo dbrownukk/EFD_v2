@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 
 @Entity
 
-@View(members="Characteristics Resources[resourcesubtype;wgresourceunit;wgresourceamount]")
+@View(members="Characteristics_Resources[resourcesubtype;wgresourceunit;wgresourceamount]")
 
 
 @Tab(
