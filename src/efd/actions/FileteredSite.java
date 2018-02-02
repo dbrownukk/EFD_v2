@@ -1,0 +1,66 @@
+package efd.actions;
+
+import java.util.List;
+
+import javax.mail.*;
+import javax.persistence.*;
+
+import org.apache.commons.validator.*;
+import org.hibernate.mapping.*;
+import org.openxava.actions.*;
+import org.openxava.jpa.*;
+
+import efd.model.*;
+
+/*
+ * DRB Do not show existing Site in pick list 
+ * 29/01/2018
+ * 
+ *  Rules 
+ *  Should not offer Sites already associated with Communities in this Project
+ *  Should only offer Sites in the Livelihood that is the current focus
+ *	Will not allow you to add a Community based on a Site in a different LZ
+ *	Will not allow you to ad the same site twice
+*/
+
+public class FileteredSite extends ReferenceSearchAction {
+
+	public void execute() throws Exception {
+		
+		super.execute(); 
+
+		String locid = getPreviousView().getValue("site.locationid").toString();
+		String cprojectid = getPreviousView().getValue("projectlz.projectid").toString();
+		
+		System.out.println("locid = "+locid);
+		System.out.println("cprojectid = "+cprojectid);
+		
+		/*
+		 * select sites that are valid for current LZ in project LZ for this Project
+		 */
+		
+		
+		Query query = XPersistence.getManager().createQuery("select lz.lzid from LivelihoodZone lz join lz.project pr "
+				+ " where pr.projectid = '" + cprojectid + "'");
+		List<LivelihoodZone> lzs = query.getResultList();
+		String lzs1 = lzs.toString().replace("[]", " ");
+		System.out.println("LZS = " + lzs + lzs.size() + lzs1);
+		String inlist ="";;
+		for (int k = 0; k < lzs.size(); k++){
+			System.out.println(lzs.get(k));
+			inlist += "'"+lzs.get(k)+"'";
+			if(k+1 == lzs.size()) break; 
+			inlist += ",";
+			System.out.println(k);
+			
+		}
+		
+		System.out.println(inlist);
+		
+		//getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
+		//+ " where pr.projectid = '" + cprojectid + ")'");
+	
+		getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")");
+		
+	}
+}
