@@ -19,8 +19,8 @@ import efd.validations.*;
 
 @Views({
 
-		@View(members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," + "Project[projectlz],"+"wgpercenttotal;"
+		@View(members = "Project[projectlz];site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," +"wgpercenttotal;"
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 		@View(name="Communitynoproject",members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
 				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," 
@@ -34,7 +34,7 @@ import efd.validations.*;
 
 /* Note the use of underscore in labels - mapped in i18n file */
 
-@Tab(properties="cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
+@Tab(properties="projectlz.projecttitle,cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
 
 
 
@@ -66,6 +66,7 @@ public class Community {
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
+	
 	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
 	@JoinColumn(name = "CProject")
 	private Project projectlz;
