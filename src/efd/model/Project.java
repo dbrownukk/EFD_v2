@@ -20,15 +20,12 @@ import org.openxava.tab.*;
 
 @Entity
 
-	@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone;community"),
-	//@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone"),
-
+	@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone"),
+		@View(name="NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate,Project.Spreadsheet()"),
 		@View(name = "NewlineProject", members = "projecttitle;pdate") })
 
-@Tab(properties = "projecttitle;pdate", editors = "List, Cards") // removes
-																	// graph
-																	// option
+@Tab(properties = "projecttitle;pdate", editors = "List, Cards") 
 
 @Table(name = "Project")
 public class Project {
@@ -36,7 +33,7 @@ public class Project {
 	@Id
 	@Hidden
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
-												// // (1)
+												
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "ProjectID", length = 32, unique = true)
 	private String projectid;
@@ -51,20 +48,25 @@ public class Project {
 	
 
 	@NewAction("LivelihoodZone.new LZ")
-	@AddAction("LivelihoodZone.add LZ")
+	//@AddAction("LivelihoodZone.add LZ") Not needed as standard code save master and detail
 	
 	
-	@ManyToMany(cascade = CascadeType.REMOVE)
+	@ManyToMany
+	//@org.hibernate.validator.constraints   (min=1)
 	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false))
 	@ListProperties("lzname,country.description,lzzonemap")
+	@CollectionView("SimpleLZ")
+	
 	private Collection<LivelihoodZone> livelihoodZone;
 
-	@OneToMany(mappedBy = "projectlz",cascade = CascadeType.ALL)
+	/* Lets keep it simple - Project and LZ 
+	//@NewAction("")
+	@OneToMany(mappedBy = "projectlz", cascade=CascadeType.ALL)
 	@CollectionView("Communitynoproject")
 	@OrderBy("cinterviewsequence")
 	@ListProperties("cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
 	private Collection<Community> community;
-
+	 */
 	
 
 	
@@ -101,13 +103,7 @@ public class Project {
 		this.livelihoodZone = livelihoodZone;
 	}
 
-	public Collection<Community> getCommunity() {
-		return community;
-	}
 
-	public void setCommunity(Collection<Community> community) {
-		this.community = community;
-	}
 
 
 

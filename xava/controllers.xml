@@ -8,16 +8,10 @@
     <env-var name="EFD_v2_DEFAULT_YEAR" value="2017"/> 
     -->
     
-    <!-- Session object:
-    <object name="EFD_v2_activeYear" class="java.lang.Integer" value="2015" 
-    	    scope="global"/>  
-    	    
-    	    
-    	    <extends controller="TypicalRealExcel"/>  
-	-->    
+
     <controller name="EFD_v2">
-		<extends controller="Typical"/>
-		
+		<extends controller="Typical" excluded-actions="save"/>
+
     <action name="save" mode="detail"
       class="efd.actions.EFDSaveAction" 
       by-default="if-possible"
@@ -50,7 +44,7 @@
 	</controller>
 	
 	<controller name="LivelihoodZone">		
-	<extends controller="Typical"/>
+	<extends controller="EFD_v2"/>
 		<action name="new LZ" image="new.gif" hidden="true" icon="library-plus"
 			class="efd.actions.NewLZ"/>
 		<action name="add LZ" hidden="true" icon="table-row-plus-after"
@@ -59,7 +53,7 @@
 	</controller>
 	
 	<controller name="Community">	
-	<extends controller="Typical"/>	
+	<extends controller="EFD_v2"/>	
 		<action name="filteredSitesearch" hidden="true" image="search.gif"
 			class="efd.actions.FileteredSite"/>
 			
