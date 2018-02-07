@@ -13,15 +13,22 @@ import org.openxava.tab.*;
 
 import efd.model.*;
 
+
 public class CreateXlsFileAction extends ViewBaseAction implements IForwardAction, JxlsConstants { // 1
 
-	private String forwardURI = null;
-    public void execute() throws Exception {
-		try {
-			JxlsWorkbook scenario = createScenario();
-			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
-			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
 
+	private String forwardURI = null;
+
+
+	public void execute() throws Exception {
+		try {
+			System.out.println("In spreadsheet 1");
+			JxlsWorkbook scenario = createScenario();
+			System.out.println("In spreadsheet 2");
+			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
+			System.out.println("In spreadsheet 3");
+			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
+			System.out.println("In spreadsheet 4");
 			/* Now to reset */
 			getView().setModelName("Community");
 			getView().clear();
@@ -40,58 +47,101 @@ public class CreateXlsFileAction extends ViewBaseAction implements IForwardActio
 		int w = 30;
 		int row;
 		int col;
-		
 
 		/* Get EFD Project Details */
 
 		/* Get WealthGroup data */
 		WealthGroup wealthgroup = XPersistence.getManager().find(WealthGroup.class, getView().getValue("wgid"));
-
+		System.out.println("In careetscenario 1");
 		/* Get Community Data */
 		Community community = XPersistence.getManager().find(Community.class,
 				wealthgroup.getCommunity().getCommunityid());
-Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
+		// System.out.println("In careetscenario 2");
+		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
 		/* Get Project Data */
-		
+		// System.out.println("In careetscenario 3");
 
 		/* Get Characteristic Resources */
-		//WGCharacteristicsResource wgharacteristicsresource =
-		//XPersistence.getManager().find(WGCharacteristicsResource.class
-		//,getView().getValue("wgid"));
-
+		// WGCharacteristicsResource wgcharacteristicsresource =
+		// XPersistence.getManager().find(WGCharacteristicsResource.class
+		// ,getView().getValue("wgid"));
+		// System.out.println("In careetscenario 4");
 		Map[] participantKeys;
+
 		if (getView().getSubview("wgcharacteristicsresource").getCollectionTab().hasSelected()) {
 			participantKeys = getView().getSubview("wgcharacteristicsresource").getCollectionTab().getSelectedKeys();
-			} else {
+		} else {
 			participantKeys = getView().getSubview("wgcharacteristicsresource").getCollectionTab().getAllKeys();
-			}
-		
-		for (int id = 0; id < participantKeys.length; id++) { 
-			
-			WGCharacteristicsResource wgcharacteristicsresource = (WGCharacteristicsResource) MapFacade
-					.findEntity("wgcharacteristicsresource", participantKeys[id]);
-			System.out.println("in loop");
-			if (wgcharacteristicsresource != null) {
-				System.out.println(wgcharacteristicsresource.getWgresourceamount());
-			}
 		}
-		
-		
-		
-		
-		//Map values = new HashMap();
-		//Map[] rows = tab.getAllKeys();
+		// System.out.println("In careetscenario keys = " +
+		List<WGCharacteristicsResource> wgr = getView().getSubview("wgcharacteristicsresource").getCollectionObjects();
+		// participantKeys.length + participantKeys[1]);
+		// System.out.println("wgr sub type = " +
+		// wgharacteristicsresource.toString() );
 
-		//for (int id = 0; id < rows.length; id++) {
-			//Map key = rows[id];
-			//WGCharacteristicsResource wgharacteristicsresource 
-			//= (WGCharacteristicsResource) MapFacade.findEntity("WGCharacteristicsResource", key);
-			// User ToUser = RequestTo.getTouser();
-			// Bundle RequestType = RequestTo.getBundle();
-			// Timestamp StartDate = RequestTo.getTime();
-			// Timestamp EndDate = RequestTo.getDueby();
+		
 
-		//}
+		int num_wgr = wgr.size();
+		String resourcesubtypeid;
+		String resourcetypeid;
+
+		HashMap<String, String> resources = new HashMap<String, String>();
+
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			// System.out.println("wgr = subtype"+
+			// wgrloop.getResourcesubtype());
+			// System.out.println("wgr = name " +
+			// wgrloop.getResourcesubtype().getResourcetypename());
+
+			// System.out.println("wgr = type " +
+			// wgrloop.getResourcesubtype().getIdresourcesubtype());
+
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+			// System.out.println("resourcetypeid = " +
+			// rst.getResourcetype().getIdresourcetype());
+
+			resourcetypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcetypeid);
+			// System.out.println("resourcetypename = " +
+			// rt.getResourcetypename());
+
+			resources.put(rt.getResourcetypename(), wgrloop.getResourcesubtype().getResourcetypename());
+
+		}
+
+		/*
+		 * MapFacade.validate("WGCharactericsResource", participantKeys[1]);
+		 * 
+		 * System.out.println("In validate 1");
+		 * 
+		 * for (int id = 0; id < participantKeys.length; id++) {
+		 * 
+		 * WGCharacteristicsResource wgcharacteristicsresource =
+		 * (WGCharacteristicsResource) MapFacade
+		 * .findEntity("WGCharactericsResource", participantKeys[id]);
+		 * System.out.println("in loop"); if (wgcharacteristicsresource != null)
+		 * {
+		 * //System.out.println(wgcharacteristicsresource.getWgresourceamount())
+		 * ; } }
+		 */
+
+		// Map values = new HashMap();
+		// Map[] rows = tab.getAllKeys();
+
+		// for (int id = 0; id < rows.length; id++) {
+		// Map key = rows[id];
+		// WGCharacteristicsResource wgharacteristicsresource
+		// = (WGCharacteristicsResource)
+		// MapFacade.findEntity("WGCharacteristicsResource", key);
+		// User ToUser = RequestTo.getTouser();
+		// Bundle RequestType = RequestTo.getBundle();
+		// Timestamp StartDate = RequestTo.getTime();
+		// Timestamp EndDate = RequestTo.getDueby();
+
+		// }
 
 		/* XLS File Name */
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(project.getProjecttitle());
@@ -170,8 +220,7 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 				textstyle); /* Number in Household */
 
 		Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
-		Interview.setValue(7, 10, "NEED TYPE OF YEAR FIELD ",
-				textstyle); /* Type of Year */
+		Interview.setValue(7, 10, " ", textstyle); /* Type of Year ?????????? */
 
 		/* Asset Sheet */
 
@@ -209,6 +258,23 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			}
 			col++;
 			row = 4;
+		}
+		row = 4;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().equals("Other Productive Assets")) {
+				Asset.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				Asset.setValue(3, row, wgrloop.getResourcesubtype().getResourcesubtypeunit(), borderStyle);
+				row++;
+			}
+
 		}
 
 		/* Crop Sheet */
@@ -248,9 +314,28 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			row = 5;
 		}
 
+		row = 5;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().contains("Crops")) {
+				Crop.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				Crop.setValue(3, row, wgrloop.getResourcesubtype().getResourcesubtypeunit(), borderStyle);
+				row++;
+			}
+
+		}
+
 		/* LS Sheet */
 
 		LS.setValue(2, 4, "Income Type i.e Milk", boldTopStyle);
+
 		LS.setValue(3, 4, "", boldTopStyle);
 		LS.setValue(4, 4, "Unit", boldTopStyle);
 		LS.setValue(5, 4, "Quantity Produced", boldTopStyle);
@@ -269,20 +354,37 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			LS.setColumnWidths(i, w); /* set col widths */
 			i++;
 		}
-
-		/* set grid for data input */
-
 		col = 2;
 		row = 5;
-		while (col < 15) {
+		while (col < 14) {
 			while (row < 16) {
 				LS.setValue(col, row, "",
 						borderStyle); /* set borders for data input fields */
 				row++;
 			}
-
 			col++;
 			row = 5;
+		}
+
+		/* get data */
+		/* this needs pulling into hash table */
+
+		row = 5;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().equals("Livestock")) {
+				LS.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				LS.setValue(4, row, wgrloop.getResourcesubtype().getResourcesubtypeunit(), borderStyle);
+				row++;
+			}
+
 		}
 
 		/* EMP Sheet */
@@ -320,6 +422,26 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			row = 4;
 		}
 
+		row = 4;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().equals("Employment")) {
+				Emp.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				// LS.setValue(4, row,
+				// wgrloop.getResourcesubtype().getResourcesubtypeunit(),
+				// boldTopStyle);
+				row++;
+			}
+
+		}
+
 		/* Transfer Sheet */
 
 		Transfer.setValue(2, 3, "Transfer Type", boldTopStyle);
@@ -353,6 +475,24 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			}
 			col++;
 			row = 4;
+		}
+
+		row = 4;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().equals("Transfer")) {
+				Transfer.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				Transfer.setValue(3, row, wgrloop.getResourcesubtype().getResourcesubtypeunit(), borderStyle);
+				row++;
+			}
+
 		}
 
 		/* Wildfood Sheet */
@@ -390,6 +530,24 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			row = 4;
 		}
 
+		row = 4;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().equals("Wild food")) {
+				Wildfood.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				Wildfood.setValue(3, row, wgrloop.getResourcesubtype().getResourcesubtypeunit(), borderStyle);
+				row++;
+			}
+
+		}
+
 		/* Food Purchase Sheet */
 
 		Foodpurchase.setValue(2, 3, "Food Type", boldTopStyle);
@@ -417,6 +575,24 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			row = 4;
 		}
 
+		row = 4;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().equals("Food Purchase")) {
+				Foodpurchase.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				Foodpurchase.setValue(3, row, wgrloop.getResourcesubtype().getResourcesubtypeunit(), borderStyle);
+				row++;
+			}
+
+		}
+
 		/* Non Food Purchase Sheet */
 
 		Nonfoodpurchase.setValue(2, 3, "Item Purchased", boldTopStyle);
@@ -442,6 +618,23 @@ Project project = XPersistence.getManager().find(Project.class, community.getPro
 			}
 			col++;
 			row = 4;
+		}
+		row = 4;
+		for (int k = 0; k < num_wgr; k++) {
+			// get resource sub type //
+			WGCharacteristicsResource wgrloop = wgr.get(k);
+			resourcesubtypeid = wgrloop.getResourcesubtype().getIdresourcesubtype();
+			ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, resourcesubtypeid);
+
+			resourcesubtypeid = rst.getResourcetype().getIdresourcetype();
+			ResourceType rt = XPersistence.getManager().find(ResourceType.class, resourcesubtypeid);
+
+			if (rt.getResourcetypename().equals("Non Food Purchase")) {
+				Nonfoodpurchase.setValue(2, row, wgrloop.getResourcesubtype().getResourcetypename(), borderStyle);
+				Nonfoodpurchase.setValue(3, row, wgrloop.getResourcesubtype().getResourcesubtypeunit(), borderStyle);
+				row++;
+			}
+
 		}
 		/* end XLS setup */
 

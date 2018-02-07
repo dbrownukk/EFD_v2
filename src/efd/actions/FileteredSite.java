@@ -27,6 +27,9 @@ public class FileteredSite extends ReferenceSearchAction {
 
 	public void execute() throws Exception {
 		
+		System.out.println("current proj " +getView().getValueString("projectlz.projectid"));
+		System.out.println("current site " +getView().getValueString("site.locationid"));
+		
 		super.execute(); 
 
 		String locid = getPreviousView().getValue("site.locationid").toString();

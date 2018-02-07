@@ -73,6 +73,7 @@ public class Community {
 	// ----------------------------------------------------------------------------------------------//
     //@DetailAction(value="Spreadsheet.scenario")
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
+	@RowAction("Spreadsheet.Template Spreadsheet")   
 	@CollectionView("FromCommunity")
 	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
 	private Collection<WealthGroup> wealthgroup;

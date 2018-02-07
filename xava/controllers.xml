@@ -38,8 +38,8 @@
    <extends controller="TypicalRealExcel"/>
 	 <action name="Template Spreadsheet"
 	 		mode="detail"
-	 		by-default="if-possible"
-	 		class="efd.actions.CreateXlsFileAction"
+	 		in-each-row="false" 
+	 		class="efd.actions.CreateXlsFileAction2"
              />
 	</controller>
 	
