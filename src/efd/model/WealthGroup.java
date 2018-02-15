@@ -11,6 +11,8 @@ import org.openxava.annotations.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
 
+import com.sun.corba.se.spi.orbutil.fsm.Guard.*;
+
 import efd.validations.*;
 
 @Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;community;wgorder,wgwives;wghhsize,wgpercent,wgpercenttotal];wgcharacteristicsresource"),
@@ -20,26 +22,16 @@ import efd.validations.*;
 		@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
 		@View(name = "SimpleWealthGroup", members = "community") })
 
-@Tab(editors = "List, Cards", properties = "wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent+")
+@Tab(editors = "List, Cards", properties = "community.site.subdistrict,wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent+")
 
 @Entity
+//@Embeddable 
+
+
 
 @Table(name = "WealthGroup")
 public class WealthGroup {
 	// ----------------------------------------------------------------------------------------------//
-	@PreUpdate // Just before updating the database
-	private void validate() throws Exception {
-		//System.out.println("in preupdate");
-		//System.out.println((getWgpercenttotal()  ));
-		//System.out.println("in preupdate 2");
-		//if (Integer.parseInt(getWgpercenttotal()) > 100) { // The validation
-															// logic
-			// The validation exception from Bean Validation
-		//throw new javax.validation.ValidationException(
-				//	XavaResources.getString("Total_Wealthgroups_Percentage_greater_than_100"));
-	
-	
-	}
 
 	@Id
 	@Hidden
@@ -89,17 +81,13 @@ public class WealthGroup {
 	private BigDecimal wghhsize;
 	// ----------------------------------------------------------------------------------------------//
 	@Transient
+	@OnChange(OnChangeWgpercenttotal.class)
 	private int ptotal;
-	
-	
 	
 	@Column(name = "WGPercent")
 	@Min(value = 1)
 	@Max(value = 100)
-	// @PropertyValidator(Valid100PerCent.class)
-	// @PropertyValidator(value=Valid100PerCent.class,
-	// properties=@PropertyValue(name="communityid",
-	// value="community.getCommunityid()"))
+
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//
 	// @Transient
@@ -110,6 +98,9 @@ public class WealthGroup {
 	@ReadOnly
 	// @Hidden
 	// @Max(100)
+	
+		
+	@OnChange(OnChangeWgpercenttotal.class)
 	@Depends("wgpercent")
 	public String getWgpercenttotal() {
 		EntityManager em = XPersistence.getManager();
@@ -125,6 +116,8 @@ public class WealthGroup {
 		// System.out.println(wgtotalpercent.toPlainString());
 		String result = q.getSingleResult().toString();
 		// em.close();
+		System.out.println(Integer.valueOf(result));
+
 		return result;
 	}
 

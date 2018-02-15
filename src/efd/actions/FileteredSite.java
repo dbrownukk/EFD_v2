@@ -9,6 +9,7 @@ import org.apache.commons.validator.*;
 import org.hibernate.mapping.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
+import org.openxava.util.*;
 
 import efd.model.*;
 
@@ -27,17 +28,29 @@ public class FileteredSite extends ReferenceSearchAction {
 
 	public void execute() throws Exception {
 		
-		System.out.println("current proj " +getView().getValueString("projectlz.projectid"));
-		System.out.println("current site " +getView().getValueString("site.locationid"));
+		//System.out.println("current proj " +getView().getValue("projectlz.projectid"));
+		//System.out.println("current site " +getView().getValue("site.locationid"));
 		
+		
+		
+		/* need to set project context */
+		if(getView().getValueString("projectlz.projectid").isEmpty()){
+			 throw new IllegalStateException(
+	                  XavaResources.getString( 
+	                           "Site lookup must be in context of a Project"));
+		}
+		
+		
+		
+		//String locid = getPreviousView().getValue("site.locationid").toString();
+		//String cprojectid = getPreviousView().getValue("projectlz.projectid").toString();
 		super.execute(); 
-
-		String locid = getPreviousView().getValue("site.locationid").toString();
-		String cprojectid = getPreviousView().getValue("projectlz.projectid").toString();
+		String locid = getPreviousView().getValueString("site.locationid");
+		String cprojectid = getPreviousView().getValueString("projectlz.projectid");
+		
 		
 		System.out.println("locid = "+locid);
 		System.out.println("cprojectid = "+cprojectid);
-		
 		/*
 		 * select sites that are valid for current LZ in project LZ for this Project
 		 */
@@ -58,7 +71,7 @@ public class FileteredSite extends ReferenceSearchAction {
 			
 		}
 		
-		System.out.println(inlist);
+		//System.out.println(inlist);
 		
 		//getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
 		//+ " where pr.projectid = '" + cprojectid + ")'");

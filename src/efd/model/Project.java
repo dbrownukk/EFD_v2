@@ -47,12 +47,11 @@ public class Project {
 	    private java.util.Date pdate;
 	
 
-	@NewAction("LivelihoodZone.new LZ")
-	//@AddAction("LivelihoodZone.add LZ") Not needed as standard code save master and detail
-	
+	@NewAction("LivelihoodZone.new LZ") /* Check projectid is not empty */ 
+	@AddAction("LivelihoodZone.add LZ") 
 	
 	@ManyToMany
-	//@org.hibernate.validator.constraints   (min=1)
+	//@ElementCollection
 	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false))
 	@ListProperties("lzname,country.description,lzzonemap")
 	@CollectionView("SimpleLZ")
@@ -67,10 +66,8 @@ public class Project {
 	@ListProperties("cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
 	private Collection<Community> community;
 	 */
-	
 
-	
-	
+
 	public String getProjectid() {
 		return projectid;
 	}

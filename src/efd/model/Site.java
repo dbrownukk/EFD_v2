@@ -13,7 +13,7 @@ import org.openxava.annotations.*;
 @Views({ @View(members = "Site[livelihoodZone,locationdistrict,subdistrict,gpslocation]"),
 		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone;"),
 		@View(name = "LZSite", members = "locationdistrict;subdistrict;gpslocation"),
-		@View(name = "FromWealthGroup", members = ";locationdistrict,subdistrict,livelihoodZone;"),
+		@View(name = "FromWealthGroup", members = "locationdistrict,subdistrict,livelihoodZone;"),
 		@View(name = "NewlineSite", members = "locationdistrictsubdistrict;gpslocation;livelihoodZone;") })
 
 @Entity
@@ -24,15 +24,13 @@ import org.openxava.annotations.*;
 
 
 @Table(name = "Site", uniqueConstraints = {
-		@UniqueConstraint(name = "uk_lz_district_sub", columnNames = { "LZ", "LocationDistrict", "SubDistrict" }) })
+		@UniqueConstraint(name = "uk_lz_district_sub", columnNames = { "lz", "LocationDistrict", "SubDistrict" }) })
 
 public class Site {
 
 	@Id
-	@Hidden // The property is not shown to the user. It's an internal
-			// identifier
-	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
-												// (1)
+	@Hidden 
+	@GeneratedValue(generator = "system-uuid") 
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "LocationID", length = 32, unique = true)
 	private String locationid;
@@ -48,9 +46,14 @@ public class Site {
 	private String gpslocation;
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = false)
+			optional = false) 
+	@SearchAction("LivelihoodZone.filteredsearch")
+	@ReferenceView("SimpleLZ")
+	@NoCreate
+	@NoModify
 	@JoinColumn(name = "LZ")
-	@DescriptionsList(descriptionProperties = "lzname")
+	//@DescriptionsList(descriptionProperties = "lzname" ,
+	//condition="${lzid} in (select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${projectid}")
 	private LivelihoodZone livelihoodZone;
 
 	@OneToMany(mappedBy = "site", cascade = CascadeType.REMOVE)
@@ -104,5 +107,7 @@ public class Site {
 	public void setCommunity(Collection<Community> community) {
 		this.community = community;
 	}
-
+	
+	
+	
 }

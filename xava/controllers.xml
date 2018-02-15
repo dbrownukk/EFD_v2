@@ -39,7 +39,7 @@
 	 <action name="Template Spreadsheet"
 	 		mode="detail"
 	 		in-each-row="false" 
-	 		class="efd.actions.CreateXlsFileAction2"
+	 		class="efd.actions.CreateXlsFileAction"
              />
 	</controller>
 	
@@ -49,6 +49,10 @@
 			class="efd.actions.NewLZ"/>
 		<action name="add LZ" hidden="true" icon="table-row-plus-after"
 			class="efd.actions.AddLZ"/>
+		<action name="filteredsearch" 
+					hidden="true" 
+					image="search.gif"
+			class="efd.actions.FilteredLZ"/>
 		
 	</controller>
 	
@@ -56,7 +60,8 @@
 	<extends controller="EFD_v2"/>	
 		<action name="filteredSitesearch" hidden="true" image="search.gif"
 			class="efd.actions.FileteredSite"/>
-			
 	</controller>
+		
+		
 		
 </controllers>

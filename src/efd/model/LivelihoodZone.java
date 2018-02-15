@@ -10,7 +10,7 @@ import org.openxava.annotations.*;
 //@View(members = "Livelihood_Zone[lzname;country;lzzonemap]" + "site"),
 
 
-@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap]"),
+@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap],site"),
 		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
 		@View(name = "CreateLZ", members = "Livelihood Zone[lzname,country,lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname;country") })
@@ -35,6 +35,8 @@ public class LivelihoodZone {
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
+	@NoModify
+	@NoCreate
 	@JoinColumn(name = "LZCountry")
 	@DescriptionsList
 	private Country country;

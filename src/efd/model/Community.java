@@ -19,8 +19,8 @@ import efd.validations.*;
 
 @Views({
 
-		@View(members = "Project[projectlz];site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," +"wgpercenttotal;"
+		@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," +"wgpercenttotal;]"
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 		@View(name="Communitynoproject",members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
 				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," 
@@ -55,6 +55,7 @@ public class Community {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@SearchAction("Community.filteredSitesearch")
+	//  need a new LZ create check @AddAction("LivelihoodZone.add LZ")
 	@NoFrame(forViews="FromWGCommunity")
 	@ReferenceViews({
 		@ReferenceView(forViews="DEFAULT", value="SimpleSite"),
@@ -66,15 +67,16 @@ public class Community {
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
-	
+	@Required
 	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
 	@JoinColumn(name = "CProject")
 	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
-    //@DetailAction(value="Spreadsheet.scenario")
+
+	//@ElementCollection
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
 	@RowAction("Spreadsheet.Template Spreadsheet")   
-	@CollectionView("FromCommunity")
+	//@CollectionView("FromCommunity")
 	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
@@ -103,6 +105,7 @@ public class Community {
 
 	@Transient
 	@ReadOnly
+	
 	//@Hidden
 	//@Max(100)
 	//@Depends("wgpercent")
