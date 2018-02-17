@@ -7,16 +7,14 @@ import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
 
-//@View(members = "Livelihood_Zone[lzname;country;lzzonemap]" + "site"),
-
 
 @Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap],site"),
 		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
 		@View(name = "CreateLZ", members = "Livelihood Zone[lzname,country,lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname;country") })
 
-@Tab(properties = "lzname,country.description") // Note - cannot add Site - it
-												// is a OneToMany
+@Tab(properties = "lzname,country.description,country.currency,country.currencySymbol")
+											
 
 @Entity
 
@@ -37,10 +35,14 @@ public class LivelihoodZone {
 			optional = false)
 	@NoModify
 	@NoCreate
+	@Required
 	@JoinColumn(name = "LZCountry")
-	@DescriptionsList
+	@ReferenceView("SimpleCurrencynoDescription")
+	@DescriptionsList(showReferenceView=true, forViews="SimpleLZ,DEFAULT")
 	private Country country;
 
+	
+	
 	@Column(name = "LZName", length = 255)
 	@Required
 	private String lzname;
@@ -53,7 +55,6 @@ public class LivelihoodZone {
 	@OneToMany(mappedBy = "livelihoodZone")
 	@ListProperties("locationdistrict,subdistrict,gpslocation")
 	@CollectionView("LZSite")
-	// @AsEmbedded
 	private Collection<Site> site;
 
 	@ManyToMany(mappedBy = "livelihoodZone")
@@ -70,7 +71,6 @@ public class LivelihoodZone {
 	}
 
 	public Country getCountry() {
-
 		return country;
 	}
 
@@ -99,7 +99,7 @@ public class LivelihoodZone {
 	}
 
 	public void setSite(Collection<Site> site) {
-		// this.site = site;
+		this.site = site;
 	}
 
 	public Collection<Project> getProject() {
@@ -109,6 +109,8 @@ public class LivelihoodZone {
 	public void setProject(Collection<Project> project) {
 		this.project = project;
 	}
+
+
 
 	/* Get / set */
 

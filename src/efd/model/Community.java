@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.*;
 
 import org.hibernate.annotations.*;
+import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 
 import efd.actions.*;
@@ -73,10 +74,10 @@ public class Community {
 	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
 
-	//@ElementCollection
+	
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
 	@RowAction("Spreadsheet.Template Spreadsheet")   
-	//@CollectionView("FromCommunity")
+	@CollectionView("FromCommunity")
 	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
@@ -105,6 +106,7 @@ public class Community {
 
 	@Transient
 	@ReadOnly
+	@Column(length=3)
 	
 	//@Hidden
 	//@Max(100)
@@ -166,6 +168,8 @@ public class Community {
 	public void setSite(Site site) {
 		this.site = site;
 	}
+
+
 
 	public Project getProjectlz() {
 		return projectlz;

@@ -5,6 +5,7 @@ import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.apache.commons.lang3.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hsqldb.persist.*;
 import org.openxava.annotations.*;
@@ -15,8 +16,8 @@ import com.sun.corba.se.spi.orbutil.fsm.Guard.*;
 
 import efd.validations.*;
 
-@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;community;wgorder,wgwives;wghhsize,wgpercent,wgpercenttotal];wgcharacteristicsresource"),
-	 	@View(name = "FromCommunity",members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent,wgpercenttotal];wgcharacteristicsresource"),
+@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;community;wgorder,wgwives;wghhsize,wgpercent;wgpercenttotal];wgcharacteristicsresource"),
+	 	@View(name = "FromCommunity",members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent;,wgpercenttotal];wgcharacteristicsresource"),
 		@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
 		@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
@@ -80,54 +81,42 @@ public class WealthGroup {
 	@Digits(integer = 3, fraction = 2)
 	private BigDecimal wghhsize;
 	// ----------------------------------------------------------------------------------------------//
-	@Transient
-	@OnChange(OnChangeWgpercenttotal.class)
-	private int ptotal;
-	
+	//@Transient
+	//@OnChange(OnChangeWgpercenttotal.class)
+	//private int ptotal = 0;
+	// ----------------------------------------------------------------------------------------------//
+
 	@Column(name = "WGPercent")
 	@Min(value = 1)
 	@Max(value = 100)
 
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//
-	// @Transient
-	// @Hidden
-	// public BigDecimal wgtotalpercent;
-
+    
 	@Transient
-	@ReadOnly
-	// @Hidden
-	// @Max(100)
-	
-		
+	@ReadOnly	
 	@OnChange(OnChangeWgpercenttotal.class)
 	@Depends("wgpercent")
-	public String getWgpercenttotal() {
+	public BigDecimal getWgpercenttotal() {
 		EntityManager em = XPersistence.getManager();
-
+		
+		/* To Automatically fire onchange when entering module add the following to application.xml
+		<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchByViewKey" />
+	    */
+		
 		Query q = em.createNativeQuery("select sum(wgpercent) from wealthgroup where communityid = ?1");
-		//System.out.println("in get 33");
-		//System.out.println(community.getCommunityid());
+		
 		q.setParameter(1, community.getCommunityid());
-		//System.out.println("wgpercenttotal in getter");
-		//System.out.println(q.getSingleResult().toString());
-		// wgtotalpercent = (BigDecimal) q.getSingleResult();
-		//System.out.println("before return in getter");
-		// System.out.println(wgtotalpercent.toPlainString());
-		String result = q.getSingleResult().toString();
-		// em.close();
-		System.out.println(Integer.valueOf(result));
+		
+		BigDecimal result = (BigDecimal) q.getSingleResult();
+		//em.close();
+		//System.out.println(Integer.valueOf(result));
 
 		return result;
+		
 	}
 
-	/*
-	 * public void setWgpercenttotal(String wgpercenttotal) {
-	 * System.out.println("in wgpercenttotal setter");
-	 * System.out.println(wgpercenttotal); this.wgpercenttotal = wgpercenttotal;
-	 * }
-	 */
-
+	
 	// ----------------------------------------------------------------------------------------------//
 
 	public String getWgid() {
@@ -194,13 +183,7 @@ public class WealthGroup {
 		this.wghhsize = wghhsize;
 	}
 
-	public int getPtotal() {
-		return ptotal;
-	}
 
-	public void setPtotal(int ptotal) {
-		this.ptotal = ptotal;
-	}
 
 	public int getWgpercent() {
 		return wgpercent;

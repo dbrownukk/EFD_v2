@@ -6,12 +6,17 @@
     
     <!-- Environment variable:
     <env-var name="EFD_v2_DEFAULT_YEAR" value="2017"/> 
+    
+        <controller name="EFD_v2">
+		<extends controller="Typical" excluded-actions="save"/>
+		</controller>
+    
     -->
     
 
     <controller name="EFD_v2">
-		<extends controller="Typical" excluded-actions="save"/>
-
+		<extends controller="Typical" />
+	
     <action name="save" mode="detail"
       class="efd.actions.EFDSaveAction" 
       by-default="if-possible"
@@ -19,9 +24,9 @@
       icon="content-save"
       keystroke="Control S"/>
 	</controller>
- 
- 
 
+ 
+	<!--
    <controller name="Project">
    <extends controller="Typical"/>
     <action name="save" mode="detail"
@@ -33,7 +38,7 @@
 	  <set property="resetAfter" value="false"/>
 	  </action>
 	</controller>
-    
+    -->
    <controller name="Spreadsheet">
    <extends controller="TypicalRealExcel"/>
 	 <action name="Template Spreadsheet"
@@ -44,6 +49,14 @@
 	</controller>
 	
 	<controller name="LivelihoodZone">		
+	<extends controller="EFD_v2"/>
+		<action name="filteredsearch" 
+					hidden="true" 
+					image="search.gif"
+			class="efd.actions.FilteredLZ"/>
+		
+	</controller>
+	<!--
 	<extends controller="EFD_v2"/>
 		<action name="new LZ" image="new.gif" hidden="true" icon="library-plus"
 			class="efd.actions.NewLZ"/>
@@ -56,6 +69,8 @@
 		
 	</controller>
 	
+	
+	-->
 	<controller name="Community">	
 	<extends controller="EFD_v2"/>	
 		<action name="filteredSitesearch" hidden="true" image="search.gif"

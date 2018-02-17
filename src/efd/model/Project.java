@@ -3,9 +3,11 @@ package efd.model;
 import java.text.*;
 import java.util.*;
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 import org.apache.commons.lang.time.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.annotations.NewAction;
 import org.openxava.annotations.Tab;
@@ -39,67 +41,67 @@ public class Project {
 	private String projectid;
 
 	@Column(name = "ProjectTitle", length = 255, unique = true)
-	@Required
+	@Required	
 	private String projecttitle;
 	
-	  @Stereotype("DATE")
+	@Stereotype("DATE")
 	    @Column(name="PDate") @Required
 	    private java.util.Date pdate;
 	
 
-	@NewAction("LivelihoodZone.new LZ") /* Check projectid is not empty */ 
-	@AddAction("LivelihoodZone.add LZ") 
-	
+	//@NewAction("LivelihoodZone.new LZ") /* Check projectid is not empty */ 
+	//@AddAction("LivelihoodZone.add LZ") /* Remember Bug for NewAction and ManyToMany */ 
+	@NewAction("ManyToMany.new")
 	@ManyToMany
-	//@ElementCollection
 	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false))
-	@ListProperties("lzname,country.description,lzzonemap")
-	@CollectionView("SimpleLZ")
+	@ListProperties("lzname,country.description,country.currency")
+	@CollectionView("SimpleLZ") 
 	
 	private Collection<LivelihoodZone> livelihoodZone;
-
-	/* Lets keep it simple - Project and LZ 
-	//@NewAction("")
-	@OneToMany(mappedBy = "projectlz", cascade=CascadeType.ALL)
-	@CollectionView("Communitynoproject")
-	@OrderBy("cinterviewsequence")
-	@ListProperties("cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
-	private Collection<Community> community;
-	 */
 
 
 	public String getProjectid() {
 		return projectid;
 	}
 
+
 	public void setProjectid(String projectid) {
 		this.projectid = projectid;
 	}
+
 
 	public String getProjecttitle() {
 		return projecttitle;
 	}
 
+
 	public void setProjecttitle(String projecttitle) {
 		this.projecttitle = projecttitle;
 	}
 
-	public Date getPdate() {
+
+	public java.util.Date getPdate() {
 		return pdate;
 	}
 
-	public void setPdate(Date pdate) {
+
+	public void setPdate(java.util.Date pdate) {
 		this.pdate = pdate;
 	}
+
 
 	public Collection<LivelihoodZone> getLivelihoodZone() {
 		return livelihoodZone;
 	}
 
+
 	public void setLivelihoodZone(Collection<LivelihoodZone> livelihoodZone) {
 		this.livelihoodZone = livelihoodZone;
 	}
 
+
+
+	
 
 
 

@@ -12,11 +12,13 @@ import org.hibernate.annotations.GenericGenerator;
 
 
 @Tab ( editors ="List, Cards", rowStyles=@RowStyle(style="highlight", property="type", value="steady")
-	,properties="isocountrycode, description") // removes graph option
+	,properties="isocountrycode, description, currency, currencySymbol") // removes graph option
 
 @Views({
-@View(members= "Country [isocountrycode, description]"),   // Put box around default detail screen 
-@View(name="SimpleCountry",members="description")
+@View(members= "description, currency"),   // Put box around default detail screen 
+@View(name="SimpleCurrency",members="description, currency"),
+@View(name="SimpleCountry",members="description"),
+@View(name="SimpleCurrencynoDescription",members="isocountrycode,currency")
 })
 
 public class Country {
@@ -38,8 +40,16 @@ public class Country {
 	@Required
 	private String description;
 
+	/* Add Currency and Currency Symbol */
+	/* Feb 2018 */
 	
 	
+	@Column(name="Currency",length=3, nullable=false)
+	@Required
+	private String currency;
+	
+	@Column(name="CurrencySymbol",length=1)
+	private String currencySymbol;
 	
 	
 	public String getIdcountry() {
@@ -64,6 +74,22 @@ public class Country {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+
+	public String getCurrencySymbol() {
+		return currencySymbol;
+	}
+
+	public void setCurrencySymbol(String currencySymbol) {
+		this.currencySymbol = currencySymbol;
 	}
 
 

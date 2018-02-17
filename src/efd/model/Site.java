@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
-@Views({ @View(members = "Site[livelihoodZone,locationdistrict,subdistrict,gpslocation]"),
+@Views({ @View(members = "Site[#livelihoodZone,locationdistrict;subdistrict;gpslocation]"),
 		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone;"),
 		@View(name = "LZSite", members = "locationdistrict;subdistrict;gpslocation"),
 		@View(name = "FromWealthGroup", members = "locationdistrict,subdistrict,livelihoodZone;"),
@@ -52,8 +52,21 @@ public class Site {
 	@NoCreate
 	@NoModify
 	@JoinColumn(name = "LZ")
-	//@DescriptionsList(descriptionProperties = "lzname" ,
-	//condition="${lzid} in (select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${projectid}")
+	
+	
+	
+	//@DescriptionsList(
+		//	descriptionProperties = "lzname", forViews="DEFAULT"
+			//condition="e.lzid in (select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${community.cproject})"
+			//)
+	/*
+	worked e.lzid in (select lzid from LivelihoodZone
+	select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${projectid}
+	*/
+	
+	
+	// was condition="${lzid} = (select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${projectid}")
+
 	private LivelihoodZone livelihoodZone;
 
 	@OneToMany(mappedBy = "site", cascade = CascadeType.REMOVE)
