@@ -61,7 +61,7 @@ public class FileteredSite extends ReferenceSearchAction {
 		List<LivelihoodZone> lzs = query.getResultList();
 		String lzs1 = lzs.toString().replace("[]", " ");
 		System.out.println("LZS = " + lzs + lzs.size() + lzs1);
-		String inlist ="";;
+		String inlist ="";
 		for (int k = 0; k < lzs.size(); k++){
 			System.out.println(lzs.get(k));
 			inlist += "'"+lzs.get(k)+"'";

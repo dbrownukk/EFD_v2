@@ -11,12 +11,17 @@ import javax.persistence.Entity;
 @Entity
 
 
-@View(members = "Characteristics_Resources[resourcesubtype;wgresourceunit]")
+
+@Views({ @View(members = "Characteristics_Resources[resourcesubtype;wgresourceunit]"),
+	@View(name = "DetailCR", members="Project")})
 
 @Tab(rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), 
-properties = "resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,wgresourceunit")
-
-//properties = "resourcetype.resourcetypename,wealthgroup,resourcesubtype,wgresourceunit")
+properties = "wealthgroup.community.projectlz.projecttitle,"
+		+ "wealthgroup.community.site.livelihoodZone.lzname,"
+		+ "wealthgroup.community.site.subdistrict,"
+		+ "resourcesubtype.resourcetype.resourcetypename,"
+		+ "resourcesubtype.resourcetypename,"
+		+ "wgresourceunit")
 
 public class WGCharacteristicsResource {
 
@@ -30,6 +35,7 @@ public class WGCharacteristicsResource {
 	private String idwgresource;
 	
 	// ----------------------------------------------------------------------------------------------//
+	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "WGID")
 	@Required
@@ -40,6 +46,8 @@ public class WGCharacteristicsResource {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "WGResourceSubType")
 	@Required
+	@NoCreate
+	//@NoModify
 	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
 	private ResourceSubType resourcesubtype;
 

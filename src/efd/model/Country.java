@@ -15,7 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 	,properties="isocountrycode, description, currency, currencySymbol") // removes graph option
 
 @Views({
-@View(members= "description, currency"),   // Put box around default detail screen 
+@View(members= "description, isocountrycode,currency,currencySymbol"),   // Put box around default detail screen 
 @View(name="SimpleCurrency",members="description, currency"),
 @View(name="SimpleCountry",members="description"),
 @View(name="SimpleCurrencynoDescription",members="isocountrycode,currency")

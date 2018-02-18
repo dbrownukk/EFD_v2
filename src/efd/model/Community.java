@@ -1,6 +1,7 @@
 package efd.model;
 
 import java.math.*;
+
 import java.util.*;
 
 import javax.persistence.*;
@@ -21,24 +22,20 @@ import efd.validations.*;
 @Views({
 
 		@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," +"wgpercenttotal;]"
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," + "wgpercenttotal,warningMessage;]"
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
-		@View(name="Communitynoproject",members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;" + "interviewers;" + "],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," 
+		@View(name = "Communitynoproject", members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;"
+				+ "interviewers;" + "]," + "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 		@View(name = "FromWGCommunity", members = "projectlz, site"),
 
-		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers") })
-
+		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,interviewers") })
 
 /* Note the use of underscore in labels - mapped in i18n file */
 
-@Tab(properties="projectlz.projecttitle,cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civparticipants,civm,civf")
-
-
-
+@Tab(properties = "projectlz.projecttitle,cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civm,civf")
 
 @Table(name = "Community")
 public class Community {
@@ -56,13 +53,11 @@ public class Community {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@SearchAction("Community.filteredSitesearch")
-	//  need a new LZ create check @AddAction("LivelihoodZone.add LZ")
-	@NoFrame(forViews="FromWGCommunity")
-	@ReferenceViews({
-		@ReferenceView(forViews="DEFAULT", value="SimpleSite"),
-		@ReferenceView(forViews="FromWGCommunity", value = "FromWealthGroup")	
-	})
-	@JoinColumn(name = "CLocation")	
+	// need a new LZ create check @AddAction("LivelihoodZone.add LZ")
+	@NoFrame(forViews = "FromWGCommunity")
+	@ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "SimpleSite"),
+			@ReferenceView(forViews = "FromWGCommunity", value = "FromWealthGroup") })
+	@JoinColumn(name = "CLocation")
 	private Site site;
 	// ----------------------------------------------------------------------------------------------//
 
@@ -71,12 +66,12 @@ public class Community {
 	@Required
 	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
 	@JoinColumn(name = "CProject")
+	@OnChange(OnChangeClearCommunity.class)
 	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
 
-	
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
-	@RowAction("Spreadsheet.Template Spreadsheet")   
+	@RowAction("Spreadsheet.Template Spreadsheet")
 	@CollectionView("FromCommunity")
 	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
 	private Collection<WealthGroup> wealthgroup;
@@ -90,7 +85,7 @@ public class Community {
 	@Required
 	private Integer cinterviewsequence;
 	// ----------------------------------------------------------------------------------------------//
-	
+
 	@Stereotype("DATE")
 	@Column(name = "CInterviewDate")
 	@Required
@@ -99,42 +94,54 @@ public class Community {
 
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
-	
+
 	// ----------------------------------------------------------------------------------------------//
-	// Is total above 100% 
+	// Is total above 100%
 	// ----------------------------------------------------------------------------------------------//
 
 	@Transient
 	@ReadOnly
-	@Column(length=3)
-	
-	//@Hidden
-	//@Max(100)
-	//@Depends("wgpercent")
+	@Column(length = 3)
+
 	public int getWgpercenttotal() {
-		int result = 0; 
-		for(WealthGroup wealthgroup: getWealthgroup() )
-		{
+		int result = 0;
+		for (WealthGroup wealthgroup : getWealthgroup()) {
 			result += wealthgroup.getWgpercent();
 		}
 		return result;
 	}
 
-	// ----------------------------------------------------------------------------------------------//
-	@ReadOnly // Calculates total particpants as male + female - no need for
-				// setters
-	@Depends("civf,civm")
-	@Column(name = "CIVParticipants")
-	public Integer getCivparticipants() {
-		if (civf == null) {
-			civf = 0;
-		}
-		if (civm == null) {
-			civm = 0;
-		}
+	@Depends("wgpercenttotal")
+	@Stereotype("LABEL") // @Stereotype("HTML_TEXT") 
+	@Transient
+	@ReadOnly
+	public String getWarningMessage() {
+		if (getWgpercenttotal() > 100) {
+			System.out.println("in stereotype" + getWgpercenttotal());
+			return "<font color=" + "red" + ">Total Wealthgroup Percent is greater than 100</font>";
 
-		return civf + civm;
+		} else if (getWgpercenttotal() < 100) {
+			System.out.println("in stereotype" + getWgpercenttotal());
+			return "<font color=" + "orange" + ">Total Wealthgroup Percent is less than 100</font>";
+		} else if (getWgpercenttotal() == 100) {
+			return "<font color=" + "green" + ">Total Wealthgroup Percent is 100</font>";
+		}
+		return null;
 	}
+
+	// ----------------------------------------------------------------------------------------------//
+
+	/*
+	 * @ReadOnly // Calculates total particpants as male + female - no need for
+	 * // setters
+	 * 
+	 * @Depends("civf,civm")
+	 * 
+	 * @Column(name = "CIVParticipants") public Integer getCivparticipants() {
+	 * if (civf == null) { civf = 0; } if (civm == null) { civm = 0; }
+	 * 
+	 * return civf + civm; }
+	 */
 	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "CIVM")
@@ -144,18 +151,16 @@ public class Community {
 	@Column(name = "CIVF")
 	private Integer civf;
 	// ----------------------------------------------------------------------------------------------//
+	@ReadOnly
+	@Column(name = "CIVparticipants")
+	@Calculation("civm+civf")
+	private Integer civparticipants;
 
 	/* Dont autogen getters and setters as civparticipants is calulated */
 
-
-	
-
-	
-	
 	public String getCommunityid() {
 		return communityid;
 	}
-
 
 	public void setCommunityid(String communityid) {
 		this.communityid = communityid;
@@ -168,8 +173,6 @@ public class Community {
 	public void setSite(Site site) {
 		this.site = site;
 	}
-
-
 
 	public Project getProjectlz() {
 		return projectlz;
@@ -233,6 +236,14 @@ public class Community {
 
 	public void setCommunityyearnotes(Collection<CommunityYearNotes> communityyearnotes) {
 		this.communityyearnotes = communityyearnotes;
+	}
+
+	public Integer getCivparticipants() {
+		return civparticipants;
+	}
+
+	public void setCivparticipants(Integer civparticipants) {
+		this.civparticipants = civparticipants;
 	}
 
 	/* get / set */

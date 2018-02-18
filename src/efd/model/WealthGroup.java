@@ -16,19 +16,17 @@ import com.sun.corba.se.spi.orbutil.fsm.Guard.*;
 
 import efd.validations.*;
 
-@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;community;wgorder,wgwives;wghhsize,wgpercent;wgpercenttotal];wgcharacteristicsresource"),
-	 	@View(name = "FromCommunity",members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent;,wgpercenttotal];wgcharacteristicsresource"),
-		@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
-		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
-		@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
-		@View(name = "SimpleWealthGroup", members = "community") })
+@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;this.community;wgorder,wgwives;wghhsize,wgpercent;wgpercenttotal];wgcharacteristicsresource"),
+ 	@View(name = "FromCommunity",members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
+	@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
+	@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
+	@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
+	 })
+
 
 @Tab(editors = "List, Cards", properties = "community.site.subdistrict,wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent+")
 
 @Entity
-//@Embeddable 
-
-
 
 @Table(name = "WealthGroup")
 public class WealthGroup {
@@ -54,9 +52,11 @@ public class WealthGroup {
 	// ----------------------------------------------------------------------------------------------//
 
 	@OneToMany(mappedBy = "wealthgroup", cascade=CascadeType.REMOVE)
+	//@ElementCollection
 	//@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,resourcesubtype.resourcesubtypeunit")
 	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,wgresourceunit")
-	private Collection<WGCharacteristicsResource> wgcharacteristicsresource;
+	
+	private List<WGCharacteristicsResource> wgcharacteristicsresource;
 	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "WGName_Local", length = 255)
@@ -81,41 +81,40 @@ public class WealthGroup {
 	@Digits(integer = 3, fraction = 2)
 	private BigDecimal wghhsize;
 	// ----------------------------------------------------------------------------------------------//
-	//@Transient
-	//@OnChange(OnChangeWgpercenttotal.class)
-	//private int ptotal = 0;
-	// ----------------------------------------------------------------------------------------------//
+
 
 	@Column(name = "WGPercent")
+	//@OnChange(OnChangeWgpercenttotal.class)
 	@Min(value = 1)
 	@Max(value = 100)
 
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//
-    
+    /*
 	@Transient
 	@ReadOnly	
 	@OnChange(OnChangeWgpercenttotal.class)
 	@Depends("wgpercent")
-	public BigDecimal getWgpercenttotal() {
+	public Integer getWgpercenttotal() {
 		EntityManager em = XPersistence.getManager();
+	
 		
-		/* To Automatically fire onchange when entering module add the following to application.xml
-		<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchByViewKey" />
-	    */
+		System.out.println("in calcgetWgpercenttotal1");
 		
 		Query q = em.createNativeQuery("select sum(wgpercent) from wealthgroup where communityid = ?1");
-		
+		System.out.println("in calcgetWgpercenttotal2");
+		System.out.println("param = "+community.getCommunityid());
 		q.setParameter(1, community.getCommunityid());
 		
-		BigDecimal result = (BigDecimal) q.getSingleResult();
+		System.out.println("in calcgetWgpercenttotal3");
+		Integer result = (Integer) q.getSingleResult();
 		//em.close();
-		//System.out.println(Integer.valueOf(result));
+		System.out.println("result = "+result);
 
 		return result;
 		
 	}
-
+*/
 	
 	// ----------------------------------------------------------------------------------------------//
 
@@ -135,13 +134,21 @@ public class WealthGroup {
 		this.community = community;
 	}
 
-	public Collection<WGCharacteristicsResource> getWgcharacteristicsresource() {
+
+
+
+
+
+
+	public List<WGCharacteristicsResource> getWgcharacteristicsresource() {
 		return wgcharacteristicsresource;
 	}
 
-	public void setWgcharacteristicsresource(Collection<WGCharacteristicsResource> wgcharacteristicsresource) {
+
+	public void setWgcharacteristicsresource(List<WGCharacteristicsResource> wgcharacteristicsresource) {
 		this.wgcharacteristicsresource = wgcharacteristicsresource;
 	}
+
 
 	public String getWgnamelocal() {
 		return wgnamelocal;

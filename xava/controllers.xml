@@ -15,14 +15,16 @@
     
 
     <controller name="EFD_v2">
-		<extends controller="Typical" />
+		<extends controller="Typical" excluded-actions="save" />
 	
     <action name="save" mode="detail"
       class="efd.actions.EFDSaveAction" 
+      
       by-default="if-possible"
       image="save.gif"
       icon="content-save"
       keystroke="Control S"/>
+	
 	</controller>
 
  

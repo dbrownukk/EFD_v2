@@ -14,7 +14,8 @@ import org.openxava.annotations.*;
 
 
 @Views({
-	 @View(members="resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
+	 //@View(members="resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
+	 @View(members="resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
 	 @View(name="SimpleSubtype", members="resourcetypename")
 	})
 

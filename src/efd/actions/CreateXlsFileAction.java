@@ -47,12 +47,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		//System.out.println("In spreadsheet 1" + getCollectionElementView().getCollectionValues().get(row));
 
 		Map m = (Map) getCollectionElementView().getCollectionValues().get(row);
-		/*
-		System.out.println("m1 = " + m.values());
-		System.out.println("m2 = " + m.keySet());
-		System.out.println("m3 = " + m.entrySet());
-		System.out.println("m4 = " + m.get("wgid"));
-*/
+
 		// System.out.println("In spreadsheet 1"+list.toString());
 		JxlsWorkbook scenario = createScenario();
 		//System.out.println("In spreadsheet 2");
@@ -148,15 +143,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();   
 			
-			//System.out.println("rst1 = "+rt);
-			//System.out.println("rst2 = "+resub);
-			
-			//Rtype thisrtype = new Rtype(rst.getResourcetypename(),
-				//	wgcharacteristicsresource.getResourcesubtype().getResourcetypename());
-			//Rtype thisrtype = new Rtype(rt,resub);
-			//rtypes.add(thisrtype);
-			
-			//System.out.println("rtypes = "+rtypes.get(k).getRtype()+rtypes.get(k).getRsubtype());
 		}
 
 		/* XLS File Name */
@@ -164,8 +150,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		/* this works */
 		filename = community.getProjectlz().getProjecttitle()+'_'
 				+site.getLivelihoodZone().getLzname()+'_'
-				//+wealthgroup.getCommunity().getSite().getLocationdistrict()+'_'
-				//+wealthgroup.getCommunity().getSite().getSubdistrict()+'_'
 				+wealthgroup.getWgnameeng();
 	
 		
@@ -184,7 +168,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		JxlsStyle boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);
 		JxlsStyle borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN,
 				BORDER_THIN, BORDER_THIN);
-		JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(LIGHT_GREEN).setTextColor(BLACK);
+		//JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(LIGHT_GREEN).setTextColor(BLACK);
+		JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK);
 		JxlsStyle datestyle = scenarioWB
 				.getDefaultDateStyle(); /*
 										 * seems to e a bug to stop setting
@@ -233,26 +218,24 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		/* Data */
 
-		Interview.setValue(3, 2, community.getCinterviewsequence(),
-				textstyle); /* Interview Number */
-		Interview.setValue(3, 4, community.getSite().getLocationdistrict(), textstyle); /* District */
+		//Interview.setValue(3, 2, community.getCinterviewsequence(),
+				//textstyle); /* Interview Number */
+		Interview.setValue(3, 4, community.getSite().getLocationdistrict(), borderStyle); /* District */
 		Interview.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
-				textstyle); /* Livelihood Zone */
-		Interview.setValue(3, 8, community.getCivparticipants(),
-				textstyle); /* Number of Participants */
+				borderStyle); /* Livelihood Zone */
+		//Interview.setValue(3, 8, community.getCivparticipants(),textstyle); /* Number of Participants */
 		Interview.setValue(3, 10, wealthgroup.getWgnameeng(),
-				textstyle); /* Wealth Group */
+				borderStyle); /* Wealth Group */
 
-		Interview.setValue(5, 2, community.getCinterviewdate(), datestyle); /* Date */
+		//Interview.setValue(5, 2, community.getCinterviewdate(), datestyle); /* Date */
 		Interview.setValue(5, 4, community.getSite().getSubdistrict(),
-				textstyle); /* Sub District */
-		Interview.setValue(5, 6, community.getInterviewers(), textstyle); /* Interviewers */
-		Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
-		Interview.setValue(5, 10, wealthgroup.getWghhsize(),
-				textstyle); /* Number in Household */
+				borderStyle); /* Sub District */
+		//Interview.setValue(5, 6, community.getInterviewers(), textstyle); /* Interviewers */
+		//Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
+		//Interview.setValue(5, 10, wealthgroup.getWghhsize(),textstyle); /* Number in Household */
 
-		Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
-		Interview.setValue(7, 10, " ", textstyle); /* Type of Year ?????????? */
+		//Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
+		//Interview.setValue(7, 10, " ", textstyle); /* Type of Year ?????????? */
 
 		/* Asset Sheet */
 

@@ -11,6 +11,7 @@ public class OnChangeWgpercenttotal extends OnChangePropertyBaseAction {
 		if (getNewValue().equals(null))
 				{
 				System.out.print("its null");
+				//getView().setValue("wgpercenttotal", "0");
 				return;
 				}
 		BigDecimal OneHundred = new BigDecimal("100");

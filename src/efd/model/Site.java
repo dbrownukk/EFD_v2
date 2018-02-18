@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
-@Views({ @View(members = "Site[#livelihoodZone,locationdistrict;subdistrict;gpslocation]"),
+@Views({ @View(members = "Site[#livelihoodZone;locationdistrict;subdistrict;gpslocation]"),
 		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone;"),
 		@View(name = "LZSite", members = "locationdistrict;subdistrict;gpslocation"),
 		@View(name = "FromWealthGroup", members = "locationdistrict,subdistrict,livelihoodZone;"),
@@ -18,8 +18,12 @@ import org.openxava.annotations.*;
 
 @Entity
 
-@Tab(editors = "List, Cards", rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), properties = "livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation", defaultOrder = "${livelihoodZone.lzname} asc,${locationdistrict} asc,${subdistrict} asc")
-//@Tab(properties = "livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation")
+@Tab(editors = "List, Cards"
+, rowStyles = @RowStyle(style = "row-highlight"
+, property = "type", value = "steady")
+, properties = "livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"
+, defaultOrder = "${livelihoodZone.lzname} asc,${locationdistrict} asc,${subdistrict} asc")
+
 
 
 
@@ -52,7 +56,7 @@ public class Site {
 	@NoCreate
 	@NoModify
 	@JoinColumn(name = "LZ")
-	
+	@DescriptionsList(descriptionProperties="lzname", forViews="DEFAULT")
 	
 	
 	//@DescriptionsList(
