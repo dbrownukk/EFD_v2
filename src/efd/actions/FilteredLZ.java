@@ -15,6 +15,25 @@ public class FilteredLZ extends ReferenceSearchAction  {
 	public void execute() throws Exception {
 		
 		
+		/* If in Site the filter is not needed */
+		/*
+		System.out.println("In Filter1 "+getView().getMembersNames());
+		System.out.println("In Filter2 "+getView().getBaseModelName());
+		
+		try{
+		getPreviousView();
+		}
+		catch (EmptyStackException ex)
+		{
+			System.out.println("caught");
+			getTab().setBaseCondition("");
+			super.execute();
+			return;
+		}
+		finally
+		{
+		}
+	*/
 		String cprojectid = getPreviousView().getValue("projectlz.projectid").toString();
 		System.out.println("cprojectid = "+cprojectid);
 		super.execute();
@@ -42,8 +61,8 @@ public class FilteredLZ extends ReferenceSearchAction  {
 		getTab().setBaseCondition("${lzid} in (" + inlist + ")");
 		
 		
+		}	
 		
-		
-	}
+	
 
 }

@@ -1,5 +1,6 @@
 package efd.model;
 
+import java.math.*;
 import java.text.*;
 import java.util.*;
 import javax.persistence.*;
@@ -22,7 +23,7 @@ import org.openxava.tab.*;
 
 @Entity
 
-	@Views({ @View(members = "Project[projecttitle,pdate];livelihoodZone"),
+	@Views({ @View(members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
 		@View(name="NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate,Project.Spreadsheet()"),
 		@View(name = "NewlineProject", members = "projecttitle;pdate") })
@@ -47,6 +48,19 @@ public class Project {
 	@Stereotype("DATE")
 	    @Column(name="PDate") @Required
 	    private java.util.Date pdate;
+	
+	
+	
+	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
+	optional = true)
+	@NoModify
+	@NoCreate
+
+	
+	@DescriptionsList(descriptionProperties="currency")
+	private Country altCurrency;
+	
+	private BigDecimal altExchangeRate;
 	
 
 	//@NewAction("LivelihoodZone.new LZ") /* Check projectid is not empty */ 
@@ -100,9 +114,24 @@ public class Project {
 	}
 
 
+	public Country getAltCurrency() {
+		return altCurrency;
+	}
 
-	
 
+	public void setAltCurrency(Country altCurrency) {
+		this.altCurrency = altCurrency;
+	}
+
+
+	public BigDecimal getAltExchangeRate() {
+		return altExchangeRate;
+	}
+
+
+	public void setAltExchangeRate(BigDecimal altExchangeRate) {
+		this.altExchangeRate = altExchangeRate;
+	}
 
 
 

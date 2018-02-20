@@ -48,7 +48,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		Map m = (Map) getCollectionElementView().getCollectionValues().get(row);
 
-		// System.out.println("In spreadsheet 1"+list.toString());
+		//System.out.println("In spreadsheet 1"+list.toString());
 		JxlsWorkbook scenario = createScenario();
 		//System.out.println("In spreadsheet 2");
 		getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
@@ -93,12 +93,12 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		/* Get WealthGroup data */
 		Map n = (Map) getCollectionElementView().getCollectionValues().get(row);
-		/*
-		System.out.println("n1 = " + n.values());
-		System.out.println("n2 = " + n.keySet());
-		System.out.println("n3 = " + n.entrySet());
-		System.out.println("n4 = " + n.get("wgid"));
-		*/
+		
+		//System.out.println("n1 = " + n.values());
+		//System.out.println("n2 = " + n.keySet());
+		//System.out.println("n3 = " + n.entrySet());
+		//System.out.println("n4 = " + n.get("wgid"));
+		
 		String wgid = (String) n.get("wgid");
 		//System.out.println("In create scenario 1 ");
 
@@ -113,8 +113,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				wealthgroup.getCommunity().getCommunityid());
 		//System.out.println("In careetscenario 222");
 		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
+		//System.out.println("In careetscenario 221");
 		Site site = XPersistence.getManager().find(Site.class, community.getSite().getLocationid() );
-		
+		//System.out.println("In careetscenario 223");
 		//System.out.println("In careetscenario project 2222"+project.getProjecttitle());
 		/******************
 		 * Need to get charresource and types using getmanager and iterate
@@ -125,10 +126,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Query query = XPersistence.getManager()
 				.createQuery("select idwgresource from WGCharacteristicsResource where wgid = '" + wgid + "'");
 		List chrs = query.getResultList();
-
-		WGCharacteristicsResource wgcharacteristicsresource2 =
-		 XPersistence.getManager().find(WGCharacteristicsResource.class,
-		 chrs.get(0));
+		//System.out.println("In careetscenario 224");
+		//WGCharacteristicsResource wgcharacteristicsresource2 =
+		 //XPersistence.getManager().find(WGCharacteristicsResource.class,
+		 //chrs.get(0));
 
 		//System.out.println("Number = " + chrs.size());
 		for (k = 0; k < chrs.size(); k++) {
@@ -175,7 +176,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 										 * seems to e a bug to stop setting
 										 * other params
 										 */
-
+		//System.out.println("done Jxl 1");
 		/* XLS Sheets */
 
 		JxlsSheet Interview = scenarioWB.addSheet("Interview Details");
@@ -191,6 +192,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			Interview.setColumnWidths(i, w); /* set col widths */
 			i++;
 		}
+		//System.out.println("done Jxl 2");
 		while (j < 11) {
 			Interview.setValue(3, j, "",
 					borderStyle); /* set borders for data input fields */
@@ -215,7 +217,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		Interview.setValue(6, 8, "Women", boldRStyle);
 		Interview.setValue(6, 10, "Type of Year", boldRStyle);
-
+		
 		/* Data */
 
 		//Interview.setValue(3, 2, community.getCinterviewsequence(),
@@ -296,7 +298,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			}
 
 			}
-
+			
+			
+			
 		/* Crop Sheet */
 
 		Crop.setValue(8, 3, "For Crops which are sold", boldTopStyle);

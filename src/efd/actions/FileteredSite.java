@@ -31,7 +31,7 @@ public class FileteredSite extends ReferenceSearchAction {
 		//System.out.println("current proj " +getView().getValue("projectlz.projectid"));
 		//System.out.println("current site " +getView().getValue("site.locationid"));
 		
-		
+		//System.out.println("In Filter from Comm "+getView().getSearchKeyName());
 		
 		/* need to set project context */
 		if(getView().getValueString("projectlz.projectid").isEmpty()){
@@ -49,8 +49,8 @@ public class FileteredSite extends ReferenceSearchAction {
 		String cprojectid = getPreviousView().getValueString("projectlz.projectid");
 		
 		
-		System.out.println("locid = "+locid);
-		System.out.println("cprojectid = "+cprojectid);
+		//System.out.println("locid = "+locid);
+		//System.out.println("cprojectid = "+cprojectid);
 		/*
 		 * select sites that are valid for current LZ in project LZ for this Project
 		 */
@@ -71,7 +71,7 @@ public class FileteredSite extends ReferenceSearchAction {
 			
 		}
 		
-		//System.out.println(inlist);
+		System.out.println(inlist);
 		
 		//getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
 		//+ " where pr.projectid = '" + cprojectid + ")'");

@@ -52,11 +52,16 @@ public class Site {
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false) 
 	@SearchAction("LivelihoodZone.filteredsearch")
+	
 	@ReferenceView("SimpleLZ")
+	//@ReferenceViews({
+	//@ReferenceView(forViews="SimpleSite", value="SimpleLZ"),
+	//@ReferenceView(forViews="DEFAULT", value="UpdateLZ"),
+	//})
 	@NoCreate
 	@NoModify
 	@JoinColumn(name = "LZ")
-	@DescriptionsList(descriptionProperties="lzname", forViews="DEFAULT")
+	//@DescriptionsList(descriptionProperties="lzname", notForViews="SimpleSite,DEFAULT")
 	
 	
 	//@DescriptionsList(

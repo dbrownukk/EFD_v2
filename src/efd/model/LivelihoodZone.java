@@ -37,8 +37,15 @@ public class LivelihoodZone {
 	@NoCreate
 	@Required
 	@JoinColumn(name = "LZCountry")
-	@ReferenceView("SimpleCurrencynoDescription")
-	@DescriptionsList(showReferenceView=true, forViews="SimpleLZ,DEFAULT")
+	@NoFrame//(forViews="SimpleLZ")
+	
+	@ReferenceViews({
+	@ReferenceView(forViews="SimpleLZ",value="SimpleCountry"),
+	@ReferenceView(forViews="DEFAULT",value="FullCountry")
+	})
+	
+	//@DescriptionsList(showReferenceView=true, forViews="SimpleLZ,DEFAULT")
+	//@DescriptionsList(showReferenceView=true,descriptionProperties="description", forViews="DEFAULT")
 	private Country country;
 
 	

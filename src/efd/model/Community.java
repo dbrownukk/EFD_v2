@@ -131,19 +131,6 @@ public class Community {
 
 	// ----------------------------------------------------------------------------------------------//
 
-	/*
-	 * @ReadOnly // Calculates total particpants as male + female - no need for
-	 * // setters
-	 * 
-	 * @Depends("civf,civm")
-	 * 
-	 * @Column(name = "CIVParticipants") public Integer getCivparticipants() {
-	 * if (civf == null) { civf = 0; } if (civm == null) { civm = 0; }
-	 * 
-	 * return civf + civm; }
-	 */
-	// ----------------------------------------------------------------------------------------------//
-
 	@Column(name = "CIVM")
 	private Integer civm;
 	// ----------------------------------------------------------------------------------------------//
@@ -155,6 +142,7 @@ public class Community {
 	@Column(name = "CIVparticipants")
 	@Calculation("civm+civf")
 	private Integer civparticipants;
+	// ----------------------------------------------------------------------------------------------//
 
 	/* Dont autogen getters and setters as civparticipants is calulated */
 
