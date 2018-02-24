@@ -8,12 +8,12 @@ import org.openxava.annotations.*;
 
 
 
-@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap],site"),
+@Views({ @View(members="Livelihood_Zone[lzname;country,site]"),
 		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
-		@View(name = "CreateLZ", members = "Livelihood Zone[lzname,country,lzzonemap]"),
+		@View(name = "CreateLZ", members = "Livelihood Zone[lzname;country;lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname;country") })
 
-@Tab(properties = "lzname,country.description,country.currency,country.currencySymbol")
+@Tab(properties = "lzname,country.description,country.isocountrycode,country.currency")
 											
 
 @Entity
@@ -22,6 +22,9 @@ import org.openxava.annotations.*;
 
 public class LivelihoodZone {
 
+
+	
+	
 	@Id
 	@Hidden // The property is not shown to the user. It's an internal
 			// identifier
@@ -44,11 +47,9 @@ public class LivelihoodZone {
 	@ReferenceView(forViews="DEFAULT",value="FullCountry")
 	})
 	
-	//@DescriptionsList(showReferenceView=true, forViews="SimpleLZ,DEFAULT")
+	@DescriptionsList
 	//@DescriptionsList(showReferenceView=true,descriptionProperties="description", forViews="DEFAULT")
 	private Country country;
-
-	
 	
 	@Column(name = "LZName", length = 255)
 	@Required

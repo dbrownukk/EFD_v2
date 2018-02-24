@@ -51,7 +51,8 @@ public class Site {
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false) 
-	@SearchAction("LivelihoodZone.filteredsearch")
+	//@SearchAction(notForViews="DEFAULT", value="LivelihoodZone.filteredsearch")
+	@SearchAction(value="LivelihoodZone.filteredsearch")
 	
 	@ReferenceView("SimpleLZ")
 	//@ReferenceViews({

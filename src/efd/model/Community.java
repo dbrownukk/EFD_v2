@@ -35,7 +35,7 @@ import efd.validations.*;
 
 /* Note the use of underscore in labels - mapped in i18n file */
 
-@Tab(properties = "projectlz.projecttitle,cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civm,civf")
+@Tab(properties = "projectlz.projecttitle,site.livelihoodZone.lzname,cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civm,civf")
 
 @Table(name = "Community")
 public class Community {
@@ -51,22 +51,26 @@ public class Community {
 	private String communityid;
 	// ----------------------------------------------------------------------------------------------//
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne  //(fetch = FetchType.LAZY, optional = false)
 	@SearchAction("Community.filteredSitesearch")
 	// need a new LZ create check @AddAction("LivelihoodZone.add LZ")
 	@NoFrame(forViews = "FromWGCommunity")
-	@ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "SimpleSite"),
-			@ReferenceView(forViews = "FromWGCommunity", value = "FromWealthGroup") })
+	//@ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "SimpleSite"),
+		//	@ReferenceView(forViews = "FromWGCommunity", value = "FromWealthGroup") })
+	
+	@ReferenceView("SimpleSite")
 	@JoinColumn(name = "CLocation")
 	private Site site;
 	// ----------------------------------------------------------------------------------------------//
 
+	
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
 	@Required
 	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
 	@JoinColumn(name = "CProject")
 	@OnChange(OnChangeClearCommunity.class)
+	@ReferenceView("SimpleProject")
 	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
 
@@ -82,13 +86,13 @@ public class Community {
 	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "CInterviewSequence")
-	@Required
+	
 	private Integer cinterviewsequence;
 	// ----------------------------------------------------------------------------------------------//
 
 	@Stereotype("DATE")
 	@Column(name = "CInterviewDate")
-	@Required
+	
 	private java.util.Date cinterviewdate;
 	// ----------------------------------------------------------------------------------------------//
 

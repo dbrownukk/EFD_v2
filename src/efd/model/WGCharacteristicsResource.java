@@ -19,9 +19,15 @@ import javax.persistence.Entity;
 properties = "wealthgroup.community.projectlz.projecttitle,"
 		+ "wealthgroup.community.site.livelihoodZone.lzname,"
 		+ "wealthgroup.community.site.subdistrict,"
+		+ "wealthgroup.wgnameeng,"
 		+ "resourcesubtype.resourcetype.resourcetypename,"
 		+ "resourcesubtype.resourcetypename,"
-		+ "wgresourceunit")
+		+ "wgresourceunit" ,
+		defaultOrder="${wealthgroup.community.projectlz.projecttitle} desc"
+				+ ", ${wealthgroup.community.site.livelihoodZone.lzname} desc"
+				+ ", ${wealthgroup.community.site.subdistrict} desc"
+				+ ", ${wealthgroup.wgnameeng} desc"	
+		)
 
 public class WGCharacteristicsResource {
 

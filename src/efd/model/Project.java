@@ -24,11 +24,15 @@ import org.openxava.tab.*;
 @Entity
 
 	@Views({ @View(members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
+		@View(name="Proj",members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
 		@View(name="NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
-		@View(name = "SimpleProject", members = "projecttitle,pdate,Project.Spreadsheet()"),
+		@View(name = "SimpleProject", members = "projecttitle,pdate"),
 		@View(name = "NewlineProject", members = "projecttitle;pdate") })
 
-@Tab(properties = "projecttitle;pdate", editors = "List, Cards") 
+
+
+
+@Tab(properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", editors = "List, Cards") 
 
 @Table(name = "Project")
 public class Project {
@@ -62,15 +66,16 @@ public class Project {
 	
 	private BigDecimal altExchangeRate;
 	
-
-	//@NewAction("LivelihoodZone.new LZ") /* Check projectid is not empty */ 
-	//@AddAction("LivelihoodZone.add LZ") /* Remember Bug for NewAction and ManyToMany */ 
-	@NewAction("ManyToMany.new")
+	//@NewActions({
+	//@NewAction(forViews="DEFAULT", value="LivelihoodZone.new LZ"), /* Check projectid is not empty */ 
+	//})
+	//@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */ 
+	//@AddAction("LivelihoodZone.add")
+	//@NewAction("LivelihoodZone.new")
 	@ManyToMany
 	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false))
 	@ListProperties("lzname,country.description,country.currency")
-	@CollectionView("SimpleLZ") 
-	
+	@CollectionView("SimpleLZ" ) 
 	private Collection<LivelihoodZone> livelihoodZone;
 
 

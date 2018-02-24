@@ -13,7 +13,7 @@
     
     -->
     
-
+<!--
     <controller name="EFD_v2">
 		<extends controller="Typical" excluded-actions="save" />
 	
@@ -26,7 +26,11 @@
       keystroke="Control S"/>
 	
 	</controller>
-
+	-->
+	
+	<controller name="EFD_v2">
+		<extends controller="TypicalNotResetOnSave"  />
+	</controller>
  
 	<!--
    <controller name="Project">
@@ -56,7 +60,10 @@
 					hidden="true" 
 					image="search.gif"
 			class="efd.actions.FilteredLZ"/>
-		
+				<action name="new LZ" hidden="false" icon="library-plus"
+			class="efd.actions.NewLZ"/>
+			<action name="add LZ" hidden="false" icon="table-row-plus-after"
+			class="efd.actions.AddLZ"/>
 	</controller>
 	<!--
 	<extends controller="EFD_v2"/>

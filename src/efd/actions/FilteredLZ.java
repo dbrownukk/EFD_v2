@@ -15,27 +15,29 @@ public class FilteredLZ extends ReferenceSearchAction  {
 	public void execute() throws Exception {
 		
 		
-		/* If in Site the filter is not needed */
-		/*
-		System.out.println("In Filter1 "+getView().getMembersNames());
-		System.out.println("In Filter2 "+getView().getBaseModelName());
+		/* If in standalone Site the filter is not needed */
+		
+		//System.out.println("In Filter1 "+getView().getMembersNames());
+		//System.out.println("In Filter2 "+getView().getBaseModelName());
+		
+		//System.out.println("vnames"+getView().);
+
 		
 		try{
-		getPreviousView();
+		getPreviousView().getValue("projectlz.projectid");
+		System.out.println("In Filter2 "+getView().getBaseModelName());
 		}
-		catch (EmptyStackException ex)
+		catch (EmptyStackException|ElementNotFoundException ex)
 		{
+			super.execute();
 			System.out.println("caught");
 			getTab().setBaseCondition("");
-			super.execute();
 			return;
 		}
-		finally
-		{
-		}
-	*/
+	
+		
 		String cprojectid = getPreviousView().getValue("projectlz.projectid").toString();
-		System.out.println("cprojectid = "+cprojectid);
+		System.out.println("In LZ Filter cprojectid = "+cprojectid);
 		super.execute();
 
 		Query query = XPersistence.getManager().createQuery("select lz.lzid from LivelihoodZone lz join lz.project pr "
@@ -61,8 +63,8 @@ public class FilteredLZ extends ReferenceSearchAction  {
 		getTab().setBaseCondition("${lzid} in (" + inlist + ")");
 		
 		
-		}	
+			
 		
-	
+	}
 
 }

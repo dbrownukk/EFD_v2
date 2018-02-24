@@ -15,9 +15,9 @@
     	<class>org.openxava.session.GalleryImage</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-  <!--  
-           <property name="hibernate.show_sql" value="true"/>    
-        -->        
+   
+           <property name="hibernate.show_sql" value="false"/>    
+               
         
         </properties>
     </persistence-unit>

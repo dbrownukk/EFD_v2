@@ -15,8 +15,8 @@ import org.hibernate.annotations.GenericGenerator;
 	,properties="isocountrycode, description, currency, currencySymbol") // removes graph option
 
 @Views({
-@View(members= "description, isocountrycode,currency,currencySymbol"),  
-@View(name="FullCountry",members= "isocountrycode,currency,currencySymbol"),
+@View(members= "description, isocountrycode,currency,currencySymbol,idcountry"),  
+@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
 @View(name="SimpleCurrency",members="description, currency"),
 @View(name="SimpleCountry",members="description"),
 @View(name="SimpleCurrencynoDescription",members="isocountrycode,currency")
