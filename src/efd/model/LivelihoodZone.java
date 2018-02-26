@@ -48,7 +48,6 @@ public class LivelihoodZone {
 	})
 	
 	@DescriptionsList
-	//@DescriptionsList(showReferenceView=true,descriptionProperties="description", forViews="DEFAULT")
 	private Country country;
 	
 	@Column(name = "LZName", length = 255)
@@ -67,7 +66,6 @@ public class LivelihoodZone {
 
 	@ManyToMany(mappedBy = "livelihoodZone")
 	// @ListProperties("projecttitle,pdate")
-
 	private Collection<Project> project;
 
 	public String getLzid() {

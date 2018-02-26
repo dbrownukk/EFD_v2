@@ -600,6 +600,10 @@ span.ox-subcontroller-select a{
 	border: 1px solid #A7CEDF !important;
 }
 
+.ui-dialog .ox-element-collection > div {
+	width: 100% !important; /* To avoid horizontal scroll bar in element collection inside dialog, such as Import dialog */
+}
+
 .ox-element-collection .form-text { 
 	width: 100%; 
 	box-sizing: border-box; 

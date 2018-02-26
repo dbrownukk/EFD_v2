@@ -35,7 +35,7 @@ public class ResourceSubType {
 			optional = false)
 	@Required
 	@JoinColumn(name = "ReourceType")
-	//@DescriptionsList(descriptionProperties="resourcetypename")
+	@DescriptionsList(descriptionProperties="resourcetypename")
 	private ResourceType resourcetype;
 	
 	@Column(name = "ResourceTypeName", length=255)  // ? ResosurceSubTypeName ?

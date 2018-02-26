@@ -411,6 +411,7 @@ openxava.initLists = function(application, module) {
 openxava.setListsSize = function(application, module, type, adjustment) {
 	var buttonBar = $('#' + openxava.decorateId(application, module, "bottom_buttons"));
 	var scrollId = '.' + openxava.decorateId(application, module, type + "_scroll");
+	if (openxava.dialogLevel > 0) scrollId = ".ui-dialog " + scrollId; // To avoid that showing a dialog resizes the list
 	$(scrollId).width(50); 	  
 	$(scrollId).width(buttonBar.outerWidth() + adjustment); 
 	$(window).resize(function() {
@@ -529,7 +530,18 @@ openxava.processKey = function(event) {
 		if (/.*_conditionValue___\d+$/.test(id)) {
 			event.returnValue = false;
 			event.preventDefault();
-			var collection = id.split("_")[6];
+			
+			var collection = ""; 
+			if (id.indexOf("_xava_collectionTab_") >= 0) { 
+				var i = 6;
+				var tokens = id.split("_");
+				while (tokens[i] !== "conditionValue" && i < tokens.length) {
+					if (collection !== "") collection = collection + "_";  
+					collection = collection + tokens[i];
+					i++;
+				}
+			}
+
 			openxava.executeAction(openxava.lastApplication, openxava.lastModule,
 				"", false, "List.filter", "collection=" + collection);
 		}

@@ -2,6 +2,7 @@ package efd.model;
 
 import java.math.*;
 import java.util.*;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
@@ -12,14 +13,23 @@ import org.openxava.annotations.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
 
-import com.sun.corba.se.spi.orbutil.fsm.Guard.*;
+@Views({
+@View(members= "Wealth_Group_Interview[# wealthgroup"
+		+ ",wgInterviewNumber"
+		+ ",wgInterviewers"
+		+ ",wgIntervieweesCount"
+		+ ";wgFemaleIVees"
+		+ ",wgMaleIVees"
+		+ ",wgAverageNumberInHH"
+		+ ",wgYearType"
+		+ ",wgInterviewDate]"
+		+ ";WildFood{wildfood}"
+		),  
+//@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
+})
 
-import efd.validations.*;
 
-
-
-
-// @Tab(editors = "List, Cards", properties = "community.site.subdistrict,wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent+")
+//@Tab(editors = "List, Cards", properties = "")
 
 @Entity
 
@@ -68,7 +78,18 @@ private java.util.Date wgInterviewDate;
 @JoinColumn(name = "WGID")
 @Required
 @NoFrame
+@NoModify
+@NoCreate
+@DescriptionsList(descriptionProperties="community.site.locationdistrict,wgnameeng")
 private WealthGroup wealthgroup;
+
+@OneToMany(mappedBy = "wealthgroupinterview")
+@ListProperties("wildfoodname,localunit,quantityproduced,quantitsold,priceperunit,otheruse")
+private Collection<WildFood> wildfood;
+
+
+
+
 
 public String getWgiid() {
 	return wgiid;
@@ -149,6 +170,20 @@ public WealthGroup getWealthgroup() {
 public void setWealthgroup(WealthGroup wealthgroup) {
 	this.wealthgroup = wealthgroup;
 }
+
+public Collection<WildFood> getWildfood() {
+	return wildfood;
+}
+
+public void setWildfood(Collection<WildFood> wildfood) {
+	this.wildfood = wildfood;
+}
+
+
+
+
+
+
 
 
 
