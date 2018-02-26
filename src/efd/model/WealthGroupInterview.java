@@ -37,40 +37,38 @@ public class WealthGroupInterview {
 
 @Column(name = "WGInterviewNumber",nullable=false)	
 @Required
-private Integer WGInterviewNumber;
+private Integer wgInterviewNumber;
 
 @Column(name = "WGInterviewers",nullable=false)	
 @Required
-private String WGInterviewers;
+private String wgInterviewers;
 
 @Column(name = "WGIntervieweesCount",nullable=false)	
 @Required
-private Integer WGIntervieweesCount;
+private Integer wgIntervieweesCount;
 
 @Column(name = "WGFemaleIVees")	
-private Integer WGFemaleIVees;
+private Integer wgFemaleIVees;
 
 @Column(name = "WGMaleIVees")	
-private Integer WGMaleIVees;
+private Integer wgMaleIVees;
 
 @Column(name = "WGAverageNumberInHH")	
-private Integer WGAverageNumberInHH;
+private Integer wgAverageNumberInHH;
 
 @Column(name = "WGYearType")	
-private String WGYearType;
+private String wgYearType;
 /* ENUM SET('Good', 'Bad', 'Normal') */ 
 
 @Column(name = "WGInterviewDate")	
 @Stereotype("DATE")
-private java.util.Date WGInterviewDate;
+private java.util.Date wgInterviewDate;
 
 @ManyToOne(fetch = FetchType.LAZY, optional = false)
 @JoinColumn(name = "WGID")
 @Required
 @NoFrame
 private WealthGroup wealthgroup;
-
-
 
 public String getWgiid() {
 	return wgiid;
@@ -80,68 +78,68 @@ public void setWgiid(String wgiid) {
 	this.wgiid = wgiid;
 }
 
-public Integer getWGInterviewNumber() {
-	return WGInterviewNumber;
+public Integer getWgInterviewNumber() {
+	return wgInterviewNumber;
 }
 
-public void setWGInterviewNumber(Integer wGInterviewNumber) {
-	WGInterviewNumber = wGInterviewNumber;
+public void setWgInterviewNumber(Integer wgInterviewNumber) {
+	this.wgInterviewNumber = wgInterviewNumber;
 }
 
-public String getWGInterviewers() {
-	return WGInterviewers;
+public String getWgInterviewers() {
+	return wgInterviewers;
 }
 
-public void setWGInterviewers(String wGInterviewers) {
-	WGInterviewers = wGInterviewers;
+public void setWgInterviewers(String wgInterviewers) {
+	this.wgInterviewers = wgInterviewers;
 }
 
-public Integer getWGIntervieweesCount() {
-	return WGIntervieweesCount;
+public Integer getWgIntervieweesCount() {
+	return wgIntervieweesCount;
 }
 
-public void setWGIntervieweesCount(Integer wGIntervieweesCount) {
-	WGIntervieweesCount = wGIntervieweesCount;
+public void setWgIntervieweesCount(Integer wgIntervieweesCount) {
+	this.wgIntervieweesCount = wgIntervieweesCount;
 }
 
-public Integer getWGFemaleIVees() {
-	return WGFemaleIVees;
+public Integer getWgFemaleIVees() {
+	return wgFemaleIVees;
 }
 
-public void setWGFemaleIVees(Integer wGFemaleIVees) {
-	WGFemaleIVees = wGFemaleIVees;
+public void setWgFemaleIVees(Integer wgFemaleIVees) {
+	this.wgFemaleIVees = wgFemaleIVees;
 }
 
-public Integer getWGMaleIVees() {
-	return WGMaleIVees;
+public Integer getWgMaleIVees() {
+	return wgMaleIVees;
 }
 
-public void setWGMaleIVees(Integer wGMaleIVees) {
-	WGMaleIVees = wGMaleIVees;
+public void setWgMaleIVees(Integer wgMaleIVees) {
+	this.wgMaleIVees = wgMaleIVees;
 }
 
-public Integer getWGAverageNumberInHH() {
-	return WGAverageNumberInHH;
+public Integer getWgAverageNumberInHH() {
+	return wgAverageNumberInHH;
 }
 
-public void setWGAverageNumberInHH(Integer wGAverageNumberInHH) {
-	WGAverageNumberInHH = wGAverageNumberInHH;
+public void setWgAverageNumberInHH(Integer wgAverageNumberInHH) {
+	this.wgAverageNumberInHH = wgAverageNumberInHH;
 }
 
-public String getWGYearType() {
-	return WGYearType;
+public String getWgYearType() {
+	return wgYearType;
 }
 
-public void setWGYearType(String wGYearType) {
-	WGYearType = wGYearType;
+public void setWgYearType(String wgYearType) {
+	this.wgYearType = wgYearType;
 }
 
-public java.util.Date getWGInterviewDate() {
-	return WGInterviewDate;
+public java.util.Date getWgInterviewDate() {
+	return wgInterviewDate;
 }
 
-public void setWGInterviewDate(java.util.Date wGInterviewDate) {
-	WGInterviewDate = wGInterviewDate;
+public void setWgInterviewDate(java.util.Date wgInterviewDate) {
+	this.wgInterviewDate = wgInterviewDate;
 }
 
 public WealthGroup getWealthgroup() {
@@ -151,6 +149,8 @@ public WealthGroup getWealthgroup() {
 public void setWealthgroup(WealthGroup wealthgroup) {
 	this.wealthgroup = wealthgroup;
 }
+
+
 
 // ----------------------------------------------------------------------------------------------//
 

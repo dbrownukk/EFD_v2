@@ -44,28 +44,32 @@ public class Project {
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "ProjectID", length = 32, unique = true)
 	private String projectid;
-
+	
+	/***********************************************************************************************/
 	@Column(name = "ProjectTitle", length = 255, unique = true)
 	@Required	
 	private String projecttitle;
 	
+	/***********************************************************************************************/
 	@Stereotype("DATE")
 	    @Column(name="PDate") @Required
 	    private java.util.Date pdate;
 	
-	
-	
+	/***********************************************************************************************/	
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 	optional = true)
 	@NoModify
 	@NoCreate
-
-	
-	@DescriptionsList(descriptionProperties="currency")
+	@DescriptionsList(descriptionProperties="currency" )
 	private Country altCurrency;
 	
+	/***********************************************************************************************/
+	@Column(precision=10, scale=5)
+	@Digits(integer=10,fraction=5)
+
 	private BigDecimal altExchangeRate;
 	
+	/***********************************************************************************************/
 	//@NewActions({
 	//@NewAction(forViews="DEFAULT", value="LivelihoodZone.new LZ"), /* Check projectid is not empty */ 
 	//})
@@ -73,11 +77,17 @@ public class Project {
 	//@AddAction("LivelihoodZone.add")
 	//@NewAction("LivelihoodZone.new")
 	@ManyToMany
-	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false))
+	@JoinTable(name = "projectlz", 
+	joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), 
+	inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false),
+	uniqueConstraints=
+            @UniqueConstraint(columnNames = { "Project", "LZ" }))
 	@ListProperties("lzname,country.description,country.currency")
 	@CollectionView("SimpleLZ" ) 
 	private Collection<LivelihoodZone> livelihoodZone;
 
+	/***********************************************************************************************/
+	/***********************************************************************************************/
 
 	public String getProjectid() {
 		return projectid;
