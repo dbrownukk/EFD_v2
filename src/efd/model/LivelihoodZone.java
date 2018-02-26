@@ -8,7 +8,7 @@ import org.openxava.annotations.*;
 
 
 
-@Views({ @View(members="Livelihood_Zone[lzname;country,site]"),
+@Views({ @View(members="Livelihood_Zone[lzname;country],site"),
 		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
 		@View(name = "CreateLZ", members = "Livelihood Zone[lzname;country;lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname;country") })

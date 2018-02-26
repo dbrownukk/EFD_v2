@@ -75,7 +75,7 @@ public class Project {
 	//})
 	//@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */ 
 	//@AddAction("LivelihoodZone.add")
-	//@NewAction("LivelihoodZone.new")
+	@NewAction("ManyToMany.new") 
 	@ManyToMany
 	@JoinTable(name = "projectlz", 
 	joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), 
@@ -83,7 +83,7 @@ public class Project {
 	uniqueConstraints=
             @UniqueConstraint(columnNames = { "Project", "LZ" }))
 	@ListProperties("lzname,country.description,country.currency")
-	@CollectionView("SimpleLZ" ) 
+	@CollectionView("SimpleLZ") 
 	private Collection<LivelihoodZone> livelihoodZone;
 
 	/***********************************************************************************************/
