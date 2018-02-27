@@ -7,6 +7,14 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
+
+@Views({
+@View(members= "WildFood[#id,wildfoodname]")
+//@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
+})
+
+@Tab(editors = "List, Cards", properties = "wildfoodname")
+
 @Entity
 
 @Table(name="WildFoods")

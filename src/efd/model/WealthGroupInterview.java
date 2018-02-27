@@ -84,7 +84,7 @@ private java.util.Date wgInterviewDate;
 private WealthGroup wealthgroup;
 
 @OneToMany(mappedBy = "wealthgroupinterview")
-@ListProperties("wildfoodname,localunit,quantityproduced,quantitsold,priceperunit,otheruse")
+@ListProperties("asset.id,wildfoodname,localunit,quantityproduced,quantitsold,priceperunit,otheruse")
 private Collection<WildFood> wildfood;
 
 
