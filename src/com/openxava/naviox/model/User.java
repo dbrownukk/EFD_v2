@@ -61,6 +61,8 @@ import org.openxava.util.*;
 })
 public class User implements java.io.Serializable {
 	
+	private static final long serialVersionUID = 2355223287420733687L;
+	
 	private final static String PROPERTIES_FILE = "naviox.properties";
 	private static Log log = LogFactory.getLog(User.class);
 	private static Properties properties;
@@ -192,7 +194,7 @@ public class User implements java.io.Serializable {
 	
 	@ReadOnly
 	public Collection<Module> getModules() {
-		if (roles == null) return Collections.EMPTY_LIST;
+		if (roles == null) return Collections.<Module>emptyList();
 		Collection<Module> modules = new ArrayList<Module>();
 		for (Role role: roles) {
 			modules.addAll(role.getModules());
@@ -251,11 +253,17 @@ public class User implements java.io.Serializable {
 	}
 	
 	private boolean isValidLoginWithLDAP(String password) { 
-        Hashtable<String, String> props = new Hashtable<String, String>();
-        String securityPrincipal = getProperties().getProperty("ldapDomain", "").trim() + "\\" + this.name;
-        String ldapURL = "ldap://" + getProperties().getProperty("ldapHost", "").trim() +
-                ":" + getProperties().getProperty("ldapPort", "").trim() + 
-                "/" + getProperties().getProperty("ldapDN", "").trim();
+        Hashtable<String, String> props = new Hashtable<String, String>();        
+        String ldapDomain = getProperties().getProperty("ldapDomain", "").trim();
+        String ldapHost = getProperties().getProperty("ldapHost", "").trim();
+        String ldapPort = getProperties().getProperty("ldapPort", "").trim();
+        String ldapDN =  getProperties().getProperty("ldapDN", "").trim();
+        
+        String ldapURL = String.format("ldap://%s:%s/%s", ldapHost, ldapPort, ldapDN);        
+        String securityPrincipal = String.format("%s%s%s", ldapDomain, 
+        		                                           ldapDomain.equals("")?"":"\\", 
+        		                                           this.name);
+        
         props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         props.put(Context.PROVIDER_URL, ldapURL);
         props.put(Context.SECURITY_AUTHENTICATION, "simple");
@@ -267,7 +275,10 @@ public class User implements java.io.Serializable {
             return true;
         } catch (NamingException ex) {
             log.error(XavaResources.getString("ldap_authentication_error"), ex);  
-        }
+        } finally {
+			log.info("javax.naming.Context.PROVIDER_URL: " + ldapURL);
+			log.info("javax.naming.Context.SECURITY_PRINCIPAL: " + securityPrincipal);
+		}
         return false;
     }
 	
@@ -394,9 +405,10 @@ public class User implements java.io.Serializable {
 		}
 	}
 	
-	public void addOrganization(Organization organization) { 
+	public boolean addOrganization(Organization organization) { 
 		if (organizations == null) organizations = new ArrayList<Organization>();
-		organizations.add(organization);
+		if (!organizations.contains(organization)) return organizations.add(organization);
+		else return false;
 	}
 	
 	public void addRole(Role role) { 

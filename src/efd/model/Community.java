@@ -71,6 +71,9 @@ public class Community {
 	@JoinColumn(name = "CProject")
 	@OnChange(OnChangeClearCommunity.class)
 	@ReferenceView("SimpleProject")
+	@NoCreate
+	@NoModify
+	
 	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
 

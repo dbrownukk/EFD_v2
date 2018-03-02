@@ -1,17 +1,10 @@
 package efd.model;
 
-import java.math.*;
 import java.util.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
-
-import org.apache.commons.lang3.*;
 import org.hibernate.annotations.GenericGenerator;
-import org.hsqldb.persist.*;
 import org.openxava.annotations.*;
-import org.openxava.jpa.*;
-import org.openxava.util.*;
 
 @Views({
 @View(members= "Wealth_Group_Interview[# wealthgroup"
@@ -22,18 +15,28 @@ import org.openxava.util.*;
 		+ ",wgMaleIVees"
 		+ ",wgAverageNumberInHH"
 		+ ",wgYearType"
-		+ ",wgInterviewDate]"
-		+ ";WildFood{wildfood}"
+		+ ",wgInterviewDate"
+		+ ";status]"
+		+ ";WildFood{wildFood}"
+		+ ";Land{assetLand}"
+		+ ";Tradeable{assetTradeable}"
+		+ ";LiveStock{assetLiveStock}"
+		+ ";FoodStock{assetFoodStock}"
+		+ ";LiveStockUse{liveStockUse}"
+		+ ";Transfer{transfer}"
+		+ ";Crop{crop}"
 		),  
-//@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
+@View(name="wg",members= "wealthgroup")
 })
 
 
-//@Tab(editors = "List, Cards", properties = "")
+@Tab(editors = "List, Detail", properties = "wealthgroup.wgnameeng,status,wgInterviewNumber,wgInterviewers,wgIntervieweesCount,wgFemaleIVees,"
+		+ "wgMaleIVees,wgAverageNumberInHH,wgYearType,wgInterviewDate")
 
 @Entity
 
-@Table(name = "WealthGroupInterview")
+//@Table(name = "WealthGroupInterview")
+
 public class WealthGroupInterview {
 	// ----------------------------------------------------------------------------------------------//
 
@@ -72,7 +75,11 @@ private String wgYearType;
 
 @Column(name = "WGInterviewDate")	
 @Stereotype("DATE")
-private java.util.Date wgInterviewDate;
+private Date wgInterviewDate;
+
+//@Editor("ValidValuesRadioButton")
+private Status status;
+public enum Status { Generated, Uploaded, Parsed, Validated, Correct, Commit };
 
 @ManyToOne(fetch = FetchType.LAZY, optional = false)
 @JoinColumn(name = "WGID")
@@ -83,12 +90,41 @@ private java.util.Date wgInterviewDate;
 @DescriptionsList(descriptionProperties="community.site.locationdistrict,wgnameeng")
 private WealthGroup wealthgroup;
 
-@OneToMany(mappedBy = "wealthgroupinterview")
-@ListProperties("asset.id,wildfoodname,localunit,quantityproduced,quantitsold,priceperunit,otheruse")
-private Collection<WildFood> wildfood;
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+//@OneToMany(mappedBy = "wealthgroupinterview")
+//@EditOnly
+//@ListProperties("resourcesubtype,wildfoodname,localunit,quantityproduced,quantitsold,priceperunit,otheruse")
+@ListProperties("resourcesubtype,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
+private Collection<WildFood> wildFood;
 
 
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("resourcesubtype,landTypeEnteredName,landArea,unitEntered")
+private Collection<AssetLand> assetLand;
 
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("resourcesubtype,tradeableTypeEnteredName,quantity")
+private Collection<AssetTradeable> assetTradeable;
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("resourcesubtype,liveStockTypeEnteredName,numberOwned,pricePerUnit,unitEntered")
+private Collection<AssetLiveStock> assetLiveStock;
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("resourcesubtype,wildFoodOrCropIndicator,foodName")
+private Collection<AssetFoodStock> assetFoodStock;
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("resourcesubtype,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
+private Collection<LiveStockUse> liveStockUse;
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("resourcesubtype,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
+private Collection<Transfer> transfer;
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("resourcesubtype,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse")
+private Collection<Crop> crop;
 
 
 public String getWgiid() {
@@ -155,12 +191,20 @@ public void setWgYearType(String wgYearType) {
 	this.wgYearType = wgYearType;
 }
 
-public java.util.Date getWgInterviewDate() {
+public Date getWgInterviewDate() {
 	return wgInterviewDate;
 }
 
-public void setWgInterviewDate(java.util.Date wgInterviewDate) {
+public void setWgInterviewDate(Date wgInterviewDate) {
 	this.wgInterviewDate = wgInterviewDate;
+}
+
+public Status getStatus() {
+	return status;
+}
+
+public void setStatus(Status status) {
+	this.status = status;
 }
 
 public WealthGroup getWealthgroup() {
@@ -171,16 +215,69 @@ public void setWealthgroup(WealthGroup wealthgroup) {
 	this.wealthgroup = wealthgroup;
 }
 
-public Collection<WildFood> getWildfood() {
-	return wildfood;
+public Collection<WildFood> getWildFood() {
+	return wildFood;
 }
 
-public void setWildfood(Collection<WildFood> wildfood) {
-	this.wildfood = wildfood;
+public void setWildFood(Collection<WildFood> wildFood) {
+	this.wildFood = wildFood;
 }
 
+public Collection<AssetLand> getAssetLand() {
+	return assetLand;
+}
 
+public void setAssetLand(Collection<AssetLand> assetLand) {
+	this.assetLand = assetLand;
+}
 
+public Collection<AssetTradeable> getAssetTradeable() {
+	return assetTradeable;
+}
+
+public void setAssetTradeable(Collection<AssetTradeable> assetTradeable) {
+	this.assetTradeable = assetTradeable;
+}
+
+public Collection<AssetLiveStock> getAssetLiveStock() {
+	return assetLiveStock;
+}
+
+public void setAssetLiveStock(Collection<AssetLiveStock> assetLiveStock) {
+	this.assetLiveStock = assetLiveStock;
+}
+
+public Collection<AssetFoodStock> getAssetFoodStock() {
+	return assetFoodStock;
+}
+
+public void setAssetFoodStock(Collection<AssetFoodStock> assetFoodStock) {
+	this.assetFoodStock = assetFoodStock;
+}
+
+public Collection<LiveStockUse> getLiveStockUse() {
+	return liveStockUse;
+}
+
+public void setLiveStockUse(Collection<LiveStockUse> liveStockUse) {
+	this.liveStockUse = liveStockUse;
+}
+
+public Collection<Transfer> getTransfer() {
+	return transfer;
+}
+
+public void setTransfer(Collection<Transfer> transfer) {
+	this.transfer = transfer;
+}
+
+public Collection<Crop> getCrop() {
+	return crop;
+}
+
+public void setCrop(Collection<Crop> crop) {
+	this.crop = crop;
+}
 
 
 

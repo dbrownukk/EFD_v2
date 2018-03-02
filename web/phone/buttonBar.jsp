@@ -47,24 +47,20 @@ PhoneManager phoneManager = new PhoneManager(manager);
 			}
 		}		
 		if (!backButtonShown && !manager.getModelName().equals("SignIn")) {
-			int modulesCount = modules.getAll().size(); 
-			if (modulesCount > 1) {
+			boolean showModulesMenuButton = modules.showsIndexLink() || modules.getAll().size() > 1;
+			if (!modules.getCurrent(request).equals("Index") && showModulesMenuButton) {
 		%>
 	<div class="phone-back-button" onclick="window.location='../phone'">
 	   	<div><span></span></div>
 	   	<p><xava:message key="back"/></p>		
 	</div>
-		<%
-			}
-			else {
-		%>
-	<div class="phone-back-button" onclick="window.location='<%=request.getContextPath()%>/naviox/signOut.jsp'">
+		<%  } else { %>
+	<div class="phone-back-button" onclick="window.location='<%=request.getContextPath()%>/naviox/signOut.jsp?organization='">
    		<div><span></span></div>
    		<p><xava:message key="exit"/></p>		
 	</div>
-		<%				
-			}
-		}
+		<%	}
+		}		
 	}	
 	else if (!previousViews.isEmpty()) {
 		for (java.util.Iterator it = manager.getMetaActions().iterator(); it.hasNext(); ) {

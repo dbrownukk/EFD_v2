@@ -7,49 +7,46 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
-/*
-@Views({
-@View(members= "WildFood[#wildfoodname]")
-//@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
-})
-*/
-//@Tab(editors = "List, Cards", properties = "wildfoodname")
+
 
 @Embeddable
 
-@Table(name = "WildFood")
+@Table(name = "Transfer")
 
-public class WildFood extends Asset{
+public class Transfer extends Asset{
 
+	/* Note fk to resourcetype is in supertype Asset */
 
-	@Column(name = "WildFoodName", length = 50)
-	private String wildFoodName;
+	@Column(name = "TransferredResourceName", length = 50)
+	private String transferredResourceName;
 
 	@Column(name = "LocalUnit", length = 45)
 	private String localUnit;
+	
 
-	@Column(name = "QuantityProduced", length = 6)
+	
+	@Column(name = "QuantityReceived", nullable=false)
 	@NotNull
-	@Min(value = 0)
-	private Integer quantityProduced;
-
-	@Column(name = "QuantitySold", length = 6)
+	private Integer quantityReceived;
+	
+	@Column(name = "QuantitySold")
 	private Integer quantitySold;
 	
-	
-	@Column(name = "PricePerUnit",precision=10, scale=2)
+	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
 	private BigDecimal pricePerUnit;
-
+	
 	@Column(name = "OtherUse", length = 255)
 	private String otherUse;
 
-	public String getWildFoodName() {
-		return wildFoodName;
+
+
+	public String getTransferredResourceName() {
+		return transferredResourceName;
 	}
 
-	public void setWildFoodName(String wildFoodName) {
-		this.wildFoodName = wildFoodName;
+	public void setTransferredResourceName(String transferredResourceName) {
+		this.transferredResourceName = transferredResourceName;
 	}
 
 	public String getLocalUnit() {
@@ -60,12 +57,14 @@ public class WildFood extends Asset{
 		this.localUnit = localUnit;
 	}
 
-	public Integer getQuantityProduced() {
-		return quantityProduced;
+
+
+	public Integer getQuantityReceived() {
+		return quantityReceived;
 	}
 
-	public void setQuantityProduced(Integer quantityProduced) {
-		this.quantityProduced = quantityProduced;
+	public void setQuantityReceived(Integer quantityReceived) {
+		this.quantityReceived = quantityReceived;
 	}
 
 	public Integer getQuantitySold() {
@@ -91,10 +90,8 @@ public class WildFood extends Asset{
 	public void setOtherUse(String otherUse) {
 		this.otherUse = otherUse;
 	}
-
-
-
-
-
-
+	
+	
+	
+	
 }

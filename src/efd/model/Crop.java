@@ -7,49 +7,43 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
-/*
-@Views({
-@View(members= "WildFood[#wildfoodname]")
-//@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
-})
-*/
-//@Tab(editors = "List, Cards", properties = "wildfoodname")
+
 
 @Embeddable
 
-@Table(name = "WildFood")
+@Table(name = "Crop")
 
-public class WildFood extends Asset{
+public class Crop extends Asset{
 
+	/* Note fk to resourcetype is in supertype Asset */
 
-	@Column(name = "WildFoodName", length = 50)
-	private String wildFoodName;
+	@Column(name = "CropName", length = 50)
+	private String cropName;
 
 	@Column(name = "LocalUnit", length = 45)
 	private String localUnit;
+	
 
-	@Column(name = "QuantityProduced", length = 6)
-	@NotNull
-	@Min(value = 0)
+	
+	@Column(name = "QuantityProduced", nullable=false)
 	private Integer quantityProduced;
-
-	@Column(name = "QuantitySold", length = 6)
+	
+	@Column(name = "QuantitySold")
 	private Integer quantitySold;
 	
-	
-	@Column(name = "PricePerUnit",precision=10, scale=2)
+	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
 	private BigDecimal pricePerUnit;
-
+	
 	@Column(name = "OtherUse", length = 255)
 	private String otherUse;
 
-	public String getWildFoodName() {
-		return wildFoodName;
+	public String getCropName() {
+		return cropName;
 	}
 
-	public void setWildFoodName(String wildFoodName) {
-		this.wildFoodName = wildFoodName;
+	public void setCropName(String cropName) {
+		this.cropName = cropName;
 	}
 
 	public String getLocalUnit() {
@@ -92,9 +86,9 @@ public class WildFood extends Asset{
 		this.otherUse = otherUse;
 	}
 
+    //@AsEmbedded
+    //private MonthlyDataQP qp;
 
 
-
-
-
+	
 }

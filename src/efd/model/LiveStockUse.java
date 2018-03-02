@@ -7,49 +7,48 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
-/*
-@Views({
-@View(members= "WildFood[#wildfoodname]")
-//@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
-})
-*/
-//@Tab(editors = "List, Cards", properties = "wildfoodname")
+
 
 @Embeddable
 
-@Table(name = "WildFood")
+@Table(name = "LiveStockUse")
 
-public class WildFood extends Asset{
+public class LiveStockUse extends Asset{
 
-
-	@Column(name = "WildFoodName", length = 50)
-	private String wildFoodName;
+	@Column(name = "LSName", length = 50)
+	private String lsName;
 
 	@Column(name = "LocalUnit", length = 45)
 	private String localUnit;
-
-	@Column(name = "QuantityProduced", length = 6)
+	
+	@Column(name = "QuantityProduced", nullable=false)
 	@NotNull
-	@Min(value = 0)
 	private Integer quantityProduced;
-
-	@Column(name = "QuantitySold", length = 6)
+	
+	@Column(name = "QuantitySold")
 	private Integer quantitySold;
 	
-	
-	@Column(name = "PricePerUnit",precision=10, scale=2)
+	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
 	private BigDecimal pricePerUnit;
-
+	
 	@Column(name = "OtherUse", length = 255)
 	private String otherUse;
+	
+	@Column(name="LSIncomeType")
+	private Integer lsIncomeType;
+	
+	@Column(name="LSIncomeType2")
+	private String lsIncomeType2;
 
-	public String getWildFoodName() {
-		return wildFoodName;
+
+
+	public String getLsName() {
+		return lsName;
 	}
 
-	public void setWildFoodName(String wildFoodName) {
-		this.wildFoodName = wildFoodName;
+	public void setLsName(String lsName) {
+		this.lsName = lsName;
 	}
 
 	public String getLocalUnit() {
@@ -92,9 +91,29 @@ public class WildFood extends Asset{
 		this.otherUse = otherUse;
 	}
 
+	public Integer getLsIncomeType() {
+		return lsIncomeType;
+	}
 
+	public void setLsIncomeType(Integer lsIncomeType) {
+		this.lsIncomeType = lsIncomeType;
+	}
 
+	public String getLsIncomeType2() {
+		return lsIncomeType2;
+	}
 
-
-
+	public void setLsIncomeType2(String lsIncomeType2) {
+		this.lsIncomeType2 = lsIncomeType2;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

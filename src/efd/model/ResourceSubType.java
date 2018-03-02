@@ -1,7 +1,5 @@
 package efd.model;
 
-import java.math.*;
-
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -21,7 +19,7 @@ import org.openxava.annotations.*;
 
 //@Tab(properties="resourcetypename")
 
-@Table(name = "resourcesubtype",uniqueConstraints=@UniqueConstraint(columnNames={"ReourceType","ResourceTypeName"}))
+@Table(name = "ResourceSubType",uniqueConstraints=@UniqueConstraint(columnNames={"ReourceType","ResourceTypeName"}))
 public class ResourceSubType {
 
 	@Id

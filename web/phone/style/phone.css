@@ -836,3 +836,7 @@ i {
 .phone-subcontroller-actions a:hover {
 	color: #5b80ab; 
 }
+
+td[class="phone-list-element-check"] > input[name*="_Index__xava_selected"] {
+	display: none;
+}

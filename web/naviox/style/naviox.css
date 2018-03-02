@@ -829,7 +829,6 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 	border-top-left-radius: 2px;
 	border-top-right-radius: 2px;	
 	border-style: none;
-	height: 28px;
 	background: white;
 	color: #191919;	
 	box-shadow: 0px -3px 4px #CCCCCC; 
@@ -888,6 +887,10 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 
 .ox-list-pair:hover, .ox-list-odd:hover {
 	background: #FFFFD6;
+}
+
+.ui-dialog .ox-element-collection > div {
+	width: 100% !important; /* To avoid horizontal scroll bar in element collection inside dialog, such as Import dialog */
 }
 
 .ox-element-collection .ox-list-pair:hover, .ox-element-collection .ox-list-odd:hover {
@@ -1054,12 +1057,13 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 }
 
 .ox-section { 
-	padding: 0px 10px 0px 17px; 
-	height: 30px; 
+	padding: 0px 10px 0px 17px;  
 	margin: 0px -10px 10px -11px;  
-	box-shadow: 0px 3px 4px #CCCCCC;  
-	-moz-box-shadow: 0px 3px 4px #CCCCCC; 
-	-webkit-box-shadow: 0px 3px 4px #CCCCCC;
+	box-shadow: 0px 0px 5px #CCCCCC;  
+}
+
+.ie .ox-section { 
+	line-height: 210%; 
 }
 
 .ox-flow-layout .ox-section {
@@ -1352,6 +1356,7 @@ div.ox-subcontroller table{
 
 .ox-charts {
 	width: 0px;
+	margin-left: 20px; 
 }
 
 .ct-chart {
@@ -1375,6 +1380,11 @@ div.ox-subcontroller table{
 	box-shadow: none; 
 	-moz-box-shadow: none; 
 	-webkit-box-shadow: none; 
+}
+
+.ox-charts > .ox-layout-detail {
+	padding-top: 15px;
+	display: block;
 }
 
 .ox-chart-x-column select {
@@ -1432,23 +1442,29 @@ div.ox-subcontroller table{
 	width: 120px;
 }
 
+.ui-dialog.no-close {
+	border-radius: 4px !important;
+	-webkit-border-radius: 4px !important;	
+}
+
 .no-close .ui-dialog-titlebar-close { 
 	display: none; 
 }
 
-.no-close .ox-detail { 
-	margin-left: -15px;  
+.no-close .ox-detail input {
+	width: 100%;
 }
 
-.no-close .ox-detail input { 
-	width: calc(100% - 13px);  
+.firefox .no-close .ox-detail input { 
+	width: calc(100% - 10px);  
 }
 
-.firefox .no-close .ox-detail {
-    margin-left: -10px;
+.no-close .ox-bottom-buttons {
+	margin-right: 7px;	
 }
-.firefox .no-close .ox-detail input {
-    width: calc(100% - 23px);
+
+.firefox .no-close .ox-bottom-buttons {
+	margin-right: 10px;	
 }
 
 i.ox-sort-indicator, i.ox-sort-indicator2 {
@@ -1748,6 +1764,7 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
 }
 
 .arrow {
+	pointer-events: none;  
 	width: 23px;
 	height: 26px;
 	overflow: hidden;

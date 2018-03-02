@@ -18,7 +18,7 @@ import org.openxava.util.*;
 @Entity
 @Table(name="OXROLES_OXMODULES")
 @IdClass(ModuleRightsKey.class)
-@View(members="module; excludedActions; excludedMembers; readOnlyMembers") 
+@View(members="module; excludedActions; excludedMembers; readOnlyMembers")
 public class ModuleRights {
 	
 	public static int countForApplication(String application) {
@@ -112,8 +112,15 @@ public class ModuleRights {
 		Collection<MetaMember> result = new ArrayList<MetaMember>();
 		MetaModel metaModel = null;
 		for (String member: members.split(",")) {
-			if (metaModel == null) metaModel = MetaModel.get(member);
-			else result.add(metaModel.getMetaMember(member));
+			if (metaModel == null) {
+				metaModel = MetaModel.get(member);
+			} else {
+				try {
+					MetaMember metaMember = metaModel.getMetaMember(member);
+					result.add(metaMember);
+				} catch(ElementNotFoundException ex) {} // In the Role administration module, 
+														// a warning is printed in log				
+			}
 		}
 		return result;
 	}

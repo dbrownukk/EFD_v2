@@ -107,8 +107,20 @@ public class FileteredSite extends ReferenceSearchAction {
 		// ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
 		// + " where pr.projectid = '" + cprojectid + ")'");
 
+		
+		if (lzs.isEmpty() && com.isEmpty()) /* No existing Sites/LZS in this project 	*/
+		{
+			getTab().setBaseCondition("${locationid} != '" + locid + "'");
+		}
+		else if (com.isEmpty())     /* No previously used sites in this project - show all sites from this proj */
+		{
+			getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")");
+		}
+		else	/* Show all relavent sites */ 
+		{
 		getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")"
 				+ "and ${locationid} not in ( " + alist + ")");
-
+		}
+	
 	}
 }

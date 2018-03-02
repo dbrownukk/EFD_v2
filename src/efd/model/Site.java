@@ -18,11 +18,11 @@ import org.openxava.annotations.*;
 
 @Entity
 
-@Tab(editors = "List, Cards"
-, rowStyles = @RowStyle(style = "row-highlight"
-, property = "type", value = "steady")
-, properties = "livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"
-, defaultOrder = "${livelihoodZone.lzname} asc,${locationdistrict} asc,${subdistrict} asc")
+//@Tab(editors = "List, Cards"
+//, rowStyles = @RowStyle(style = "row-highlight"
+//, property = "type", value = "steady")
+//, properties = "livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"
+//, defaultOrder = "${livelihoodZone.lzname} asc,${locationdistrict} asc,${subdistrict} asc")
 
 
 

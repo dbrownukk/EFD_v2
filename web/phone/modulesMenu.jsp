@@ -14,9 +14,15 @@
    	<p><xava:message key="back"/></p>		
 </div>
 </a>
-<% } else { 
-		String organization = Organizations.getCurrent(request);
-		if (organization == null) organization = "";
+<% } else if (modules.showsIndexLink()) { %>
+<div class="phone-back-button"
+	onclick="window.location='<%=request.getContextPath()%>/m/Index'">	
+   	<div><span></span></div>
+   	<p><xava:label key="Index"/></p>		
+</div>	 
+<% } else {
+	String organization = Organizations.getCurrent(request);
+	if (organization == null) organization = "";
 %>
 <div class="phone-back-button" 
 	onclick="window.location='<%=request.getContextPath()%>/naviox/signOut.jsp?organization=<%=organization%>'">
