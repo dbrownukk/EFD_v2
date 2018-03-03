@@ -8,6 +8,8 @@ import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 import org.openxava.model.*;
 
+import efd.model.WealthGroupInterview.*;
+
 @MappedSuperclass
 
 
@@ -28,23 +30,37 @@ abstract public class Asset {
 	//private WealthGroupInterview wealthgroupinterview;
 	
 	
-	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = false)
-	@JoinColumn(name = "AssetType")     /* Asset Type ID */
-	@DescriptionsList(descriptionProperties = "resourcetypename")
-	private ResourceSubType resourcesubtype;
+	//@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
+		//	optional = false)
+	//@NoModify
+	//@NoCreate
+	//@JoinColumn(name = "AssetType")     /* Asset Type ID */
+	//@DescriptionsList(descriptionProperties = "resourcetypename")
+	
+	@Column(name="AssetType", length=50)
+	private String assetType;
 
+	@Column(name="Status", nullable=false)
+	private Status status;
+	public enum Status { Invalid, NotChecked, Valid }
 
-
-
-	public ResourceSubType getResourcesubtype() {
-		return resourcesubtype;
+	
+	
+	public String getAssetType() {
+		return assetType;
 	}
-
-
-	public void setResourcesubtype(ResourceSubType resourcesubtype) {
-		this.resourcesubtype = resourcesubtype;
+	public void setAssetType(String assetType) {
+		this.assetType = assetType;
 	}
+	public Status getStatus() {
+		return status;
+	}
+	public void setStatus(Status status) {
+		this.status = status;
+	};
+
+
+
 
 
 	

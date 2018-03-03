@@ -124,11 +124,11 @@ public class Community {
 	@ReadOnly
 	public String getWarningMessage() {
 		if (getWgpercenttotal() > 100) {
-			System.out.println("in stereotype" + getWgpercenttotal());
+			//System.out.println("in stereotype" + getWgpercenttotal());
 			return "<font color=" + "red" + ">Total Wealthgroup Percent is greater than 100</font>";
 
 		} else if (getWgpercenttotal() < 100) {
-			System.out.println("in stereotype" + getWgpercenttotal());
+			//System.out.println("in stereotype" + getWgpercenttotal());
 			return "<font color=" + "orange" + ">Total Wealthgroup Percent is less than 100</font>";
 		} else if (getWgpercenttotal() == 100) {
 			return "<font color=" + "green" + ">Total Wealthgroup Percent is 100</font>";

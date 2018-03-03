@@ -25,6 +25,7 @@ import org.openxava.annotations.*;
 		+ ";LiveStockUse{liveStockUse}"
 		+ ";Transfer{transfer}"
 		+ ";Crop{crop}"
+		+ ";Employment{employment}"
 		),  
 @View(name="wg",members= "wealthgroup")
 })
@@ -48,6 +49,8 @@ public class WealthGroupInterview {
 	private String wgiid;
 	// ----------------------------------------------------------------------------------------------//
 
+
+	
 @Column(name = "WGInterviewNumber",nullable=false)	
 @Required
 private Integer wgInterviewNumber;
@@ -91,41 +94,42 @@ public enum Status { Generated, Uploaded, Parsed, Validated, Correct, Commit };
 private WealthGroup wealthgroup;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-//@OneToMany(mappedBy = "wealthgroupinterview")
-//@EditOnly
-//@ListProperties("resourcesubtype,wildfoodname,localunit,quantityproduced,quantitsold,priceperunit,otheruse")
-@ListProperties("resourcesubtype,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,assetType,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
 private Collection<WildFood> wildFood;
 
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("resourcesubtype,landTypeEnteredName,landArea,unitEntered")
+@ListProperties("status,assetType,landTypeEnteredName,landArea,unitEntered")
 private Collection<AssetLand> assetLand;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("resourcesubtype,tradeableTypeEnteredName,quantity")
+@ListProperties("status,assetType,tradeableTypeEnteredName,quantity")
 private Collection<AssetTradeable> assetTradeable;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("resourcesubtype,liveStockTypeEnteredName,numberOwned,pricePerUnit,unitEntered")
+@ListProperties("status,assetType,liveStockTypeEnteredName,numberOwned,pricePerUnit,unitEntered")
 private Collection<AssetLiveStock> assetLiveStock;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("resourcesubtype,wildFoodOrCropIndicator,foodName")
+@ListProperties("status,assetType,wildFoodOrCropIndicator,foodName")
 private Collection<AssetFoodStock> assetFoodStock;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("resourcesubtype,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
+@ListProperties("status,assetType,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
 private Collection<LiveStockUse> liveStockUse;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("resourcesubtype,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,assetType,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
 private Collection<Transfer> transfer;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("resourcesubtype,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,assetType,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse")
 private Collection<Crop> crop;
 
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("status,assetType,employmentName,peopleCount,frequency, cashPaymentPerUnit, foodPaymentPerUnit")
+private Collection<Employment> employment;
 
 public String getWgiid() {
 	return wgiid;
@@ -277,6 +281,14 @@ public Collection<Crop> getCrop() {
 
 public void setCrop(Collection<Crop> crop) {
 	this.crop = crop;
+}
+
+public Collection<Employment> getEmployment() {
+	return employment;
+}
+
+public void setEmployment(Collection<Employment> employment) {
+	this.employment = employment;
 }
 
 

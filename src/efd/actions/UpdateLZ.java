@@ -1,13 +1,7 @@
 package efd.actions;
 
 
-import java.util.*;
-
-import javax.ejb.*;
-
 import org.openxava.actions.*;
-import org.openxava.controller.*;
-import org.openxava.tab.*;
 
 
 public class UpdateLZ extends NewAction {
