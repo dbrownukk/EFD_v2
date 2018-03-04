@@ -22,6 +22,7 @@ import antlr.*;
 import org.openxava.tab.*;
 
 import efd.model.*;
+import efd.model.WealthGroupInterview.*;
 import efd.utils.*;
 import sun.swing.*;
 
@@ -30,8 +31,7 @@ import org.apache.commons.lang.StringUtils;
 
 //public class CreateXlsFileAction2 extends CollectionElementViewBaseAction implements IForwardAction, JxlsConstants { // 1
 public class CreateXlsFileAction extends CollectionBaseAction implements IForwardAction, JxlsConstants {
-	
-	
+
 	/* nulls .... */
 	private static final String String = null;
 	private String method = null;
@@ -42,23 +42,22 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		// View view = getCollectionElementView();
 
-		//System.out.println("In spreadsheet 001" + getView().getKeyValuesWithValue());
+		// System.out.println("In spreadsheet 001" + getView().getKeyValuesWithValue());
 
-		//System.out.println("In spreadsheet 1" + getCollectionElementView().getCollectionValues().get(row));
+		// System.out.println("In spreadsheet 1" +
+		// getCollectionElementView().getCollectionValues().get(row));
 
 		Map m = (Map) getCollectionElementView().getCollectionValues().get(row);
 
-		//System.out.println("In spreadsheet 1"+list.toString());
+		// System.out.println("In spreadsheet 1"+list.toString());
 		JxlsWorkbook scenario = createScenario();
-		//System.out.println("In spreadsheet 2");
+		// System.out.println("In spreadsheet 2");
 		getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
-		//System.out.println("In spreadsheet 3");
+		// System.out.println("In spreadsheet 3");
 		setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
-		//System.out.println("In spreadsheet 4");
-		/* Now to reset */
+		// System.out.println("In spreadsheet 4");
+	
 
-		// getView().setModelName("Community");
-		// getView().clear();
 	}
 
 	// setControllers("Return");
@@ -78,6 +77,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int k = 0;
 		int w = 30;
 		int rows;
+		int landrow = 0;
 		int col;
 		Map key;
 		List wgl;
@@ -93,30 +93,29 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		/* Get WealthGroup data */
 		Map n = (Map) getCollectionElementView().getCollectionValues().get(row);
-		
-		//System.out.println("n1 = " + n.values());
-		//System.out.println("n2 = " + n.keySet());
-		//System.out.println("n3 = " + n.entrySet());
-		//System.out.println("n4 = " + n.get("wgid"));
-		
-		String wgid = (String) n.get("wgid");
-		//System.out.println("In create scenario 1 ");
 
-		//System.out.println("wgid = " + wgid);
+		// System.out.println("n1 = " + n.values());
+		// System.out.println("n2 = " + n.keySet());
+		// System.out.println("n3 = " + n.entrySet());
+		// System.out.println("n4 = " + n.get("wgid"));
+
+		String wgid = (String) n.get("wgid");
+		// System.out.println("In create scenario 1 ");
+
+		// System.out.println("wgid = " + wgid);
 
 		WealthGroup wealthgroup = XPersistence.getManager().find(WealthGroup.class, wgid);
-		//System.out.println("In careetscenario 22");
+		// System.out.println("In careetscenario 22");
 
 		/* Get Community Data */
 
 		Community community = XPersistence.getManager().find(Community.class,
 				wealthgroup.getCommunity().getCommunityid());
-		//System.out.println("In careetscenario 222");
+		// System.out.println("In careetscenario 222");
 		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
-		//System.out.println("In careetscenario 221");
-		Site site = XPersistence.getManager().find(Site.class, community.getSite().getLocationid() );
-		//System.out.println("In careetscenario 223");
-		//System.out.println("In careetscenario project 2222"+project.getProjecttitle());
+		// System.out.println("In careetscenario 221");
+		Site site = XPersistence.getManager().find(Site.class, community.getSite().getLocationid());
+
 		/******************
 		 * Need to get charresource and types using getmanager and iterate
 		 ********************/
@@ -126,12 +125,12 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Query query = XPersistence.getManager()
 				.createQuery("select idwgresource from WGCharacteristicsResource where wgid = '" + wgid + "'");
 		List chrs = query.getResultList();
-		//System.out.println("In careetscenario 224");
-		//WGCharacteristicsResource wgcharacteristicsresource2 =
-		 //XPersistence.getManager().find(WGCharacteristicsResource.class,
-		 //chrs.get(0));
+		// System.out.println("In careetscenario 224");
+		// WGCharacteristicsResource wgcharacteristicsresource2 =
+		// XPersistence.getManager().find(WGCharacteristicsResource.class,
+		// chrs.get(0));
 
-		//System.out.println("Number = " + chrs.size());
+		// System.out.println("Number = " + chrs.size());
 		for (k = 0; k < chrs.size(); k++) {
 			/* Get Resource Sub Type */
 			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
@@ -142,41 +141,28 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();   
-			
+			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
 		}
 
 		/* XLS File Name */
-		//JxlsWorkbook scenarioWB = new JxlsWorkbook(project.getProjecttitle());
+		// JxlsWorkbook scenarioWB = new JxlsWorkbook(project.getProjecttitle());
 		/* this works */
-		filename = community.getProjectlz().getProjecttitle()+'_'
-				+site.getLivelihoodZone().getLzname()+'_'
-				+wealthgroup.getWgnameeng();
-	
-		
-		/* this does not
-		filename =  StringUtils.trim(
-				wealthgroup.getCommunity().getSite().getSubdistrict()+'_'
-				+wealthgroup.getWgnameeng()+'_'
-				+community.getProjectlz().getProjecttitle()+'_'
-				+site.getLivelihoodZone().getLzname()+'_'
-				+wealthgroup.getCommunity().getSite().getLocationdistrict());
-		*/
-		
-		
+		filename = community.getProjectlz().getProjecttitle() + '_' + site.getLivelihoodZone().getLzname() + '_'
+				+ wealthgroup.getWgnameeng();
+
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(filename);
 		JxlsStyle boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
 		JxlsStyle boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);
 		JxlsStyle borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN,
 				BORDER_THIN, BORDER_THIN);
-		//JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(LIGHT_GREEN).setTextColor(BLACK);
+		// JxlsStyle textstyle =
+		// scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(LIGHT_GREEN).setTextColor(BLACK);
 		JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK);
-		JxlsStyle datestyle = scenarioWB
-				.getDefaultDateStyle(); /*
-										 * seems to e a bug to stop setting
-										 * other params
-										 */
-		//System.out.println("done Jxl 1");
+		JxlsStyle datestyle = scenarioWB.getDefaultDateStyle(); /*
+																 * seems to e a bug to stop setting other params
+																 */
+		// System.out.println("done Jxl 1");
 		/* XLS Sheets */
 
 		JxlsSheet Interview = scenarioWB.addSheet("Interview Details");
@@ -192,10 +178,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			Interview.setColumnWidths(i, w); /* set col widths */
 			i++;
 		}
-		//System.out.println("done Jxl 2");
+		// System.out.println("done Jxl 2");
 		while (j < 11) {
-			Interview.setValue(3, j, "",
-					borderStyle); /* set borders for data input fields */
+			Interview.setValue(3, j, "", borderStyle); /* set borders for data input fields */
 			Interview.setValue(5, j, "", borderStyle);
 			j += 2;
 		}
@@ -217,27 +202,29 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		Interview.setValue(6, 8, "Women", boldRStyle);
 		Interview.setValue(6, 10, "Type of Year", boldRStyle);
-		
+
 		/* Data */
 
-		//Interview.setValue(3, 2, community.getCinterviewsequence(),
-				//textstyle); /* Interview Number */
+		// Interview.setValue(3, 2, community.getCinterviewsequence(),
+		// textstyle); /* Interview Number */
 		Interview.setValue(3, 4, community.getSite().getLocationdistrict(), borderStyle); /* District */
 		Interview.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
 				borderStyle); /* Livelihood Zone */
-		//Interview.setValue(3, 8, community.getCivparticipants(),textstyle); /* Number of Participants */
-		Interview.setValue(3, 10, wealthgroup.getWgnameeng(),
-				borderStyle); /* Wealth Group */
+		// Interview.setValue(3, 8, community.getCivparticipants(),textstyle); /* Number
+		// of Participants */
+		Interview.setValue(3, 10, wealthgroup.getWgnameeng(), borderStyle); /* Wealth Group */
 
-		//Interview.setValue(5, 2, community.getCinterviewdate(), datestyle); /* Date */
-		Interview.setValue(5, 4, community.getSite().getSubdistrict(),
-				borderStyle); /* Sub District */
-		//Interview.setValue(5, 6, community.getInterviewers(), textstyle); /* Interviewers */
-		//Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
-		//Interview.setValue(5, 10, wealthgroup.getWghhsize(),textstyle); /* Number in Household */
+		// Interview.setValue(5, 2, community.getCinterviewdate(), datestyle); /* Date
+		// */
+		Interview.setValue(5, 4, community.getSite().getSubdistrict(), borderStyle); /* Sub District */
+		// Interview.setValue(5, 6, community.getInterviewers(), textstyle); /*
+		// Interviewers */
+		// Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
+		// Interview.setValue(5, 10, wealthgroup.getWghhsize(),textstyle); /* Number in
+		// Household */
 
-		//Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
-		//Interview.setValue(7, 10, " ", textstyle); /* Type of Year ?????????? */
+		// Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
+		// Interview.setValue(7, 10, " ", textstyle); /* Type of Year ?????????? */
 
 		/* Asset Sheet */
 
@@ -265,8 +252,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 					row = 17;
 				}
 
-				Asset.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				Asset.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 				if (col == 5 && row > 16) {
 					row = 30;
@@ -277,30 +263,34 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			row = 4;
 		}
 		row = 4;
-		
-			// get resource sub type //
-			for (k = 0; k < chrs.size(); k++) {
-				/* Get Resource Sub Type */
-				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-						.find(WGCharacteristicsResource.class, chrs.get(k));
-				/* Get Resource Type */
-				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+		landrow=17;
+		// get resource sub type //
+		for (k = 0; k < chrs.size(); k++) {
+			/* Get Resource Sub Type */
+			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+					.find(WGCharacteristicsResource.class, chrs.get(k));
+			/* Get Resource Type */
+			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
 
-				rt = rst.getResourcetypename();
-				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-			
-				if (rt.equals("Other Productive Assets")) {
+			rt = rst.getResourcetypename();
+			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+			if (rt.equals("Livestock")) {
 				Asset.setValue(2, row, resub, borderStyle);
 				Asset.setValue(3, row, rtunit, borderStyle);
 				row++;
 			}
-
+			
+			if (rt.equals("Land")) {
+				Asset.setValue(2, landrow, resub, borderStyle);
+				Asset.setValue(3, landrow, rtunit, borderStyle);
+				landrow++;
 			}
-			
-			
-			
+
+		}
+
 		/* Crop Sheet */
 
 		Crop.setValue(8, 3, "For Crops which are sold", boldTopStyle);
@@ -329,8 +319,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 5;
 		while (col < 14) {
 			while (row < 16) {
-				Crop.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				Crop.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 			}
 
@@ -385,8 +374,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 5;
 		while (col < 14) {
 			while (row < 16) {
-				LS.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				LS.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -409,7 +397,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
-			if (rt.equals("Livestock")) {
+			/* Not Livestock Asset - this is Use of Livestock */
+			
+			if (rt.equals("Use of Livestock")) {
 				LS.setValue(2, row, resub, borderStyle);
 				LS.setValue(4, row, rtunit, borderStyle);
 				row++;
@@ -444,8 +434,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Emp.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				Emp.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -502,8 +491,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Transfer.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				Transfer.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -558,8 +546,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Wildfood.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				Wildfood.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -606,8 +593,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 6) {
 			while (row < 16) {
-				Foodpurchase.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				Foodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -654,8 +640,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 6) {
 			while (row < 16) {
-				Nonfoodpurchase.setValue(col, row, "",
-						borderStyle); /* set borders for data input fields */
+				Nonfoodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -681,6 +666,30 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			}
 
 		}
+		
+		/* Now write the wealthgroup interview header data */
+		/*
+		EntityManagerFactory f = Persistence.createEntityManagerFactory("default");
+		EntityManager manager = f.createEntityManager();
+		manager.getTransaction().begin();
+		
+		
+		WealthGroupInterview wgi = new WealthGroupInterview();
+
+		
+		wgi.setWealthgroup??????????????????????????????
+		wgi.setWgInterviewNumber(2);
+		wgi.setWgInterviewNumber(0);
+		wgi.setWgIntervieweesCount(3);
+		wgi.setWgInterviewers("Basil");
+		
+		
+		manager.persist(wgi);
+		manager.getTransaction().commit();
+		manager.close();
+		
+		*/
+		
 		return scenarioWB;
 		/* end XLS setup */
 

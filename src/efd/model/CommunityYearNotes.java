@@ -6,7 +6,10 @@ import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.*;
+
 import org.hibernate.annotations.*;
+import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 
 import efd.actions.*;
@@ -32,14 +35,16 @@ public class CommunityYearNotes {
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
 	@JoinColumn(name="CommunityID")	
-	//@ReferenceView("OriginalCommunity")
 	@Required
     private Community community;	
 	//----------------------------------------------------------------------------------------------//
-	@Stereotype("DATE")
-	@Column(name="Year", nullable=false)
+
+	@Column(name="Year", nullable=false, length=4)
+	//@Min(value=2001)
+	//@Max(value=2020)
+	//@Range(min=2001,max=2020)
 	@Required
-	private java.util.Date year;
+	private int year;
 	
 	
 	//----------------------------------------------------------------------------------------------//
@@ -65,10 +70,11 @@ public class CommunityYearNotes {
 
 
 
-	public java.util.Date getYear() {
+
+	public Integer getYear() {
 		return year;
 	}
-	public void setYear(java.util.Date year) {
+	public void setYear(Integer year) {
 		this.year = year;
 	}
 	public String getNotes() {
