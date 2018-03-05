@@ -84,7 +84,7 @@ private String wgYearType;
 private Date wgInterviewDate;
 
 //@Editor("ValidValuesRadioButton")
-@ReadOnly
+//@ReadOnly
 @Column(name="WGIStatus")
 private Status status;
 public enum Status { Generated, Uploaded, Parsed, Validated, Correct, Commit };
@@ -98,6 +98,7 @@ public enum Status { Generated, Uploaded, Parsed, Validated, Correct, Commit };
 @NoCreate
 @DescriptionsList(descriptionProperties="community.site.locationdistrict,wgnameeng")
 private WealthGroup wealthgroup;
+
 
 @Stereotype("FILE")
 // @OnChange(OnChangeSetWGIStatus.class)

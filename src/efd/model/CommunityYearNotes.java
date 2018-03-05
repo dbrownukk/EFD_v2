@@ -68,14 +68,6 @@ public class CommunityYearNotes {
 	// get / set 
 	//----------------------------------------------------------------------------------------------//
 
-
-
-
-	public Community getCommunity() {
-		return community;
-	}
-
-
 	public String getNotesid() {
 		return notesid;
 	}
@@ -83,6 +75,11 @@ public class CommunityYearNotes {
 
 	public void setNotesid(String notesid) {
 		this.notesid = notesid;
+	}
+
+
+	public Community getCommunity() {
+		return community;
 	}
 
 
@@ -109,6 +106,9 @@ public class CommunityYearNotes {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
+
+
+
 	
 	
 
