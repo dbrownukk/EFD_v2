@@ -38,26 +38,31 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	private int row;
 	private String forwardURI = null;
 
+
 	public void execute() throws Exception {
 
-		// View view = getCollectionElementView();
 
-		// System.out.println("In spreadsheet 001" + getView().getKeyValuesWithValue());
-
-		// System.out.println("In spreadsheet 1" +
-		// getCollectionElementView().getCollectionValues().get(row));
-
-		Map m = (Map) getCollectionElementView().getCollectionValues().get(row);
-
+	
+		try{
 		// System.out.println("In spreadsheet 1"+list.toString());
 		JxlsWorkbook scenario = createScenario();
 		// System.out.println("In spreadsheet 2");
-		getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
+		if(scenario.equals(null))
+		{
+			System.out.println("In spreadsheet exit");
+			addError("Template cannot be regenerated once it has been uploaded.");
+		}
+			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
 		// System.out.println("In spreadsheet 3");
 		setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
 		// System.out.println("In spreadsheet 4");
-	
-
+		}
+		catch(NullPointerException em)
+		{
+			addError("Template cannot be regenerated once it has been uploaded");
+		}
+		
+		
 	}
 
 	// setControllers("Return");
@@ -94,17 +99,56 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		/* Get WealthGroup data */
 		Map n = (Map) getCollectionElementView().getCollectionValues().get(row);
 
-		// System.out.println("n1 = " + n.values());
-		// System.out.println("n2 = " + n.keySet());
-		// System.out.println("n3 = " + n.entrySet());
-		// System.out.println("n4 = " + n.get("wgid"));
+
 
 		String wgid = (String) n.get("wgid");
-		// System.out.println("In create scenario 1 ");
+		WealthGroup wealthgroup = XPersistence.getManager().find(WealthGroup.class, wgid  );
+	
+
+		/*
+		 * Check if WGInterview exists and if so is still at Generated status,
+		 * otherwise do not allow
+		 */
+		
+		
+		Query querywgi = XPersistence.getManager().
+				createQuery("select wi from WealthGroupInterview wi join wi.wealthgroup wg where wg.wgid = '" + wgid +"'");
+		
+		List<WealthGroupInterview> wgi = querywgi.getResultList();
+		System.out.println( " in Template, size = "+wgi.size() + wgi.get(0).getStatus());
+		if (wgi.isEmpty()) {    
+			addMessage("Generating Spreadheet Template");
+			System.out.println("Generating Template, size = "+wgi.size());
+			
+			/* Now write the wealthgroup interview header data */
+			 WealthGroupInterview wginew = new WealthGroupInterview(); 
+			 wginew.setWgInterviewNumber(2); 
+			 wginew.setWgIntervieweesCount(3); 
+			 wginew.setWgInterviewers("Basil");
+			 wginew.setStatus(Status.Generated);
+			 wginew.setWealthgroup(wealthgroup);
+			 System.out.println("Generating Template done sets ");
+			 
+			 XPersistence.getManager().persist(wginew);		
+			 // XPersistence.commit();
+			 System.out.println("Generating Template done persist ");
+			
+			
+		}
+		else if (wgi.size() == 1  && wgi.get(0).getStatus().equals("Generated") )
+		{
+			System.out.println("ok to print again as staus still generated in template gen "+wgi.get(0).getStatus());
+		}
+			else if (wgi.size() == 1 && wgi.get(0).getStatus().toString() != "Generated") /* template already generated */ 
+			{
+			//addError("Template cannot be regenerated once it has been uploaded");
+			return null;
+			}
+		
 
 		// System.out.println("wgid = " + wgid);
 
-		WealthGroup wealthgroup = XPersistence.getManager().find(WealthGroup.class, wgid);
+	
 		// System.out.println("In careetscenario 22");
 
 		/* Get Community Data */
@@ -146,7 +190,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		}
 
 		/* XLS File Name */
-		// JxlsWorkbook scenarioWB = new JxlsWorkbook(project.getProjecttitle());
+		// JxlsWorkbook scenarioWB = new
+		// JxlsWorkbook(project.getProjecttitle());
 		/* this works */
 		filename = community.getProjectlz().getProjecttitle() + '_' + site.getLivelihoodZone().getLzname() + '_'
 				+ wealthgroup.getWgnameeng();
@@ -159,9 +204,11 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		// JxlsStyle textstyle =
 		// scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(LIGHT_GREEN).setTextColor(BLACK);
 		JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK);
-		JxlsStyle datestyle = scenarioWB.getDefaultDateStyle(); /*
-																 * seems to e a bug to stop setting other params
-																 */
+		JxlsStyle datestyle = scenarioWB
+				.getDefaultDateStyle(); /*
+										 * seems to e a bug to stop setting
+										 * other params
+										 */
 		// System.out.println("done Jxl 1");
 		/* XLS Sheets */
 
@@ -180,7 +227,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		}
 		// System.out.println("done Jxl 2");
 		while (j < 11) {
-			Interview.setValue(3, j, "", borderStyle); /* set borders for data input fields */
+			Interview.setValue(3, j, "",
+					borderStyle); /* set borders for data input fields */
 			Interview.setValue(5, j, "", borderStyle);
 			j += 2;
 		}
@@ -210,21 +258,27 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Interview.setValue(3, 4, community.getSite().getLocationdistrict(), borderStyle); /* District */
 		Interview.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
 				borderStyle); /* Livelihood Zone */
-		// Interview.setValue(3, 8, community.getCivparticipants(),textstyle); /* Number
+		// Interview.setValue(3, 8, community.getCivparticipants(),textstyle);
+		// /* Number
 		// of Participants */
-		Interview.setValue(3, 10, wealthgroup.getWgnameeng(), borderStyle); /* Wealth Group */
+		Interview.setValue(3, 10, wealthgroup.getWgnameeng(),
+				borderStyle); /* Wealth Group */
 
-		// Interview.setValue(5, 2, community.getCinterviewdate(), datestyle); /* Date
+		// Interview.setValue(5, 2, community.getCinterviewdate(), datestyle);
+		// /* Date
 		// */
-		Interview.setValue(5, 4, community.getSite().getSubdistrict(), borderStyle); /* Sub District */
+		Interview.setValue(5, 4, community.getSite().getSubdistrict(),
+				borderStyle); /* Sub District */
 		// Interview.setValue(5, 6, community.getInterviewers(), textstyle); /*
 		// Interviewers */
 		// Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
-		// Interview.setValue(5, 10, wealthgroup.getWghhsize(),textstyle); /* Number in
+		// Interview.setValue(5, 10, wealthgroup.getWghhsize(),textstyle); /*
+		// Number in
 		// Household */
 
 		// Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
-		// Interview.setValue(7, 10, " ", textstyle); /* Type of Year ?????????? */
+		// Interview.setValue(7, 10, " ", textstyle); /* Type of Year ??????????
+		// */
 
 		/* Asset Sheet */
 
@@ -252,7 +306,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 					row = 17;
 				}
 
-				Asset.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Asset.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 				if (col == 5 && row > 16) {
 					row = 30;
@@ -263,7 +318,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			row = 4;
 		}
 		row = 4;
-		landrow=17;
+		landrow = 17;
 		// get resource sub type //
 		for (k = 0; k < chrs.size(); k++) {
 			/* Get Resource Sub Type */
@@ -282,7 +337,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				Asset.setValue(3, row, rtunit, borderStyle);
 				row++;
 			}
-			
+
 			if (rt.equals("Land")) {
 				Asset.setValue(2, landrow, resub, borderStyle);
 				Asset.setValue(3, landrow, rtunit, borderStyle);
@@ -319,7 +374,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 5;
 		while (col < 14) {
 			while (row < 16) {
-				Crop.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Crop.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 
@@ -374,7 +430,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 5;
 		while (col < 14) {
 			while (row < 16) {
-				LS.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				LS.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -398,7 +455,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			/* Not Livestock Asset - this is Use of Livestock */
-			
+
 			if (rt.equals("Use of Livestock")) {
 				LS.setValue(2, row, resub, borderStyle);
 				LS.setValue(4, row, rtunit, borderStyle);
@@ -434,7 +491,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Emp.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Emp.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -491,7 +549,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Transfer.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Transfer.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -546,7 +605,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 14) {
 			while (row < 16) {
-				Wildfood.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Wildfood.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -593,7 +653,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 6) {
 			while (row < 16) {
-				Foodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Foodpurchase.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -640,7 +701,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		row = 4;
 		while (col < 6) {
 			while (row < 16) {
-				Nonfoodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				Nonfoodpurchase.setValue(col, row, "",
+						borderStyle); /* set borders for data input fields */
 				row++;
 			}
 			col++;
@@ -666,30 +728,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			}
 
 		}
-		
-		/* Now write the wealthgroup interview header data */
-		/*
-		EntityManagerFactory f = Persistence.createEntityManagerFactory("default");
-		EntityManager manager = f.createEntityManager();
-		manager.getTransaction().begin();
-		
-		
-		WealthGroupInterview wgi = new WealthGroupInterview();
 
-		
-		wgi.setWealthgroup??????????????????????????????
-		wgi.setWgInterviewNumber(2);
-		wgi.setWgInterviewNumber(0);
-		wgi.setWgIntervieweesCount(3);
-		wgi.setWgInterviewers("Basil");
-		
-		
-		manager.persist(wgi);
-		manager.getTransaction().commit();
-		manager.close();
-		
-		*/
-		
+		 
+
 		return scenarioWB;
 		/* end XLS setup */
 

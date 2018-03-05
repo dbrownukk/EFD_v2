@@ -16,21 +16,25 @@ import efd.actions.*;
 import efd.validations.*;
 
 
-@View(members="year;notes")
+@View(members="year;yearMessage,notes")
 
 @Entity
 
+@Tab(properties = "year,notes")
 
 
 @Table(name = "CommunityYearNotes")
 public class CommunityYearNotes {
+	
+	
+	
 	//----------------------------------------------------------------------------------------------//
 	@Id
 	@Hidden // The property is not shown to the user. It's an internal identifier
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "IDCommunityYearNotes", length = 32, unique = true)
-	private String communityid;
+	private String notesid;
 	//----------------------------------------------------------------------------------------------//
 	@ManyToOne(fetch=FetchType.LAZY, // The reference is loaded on demand
 	        optional=false)
@@ -40,11 +44,19 @@ public class CommunityYearNotes {
 	//----------------------------------------------------------------------------------------------//
 
 	@Column(name="Year", nullable=false, length=4)
-	//@Min(value=2001)
+	//@Min(value=2000)
 	//@Max(value=2020)
-	//@Range(min=2001,max=2020)
+	@Range(min=2000,max=2030)
 	@Required
 	private int year;
+	
+	@Depends("year")
+	@Transient
+	@ReadOnly
+	@Stereotype("LABEL")
+	public String getYearMessage() {
+			return "Year must be betweeen 2000 and 2030";
+	}
 	
 	
 	//----------------------------------------------------------------------------------------------//
@@ -55,37 +67,48 @@ public class CommunityYearNotes {
 	//----------------------------------------------------------------------------------------------//
 	// get / set 
 	//----------------------------------------------------------------------------------------------//
-	public String getCommunityid() {
-		return communityid;
-	}
-	public void setCommunityid(String communityid) {
-		this.communityid = communityid;
-	}
+
+
+
+
 	public Community getCommunity() {
 		return community;
 	}
+
+
+	public String getNotesid() {
+		return notesid;
+	}
+
+
+	public void setNotesid(String notesid) {
+		this.notesid = notesid;
+	}
+
+
 	public void setCommunity(Community community) {
 		this.community = community;
 	}
 
 
-
-
-	public Integer getYear() {
+	public int getYear() {
 		return year;
 	}
-	public void setYear(Integer year) {
+
+
+	public void setYear(int year) {
 		this.year = year;
 	}
+
+
 	public String getNotes() {
 		return notes;
 	}
+
+
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-
-	/* get / set */
-
 	
 	
 

@@ -6,6 +6,8 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
+import efd.validations.*;
+
 @Views({
 @View(members= "Wealth_Group_Interview[# wealthgroup"
 		+ ",wgInterviewNumber"
@@ -16,7 +18,8 @@ import org.openxava.annotations.*;
 		+ ",wgAverageNumberInHH"
 		+ ",wgYearType"
 		+ ",wgInterviewDate"
-		+ ";status]"
+		+ ";spreadsheet"
+		+ ",status]"
 		+ ";WildFood{wildFood}"
 		+ ";Land{assetLand}"
 		+ ";Tradeable{assetTradeable}"
@@ -81,6 +84,8 @@ private String wgYearType;
 private Date wgInterviewDate;
 
 //@Editor("ValidValuesRadioButton")
+@ReadOnly
+@Column(name="WGIStatus")
 private Status status;
 public enum Status { Generated, Uploaded, Parsed, Validated, Correct, Commit };
 
@@ -89,9 +94,19 @@ public enum Status { Generated, Uploaded, Parsed, Validated, Correct, Commit };
 @Required
 @NoFrame
 @NoModify
+@ReadOnly
 @NoCreate
 @DescriptionsList(descriptionProperties="community.site.locationdistrict,wgnameeng")
 private WealthGroup wealthgroup;
+
+@Stereotype("FILE")
+// @OnChange(OnChangeSetWGIStatus.class)
+@Column(length=32,name="WGISpreadsheet")
+private String spreadsheet;
+
+
+
+/*  Collections of resource elements */
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,assetType,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
@@ -123,7 +138,9 @@ private Collection<LiveStockUse> liveStockUse;
 private Collection<Transfer> transfer;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,assetType,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse"
+		+ ",janQP,febQP,marQP,aprQP,mayQP,junQP"
+		+ ",julQP,augQP,sepQP,octQP,novQP,decQP")
 private Collection<Crop> crop;
 
 
@@ -291,7 +308,16 @@ public void setEmployment(Collection<Employment> employment) {
 	this.employment = employment;
 }
 
+public String getSpreadsheet() {
+	return spreadsheet;
+}
 
+public void setSpreadsheet(String spreadsheet) {
+	{
+	this.spreadsheet = spreadsheet;
+}
+
+}
 
 
 

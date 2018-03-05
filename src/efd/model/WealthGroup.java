@@ -90,33 +90,9 @@ public class WealthGroup {
 
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//
-    /*
-	@Transient
-	@ReadOnly	
-	@OnChange(OnChangeWgpercenttotal.class)
-	@Depends("wgpercent")
-	public Integer getWgpercenttotal() {
-		EntityManager em = XPersistence.getManager();
-	
-		
-		System.out.println("in calcgetWgpercenttotal1");
-		
-		Query q = em.createNativeQuery("select sum(wgpercent) from wealthgroup where communityid = ?1");
-		System.out.println("in calcgetWgpercenttotal2");
-		System.out.println("param = "+community.getCommunityid());
-		q.setParameter(1, community.getCommunityid());
-		
-		System.out.println("in calcgetWgpercenttotal3");
-		Integer result = (Integer) q.getSingleResult();
-		//em.close();
-		System.out.println("result = "+result);
 
-		return result;
-		
-	}
-*/
 	
-	// ----------------------------------------------------------------------------------------------//
+	
 
 	public String getWgid() {
 		return wgid;
