@@ -32,37 +32,29 @@ import org.apache.commons.lang.StringUtils;
 //public class CreateXlsFileAction2 extends CollectionElementViewBaseAction implements IForwardAction, JxlsConstants { // 1
 public class CreateXlsFileAction extends CollectionBaseAction implements IForwardAction, JxlsConstants {
 
-	/* nulls .... */
-	private static final String String = null;
-	private String method = null;
 	private int row;
 	private String forwardURI = null;
 
-
 	public void execute() throws Exception {
 
+		System.out.println("in xls gen ");
 
-	
-		try{
-		// System.out.println("In spreadsheet 1"+list.toString());
-		JxlsWorkbook scenario = createScenario();
-		// System.out.println("In spreadsheet 2");
-		if(scenario.equals(null))
-		{
-			System.out.println("In spreadsheet exit");
-			addError("Template cannot be regenerated once it has been uploaded.");
-		}
+		try {
+			System.out.println("In spreadsheet 1");
+			JxlsWorkbook scenario = createScenario();
+			System.out.println("In spreadsheet 2");
+			if (scenario.equals(null)) {
+				System.out.println("In spreadsheet exit");
+				addError("Template cannot be regenerated once it has been uploaded.");
+			}
 			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
-		// System.out.println("In spreadsheet 3");
-		setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
-		// System.out.println("In spreadsheet 4");
-		}
-		catch(NullPointerException em)
-		{
+			System.out.println("In spreadsheet 3");
+			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
+			System.out.println("In spreadsheet 4");
+		} catch (NullPointerException em) {
 			addError("Template cannot be regenerated once it has been uploaded");
 		}
-		
-		
+
 	}
 
 	// setControllers("Return");
@@ -97,64 +89,79 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		/* Get EFD Project Details */
 
 		/* Get WealthGroup data */
+		System.out.println("before n");
 		Map n = (Map) getCollectionElementView().getCollectionValues().get(row);
 
-
+		System.out.println("after n");
 
 		String wgid = (String) n.get("wgid");
-		WealthGroup wealthgroup = XPersistence.getManager().find(WealthGroup.class, wgid  );
-	
+		System.out.println("wgid = " + wgid);
+		WealthGroup wealthgroup = XPersistence.getManager().find(WealthGroup.class, wgid);
+		System.out.println("wgid after wg get= " + wgid);
+		Community community = XPersistence.getManager().find(Community.class,
+				wealthgroup.getCommunity().getCommunityid());
 
 		/*
 		 * Check if WGInterview exists and if so is still at Generated status,
 		 * otherwise do not allow
 		 */
-		
-		
-		Query querywgi = XPersistence.getManager().
-				createQuery("select wi from WealthGroupInterview wi join wi.wealthgroup wg where wg.wgid = '" + wgid +"'");
-		
-		List<WealthGroupInterview> wgi = querywgi.getResultList();
-		System.out.println( " in Template, size = "+wgi.size() + wgi.get(0).getStatus());
-		if (wgi.isEmpty()) {    
+
+		// Query querywgi = XPersistence.getManager().
+		// createQuery("select wi from WealthGroupInterview wi join
+		// wi.wealthgroup wg where wg.wgid = '" + wgid +"'");
+
+		Query querywgi = XPersistence.getManager().createQuery(
+				"select wi from WealthGroupInterview wi join wi.wealthgroup wg where wg.wgid = '" + wgid + "'");
+
+		System.out.println("post query " + querywgi.toString());
+
+		List <WealthGroupInterview> wgi = querywgi.getResultList();
+
+		//List wgi = querywgi.getResultList();
+		System.out.println(" in Template, size = " + wgi.size());
+
+		if (wgi.size() == 0) { /* New WGInter */
 			addMessage("Generating Spreadheet Template");
-			System.out.println("Generating Template, size = "+wgi.size());
-			
+			System.out.println("Generating Template, size = " + wgi.size());
+
 			/* Now write the wealthgroup interview header data */
-			 WealthGroupInterview wginew = new WealthGroupInterview(); 
-			 wginew.setWgInterviewNumber(2); 
-			 wginew.setWgIntervieweesCount(3); 
-			 wginew.setWgInterviewers("Basil");
-			 wginew.setStatus(Status.Generated);
-			 wginew.setWealthgroup(wealthgroup);
-			 System.out.println("Generating Template done sets ");
-			 
-			 XPersistence.getManager().persist(wginew);		
-			 // XPersistence.commit();
-			 System.out.println("Generating Template done persist ");
+			WealthGroupInterview wginew = new WealthGroupInterview();
+			wginew.setWgInterviewNumber(community.getCinterviewsequence());
+			wginew.setWgIntervieweesCount(1);
+			wginew.setWgInterviewers(community.getInterviewers());
+			wginew.setStatus(Status.Generated);
+			wginew.setWealthgroup(wealthgroup);
+			System.out.println("Generating Template done sets ");
+
+			XPersistence.getManager().persist(wginew);
+			XPersistence.commit();
+			System.out.println("Generating Template done persist ");
 			
 			
-		}
-		else if (wgi.size() == 1  && wgi.get(0).getStatus().equals("Generated") )
+			
+
+		} else if (wgi.size() == 1 && wgi.get(0).getStatus().equals("Generated")) {
+			System.out.println("ok to print again as status still generated in template gen " + wgi.get(0).getStatus());
+		} else if (wgi.size() == 1 && wgi.get(0).getStatus()
+				.toString() != "Generated") /* template already generated */
 		{
-			System.out.println("ok to print again as staus still generated in template gen "+wgi.get(0).getStatus());
-		}
-			else if (wgi.size() == 1 && wgi.get(0).getStatus().toString() != "Generated") /* template already generated */ 
-			{
+
 			//addError("Template cannot be regenerated once it has been uploaded");
 			return null;
-			}
+		}
+
+		System.out.println("In careetscenario 22");
+
+		/* Need to reset Welathgroup */
 		
-
-		// System.out.println("wgid = " + wgid);
-
-	
-		// System.out.println("In careetscenario 22");
-
+		wealthgroup = XPersistence.getManager().find(WealthGroup.class, wgid);
+		System.out.println("wgid 22 after wg get= " + wgid);
+		
+		
 		/* Get Community Data */
 
-		Community community = XPersistence.getManager().find(Community.class,
-				wealthgroup.getCommunity().getCommunityid());
+		//Community community = XPersistence.getManager().find(Community.class,
+		//		wealthgroup.getCommunity().getCommunityid());
 		// System.out.println("In careetscenario 222");
 		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
 		// System.out.println("In careetscenario 221");
@@ -215,7 +222,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		JxlsSheet Interview = scenarioWB.addSheet("Interview Details");
 		JxlsSheet Asset = scenarioWB.addSheet("Assets");
 		JxlsSheet Crop = scenarioWB.addSheet("Crops");
-		JxlsSheet LS = scenarioWB.addSheet("LS");
+		JxlsSheet LS = scenarioWB.addSheet("Livestock Products");
 		JxlsSheet Emp = scenarioWB.addSheet("EMP");
 		JxlsSheet Transfer = scenarioWB.addSheet("Transfers");
 		JxlsSheet Wildfood = scenarioWB.addSheet("WILD FOODS");
@@ -456,7 +463,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			/* Not Livestock Asset - this is Use of Livestock */
 
-			if (rt.equals("Use of Livestock")) {
+			if (rt.equals("Livestock Products")) {
 				LS.setValue(2, row, resub, borderStyle);
 				LS.setValue(4, row, rtunit, borderStyle);
 				row++;
@@ -728,8 +735,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			}
 
 		}
-
-		 
 
 		return scenarioWB;
 		/* end XLS setup */

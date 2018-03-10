@@ -8,12 +8,14 @@ import org.openxava.annotations.*;
 
 
 
-@Views({ @View(members="Livelihood_Zone[lzname;country],site"),
+@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap],site"),
 		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
 		@View(name = "CreateLZ", members = "Livelihood Zone[lzname;country;lzzonemap]"),
-		@View(name = "SimpleLZ", members = "lzname;country") })
+		@View(name = "SimpleLZ", members = "lzname,country;lzzonemap"),
+		@View(name = "SimpleLZnomap", members = "lzname,country") 
+})
 
-@Tab(properties = "lzname,country.description,country.isocountrycode,country.currency")
+@Tab(properties = "lzname,country.description,country.isocountrycode,country.currency,lzzonemap")
 											
 
 @Entity

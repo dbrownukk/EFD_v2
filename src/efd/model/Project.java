@@ -82,7 +82,7 @@ public class Project {
 	inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false),
 	uniqueConstraints=
             @UniqueConstraint(columnNames = { "Project", "LZ" }))
-	@ListProperties("lzname,country.description,country.currency")
+	@ListProperties("lzname,country.description,country.currency,lzzonemap")
 	@CollectionView("SimpleLZ") 
 	private Collection<LivelihoodZone> livelihoodZone;
 

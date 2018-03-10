@@ -54,9 +54,9 @@ public class Site {
 	//@SearchAction(notForViews="DEFAULT", value="LivelihoodZone.filteredsearch")
 	@SearchAction(value="LivelihoodZone.filteredsearch")
 	
-	@ReferenceView("SimpleLZ")
+	@ReferenceView("SimpleLZnomap")
 	//@ReferenceViews({
-	//@ReferenceView(forViews="SimpleSite", value="SimpleLZ"),
+	//@ReferenceView(forViews="SimpleSite", value="SimpleLZnomap"),
 	//@ReferenceView(forViews="DEFAULT", value="UpdateLZ"),
 	//})
 	@NoCreate

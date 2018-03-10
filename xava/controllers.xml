@@ -54,6 +54,18 @@
              />
 	</controller>
 	
+ <controller name="ParseSpreadsheet">
+ 	 <extends controller="TypicalNotResetOnSave"/>
+	 <action name="Parse Spreadsheet"
+	 		label="Parse Interview Spreadsheet"
+	 		icon="file-excel"
+	 		mode="detail"
+	 		in-each-row="false" 
+	 		class="efd.actions.ParseXLSFile"
+             />
+	</controller>
+	
+	
 	<controller name="LivelihoodZone">		
 	<extends controller="EFD_v2"/>
 		<action name="filteredsearch" 

@@ -42,6 +42,9 @@ import efd.validations.*;
 //@Table(name = "WealthGroupInterview")
 
 public class WealthGroupInterview {
+	
+	
+	
 	// ----------------------------------------------------------------------------------------------//
 
 	@Id
