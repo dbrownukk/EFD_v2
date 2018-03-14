@@ -9,6 +9,7 @@ import org.openxava.annotations.*;
 
 @Embeddable
 
+
 @Table(name = "Asset_Tradeable")
 
 public class AssetTradeable extends Asset{

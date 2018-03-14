@@ -56,7 +56,7 @@ public class WealthGroupInterview {
 	// ----------------------------------------------------------------------------------------------//
 
 
-@Version
+
 @Column(name = "WGInterviewNumber",nullable=false)	
 @Required
 private Integer wgInterviewNumber;

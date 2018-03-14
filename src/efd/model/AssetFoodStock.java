@@ -14,18 +14,20 @@ import efd.model.WealthGroupInterview.*;
 
 @Embeddable
 
+
 @Table(name = "Asset_FoodStock")
 
 public class AssetFoodStock extends Asset {
 
 	
-	
-	
 	/* Boolean or either / or ?? */
 	
-	@Editor("ValidValuesRadioButton")
-	private WilFoodOrCropIndicator wildFoodOrCropIndicator;
-	public enum WilFoodOrCropIndicator { Wildfood, Crop };
+
+	
+	
+	//@Editor("ValidValuesRadioButton")
+	private WildFoodOrCropIndicator wildFoodOrCropIndicator;
+	public enum WildFoodOrCropIndicator { Wildfood, Crop };
 	
 	
 	@Column(name = "FoodName", nullable=false, length=50 )
@@ -33,12 +35,12 @@ public class AssetFoodStock extends Asset {
 
 
 
-	public WilFoodOrCropIndicator getWildFoodOrCropIndicator() {
+	public WildFoodOrCropIndicator getWildFoodOrCropIndicator() {
 		return wildFoodOrCropIndicator;
 	}
 
 
-	public void setWildFoodOrCropIndicator(WilFoodOrCropIndicator wildFoodOrCropIndicator) {
+	public void setWildFoodOrCropIndicator(WildFoodOrCropIndicator wildFoodOrCropIndicator) {
 		this.wildFoodOrCropIndicator = wildFoodOrCropIndicator;
 	}
 

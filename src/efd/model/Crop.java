@@ -9,6 +9,7 @@ import org.openxava.annotations.*;
 
 @Embeddable
 
+
 @Table(name = "Crop")
 
 public class Crop extends Asset {
@@ -16,9 +17,11 @@ public class Crop extends Asset {
 	/* Note fk to resourcetype is in supertype Asset */
 
 	@Column(name = "CropName", length = 50)
+	@DisplaySize(20)
 	private String cropName;
 
 	@Column(name = "LocalUnit", length = 45)
+	@DisplaySize(20)
 	private String localUnit;
 
 	@Column(name = "QuantityProduced", nullable = false)
@@ -32,6 +35,7 @@ public class Crop extends Asset {
 	private BigDecimal pricePerUnit;
 
 	@Column(name = "OtherUse", length = 255)
+	@DisplaySize(10)
 	private String otherUse;
 
 	@Column(name = "JanQP")

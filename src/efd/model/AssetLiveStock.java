@@ -13,6 +13,7 @@ import efd.model.Asset.*;
 
 @Embeddable
 
+
 @Table(name = "Asset_LiveStock")
 
 public class AssetLiveStock extends Asset{

@@ -11,11 +11,11 @@
 	<controller name="EFD_v2">
 		<extends controller="TypicalNotResetOnSave"  />
 	</controller>
-	
+ -->	
 	<controller name="EFD_v2">
 		<extends controller="Typical"  />
 	</controller>
- -->
+
  
  
 	<!--

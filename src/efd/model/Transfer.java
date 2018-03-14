@@ -11,6 +11,7 @@ import org.openxava.annotations.*;
 
 @Embeddable
 
+
 @Table(name = "Transfer")
 
 public class Transfer extends Asset{

@@ -11,9 +11,11 @@ import org.openxava.annotations.*;
 //abstract public class Asset {
 	public class Asset {
 	
-	@ManyToOne(optional=false)
+	//@ManyToOne(optional=false)
+	@ManyToOne
 	@JoinColumn(name="ResourceType")
-	@Required 
+	//@Required 
+	
 	private ResourceType resourceType;
 
 	@Column(name = "Status", nullable = false)
@@ -22,6 +24,9 @@ import org.openxava.annotations.*;
 	public enum Status {
 		Invalid, NotChecked, Valid
 	}
+	
+	
+	
 
 	public ResourceType getResourceType() {
 		return resourceType;

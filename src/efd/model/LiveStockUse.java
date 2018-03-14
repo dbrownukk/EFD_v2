@@ -11,6 +11,7 @@ import org.openxava.annotations.*;
 
 @Embeddable
 
+
 @Table(name = "LiveStockUse")
 
 public class LiveStockUse extends Asset{
