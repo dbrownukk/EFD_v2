@@ -7,6 +7,7 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
+import efd.model.Asset.Status;
 import efd.model.WealthGroupInterview.*;
 
 
@@ -15,8 +16,10 @@ import efd.model.WealthGroupInterview.*;
 
 @Table(name = "Asset_FoodStock")
 
-public class AssetFoodStock extends Asset{
+public class AssetFoodStock extends Asset {
 
+	
+	
 	
 	/* Boolean or either / or ?? */
 	
@@ -48,6 +51,9 @@ public class AssetFoodStock extends Asset{
 	public void setFoodName(String foodName) {
 		this.foodName = foodName;
 	}
+
+
+
 
 	
 	

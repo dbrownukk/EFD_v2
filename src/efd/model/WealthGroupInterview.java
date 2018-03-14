@@ -56,7 +56,7 @@ public class WealthGroupInterview {
 	// ----------------------------------------------------------------------------------------------//
 
 
-	
+@Version
 @Column(name = "WGInterviewNumber",nullable=false)	
 @Required
 private Integer wgInterviewNumber;
@@ -90,14 +90,14 @@ private Date wgInterviewDate;
 //@ReadOnly
 @Column(name="WGIStatus")
 private Status status;
-public enum Status { Generated, Uploaded, Parsed, Validated, Correct, Commit };
+public enum Status { Generated, Uploaded, Parsed, Validated };
 
 @ManyToOne(fetch = FetchType.LAZY, optional = false)
 @JoinColumn(name = "WGID")
 @Required
 @NoFrame
 @NoModify
-@ReadOnly
+//@ReadOnly
 @NoCreate
 @DescriptionsList(descriptionProperties="community.site.locationdistrict,wgnameeng")
 private WealthGroup wealthgroup;
@@ -113,43 +113,43 @@ private String spreadsheet;
 /*  Collections of resource elements */
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
 private Collection<WildFood> wildFood;
 
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,landTypeEnteredName,landArea,unitEntered")
+@ListProperties("status,landTypeEnteredName,landArea,unitEntered")
 private Collection<AssetLand> assetLand;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,tradeableTypeEnteredName,quantity")
+@ListProperties("status,tradeableTypeEnteredName,quantity")
 private Collection<AssetTradeable> assetTradeable;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,liveStockTypeEnteredName,numberOwned,pricePerUnit,unitEntered")
+@ListProperties("status,liveStockTypeEnteredName,unitEntered,numberOwned,pricePerUnit")
 private Collection<AssetLiveStock> assetLiveStock;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,wildFoodOrCropIndicator,foodName")
+@ListProperties("status,wildFoodOrCropIndicator,foodName")
 private Collection<AssetFoodStock> assetFoodStock;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
+@ListProperties("status,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
 private Collection<LiveStockUse> liveStockUse;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
 private Collection<Transfer> transfer;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse"
+@ListProperties("status,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse"
 		+ ",janQP,febQP,marQP,aprQP,mayQP,junQP"
 		+ ",julQP,augQP,sepQP,octQP,novQP,decQP")
 private Collection<Crop> crop;
 
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,assetType,employmentName,peopleCount,frequency, cashPaymentPerUnit, foodPaymentPerUnit")
+@ListProperties("status,employmentName,peopleCount,frequency, cashPaymentPerUnit, foodPaymentPerUnit")
 private Collection<Employment> employment;
 
 public String getWgiid() {

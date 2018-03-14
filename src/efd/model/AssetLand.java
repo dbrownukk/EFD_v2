@@ -3,6 +3,10 @@ package efd.model;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.openxava.annotations.*;
+
+import efd.model.Asset.*;
+
 
 
 @Embeddable
@@ -10,6 +14,8 @@ import javax.validation.constraints.*;
 @Table(name = "Asset_Land")
 
 public class AssetLand extends Asset{
+	
+
 
 
 
@@ -49,6 +55,8 @@ public class AssetLand extends Asset{
 	public void setUnitEntered(String unitEntered) {
 		this.unitEntered = unitEntered;
 	}
+
+
 
 
 

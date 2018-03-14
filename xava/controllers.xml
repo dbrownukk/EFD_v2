@@ -4,33 +4,19 @@
 
 <controllers>
     
-    <!-- Environment variable:
-    <env-var name="EFD_v2_DEFAULT_YEAR" value="2017"/> 
+
     
-        <controller name="EFD_v2">
-		<extends controller="Typical" excluded-actions="save"/>
-		</controller>
-    
-    -->
-    
-<!--
-    <controller name="EFD_v2">
-		<extends controller="Typical" excluded-actions="save" />
-	
-    <action name="save" mode="detail"
-      class="efd.actions.EFDSaveAction" 
-      
-      by-default="if-possible"
-      image="save.gif"
-      icon="content-save"
-      keystroke="Control S"/>
-	
-	</controller>
-	-->
-	
+
+	<!--  
 	<controller name="EFD_v2">
 		<extends controller="TypicalNotResetOnSave"  />
 	</controller>
+	
+	<controller name="EFD_v2">
+		<extends controller="Typical"  />
+	</controller>
+ -->
+ 
  
 	<!--
    <controller name="Project">

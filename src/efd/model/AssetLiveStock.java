@@ -5,6 +5,10 @@ import java.math.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.openxava.annotations.*;
+
+import efd.model.Asset.*;
+
 
 
 @Embeddable
@@ -26,7 +30,6 @@ public class AssetLiveStock extends Asset{
 	
 	@Column(name = "UnitEntered", length = 50)
 	private String unitEntered;
-
 
 	public String getLiveStockTypeEnteredName() {
 		return liveStockTypeEnteredName;
@@ -59,6 +62,9 @@ public class AssetLiveStock extends Asset{
 	public void setUnitEntered(String unitEntered) {
 		this.unitEntered = unitEntered;
 	}
+
+
+
 	
 	
 	

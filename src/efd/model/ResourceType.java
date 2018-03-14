@@ -28,41 +28,33 @@ public class ResourceType {
 	private Collection<ResourceSubType> resourcesubtype;
 	//----------------------------------------------------------------------------------------------//
 
-		// get / set
-
-	public Collection<ResourceSubType> getResourcesubtype() {
-		return resourcesubtype;
-	}
-
-
-
-	public void setResourcesubtype(Collection<ResourceSubType> resourcesubtype) {
-		this.resourcesubtype = resourcesubtype;
-	}
-
-
-
 	public String getIdresourcetype() {
 		return idresourcetype;
 	}
-
-
 
 	public void setIdresourcetype(String idresourcetype) {
 		this.idresourcetype = idresourcetype;
 	}
 
-
-
 	public String getResourcetypename() {
 		return resourcetypename;
 	}
 
-
-
 	public void setResourcetypename(String resourcetypename) {
 		this.resourcetypename = resourcetypename;
 	}
+
+	public Collection<ResourceSubType> getResourcesubtype() {
+		return resourcesubtype;
+	}
+
+	public void setResourcesubtype(Collection<ResourceSubType> resourcesubtype) {
+		this.resourcesubtype = resourcesubtype;
+	}
+
+		// get / set
+
+
 	
 
 	
