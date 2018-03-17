@@ -134,7 +134,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			System.out.println("Generating Template done sets ");
 
 			XPersistence.getManager().persist(wginew);
-			XPersistence.commit();
+			//XPersistence.commit();
+			
 			System.out.println("Generating Template done persist ");
 			
 			

@@ -79,6 +79,12 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			InputStream input = rs.getBinaryStream("DATA"); /* get stream data as well */
 			//System.out.println("done inputstream ");
 
+			
+			
+			
+			
+			
+			
 			; /* Move to first row */
 
 			String spreadsheetPkey = rs.getString(1);
@@ -239,6 +245,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			Boolean getNextRow = false;
 			String market1,market2,market3;
 			Double percent1,percent2,percent3;
+			
+			
+			
+			
 			
 			
 			
@@ -684,7 +694,12 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			getView().refresh();
 
 			return;
-		} catch (Exception ex) {
+		} 
+		
+		
+		
+		
+		catch (Exception ex) {
 			addError("Incomplete Spreadsheet data, correct spreadsheet and upload again", ex);
 			// You can throw any runtime exception here
 			throw new SystemException(ex);

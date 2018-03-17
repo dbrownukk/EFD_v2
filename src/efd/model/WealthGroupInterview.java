@@ -10,7 +10,7 @@ import efd.validations.*;
 
 @Views({
 @View(members= "Wealth_Group_Interview[# wealthgroup"
-		+ ",wgInterviewNumber"
+		+ ";wgInterviewNumber"
 		+ ",wgInterviewers"
 		+ ",wgIntervieweesCount"
 		+ ";wgFemaleIVees"
@@ -34,8 +34,15 @@ import efd.validations.*;
 })
 
 
-@Tab(editors = "List, Detail", properties = "wealthgroup.wgnameeng,status,wgInterviewNumber,wgInterviewers,wgIntervieweesCount,wgFemaleIVees,"
-		+ "wgMaleIVees,wgAverageNumberInHH,wgYearType,wgInterviewDate")
+@Tab(editors = "List, Detail", properties = "wealthgroup.community.projectlz.projecttitle,wealthgroup.community.site.livelihoodZone.lzname, "
+		+ "wealthgroup.community.site.locationdistrict, wealthgroup.community.site.subdistrict, wealthgroup.wgnameeng,status,wgInterviewNumber,"
+		+ "wgInterviewers,wgIntervieweesCount,wgFemaleIVees,"
+		+ "wgMaleIVees,wgAverageNumberInHH,wgYearType,wgInterviewDate", 
+		defaultOrder="${wealthgroup.community.projectlz.projecttitle}"
+				+ ",${wealthgroup.community.site.livelihoodZone.lzname}"
+				+ ",${wealthgroup.community.site.locationdistrict}"
+				+ ",${wealthgroup.community.site.subdistrict}"
+				+ ",${wealthgroup.wgnameeng}")
 
 @Entity
 
@@ -94,12 +101,12 @@ public enum Status { Generated, Uploaded, Parsed, Validated };
 
 @ManyToOne(fetch = FetchType.LAZY, optional = false)
 @JoinColumn(name = "WGID")
-@Required
+//@Required
 @NoFrame
 @NoModify
-//@ReadOnly
+@ReadOnly
 @NoCreate
-@DescriptionsList(descriptionProperties="community.site.locationdistrict,wgnameeng")
+@DescriptionsList(descriptionProperties="community.site.livelihoodZone.lzname,community.site.locationdistrict,community.site.subdistrict,wgnameeng")
 private WealthGroup wealthgroup;
 
 
