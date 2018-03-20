@@ -16,7 +16,7 @@ import efd.validations.*;
 		+ ";wgFemaleIVees"
 		+ ",wgMaleIVees"
 		+ ",wgAverageNumberInHH"
-		+ ",wgYearType"
+		+ ";wgYearType"
 		+ ",wgInterviewDate"
 		+ ";spreadsheet"
 		+ ",status]"

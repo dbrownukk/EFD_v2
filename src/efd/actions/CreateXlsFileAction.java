@@ -416,7 +416,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		LS.setValue(2, 4, "Income Type i.e Milk", boldTopStyle);
 
-		LS.setValue(3, 4, "", boldTopStyle);
+		LS.setValue(3, 4, "Livestock Type", boldTopStyle);
 		LS.setValue(4, 4, "Unit", boldTopStyle);
 		LS.setValue(5, 4, "Quantity Produced", boldTopStyle);
 		LS.setValue(6, 4, "Quantity Sold", boldTopStyle);

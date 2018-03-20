@@ -49,6 +49,13 @@
 	 		in-each-row="false" 
 	 		class="efd.actions.ParseXLSFile"
              />
+             <action name="Validate Asset Data"
+	 		label="Validate Asset Data"
+	 		icon="marker-check"
+	 		mode="detail"
+	 		in-each-row="false" 
+	 		class="efd.actions.ValidateXLSFile"
+             />
 	</controller>
 	
 	
