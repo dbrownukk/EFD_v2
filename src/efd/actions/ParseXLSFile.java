@@ -17,7 +17,9 @@ import org.openxava.web.editors.*;
 import efd.model.*;
 import efd.model.WealthGroupInterview.*;
 
+import org.apache.commons.lang3.*;
 import org.apache.poi.ss.usermodel.*;
+import org.jsoup.helper.*;
 
 public class ParseXLSFile extends CollectionBaseAction implements IForwardAction, JxlsConstants, IFilePersistor {
 
@@ -157,8 +159,11 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			if (checkCell("Interview Date", sheet, 4, 1, nullable))
 				cell = sheet.getRow(1).getCell(4, Row.CREATE_NULL_AS_BLANK);
 			else
+			{
+				addError("Incomplete Spreadsheet data - Interview Date error ");
 				return;
-
+			}
+				
 			if (cell.getCellType() == 0) { /* Numeric */
 				System.out.println("in Numeric Date");
 				Double iDateD = cell.getNumericCellValue();
@@ -288,15 +293,28 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 			for (rowNumber = 3; rowNumber < 50; rowNumber++) {
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
-				if (var1.isEmpty())
+				if (StringUtil.isBlank(var1))
 					break;
-				System.out.println("done asset 111 ");
+				System.out.println("done asset 111 "+var1);
 
 				var2 = sheet.getRow(rowNumber).getCell(2).getStringCellValue();
-				System.out.println("done asset 112 ");
-				if (checkCell("Livestock Asset Number Owned", sheet, 3, rowNumber, false))
-					d1 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue();
-				else 
+
+				System.out.println("done asset 112 "+var2);
+
+				cell = sheet.getRow(rowNumber).getCell(3);
+				if (checkCell("Livestock Asset Number Owned", sheet, 3, rowNumber, false)) {
+					if (cell.getCellType() == 0) {
+						System.out.println("done asset 112_1 ");
+						d1 = cell.getNumericCellValue();
+						System.out.println("done asset 112_2 ");
+					}
+					else if (cell.getCellType() == 1 )
+					{
+						System.out.println("done asset 112_3 "+cell.getStringCellValue());
+						d1 = Double.parseDouble(cell.getStringCellValue());
+						System.out.println("done asset 112_4 ");
+					}
+					} else
 					return;
 				System.out.println("done asset 113 ");
 				if (checkCell("Livestock Asset Price Per Unit", sheet, 4, rowNumber, true))
@@ -355,7 +373,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 				System.out.println("Land = 42 ");
 				var2 = sheet.getRow(rowNumber).getCell(2).getStringCellValue(); // Unit
-				System.out.println("Land = 43 row = "+rowNumber);
+				System.out.println("Land = 43 row = " + rowNumber);
 
 				if (checkCell("Land Asset Area ", sheet, 3, rowNumber, false))
 					d1 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue(); // Area
@@ -399,7 +417,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Food loop type = " + sheet.getRow(rowNumber).getCell(1).getCellType());
 				var1 = sheet.getRow(rowNumber).getCell(1, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				System.out.println("Food loop = " + var1);
-				if (var1.isEmpty()) {
+				if (StringUtil.isBlank(var1)) {
 					break;
 				}
 
@@ -437,18 +455,57 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 					.createQuery("from ResourceType where ResourceTypeName = 'Crops'").getSingleResult();
 			System.out.println("Crop sql done ");
 			Crop ac;
+			System.out.println("Crop sheet size loop = " + sheet.getLastRowNum());
 			for (rowNumber = 4; rowNumber < 100; rowNumber++) {
-				System.out.println("Crop = 3291 ");
+
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
-				// System.out.println("Crop loop = "+var1);
-				if (var1.isEmpty()) {
+				System.out.println("Crop = 3291 " + var1);
+				System.out.println("Crop loop = " + var1);
+				if (StringUtils.isBlank(var1)) {
 					break;
 				}
 				System.out.println("Crop = 3292 ");
 				var2 = sheet.getRow(rowNumber).getCell(2).getStringCellValue();
-				d1 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue(); // Q produced
-				d2 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue();
-				d3 = sheet.getRow(rowNumber).getCell(5).getNumericCellValue();
+				System.out.println("Crop = 3293 ");
+
+				cell = sheet.getRow(rowNumber).getCell(3); // d1 QP
+				if (cell.getCellType() == 0 && !cell.equals(null)) { /* Numeric */
+					System.out.println("in Numeric and not null");
+					d1 = cell.getNumericCellValue();
+
+				} else if (cell.getCellType() == 1 && cell.getStringCellValue().isEmpty()) {
+					continue;
+				} else {
+					System.out.println("Crop = 32999 vsal = ");
+					d1 = Double.parseDouble(cell.getStringCellValue());
+					System.out.println("Crop = 32999_1  ");
+				}
+
+				System.out.println("Crop = 3294 ");
+				d2 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue(); // Sold
+				System.out.println("Crop = 3295 " + d2);
+
+				cell = sheet.getRow(rowNumber).getCell(5); // ppu String in Number or blank ?
+				System.out.println("cell type = " + cell.getCellType());
+
+				if (cell.getCellType() == 0 && !cell.equals(null)) { /* Numeric */
+					System.out.println("in Numeric and not null");
+					d3 = cell.getNumericCellValue();
+
+				} else if (cell.getCellType() == 1 && cell.getStringCellValue().isEmpty()) {
+					System.out.println("Crop = 32977 vsal = ");
+					continue;
+				} else if (cell.getCellType() == 1 && cell.getStringCellValue() != "") {
+					System.out.println("Crop = 32966 vsal = ");
+					System.out.println("Crop = String val = " + cell.getStringCellValue());
+
+					// d3 = cell.getNumericCellValue();
+					System.out.println("Crop = 32966_1  ");
+					d3 = 0.0;
+
+				}
+
+				System.out.println("Crop = 3296 ");
 				System.out.println("Crop = 330 " + sheet.getRow(rowNumber).getCell(6).getCellType());
 				cell = sheet.getRow(rowNumber).getCell(6); // Other - number or string
 
@@ -459,16 +516,16 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 					var3 = Double.toString(d4);
 				}
 
-				System.out.println("Crop = 331 ");
-				market1 = sheet.getRow(rowNumber).getCell(7).getStringCellValue();
-				System.out.println("Crop = 332 ");
-				market2 = sheet.getRow(rowNumber).getCell(9).getStringCellValue();
-				System.out.println("Crop = 333 ");
-				market3 = sheet.getRow(rowNumber).getCell(11).getStringCellValue();
+				// System.out.println("Crop = 331 ");
+				// market1 = sheet.getRow(rowNumber).getCell(7).getStringCellValue();
+				// System.out.println("Crop = 332 ");
+				// market2 = sheet.getRow(rowNumber).getCell(9).getStringCellValue();
+				// System.out.println("Crop = 333 ");
+				// market3 = sheet.getRow(rowNumber).getCell(11).getStringCellValue();
 
-				percent1 = sheet.getRow(rowNumber).getCell(8).getNumericCellValue();
-				percent1 = sheet.getRow(rowNumber).getCell(10).getNumericCellValue();
-				percent1 = sheet.getRow(rowNumber).getCell(12).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(8).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(10).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(12).getNumericCellValue();
 
 				// System.out.println("Crop = " + var1 + var2);
 
@@ -478,12 +535,27 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 				ac.setStatus(efd.model.Asset.Status.NotChecked);
 				ac.setCropName(var1);
+				System.out.println("Crop = 33c ");
 				ac.setLocalUnit(var2);
+				System.out.println("Crop = 33b ");
 				ac.setQuantityProduced(d1.intValue());
-				ac.setQuantitySold(d2.intValue());
-				ac.setPricePerUnit(BigDecimal.valueOf(d3));
-				ac.setOtherUse(var3);
 
+				System.out.println("Crop = 33a ");
+
+				ac.setQuantitySold(d2.intValue());
+
+				System.out.println("Crop = 3356__9 ");
+				if (d3.isNaN())
+					System.out.println("Crop d3 nan = 3357 ");
+
+				// String aa = Double.toString(d3);
+				System.out.println("Crop = 33k ");
+
+				ac.setPricePerUnit(BigDecimal.valueOf(d3));
+
+				System.out.println("Crop = 3356 ");
+				ac.setOtherUse(var3);
+				System.out.println("Crop = 3357 ");
 				/****************************/
 				/* Where is the market data */
 				/****************************/
@@ -502,11 +574,25 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 			Transfer tf;
 			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
-
+				System.out.println("TF = 39_1 ");
+				
+				/* Heavy handed - but cell may contain garbage that cannot be grabbed */
+				try {
+					System.out.println("TF = 39_2 ");
+				cell = sheet.getRow(rowNumber).getCell(1);
+				System.out.println("TF = 39_3 " + cell.getCellType());
+				}
+				catch (Exception ex) {
+					break;
+				}
+						
+				
+				
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
+				System.out.println("TF = 40 ");
 				System.out.println("TF loop = " + var1);
-				System.out.println("TF loop size = " + sheet.getLastRowNum());
-				if (var1.isEmpty()) {
+				
+				if (StringUtil.isBlank(var1)) {
 					System.out.println("TF No records");
 					break;
 				}
@@ -515,31 +601,45 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				d1 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue(); // Q received
 				d2 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue();
 				d3 = sheet.getRow(rowNumber).getCell(5).getNumericCellValue();
-				System.out.println("TF 20");
-				var3 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); // Other Use - SHOULD THIS BE A NUMBER?
+				System.out.println("TF 20 = "+d1+d2+d3);
 
-				market1 = sheet.getRow(rowNumber).getCell(7).getStringCellValue();
+				cell = sheet.getRow(rowNumber).getCell(6); // Other - number or string
 
-				market2 = sheet.getRow(rowNumber).getCell(9).getStringCellValue();
+				if (cell.getCellType() == 1)
+					var3 = cell.getStringCellValue(); // Other Use - SHOULD THIS BE A NUMBER?
+				else if (cell.getCellType() == 0) {
+					d4 = cell.getNumericCellValue();
+					var3 = Double.toString(d4);
+				}
 
-				market3 = sheet.getRow(rowNumber).getCell(11).getStringCellValue();
+				// var3 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); // Other Use
+				// - SHOULD THIS BE A NUMBER?
+
+				// market1 = sheet.getRow(rowNumber).getCell(7).getStringCellValue();
+
+				// market2 = sheet.getRow(rowNumber).getCell(9).getStringCellValue();
+
+				// market3 = sheet.getRow(rowNumber).getCell(11).getStringCellValue();
 				System.out.println("TF 30");
-				percent1 = sheet.getRow(rowNumber).getCell(8).getNumericCellValue();
-				percent1 = sheet.getRow(rowNumber).getCell(10).getNumericCellValue();
-				percent1 = sheet.getRow(rowNumber).getCell(12).getNumericCellValue();
-				System.out.println("TF 40");
+				// percent1 = sheet.getRow(rowNumber).getCell(8).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(10).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(12).getNumericCellValue();
+				// System.out.println("TF 40");
 				// System.out.println("TRANS = " + var1 + var2);
 
 				tf = new Transfer();
 
-				// System.out.println("TF = 33 ");
+				System.out.println("TF = 33 ");
 
 				tf.setStatus(efd.model.Asset.Status.NotChecked);
 				tf.setTransferredResourceName(var1);
 				tf.setLocalUnit(var2);
+				System.out.println("TF = 34 ");
 				tf.setQuantityReceived(d1.intValue());
 				tf.setQuantitySold(d2.intValue());
+				System.out.println("TF = 35 ");
 				tf.setPricePerUnit(BigDecimal.valueOf(d3));
+				System.out.println("TF = 36 ");
 				tf.setOtherUse(var3);
 
 				/****************************/
@@ -547,8 +647,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/****************************/
 
 				tf.setResourceType(transfers);
+				System.out.println("TF = 37 ");
 
 				wgi.getTransfer().add(tf);
+				System.out.println("TF = 38 ");
 			}
 			localMessage("Done Transfers");
 			/*************************************************************************************************/
@@ -563,13 +665,13 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 					.createQuery("from ResourceType where ResourceTypeName = 'Livestock Products'").getSingleResult();
 			System.out.println("Done LS Products Query");
 			LiveStockUse lsu;
-			for (rowNumber = 4; rowNumber < 100; rowNumber++) {
+			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
 				System.out.println("LS 5");
 
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
 
 				System.out.println("LS loop = " + var1);
-				if (var1.isEmpty()) {
+				if (StringUtil.isBlank(var1)) {
 					break;
 				}
 				System.out.println("LS 10");
@@ -577,9 +679,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				var3 = sheet.getRow(rowNumber).getCell(3).getStringCellValue(); // Unit
 				System.out.println("LS 20");
 				if (checkCell("Livestock Products Quantity Produced", sheet, 4, rowNumber, false))
-
 					d1 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue();
-
 				else
 					return;
 				System.out.println("LS 21");
@@ -590,7 +690,17 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 					d3 = sheet.getRow(rowNumber).getCell(6).getNumericCellValue();
 				// System.out.println("LS = 330 ");
 				System.out.println("LS 30");
-				var4 = sheet.getRow(rowNumber).getCell(7).getStringCellValue(); // Other
+
+				cell = sheet.getRow(rowNumber).getCell(7); // Other - number or string
+
+				if (cell.getCellType() == 1)
+					var4 = cell.getStringCellValue(); // Other Use - SHOULD THIS BE A NUMBER?
+				else if (cell.getCellType() == 0) {
+					d4 = cell.getNumericCellValue();
+					var4 = Double.toString(d4);
+				}
+
+				// var4 = sheet.getRow(rowNumber).getCell(7).getStringCellValue(); // Other
 
 				// System.out.println("LS = 331 ");
 				/* No database location for market data yet */
@@ -611,8 +721,8 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				// System.out.println("LS = 33 ");
 
 				lsu.setStatus(efd.model.Asset.Status.NotChecked);
-				lsu.setLsIncomeType2(var1);
-				lsu.setLsName(var2);
+				// lsu.setLsIncomeType2(var1);
+				lsu.setLsName(var1);
 				lsu.setLocalUnit(var3);
 				System.out.println("LS 45");
 				if (d1 == null)
@@ -627,7 +737,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				if (d3 == null)
 					d3 = 0.0;
 				lsu.setPricePerUnit(BigDecimal.valueOf(d3));
-				
+
 				System.out.println("LS 49");
 				lsu.setOtherUse(var4);
 				System.out.println("LS 50");
@@ -652,30 +762,39 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
 
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
-				// System.out.println("WF loop = "+var1);
-				if (var1.isEmpty()) {
+				System.out.println("WF loop = " + var1);
+				if (StringUtils.isBlank(var1)) {
 					break;
 				}
 
 				var2 = sheet.getRow(rowNumber).getCell(2).getStringCellValue(); // Unit
 
-				d1 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue();
-				d2 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue();
-				d3 = sheet.getRow(rowNumber).getCell(5).getNumericCellValue();
-				// System.out.println("WF = 330 ");
+				d1 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue(); // QP
+				d2 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue(); // QS
+				d3 = sheet.getRow(rowNumber).getCell(5).getNumericCellValue(); // PPU
+				System.out.println("WF = 330 ");
 
-				var4 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); // Other
+				cell = sheet.getRow(rowNumber).getCell(7); // Other - number or string
+
+				if (cell.getCellType() == 1)
+					var4 = cell.getStringCellValue(); // Other Use - SHOULD THIS BE A NUMBER?
+				else if (cell.getCellType() == 0) {
+					d4 = cell.getNumericCellValue();
+					var4 = Double.toString(d4);
+				}
+
+				// var4 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); // Other
 
 				// System.out.println("WF = 331 ");
-				market1 = sheet.getRow(rowNumber).getCell(7).getStringCellValue();
+				// market1 = sheet.getRow(rowNumber).getCell(7).getStringCellValue();
 				// System.out.println("WF = 332 ");
-				market2 = sheet.getRow(rowNumber).getCell(9).getStringCellValue();
+				// market2 = sheet.getRow(rowNumber).getCell(9).getStringCellValue();
 				// System.out.println("WF = 333 ");
-				market3 = sheet.getRow(rowNumber).getCell(11).getStringCellValue();
+				// market3 = sheet.getRow(rowNumber).getCell(11).getStringCellValue();
 
-				percent1 = sheet.getRow(rowNumber).getCell(8).getNumericCellValue();
-				percent1 = sheet.getRow(rowNumber).getCell(10).getNumericCellValue();
-				percent1 = sheet.getRow(rowNumber).getCell(12).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(8).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(10).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(12).getNumericCellValue();
 
 				System.out.println("WF = " + var1 + var2);
 
@@ -712,16 +831,16 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
 				System.out.println("EMP loop = " + var1);
-				if (var1.isEmpty()) {
+				if (StringUtil.isBlank(var1)) {
 					break;
 				}
 				System.out.println("EMP 80-1");
-				
+
 				if (checkCell("Employment - Number of People Working ", sheet, 2, rowNumber, false))
 					d1 = sheet.getRow(rowNumber).getCell(2).getNumericCellValue(); // Number of people
 				else
 					return;
-				
+
 				System.out.println("EMP 80-2");
 				if (checkCell("Employment - Frequency ", sheet, 3, rowNumber, true))
 					d4 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue(); // Frequency
@@ -730,20 +849,20 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 					d2 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue(); // Duration
 				System.out.println("EMP 81");
 				var3 = sheet.getRow(rowNumber).getCell(5).getStringCellValue(); // Pay
-				
+
 				System.out.println("EMP 82");
 				var4 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); // Food Type
-				
+
 				if (checkCell("Employement - Pay Cash ", sheet, 7, rowNumber, true))
 					d3 = sheet.getRow(rowNumber).getCell(7).getNumericCellValue(); // Pay Cash
 				System.out.println("EMP 83");
-				//market1 = sheet.getRow(rowNumber).getCell(8).getStringCellValue();
-				//market2 = sheet.getRow(rowNumber).getCell(10).getStringCellValue();
-				//market3 = sheet.getRow(rowNumber).getCell(12).getStringCellValue();
+				// market1 = sheet.getRow(rowNumber).getCell(8).getStringCellValue();
+				// market2 = sheet.getRow(rowNumber).getCell(10).getStringCellValue();
+				// market3 = sheet.getRow(rowNumber).getCell(12).getStringCellValue();
 
-				//percent1 = sheet.getRow(rowNumber).getCell(9).getNumericCellValue();
-				//percent1 = sheet.getRow(rowNumber).getCell(11).getNumericCellValue();
-				//percent1 = sheet.getRow(rowNumber).getCell(13).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(9).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(11).getNumericCellValue();
+				// percent1 = sheet.getRow(rowNumber).getCell(13).getNumericCellValue();
 
 				System.out.println("EMP = " + var1 + var2);
 
@@ -884,7 +1003,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 					return false;
 				}
 			} else if (cell.getCellType() == 1) {
-				System.out.println("in cell type 1 check for string null? " + nullable+cell.getStringCellValue());
+				System.out.println("in cell type 1 check for string null? " + nullable + cell.getStringCellValue());
 				try {
 					stest = cell.getStringCellValue();
 					if (stest.isEmpty() && nullable) {

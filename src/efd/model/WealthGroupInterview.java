@@ -20,15 +20,15 @@ import efd.validations.*;
 		+ ",wgInterviewDate"
 		+ ";spreadsheet"
 		+ ",status]"
-		+ ";WildFood{wildFood}"
-		+ ";Land{assetLand}"
-		+ ";Tradeable{assetTradeable}"
 		+ ";LiveStock{assetLiveStock}"
-		+ ";FoodStock{assetFoodStock}"
+		+ ";Land{assetLand}"
+		+ ";Crops{crop}"
 		+ ";LiveStockUse{liveStockUse}"
-		+ ";Transfer{transfer}"
-		+ ";Crop{crop}"
 		+ ";Employment{employment}"
+		+ ";Transfer{transfer}"
+		+ ";WildFood{wildFood}"
+		+ ";Tradeable{assetTradeable}"
+		+ ";FoodStock{assetFoodStock}"
 		),  
 @View(name="wg",members= "wealthgroup")
 })
@@ -120,33 +120,12 @@ private String spreadsheet;
 /*  Collections of resource elements */
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
-private Collection<WildFood> wildFood;
-
-
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,landTypeEnteredName,landArea,unitEntered")
-private Collection<AssetLand> assetLand;
-
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,tradeableTypeEnteredName,quantity")
-private Collection<AssetTradeable> assetTradeable;
-
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,liveStockTypeEnteredName,unitEntered,numberOwned,pricePerUnit")
 private Collection<AssetLiveStock> assetLiveStock;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,wildFoodOrCropIndicator,foodName")
-private Collection<AssetFoodStock> assetFoodStock;
-
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
-private Collection<LiveStockUse> liveStockUse;
-
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
-private Collection<Transfer> transfer;
+@ListProperties("status,landTypeEnteredName,landArea,unitEntered")
+private Collection<AssetLand> assetLand;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse"
@@ -154,10 +133,40 @@ private Collection<Transfer> transfer;
 		+ ",julQP,augQP,sepQP,octQP,novQP,decQP")
 private Collection<Crop> crop;
 
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("status,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
+private Collection<LiveStockUse> liveStockUse;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,employmentName,peopleCount,frequency, cashPaymentPerUnit, foodPaymentPerUnit")
 private Collection<Employment> employment;
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("status,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
+private Collection<Transfer> transfer;
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("status,wildFoodOrCropIndicator,foodName")
+private Collection<AssetFoodStock> assetFoodStock;
+
+
+
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("status,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
+private Collection<WildFood> wildFood;
+
+
+
+
+@ElementCollection      // Note  problem with Descriptions list for resourcetype 
+@ListProperties("status,tradeableTypeEnteredName,quantity")
+private Collection<AssetTradeable> assetTradeable;
+
+
+
+
+
 
 public String getWgiid() {
 	return wgiid;
