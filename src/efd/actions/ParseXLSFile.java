@@ -7,6 +7,9 @@ import java.sql.*;
 /* Read XLS Community Interview  spreadsheet */
 
 import java.util.Collection;
+
+import javax.persistence.*;
+
 import java.text.SimpleDateFormat;
 
 import org.openxava.actions.*;
@@ -18,6 +21,7 @@ import efd.model.*;
 import efd.model.WealthGroupInterview.*;
 
 import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.text.*;
 import org.apache.poi.ss.usermodel.*;
 import org.jsoup.helper.*;
 
@@ -44,6 +48,8 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 		String typeOfYear;
 		String stest;
 		Boolean nullable = false;
+		Query query = null;
+		ResourceSubType rst = null;
 
 		// System.out.println("in xls parse ");
 
@@ -158,12 +164,11 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			nullable = true;
 			if (checkCell("Interview Date", sheet, 4, 1, nullable))
 				cell = sheet.getRow(1).getCell(4, Row.CREATE_NULL_AS_BLANK);
-			else
-			{
+			else {
 				addError("Incomplete Spreadsheet data - Interview Date error ");
 				return;
 			}
-				
+
 			if (cell.getCellType() == 0) { /* Numeric */
 				System.out.println("in Numeric Date");
 				Double iDateD = cell.getNumericCellValue();
@@ -295,11 +300,11 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
 				if (StringUtil.isBlank(var1))
 					break;
-				System.out.println("done asset 111 "+var1);
+				System.out.println("done asset 111 " + var1);
 
 				var2 = sheet.getRow(rowNumber).getCell(2).getStringCellValue();
 
-				System.out.println("done asset 112 "+var2);
+				System.out.println("done asset 112 " + var2);
 
 				cell = sheet.getRow(rowNumber).getCell(3);
 				if (checkCell("Livestock Asset Number Owned", sheet, 3, rowNumber, false)) {
@@ -307,14 +312,12 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 						System.out.println("done asset 112_1 ");
 						d1 = cell.getNumericCellValue();
 						System.out.println("done asset 112_2 ");
-					}
-					else if (cell.getCellType() == 1 )
-					{
-						System.out.println("done asset 112_3 "+cell.getStringCellValue());
+					} else if (cell.getCellType() == 1) {
+						System.out.println("done asset 112_3 " + cell.getStringCellValue());
 						d1 = Double.parseDouble(cell.getStringCellValue());
 						System.out.println("done asset 112_4 ");
 					}
-					} else
+				} else
 					return;
 				System.out.println("done asset 113 ");
 				if (checkCell("Livestock Asset Price Per Unit", sheet, 4, rowNumber, true))
@@ -337,10 +340,20 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Assets = 46 ");
 				if (d2 != null)
 					als.setPricePerUnit(BigDecimal.valueOf(d2));
-				als.setResourceType(livestock);
+
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, livestock.getIdresourcetype().toString())) != null) {
+					System.out.println("done als get =  "+rst.getResourcetypename());
+					
+					als.setResourceSubType(rst);
+					als.setStatus(efd.model.Asset.Status.Valid);
+				}
+
 				System.out.println("Assets = 47 ");
 
 				wgi.getAssetLiveStock().add(als);
+				System.out.println("Assets - done assetlivestock elementcollection add ");
 			}
 			localMessage("done Stock Asset");
 			/*************************************************************************************************/
@@ -397,7 +410,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Land = 46 ");
 
 				System.out.println("asset resource type = " + land.getResourcetypename());
-				al.setResourceType(land);
+			//	al.setResourceType(land);
 
 				wgi.getAssetLand().add(al);
 
@@ -441,7 +454,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 				// afs .setLandArea(d1.intValue());
 				System.out.println("Food = 441 ");
-				afs.setResourceType(foodstock);
+			//	afs.setResourceType(foodstock);
 				System.out.println("Food = 442 ");
 				wgi.getAssetFoodStock().add(afs);
 				System.out.println("Food = 443 ");
@@ -502,8 +515,9 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 					// d3 = cell.getNumericCellValue();
 					System.out.println("Crop = 32966_1  ");
 					d3 = 0.0;
-
 				}
+				else if (cell.getCellType() == 3 )    // blank
+					d3 = 0.0;
 
 				System.out.println("Crop = 3296 ");
 				System.out.println("Crop = 330 " + sheet.getRow(rowNumber).getCell(6).getCellType());
@@ -545,8 +559,8 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				ac.setQuantitySold(d2.intValue());
 
 				System.out.println("Crop = 3356__9 ");
-				if (d3.isNaN())
-					System.out.println("Crop d3 nan = 3357 ");
+				//if (d3.isNaN())
+				//	System.out.println("Crop d3 nan = 3357 ");
 
 				// String aa = Double.toString(d3);
 				System.out.println("Crop = 33k ");
@@ -560,7 +574,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/* Where is the market data */
 				/****************************/
 
-				ac.setResourceType(crops);
+				// ac.setResourceType(crops);
 
 				wgi.getCrop().add(ac);
 			}
@@ -575,23 +589,20 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			Transfer tf;
 			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
 				System.out.println("TF = 39_1 ");
-				
+
 				/* Heavy handed - but cell may contain garbage that cannot be grabbed */
 				try {
 					System.out.println("TF = 39_2 ");
-				cell = sheet.getRow(rowNumber).getCell(1);
-				System.out.println("TF = 39_3 " + cell.getCellType());
-				}
-				catch (Exception ex) {
+					cell = sheet.getRow(rowNumber).getCell(1);
+					System.out.println("TF = 39_3 " + cell.getCellType());
+				} catch (Exception ex) {
 					break;
 				}
-						
-				
-				
+
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
 				System.out.println("TF = 40 ");
 				System.out.println("TF loop = " + var1);
-				
+
 				if (StringUtil.isBlank(var1)) {
 					System.out.println("TF No records");
 					break;
@@ -601,7 +612,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				d1 = sheet.getRow(rowNumber).getCell(3).getNumericCellValue(); // Q received
 				d2 = sheet.getRow(rowNumber).getCell(4).getNumericCellValue();
 				d3 = sheet.getRow(rowNumber).getCell(5).getNumericCellValue();
-				System.out.println("TF 20 = "+d1+d2+d3);
+				System.out.println("TF 20 = " + d1 + d2 + d3);
 
 				cell = sheet.getRow(rowNumber).getCell(6); // Other - number or string
 
@@ -646,7 +657,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/* Where is the market data */
 				/****************************/
 
-				tf.setResourceType(transfers);
+			//	tf.setResourceType(transfers);
 				System.out.println("TF = 37 ");
 
 				wgi.getTransfer().add(tf);
@@ -721,7 +732,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				// System.out.println("LS = 33 ");
 
 				lsu.setStatus(efd.model.Asset.Status.NotChecked);
-				// lsu.setLsIncomeType2(var1);
+				//lsu.setLsIncomeType2(var1);
 				lsu.setLsName(var1);
 				lsu.setLocalUnit(var3);
 				System.out.println("LS 45");
@@ -746,7 +757,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/* Where is the market data */
 				/****************************/
 
-				lsu.setResourceType(lsp);
+				// lsu.setResourceType(lsp);
 
 				wgi.getLiveStockUse().add(lsu);
 			}
@@ -814,7 +825,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/* Where is the market data */
 				/****************************/
 
-				wf.setResourceType(wft);
+				// wf.setResourceType(wft);
 
 				wgi.getWildFood().add(wf);
 			}
@@ -884,15 +895,19 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/* Where is the work location data */
 				/****************************/
 
-				emp.setResourceType(empt);
+				// emp.setResourceType(empt);
 
 				wgi.getEmployment().add(emp);
 			}
 			localMessage("Done Employment ");
-			System.out.println("Assets = 46 ");
+			System.out.println("Assets = 46 222");
 			XPersistence.getManager().persist(wgi);
-			System.out.println("Assets = 47 ");
+			System.out.println("Assets = 47 222");
+			
 			getView().refresh();
+			
+			System.out.println("Assets = 48 222 ");
+			
 			addMessage("Successful Parse");
 			return;
 		}
@@ -957,6 +972,24 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			System.out.println(message);
 			addMessage(message);
 		}
+	}
+
+	private ResourceSubType checkSubType(String var1, String resourceType) {
+		try {
+			var1 = WordUtils.capitalize(var1);
+			ResourceSubType rst = (ResourceSubType) XPersistence.getManager()
+					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'"
+							+ "and resourcetypename = '" + var1 + "'")
+					.getSingleResult();
+			System.out.println("done asset sub type query " + rst.getResourcetypename() + var1);
+			return rst;
+		}
+
+		catch (Exception ex) {
+			return null; // no record found to match data entered
+
+		}
+
 	}
 
 	private Boolean checkCell(String cname, Sheet sheet, int x, int y, Boolean nullable) /* Is spreadsheet Cell Valid */

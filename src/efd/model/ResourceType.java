@@ -6,6 +6,11 @@ import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
 
+@Views({
+	 @View(members="resourcetypename;resourcesubtype"),
+	 @View(name="SimpleSubtype", members="resourcetypename")
+	})
+
 
 @Entity
 public class ResourceType {

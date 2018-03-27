@@ -11,12 +11,15 @@ import org.openxava.annotations.*;
 //abstract public class Asset {
 	public class Asset {
 	
-	//@ManyToOne(optional=false)
-	@ManyToOne
-	@JoinColumn(name="ResourceType")
-	//@Required 
-	
-	private ResourceType resourceType;
+	@SearchAction("WealthGroupInterview.resourceSubTypeFilter")
+	@AddAction("WealthGroupInterview.newResourceSubType")
+	@ManyToOne(fetch=FetchType.LAZY, optional=true)
+	@JoinColumn(name="ResourceSubType")
+	//@DescriptionsList(descriptionProperties="resourcetypename")
+	//@DescriptionsList(showReferenceView=true)
+
+	@ReferenceView("SimpleSubtype")
+	private ResourceSubType resourceSubType;
 
 	@Column(name = "Status", nullable = false)
 	private Status status;
@@ -24,16 +27,13 @@ import org.openxava.annotations.*;
 	public enum Status {
 		Invalid, NotChecked, Valid
 	}
-	
-	
-	
 
-	public ResourceType getResourceType() {
-		return resourceType;
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
 	}
 
-	public void setResourceType(ResourceType resourceType) {
-		this.resourceType = resourceType;
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
 	}
 
 	public Status getStatus() {
@@ -43,6 +43,7 @@ import org.openxava.annotations.*;
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+	
 
 
 

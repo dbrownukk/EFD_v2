@@ -88,6 +88,12 @@
 			class="efd.actions.FileteredSite"/>
 	</controller>
 		
-		
+	<controller name="WealthGroupInterview">	
+	<extends controller="EFD_v2"/>	
+		<action name="resourceSubTypeFilter" hidden="true" image="search.gif"
+			class="efd.actions.ResourceSubTypeFilter"/>
+			<action name="newResourceSubType" hidden="true" image="new.gif"
+			class="efd.actions.newResourceSubType"/>
+	</controller>
 		
 </controllers>
