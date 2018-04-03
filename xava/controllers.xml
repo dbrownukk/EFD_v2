@@ -5,7 +5,7 @@
 <controllers>
     
 
-    
+    <object name="xava_activeSection" class="java.lang.Integer" value="0"/>
 
 	
 	<controller name="EFD_v2">
@@ -103,7 +103,10 @@
 		
 		<action name="change" 
 			class="efd.actions.AssetChangeSectionAction"
-			keystroke="Control 1..9"/>
+			keystroke="Control 1..9">
+			<use-object name="xava_activeSection"/>
+		</action>
+			
 	
 	
 	

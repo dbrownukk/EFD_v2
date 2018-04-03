@@ -410,6 +410,19 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Land = 46 ");
 
 				System.out.println("asset resource type = " + land.getResourcetypename());
+				
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, land.getIdresourcetype().toString())) != null) {
+					System.out.println("done ls get =  "+rst.getResourcetypename());
+					
+					al.setResourceSubType(rst);
+					al.setStatus(efd.model.Asset.Status.Valid);
+				}
+				
+				
+				
+				
 			//	al.setResourceType(land);
 
 				wgi.getAssetLand().add(al);
@@ -456,6 +469,19 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Food = 441 ");
 			//	afs.setResourceType(foodstock);
 				System.out.println("Food = 442 ");
+				
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, foodstock.getIdresourcetype().toString())) != null) {
+					System.out.println("done afs get =  "+rst.getResourcetypename());
+					
+					afs.setResourceSubType(rst);
+					afs.setStatus(efd.model.Asset.Status.Valid);
+				}
+				
+				
+				
+				
 				wgi.getAssetFoodStock().add(afs);
 				System.out.println("Food = 443 ");
 			}
@@ -465,7 +491,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			sheet = wb.getSheet("Crops");
 			System.out.println("Crop sql todo ");
 			ResourceType crops = (ResourceType) XPersistence.getManager()
-					.createQuery("from ResourceType where ResourceTypeName = 'Crops'").getSingleResult();
+					.createQuery("from ResourceType where ResourceTypeName = 'Crops - primarily for Sale'").getSingleResult();    // NOTE - Need RST to match spreadsheet tabs
 			System.out.println("Crop sql done ");
 			Crop ac;
 			System.out.println("Crop sheet size loop = " + sheet.getLastRowNum());
@@ -575,6 +601,15 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/****************************/
 
 				// ac.setResourceType(crops);
+				
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, crops.getIdresourcetype().toString())) != null) {
+					System.out.println("done crops get =  "+rst.getResourcetypename());
+					
+					ac.setResourceSubType(rst);
+					ac.setStatus(efd.model.Asset.Status.Valid);
+				}
 
 				wgi.getCrop().add(ac);
 			}
@@ -659,6 +694,18 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 			//	tf.setResourceType(transfers);
 				System.out.println("TF = 37 ");
+				
+				
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, transfers.getIdresourcetype().toString())) != null) {
+					System.out.println("done als get =  "+rst.getResourcetypename());
+					
+					tf.setResourceSubType(rst);
+					tf.setStatus(efd.model.Asset.Status.Valid);
+				}
+				
+				
 
 				wgi.getTransfer().add(tf);
 				System.out.println("TF = 38 ");
@@ -758,6 +805,18 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/****************************/
 
 				// lsu.setResourceType(lsp);
+				
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, lsp.getIdresourcetype().toString())) != null) {
+					System.out.println("done als get =  "+rst.getResourcetypename());
+					
+					lsu.setResourceSubType(rst);
+					lsu.setStatus(efd.model.Asset.Status.Valid);
+				}
+				
+				
+				
 
 				wgi.getLiveStockUse().add(lsu);
 			}
@@ -826,6 +885,17 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/****************************/
 
 				// wf.setResourceType(wft);
+				
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, wft.getIdresourcetype().toString())) != null) {
+					System.out.println("done als get =  "+rst.getResourcetypename());
+					
+					wf.setResourceSubType(rst);
+					wf.setStatus(efd.model.Asset.Status.Valid);
+				}
+				
+				
 
 				wgi.getWildFood().add(wf);
 			}
@@ -896,6 +966,16 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				/****************************/
 
 				// emp.setResourceType(empt);
+				
+				/* Set to Resource Sub Type.. */
+
+				if ((rst = checkSubType(var1, empt.getIdresourcetype().toString())) != null) {
+					System.out.println("done als get =  "+rst.getResourcetypename());
+					
+					emp.setResourceSubType(rst);
+					emp.setStatus(efd.model.Asset.Status.Valid);
+				}
+				
 
 				wgi.getEmployment().add(emp);
 			}

@@ -124,6 +124,8 @@ private String spreadsheet;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,resourceSubType,liveStockTypeEnteredName,unitEntered,numberOwned,pricePerUnit")
+@XOrderBy("status desc") 
+@OrderBy("Status desc")
 private Collection<AssetLiveStock> assetLiveStock;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 

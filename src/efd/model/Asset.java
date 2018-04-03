@@ -20,6 +20,9 @@ import efd.actions.*;
 	@JoinColumn(name="ResourceSubType")
 	//@ReferenceView("SimpleSubtype")
 	
+	
+	//this.getActiveSection(); gives section number
+	
 	//@OnChange(ResourceSubTypeFilter.class)
 	// @DisplaySize(35) not allowed
 	@DescriptionsList(descriptionProperties="resourcetype.resourcetypename,resourcetypename")
