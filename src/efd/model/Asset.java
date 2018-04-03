@@ -6,20 +6,26 @@ import javax.persistence.*;
 
 import org.openxava.annotations.*;
 
+import efd.actions.*;
+
 @MappedSuperclass
 
 //abstract public class Asset {
 	public class Asset {
 	
-	@SearchAction("WealthGroupInterview.resourceSubTypeFilter")
-	@AddAction("WealthGroupInterview.newResourceSubType")
-	@ManyToOne(fetch=FetchType.LAZY, optional=true)
-	@JoinColumn(name="ResourceSubType")
-	//@DescriptionsList(descriptionProperties="resourcetypename")
-	//@DescriptionsList(showReferenceView=true)
 
-	@ReferenceView("SimpleSubtype")
+	
+	@ManyToOne
+	//@SearchAction("WealthGroupInterview.resourceSubTypeFilter")
+	@JoinColumn(name="ResourceSubType")
+	//@ReferenceView("SimpleSubtype")
+	
+	//@OnChange(ResourceSubTypeFilter.class)
+	// @DisplaySize(35) not allowed
+	@DescriptionsList(descriptionProperties="resourcetype.resourcetypename,resourcetypename")
 	private ResourceSubType resourceSubType;
+	
+	
 
 	@Column(name = "Status", nullable = false)
 	private Status status;
@@ -28,13 +34,8 @@ import org.openxava.annotations.*;
 		Invalid, NotChecked, Valid
 	}
 
-	public ResourceSubType getResourceSubType() {
-		return resourceSubType;
-	}
 
-	public void setResourceSubType(ResourceSubType resourceSubType) {
-		this.resourceSubType = resourceSubType;
-	}
+
 
 	public Status getStatus() {
 		return status;
@@ -42,6 +43,14 @@ import org.openxava.annotations.*;
 
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
 	}
 	
 

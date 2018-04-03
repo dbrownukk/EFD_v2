@@ -88,12 +88,26 @@
 			class="efd.actions.FileteredSite"/>
 	</controller>
 		
+		<controller name="Sections">
+		<action name="change" 
+			class="efd.actions.AssetChangeSectionAction"
+			keystroke="Control 1..9"/>
+	</controller>	
+		
+		
 	<controller name="WealthGroupInterview">	
 	<extends controller="EFD_v2"/>	
-		<action name="resourceSubTypeFilter" hidden="true" image="search.gif"
+		<action name="resourceSubTypeFilter" hidden="false" image="search.gif"
 			class="efd.actions.ResourceSubTypeFilter"/>
-			<action name="newResourceSubType" hidden="true" image="new.gif"
-			class="efd.actions.newResourceSubType"/>
+	
+		
+		<action name="change" 
+			class="efd.actions.AssetChangeSectionAction"
+			keystroke="Control 1..9"/>
+	
+	
+	
+	
 	</controller>
 		
 </controllers>

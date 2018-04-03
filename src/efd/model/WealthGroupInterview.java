@@ -118,6 +118,8 @@ private String spreadsheet;
 
 
 
+
+
 /*  Collections of resource elements */
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
@@ -129,39 +131,33 @@ private Collection<AssetLiveStock> assetLiveStock;
 private Collection<AssetLand> assetLand;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse"
+@ListProperties("status,resourceSubType,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse"
 		+ ",janQP,febQP,marQP,aprQP,mayQP,junQP"
 		+ ",julQP,augQP,sepQP,octQP,novQP,decQP")
 private Collection<Crop> crop;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
+@ListProperties("status,resourceSubType,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
 private Collection<LiveStockUse> liveStockUse;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,employmentName,peopleCount,frequency, cashPaymentPerUnit, foodPaymentPerUnit")
+@ListProperties("status,resourceSubType,employmentName,peopleCount,frequency, cashPaymentPerUnit, foodPaymentPerUnit")
 private Collection<Employment> employment;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,resourceSubType,transferredResourceName,localUnit,quantityReceived, quantitySold,pricePerUnit,otherUse")
 private Collection<Transfer> transfer;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,wildFoodOrCropIndicator,foodName")
+@ListProperties("status,resourceSubType,wildFoodOrCropIndicator,foodName")
 private Collection<AssetFoodStock> assetFoodStock;
 
-
-
-
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
+@ListProperties("status,resourceSubType,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
 private Collection<WildFood> wildFood;
 
-
-
-
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,tradeableTypeEnteredName,quantity")
+@ListProperties("status,resourceSubType,tradeableTypeEnteredName,quantity")
 private Collection<AssetTradeable> assetTradeable;
 
 
@@ -457,6 +453,7 @@ public Collection<AssetTradeable> getAssetTradeable() {
 public void setAssetTradeable(Collection<AssetTradeable> assetTradeable) {
 	this.assetTradeable = assetTradeable;
 }
+
 
 
 

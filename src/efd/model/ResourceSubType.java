@@ -23,13 +23,13 @@ import efd.utils.*;
 @Table(name = "ResourceSubType",uniqueConstraints=@UniqueConstraint(columnNames={"ReourceType","ResourceTypeName"}))
 public class ResourceSubType {
 
-	//@Id
+	@Id
 	//@Hidden // The property is not shown to the user. It's an internal identifier
-	//@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
-	//@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	//@Column(name = "IDResourceSubType", length = 32, unique = true)
-	//@Column(name = "IDResourceSubType", length = 32, unique = true)
-	//private String idresourcesubtype;
+	@Column(name = "IDResourceSubType", length = 32, unique = true)
+	private String idresourcesubtype;
 	
 	@ManyToOne       //(fetch = FetchType.LAZY, optional = false)
 	@Required
@@ -37,7 +37,7 @@ public class ResourceSubType {
 	@DescriptionsList(descriptionProperties="resourcetypename")
 	private ResourceType resourcetype;
 	
-	@Id
+	//@Id
 	@Column(name = "ResourceTypeName", length=255)  // ? ResosurceSubTypeName ?
 	@Required
 	private String resourcetypename;
@@ -93,6 +93,14 @@ public class ResourceSubType {
 
 	public void setResourcesubtypekcal(int resourcesubtypekcal) {
 		this.resourcesubtypekcal = resourcesubtypekcal;
+	}
+
+	public String getIdresourcesubtype() {
+		return idresourcesubtype;
+	}
+
+	public void setIdresourcesubtype(String idresourcesubtype) {
+		this.idresourcesubtype = idresourcesubtype;
 	}
 
 	
