@@ -276,9 +276,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			System.out.println("done delete ");
 
 			sheet = wb.getSheetAt(1);
-			String var1 = null, var2 = null, var3 = null, var4 = null, var5 = null;
-			Integer int1, int2, int3;
-			Cell cell1, cell2, cell3;
+			String var1 = null, var2 = null, var3 = null, var4 = null;
 			Double d1 = null, d2 = null, d3 = null, d4 = null;
 			Boolean getNextRow = false;
 			String market1, market2, market3;
@@ -356,8 +354,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Assets - done assetlivestock elementcollection add ");
 			}
 			localMessage("done Stock Asset");
-			/*************************************************************************************************/
+			/*************************************************************************************************/			 
 			/* Get Asset id for LAND Asset */
+			
+			
 			ResourceType land = (ResourceType) XPersistence.getManager()
 					.createQuery("from ResourceType where ResourceTypeName = 'Land'").getSingleResult();
 			System.out.println("done land asset query ");
@@ -365,7 +365,9 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			System.out.println("Land = 41 size = " + sheet.getLastRowNum());
 
 			for (rowNumber = 14; rowNumber < 100; rowNumber++) {
-				System.out.println("Land = 411 ");
+				/* Reset vars */
+				var1 = ""; var2 = ""; var3 = ""; var4 = "";
+				d1 = 0.0; d2 = 0.0; d3 = 0.0; d4 = 0.0;
 
 				try {
 					var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
@@ -431,6 +433,8 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			localMessage("done Land Asset");
 			/*************************************************************************************************/
 			/* Get Asset id for FOODSTOCK Asset */
+
+			
 			sheet = wb.getSheet("FOOD PURCHASE");
 
 			ResourceType foodstock = (ResourceType) XPersistence.getManager()
@@ -438,6 +442,12 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 			AssetFoodStock afs;
 			for (rowNumber = 3; rowNumber <= sheet.getLastRowNum(); rowNumber++) {
+				
+				/* Reset vars */
+				var1 = ""; var2 = ""; var3 = ""; var4 = "";
+				d1 = 0.0; d2 = 0.0; d3 = 0.0; d4 = 0.0;
+				
+				
 				System.out.println("Food loop = row = " + rowNumber);
 				System.out.println("Food loop = rows = " + sheet.getLastRowNum());
 				System.out.println("Food loop type = " + sheet.getRow(rowNumber).getCell(1).getCellType());
@@ -488,6 +498,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			localMessage("Done Food Stock");
 			/*************************************************************************************************/
 			/* Get Asset id for CROPS Asset - */
+
 			sheet = wb.getSheet("Crops");
 			System.out.println("Crop sql todo ");
 			ResourceType crops = (ResourceType) XPersistence.getManager()
@@ -497,6 +508,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			System.out.println("Crop sheet size loop = " + sheet.getLastRowNum());
 			for (rowNumber = 4; rowNumber < 100; rowNumber++) {
 
+				/* Reset vars */
+				var1 = ""; var2 = ""; var3 = ""; var4 = "";
+				d1 = 0.0; d2 = 0.0; d3 = 0.0; d4 = 0.0;
+				
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
 				System.out.println("Crop = 3291 " + var1);
 				System.out.println("Crop loop = " + var1);
@@ -616,6 +631,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			localMessage("Done Crops");
 			/*************************************************************************************************/
 			/* Get Assets for Transfers */
+			
 			sheet = wb.getSheet("TRANSFERS");
 
 			ResourceType transfers = (ResourceType) XPersistence.getManager()
@@ -623,7 +639,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 			Transfer tf;
 			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
-				System.out.println("TF = 39_1 ");
+				
+				/* Reset vars */
+				var1 = ""; var2 = ""; var3 = ""; var4 = "";
+				d1 = 0.0; d2 = 0.0; d3 = 0.0; d4 = 0.0;
 
 				/* Heavy handed - but cell may contain garbage that cannot be grabbed */
 				try {
@@ -650,12 +669,16 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("TF 20 = " + d1 + d2 + d3);
 
 				cell = sheet.getRow(rowNumber).getCell(6); // Other - number or string
-
+				System.out.println("TF Var 3 TYPE is  = "+cell.getCellType());
 				if (cell.getCellType() == 1)
+				{
 					var3 = cell.getStringCellValue(); // Other Use - SHOULD THIS BE A NUMBER?
-				else if (cell.getCellType() == 0) {
+					System.out.println("TF Var 3 is a string = " +var3);
+				}
+					else if (cell.getCellType() == 0) {
 					d4 = cell.getNumericCellValue();
 					var3 = Double.toString(d4);
+					System.out.println("TF Var 3 is a number = " +var3);
 				}
 
 				// var3 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); // Other Use
@@ -713,6 +736,8 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			localMessage("Done Transfers");
 			/*************************************************************************************************/
 			/* Get Asset id for Livestock Product (was LS) Asset - */
+
+			
 			System.out.println("in ls");
 
 			sheet = wb.getSheetAt(3);
@@ -724,6 +749,11 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			System.out.println("Done LS Products Query");
 			LiveStockUse lsu;
 			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
+				
+				/* Reset vars */
+				var1 = ""; var2 = ""; var3 = ""; var4 = "";
+				d1 = 0.0; d2 = 0.0; d3 = 0.0; d4 = 0.0;
+				
 				System.out.println("LS 5");
 
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
@@ -823,6 +853,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			localMessage("Done LS Use");
 			/*************************************************************************************************/
 			/* Get Asset id for WildFood Asset - */
+
 			sheet = wb.getSheet("WILD FOODS"); /* WIll need to change to Livestock Products */
 
 			ResourceType wft = (ResourceType) XPersistence.getManager()
@@ -830,6 +861,11 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 			WildFood wf;
 			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
+				
+				/* Reset vars */
+				var1 = ""; var2 = ""; var3 = ""; var4 = "";
+				d1 = 0.0; d2 = 0.0; d3 = 0.0; d4 = 0.0;
+				
 
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
 				System.out.println("WF loop = " + var1);
@@ -902,6 +938,8 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			localMessage("Done Wild Food");
 			/*************************************************************************************************/
 			/* Get Asset EMPLOYMENT - */
+
+			
 			sheet = wb.getSheet("EMP");
 
 			ResourceType empt = (ResourceType) XPersistence.getManager()
@@ -909,6 +947,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 			Employment emp;
 			for (rowNumber = 3; rowNumber < 100; rowNumber++) {
+				
+				/* Reset vars */
+				var1 = ""; var2 = ""; var3 = ""; var4 = "";
+				d1 = 0.0; d2 = 0.0; d3 = 0.0; d4 = 0.0;
 
 				var1 = sheet.getRow(rowNumber).getCell(1).getStringCellValue();
 				System.out.println("EMP loop = " + var1);
@@ -932,8 +974,8 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				var3 = sheet.getRow(rowNumber).getCell(5).getStringCellValue(); // Pay
 
 				System.out.println("EMP 82");
-				var4 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); // Food Type
-
+				var4 = sheet.getRow(rowNumber).getCell(6).getStringCellValue(); 
+				
 				if (checkCell("Employement - Pay Cash ", sheet, 7, rowNumber, true))
 					d3 = sheet.getRow(rowNumber).getCell(7).getNumericCellValue(); // Pay Cash
 				System.out.println("EMP 83");
@@ -953,7 +995,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				emp.setStatus(efd.model.Asset.Status.NotChecked);
 				emp.setEmploymentName(var1);
 				emp.setPeopleCount(d1.intValue());
-				emp.setFrequency(var2);
+				emp.setFrequency(Double.toString(d4));
 				emp.setDuration(d2.intValue());
 				// emp.setFoodPaymentPerUnit(var3);
 
