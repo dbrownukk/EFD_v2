@@ -58,6 +58,15 @@
              />
 	</controller>
 	
+	 <controller name="Reports">
+	 <action name="Country Report"
+	 		label="Country Report"
+	 		icon="view-list"
+	 		class="efd.reports.ReportCountry"
+             />
+	</controller>
+	
+	
 	
 	<controller name="LivelihoodZone">		
 	<extends controller="EFD_v2"/>

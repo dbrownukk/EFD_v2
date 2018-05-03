@@ -62,7 +62,7 @@
         <properties>
 		<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
 		<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-		<property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/efd"/>
+		<property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/efd"/>       <!--  3306 at was 127.0.0.1 -->
 		<property name="hibernate.connection.username" value="efd"/>
 		<property name="hibernate.connection.password" value="efd"/>
         </properties>
