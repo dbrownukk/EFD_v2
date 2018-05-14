@@ -18,7 +18,7 @@ import org.openxava.annotations.*;
 
 @Entity
 
-@Tab(editors = "List, Cards"
+@Tab(editors = "List, Cards, Charts"
 , rowStyles = @RowStyle(style = "row-highlight"
 , property = "type", value = "steady")
 , properties = "livelihoodZone.project.projecttitle,livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"

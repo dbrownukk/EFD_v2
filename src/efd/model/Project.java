@@ -32,7 +32,8 @@ import org.openxava.tab.*;
 
 
 
-@Tab(properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", editors = "List, Cards") 
+@Tab(properties = "projecttitle,pdate,altCurrency.description,altExchangeRate") 
+//@Tab(properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", editors = "List, Cards") 
 
 @Table(name = "Project")
 public class Project {

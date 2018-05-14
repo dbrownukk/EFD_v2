@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Projects_v1" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="11e4f5f5-4903-415d-9a9b-daf8a8d9a63f">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="efd"/>
+	<queryString language="SQL">
+		<![CDATA[select  p.projecttitle
+,s.LocationDistrict
+,s.SubDistrict
+,WGName_Eng
+,wgi.WGInterviewers
+from project p
+,community c
+,wealthgroup w 
+,site s,wealthgroupinterview wgi
+where c.CProject=p.ProjectID
+and c.CLocation=s.LocationID
+and w.CommunityID=c.CID
+and wgi.WGID=w.WealthGroupID]]>
+	</queryString>
+	<field name="projecttitle" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="projecttitle"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="project"/>
+	</field>
+	<field name="LocationDistrict" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LocationDistrict"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="SubDistrict" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SubDistrict"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="WGName_Eng" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGName_Eng"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGInterviewers" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGInterviewers"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<group name="projecttitle">
+		<groupExpression><![CDATA[$F{projecttitle}]]></groupExpression>
+	</group>
+	<group name="LocationDistrict">
+		<groupExpression><![CDATA[$F{LocationDistrict}]]></groupExpression>
+	</group>
+	<group name="SubDistrict">
+		<groupExpression><![CDATA[$F{SubDistrict}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="30" uuid="273416dc-5468-4886-9b5b-1bd0da004ccd"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[EFD Projects]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="111" height="61" uuid="f1ff912e-1e93-4c16-a64d-a9ada29d47d7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="95813fb0-7025-4973-97b4-7affafe91c26"/>
+				</reportElement>
+				<text><![CDATA[Project]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="111" y="0" width="111" height="61" uuid="298d397d-1a27-4c9f-b5dd-0a4ce287078e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5672fae9-3a41-4cc7-9f8d-9ea863ed07d8"/>
+				</reportElement>
+				<text><![CDATA[District]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="0" width="111" height="61" uuid="82aa4caf-8f17-44c1-b815-064b0aebb089">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="78cb11ed-cbb5-48ad-865d-dd0a7674de62"/>
+				</reportElement>
+				<text><![CDATA[Sub District]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="333" y="0" width="111" height="61" uuid="f1cc9fa6-9eec-4125-95b0-88ef979e2535">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5e23827c-f89c-48b9-b18d-b6a9e0420398"/>
+				</reportElement>
+				<text><![CDATA[Wealth Group]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="444" y="0" width="111" height="61" uuid="66f28f4c-b37a-4316-8c89-8d3d28972156">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6e8ea6df-5c72-4248-a56a-2bc4ab8bf00a"/>
+				</reportElement>
+				<text><![CDATA[Wealth Group Interviewer]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout"/>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="111" height="30" isRemoveLineWhenBlank="true" printWhenGroupChanges="projecttitle" uuid="01be4e69-b8ff-4e88-830e-9a2293907b4f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="95813fb0-7025-4973-97b4-7affafe91c26"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{projecttitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="111" y="0" width="111" height="30" uuid="8af7e35c-cf73-4b9b-98ad-a820aee4f0da">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5672fae9-3a41-4cc7-9f8d-9ea863ed07d8"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{LocationDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="222" y="0" width="111" height="30" uuid="311eba42-ff83-4858-8eb8-3e591a4d4777">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="78cb11ed-cbb5-48ad-865d-dd0a7674de62"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{SubDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="333" y="0" width="111" height="30" uuid="b40b2a0c-5eef-4fe6-b542-d6e71ae27839">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="5e23827c-f89c-48b9-b18d-b6a9e0420398"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{WGName_Eng}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="444" y="0" width="111" height="30" uuid="22eada51-c88d-40c3-bcb8-8a066fecf75d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6e8ea6df-5c72-4248-a56a-2bc4ab8bf00a"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{WGInterviewers}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

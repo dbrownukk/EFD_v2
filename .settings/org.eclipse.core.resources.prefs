@@ -1,3 +1,7 @@
 eclipse.preferences.version=1
-encoding//JasperReports/Country.jrxml=UTF-8
-encoding//JasperReports/Simple_Blue_Table_Based.jrxml=UTF-8
+encoding//reports/ChartFood.jrxml=UTF-8
+encoding//reports/Countrys.jrxml=UTF-8
+encoding//reports/Projects_v1.jrxml=UTF-8
+encoding//reports/SitesByCountry.jrxml=UTF-8
+encoding/ChartFood.jrxml=UTF-8
+encoding/Countrys.jrxml=UTF-8
