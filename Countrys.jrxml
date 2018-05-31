@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Countrys" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a6bed55f-8712-4675-8e16-2c2ff4ddc775">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="efd"/>
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[ZWZkLmNvdW50cnkgQVMgLDEzOSwxMzcsZmMzYjUyZjQtNGE0YS00YTU3LWJiMWEtOGRhZjI5ZWMx
+ODU3Ow==
+]]>
+	</property>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Dataset1" uuid="1cff4b1e-ec39-4f70-ac58-8536fdfc25b8">
+		<property name="com.jaspersoft.studio.data.sql.tables">
+			<![CDATA[Y291bnRyeSAsMTUsMTUsYWM4ZGQwYjMtZmI2Yy00ZDQzLWIzYzgtMjk4ZWY0NzgwNmU5Ow==
+]]>
+		</property>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="efd"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT *
+FROM country]]>
+		</queryString>
+		<field name="CountryName" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="CountryName"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="country"/>
+		</field>
+		<field name="Currency" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.label" value="Currency"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="country"/>
+		</field>
+	</subDataset>
+	<queryString>
+		<![CDATA[SELECT efd.country.`IDCountry`,
+	efd.country.`CountryName`,
+	efd.country.`ISOCountryCode`,
+	efd.country.`Currency`,
+	efd.country.`CurrencySymbol`
+FROM efd.country]]>
+	</queryString>
+	<field name="IDCountry" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="IDCountry"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="country"/>
+	</field>
+	<field name="CountryName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CountryName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="country"/>
+	</field>
+	<field name="ISOCountryCode" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ISOCountryCode"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="country"/>
+	</field>
+	<field name="Currency" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Currency"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="country"/>
+	</field>
+	<field name="CurrencySymbol" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CurrencySymbol"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="country"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="20" width="250" height="30" forecolor="#272DE3" backcolor="rgba(51, 153, 255, 0.0)" uuid="e270b75e-99e1-4d69-8898-b45947ccf0de"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[EFD Countrys]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="600" y="0" width="100" height="30" uuid="64558fd2-2990-4d42-9364-ff2646e63fd1"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="720" y="0" width="100" height="30" uuid="49613987-d428-4492-9053-8a6908cdc497"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="218" splitType="Stretch">
+			<componentElement>
+				<reportElement mode="Opaque" x="-10" y="10" width="554" height="200" uuid="95a29f88-32ad-48dc-b600-12cda3d98585">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+					<property name="com.jaspersoft.studio.components.autoresize.next" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset1" uuid="a78387e9-00a9-44d6-a131-54f3fd34ee41">
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="300" uuid="5b91e70e-7d71-4668-859d-67e1be0ecd58">
+						<jr:tableHeader style="Table_TH" height="30"/>
+						<jr:tableFooter style="Table_TH" height="30"/>
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="300" height="30" uuid="7e372dd9-843d-4f49-a4be-a79c74f7ad91"/>
+								<text><![CDATA[Country]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="300" height="30" uuid="d854b167-3fff-4565-af46-99673330659d"/>
+								<textFieldExpression><![CDATA[$F{CountryName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="254" uuid="c630bcec-57ae-423e-88a3-9462817dcbb7">
+						<jr:tableHeader style="Table_TH" height="30"/>
+						<jr:tableFooter style="Table_TH" height="30"/>
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="254" height="30" uuid="be52500b-9c42-48f2-be8a-b9ed46329f3d"/>
+								<text><![CDATA[Currency]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="254" height="30" uuid="69b0f13c-6b00-4549-8d10-cbcda04c677f"/>
+								<textFieldExpression><![CDATA[$F{Currency}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ChartFood" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ccdb3923-fb11-4b63-bc59-c7a1692ca66b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="efd"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	efd.site.`SubDistrict`,
+	efd.site.`LocationDistrict`,
+	efd.wealthgroup.`WGName_Eng`,
+	efd.`WealthGroupInterview_crop`.`WealthGroupInterview_WGIID`,
+	efd.`WealthGroupInterview_crop`.`CropName`,
+	efd.`WealthGroupInterview_crop`.`LocalUnit`,
+	efd.`WealthGroupInterview_crop`.`OtherUse`,
+	efd.`WealthGroupInterview_crop`.`PricePerUnit`,
+	efd.`WealthGroupInterview_crop`.`QuantityProduced`,
+	efd.`WealthGroupInterview_crop`.`QuantitySold`,
+	efd.`WealthGroupInterview_crop`.`ResourceSubType`,
+	efd.`WealthGroupInterview_crop`.`Status`,
+	efd.livelihoodzone.`LZName`
+FROM efd.wealthgroupinterview
+	INNER JOIN efd.wealthgroup ON 
+	 efd.wealthgroupinterview.`WGID` = efd.wealthgroup.`WealthGroupID` 
+	INNER JOIN efd.community ON 
+	 efd.wealthgroup.`CommunityID` = efd.community.`CID` 
+	INNER JOIN efd.site ON 
+	 efd.community.`CLocation` = efd.site.`LocationID` 
+	INNER JOIN efd.`WealthGroupInterview_crop` ON 
+	 efd.`WealthGroupInterview_crop`.`WealthGroupInterview_WGIID` = efd.wealthgroupinterview.`WGIID` 
+	INNER JOIN efd.livelihoodzone ON 
+	 efd.site.`LZ` = efd.livelihoodzone.`LZID`
+	  and efd.`WealthGroupInterview_crop`.`Status` = 1
+	 order by efd.livelihoodzone.`LZName`,efd.site.`SubDistrict`,
+	efd.site.`LocationDistrict`,efd.wealthgroup.`WGName_Eng`]]>
+	</queryString>
+	<field name="SubDistrict" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SubDistrict"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="LocationDistrict" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LocationDistrict"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="WGName_Eng" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGName_Eng"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WealthGroupInterview_WGIID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WealthGroupInterview_WGIID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="CropName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CropName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="LocalUnit" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LocalUnit"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="OtherUse" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="OtherUse"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="PricePerUnit" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PricePerUnit"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="QuantityProduced" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="QuantityProduced"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="QuantitySold" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="QuantitySold"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="ResourceSubType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceSubType"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="Status" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="Status"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_crop"/>
+	</field>
+	<field name="LZName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LZName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="livelihoodzone"/>
+	</field>
+	<group name="WealthGroup">
+		<groupExpression><![CDATA[$F{LZName}+$F{LocationDistrict}+$F{SubDistrict}]]></groupExpression>
+	</group>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{LZName}+$F{LocationDistrict}+$F{SubDistrict}+$F{WGName_Eng}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="82" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="26" width="710" height="30" uuid="bf5c0d59-8cc6-43cb-9abe-7c78b6c652e0"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[EFD Quantity Produced ]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="18" width="620" height="26" uuid="8db54e5e-d5c0-452c-83af-6446aaffaa00"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{LZName}+' '+$F{LocationDistrict}+' '+$F{SubDistrict}+' '+$F{WGName_Eng}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="494" splitType="Stretch">
+			<barChart>
+				<chart evaluationTime="Report">
+					<reportElement x="95" y="44" width="605" height="396" uuid="c40de2ec-6d5c-4c80-8155-d098f36ac9d6"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{CropName}]]></seriesExpression>
+						<categoryExpression><![CDATA[0]]></categoryExpression>
+						<valueExpression><![CDATA[$F{QuantityProduced}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</detail>
+</jasperReport>

@@ -7,8 +7,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
-import efd.utils.*;
-
 @Entity
 
 
@@ -18,26 +16,27 @@ import efd.utils.*;
 	 @View(name="SimpleSubtype", members="resourcetypename")
 	})
 
-//@Tab(properties="resourcetypename")
+
+@Tab(properties="resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
+
+
 
 @Table(name = "ResourceSubType",uniqueConstraints=@UniqueConstraint(columnNames={"ReourceType","ResourceTypeName"}))
 public class ResourceSubType {
 
-	@Id
-	//@Hidden // The property is not shown to the user. It's an internal identifier
+	@Id	
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	//@Column(name = "IDResourceSubType", length = 32, unique = true)
 	@Column(name = "IDResourceSubType", length = 32, unique = true)
 	private String idresourcesubtype;
 	
-	@ManyToOne       //(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne     
 	@Required
 	@JoinColumn(name = "ReourceType")
 	@DescriptionsList(descriptionProperties="resourcetypename")
 	private ResourceType resourcetype;
 	
-	//@Id
+	
 	@Column(name = "ResourceTypeName", length=255)  // ? ResosurceSubTypeName ?
 	@Required
 	private String resourcetypename;
