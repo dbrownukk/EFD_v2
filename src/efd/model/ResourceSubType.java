@@ -37,7 +37,7 @@ public class ResourceSubType {
 	private ResourceType resourcetype;
 	
 	
-	@Column(name = "ResourceTypeName", length=255)  // ? ResosurceSubTypeName ?
+	@Column(name = "ResourceTypeName", length=255, unique=true )  // ? ResosurceSubTypeName ?
 	@Required
 	private String resourcetypename;
 	

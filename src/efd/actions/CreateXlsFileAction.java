@@ -28,6 +28,17 @@ import sun.swing.*;
 
 import org.apache.commons.lang.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.*;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDataValidation;
+import org.apache.poi.hssf.usermodel.HSSFName;
+import org.apache.poi.hssf.usermodel.DVConstraint;
 
 //public class CreateXlsFileAction2 extends CollectionElementViewBaseAction implements IForwardAction, JxlsConstants { // 1
 public class CreateXlsFileAction extends CollectionBaseAction implements IForwardAction, JxlsConstants {
@@ -44,15 +55,15 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			JxlsWorkbook scenario = createScenario();
 			System.out.println("In spreadsheet 2");
 			if (scenario.equals(null)) {
-				//System.out.println("In spreadsheet exit");
-				addError("Template cannot be regenerated once it has been uploaded.");
+				// System.out.println("In spreadsheet exit");
+				addError("Template failed to be created");
 			}
 			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
 			System.out.println("In spreadsheet 3");
 			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
 			System.out.println("In spreadsheet 4");
 		} catch (NullPointerException em) {
-			addError("Template cannot be regenerated once it has been uploaded");
+			addError("Template failed to be created - ");
 		}
 
 	}
@@ -195,6 +206,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Query query = XPersistence.getManager()
 				.createQuery("select idwgresource from WGCharacteristicsResource where wgid = '" + wgid + "'");
 		List chrs = query.getResultList();
+
 		// System.out.println("In careetscenario 224");
 		// WGCharacteristicsResource wgcharacteristicsresource2 =
 		// XPersistence.getManager().find(WGCharacteristicsResource.class,
@@ -215,14 +227,11 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		}
 
-		/* XLS File Name */
-		// JxlsWorkbook scenarioWB = new
-		// JxlsWorkbook(project.getProjecttitle());
-		/* this works */
 		filename = community.getProjectlz().getProjecttitle() + '_' + site.getLivelihoodZone().getLzname() + '_'
 				+ wealthgroup.getWgnameeng();
 
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(filename);
+
 		JxlsStyle boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
 		JxlsStyle boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);
 		JxlsStyle borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN,
@@ -742,11 +751,104 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		}
 
+		/*
+		 * add some drop downs using POI
+		 * 
+		 */
+
+		HSSFWorkbook workbook = null;
+
+		/* convert OX jxls to HSSF */
+
+		workbook = (HSSFWorkbook) scenarioWB.createPOIWorkbook();
+		
+		/*
+		 * see
+		 * https://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/ss
+		 * /examples/LinkedDropDownLists.java
+		 */
+
+		Sheet sheet = workbook.createSheet("Validations");
+		buildDataSheet(sheet);
+
+		Sheet AssetSheet = workbook.getSheetAt(1); // Assets Sheet
+		System.out.println("done create sheet "+AssetSheet.getSheetName());
+		
+		
+		CellRangeAddressList addressList=null;
+		
+		for(int l = 3;l< 12;l++)
+		{
+		addressList = new CellRangeAddressList(1, l, 1, l);
+		DataValidationHelper dvHelper = sheet.getDataValidationHelper();
+		DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint("LIVESTOCK");
+		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(false);   // Allows for other values - combo style
+		AssetSheet.addValidationData(validation);
+		}
+		
+		
 		return scenarioWB;
-		/* end XLS setup */
 
 		/* end XLS setup */
 
+	}
+
+	private static void buildDataSheet(Sheet dataSheet) {
+		Row row = null;
+		Cell cell = null;
+		Name name = null;
+
+		List<ResourceSubType> rst = XPersistence.getManager().createQuery("from ResourceSubType").getResultList();
+
+		row = dataSheet.createRow(10); // Livestock
+
+		int j = 0;
+		for (int k = 0; k < rst.size(); k++) {
+			//System.out.println("subtype ="+rst.get(k).getResourcetypename());
+			//System.out.println("type ="+rst.get(k).getResourcetype().getResourcetypename());
+
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Livestock".toString())) {
+				cell = row.createCell(j);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				j++;
+				System.out.println("cell set to "+j+" "+cell.getStringCellValue());
+			}
+
+		}
+		
+		System.out.println("done build list 1");
+		name = dataSheet.getWorkbook().createName();
+		name.setRefersToFormula("Validations" + "!$A$11:$I$11"); //Need to allow for longer lists.. 
+		name.setNameName("LIVESTOCK");
+	}
+
+	private void populateDataSheet(Sheet worksheet) {
+		HSSFRow row = null;
+		int rowIndex = 0;
+		int lastColIndex = 0;
+		int result = 0;
+		String[] atype = { "Food", "Land" };
+
+		// Firstly, add the atypes
+		result = this.populateRow(worksheet.createRow(rowIndex++), "AType.", atype);
+		if (result > lastColIndex) {
+			lastColIndex = result;
+		}
+
+	}
+
+	public int populateRow(Row row, String label, String[] data) {
+		Cell cell = null;
+		int columnIndex = 0;
+		cell = row.createCell(columnIndex++);
+		cell.setCellValue(label);
+		for (String item : data) {
+			cell = row.createCell(columnIndex++);
+			cell.setCellValue(item);
+		}
+		return (columnIndex);
 	}
 
 	public String getForwardURI() {
