@@ -40,11 +40,46 @@ import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFName;
 import org.apache.poi.hssf.usermodel.DVConstraint;
 
-//public class CreateXlsFileAction2 extends CollectionElementViewBaseAction implements IForwardAction, JxlsConstants { // 1
-public class CreateXlsFileAction extends CollectionBaseAction implements IForwardAction, JxlsConstants {
+
+public class CreateXlsFileAction2 extends CollectionBaseAction implements IForwardAction, JxlsConstants {
 
 	private int row;
 	private String forwardURI = null;
+	JxlsSheet interview = null;
+	JxlsSheet assetLand = null;
+	JxlsSheet assetLivestock = null;
+	
+	JxlsWorkbook scenarioWB = null;
+	
+	//HSSFWorkbook workbook = null;   // used for drop downs as not available in jxls
+	
+	
+	/*
+	JxlsSheet Crop = scenarioWB.addSheet("Crops");
+	JxlsSheet LS = scenarioWB.addSheet("Livestock Products");
+	JxlsSheet Emp = scenarioWB.addSheet("EMP");
+	JxlsSheet Transfer = scenarioWB.addSheet("Transfers");
+	JxlsSheet Wildfood = scenarioWB.addSheet("WILD FOODS");
+	JxlsSheet Foodpurchase = scenarioWB.addSheet("FOOD PURCHASE");
+	JxlsSheet Nonfoodpurchase = scenarioWB.addSheet("NON FOOD PURCHASE");
+	*/
+	
+	
+	
+	JxlsStyle boldRStyle = null;
+	JxlsStyle boldTopStyle = null;
+	JxlsStyle borderStyle = null;
+	JxlsStyle textstyle = null;
+	JxlsStyle datestyle = null;
+	
+	Sheet valSheet;
+	
+	int width = 30;
+	List chrs = null;
+	String rt;
+	String resub;
+	String rtunit;
+	int numrows = 30;
 
 	public void execute() throws Exception {
 
@@ -89,9 +124,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int col;
 		Map key;
 		List wgl;
-		String rt;
-		String resub;
-		String rtunit;
+
 		ArrayList<Rtype> rtypes = new ArrayList<Rtype>();
 		String resourcesubtypeid;
 		String resourcetypeid;
@@ -194,7 +227,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		// wealthgroup.getCommunity().getCommunityid());
 		// System.out.println("In careetscenario 222");
 		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
-		// System.out.println("In careetscenario 221");
+		System.out.println("In careetscenario 221");
 		Site site = XPersistence.getManager().find(Site.class, community.getSite().getLocationid());
 
 		/******************
@@ -205,12 +238,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		Query query = XPersistence.getManager()
 				.createQuery("select idwgresource from WGCharacteristicsResource where wgid = '" + wgid + "'");
-		List chrs = query.getResultList();
+		chrs = query.getResultList();
 
-		// System.out.println("In careetscenario 224");
-		// WGCharacteristicsResource wgcharacteristicsresource2 =
-		// XPersistence.getManager().find(WGCharacteristicsResource.class,
-		// chrs.get(0));
+		System.out.println("In careetscenario 223");
 
 		// System.out.println("Number = " + chrs.size());
 		for (k = 0; k < chrs.size(); k++) {
@@ -226,27 +256,41 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 		}
-
+		System.out.println("In careetscenario 224");
 		filename = community.getProjectlz().getProjecttitle() + '_' + site.getLivelihoodZone().getLzname() + '_'
 				+ wealthgroup.getWgnameeng();
 
-		JxlsWorkbook scenarioWB = new JxlsWorkbook(filename);
+		scenarioWB = new JxlsWorkbook(filename);
+		System.out.println("In careetscenario 225");
+		
+		
 
-		JxlsStyle boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
-		JxlsStyle boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);
-		JxlsStyle borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN,
+		System.out.println("In careetscenario 226");
+		
+		/* Styles */
+		
+		
+		 boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
+		 boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);
+		 borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN,
 				BORDER_THIN, BORDER_THIN);
-		// JxlsStyle textstyle =
-		// scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(LIGHT_GREEN).setTextColor(BLACK);
-		JxlsStyle textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK);
-		JxlsStyle datestyle = scenarioWB.getDefaultDateStyle(); /*
+		
+		 textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK);
+		 datestyle = scenarioWB.getDefaultDateStyle(); 
+			System.out.println("created styles ");
+		 
+		 /*
 																 * seems to e a bug to stop setting other params
 																 */
-		// System.out.println("done Jxl 1");
+
 		/* XLS Sheets */
 
-		JxlsSheet Interview = scenarioWB.addSheet("Interview Details");
-		JxlsSheet Asset = scenarioWB.addSheet("Assets");
+		 interview = scenarioWB.addSheet("Interview Details");
+		 assetLand = scenarioWB.addSheet("Assets - Land");
+		 assetLivestock = scenarioWB.addSheet("Assets - Livestock");
+		 System.out.println("created new sheets ");
+		
+		
 		JxlsSheet Crop = scenarioWB.addSheet("Crops");
 		JxlsSheet LS = scenarioWB.addSheet("Livestock Products");
 		JxlsSheet Emp = scenarioWB.addSheet("EMP");
@@ -254,127 +298,64 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		JxlsSheet Wildfood = scenarioWB.addSheet("WILD FOODS");
 		JxlsSheet Foodpurchase = scenarioWB.addSheet("FOOD PURCHASE");
 		JxlsSheet Nonfoodpurchase = scenarioWB.addSheet("NON FOOD PURCHASE");
+		
+		
 		while (i < 7) {
-			Interview.setColumnWidths(i, w); /* set col widths */
+			interview.setColumnWidths(i, w); /* set col widths */
 			i++;
 		}
-		// System.out.println("done Jxl 2");
+		System.out.println("done Jxl 2");
 		while (j < 11) {
-			Interview.setValue(3, j, "", borderStyle); /* set borders for data input fields */
-			Interview.setValue(5, j, "", borderStyle);
+			interview.setValue(3, j, "", borderStyle); /* set borders for data input fields */
+			interview.setValue(5, j, "", borderStyle);
 			j += 2;
 		}
-		Interview.setValue(7, 8, "", borderStyle);
-		Interview.setValue(7, 10, "", borderStyle);
+		interview.setValue(7, 8, "", borderStyle);
+		interview.setValue(7, 10, "", borderStyle);
 
-		Interview.setValue(1, 1, "Project Date: " + project.getPdate());
-		Interview.setValue(2, 2, "Interview Number", boldRStyle);
-		Interview.setValue(2, 4, "District", boldRStyle);
-		Interview.setValue(2, 6, "Livelihood Zone", boldRStyle);
-		Interview.setValue(2, 8, "Number of Particpants", boldRStyle);
-		Interview.setValue(2, 10, "Wealth Group", boldRStyle);
+		interview.setValue(1, 1, "Project Date: " + project.getPdate());
+		interview.setValue(2, 2, "Interview Number", boldRStyle);
+		interview.setValue(2, 4, "District", boldRStyle);
+		interview.setValue(2, 6, "Livelihood Zone", boldRStyle);
+		interview.setValue(2, 8, "Number of Particpants", boldRStyle);
+		interview.setValue(2, 10, "Wealth Group", boldRStyle);
 
-		Interview.setValue(4, 2, "Date", boldRStyle);
-		Interview.setValue(4, 4, "Village / Sub District", boldRStyle);
-		Interview.setValue(4, 6, "Interviewers", boldRStyle);
-		Interview.setValue(4, 8, "Men", boldRStyle);
-		Interview.setValue(4, 10, "Number of People in Household", boldRStyle);
+		interview.setValue(4, 2, "Date", boldRStyle);
+		interview.setValue(4, 4, "Village / Sub District", boldRStyle);
+		interview.setValue(4, 6, "Interviewers", boldRStyle);
+		interview.setValue(4, 8, "Men", boldRStyle);
+		interview.setValue(4, 10, "Number of People in Household", boldRStyle);
 
-		Interview.setValue(6, 8, "Women", boldRStyle);
-		Interview.setValue(6, 10, "Type of Year", boldRStyle);
+		interview.setValue(6, 8, "Women", boldRStyle);
+		interview.setValue(6, 10, "Type of Year", boldRStyle);
 
 		/* Data */
 
-		// Interview.setValue(3, 2, community.getCinterviewsequence(),
-		// textstyle); /* Interview Number */
-		Interview.setValue(3, 4, community.getSite().getLocationdistrict(), borderStyle); /* District */
-		Interview.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
+	 /* Interview Number */
+		interview.setValue(3, 4, community.getSite().getLocationdistrict(), borderStyle); /* District */
+		interview.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
 				borderStyle); /* Livelihood Zone */
 		// Interview.setValue(3, 8, community.getCivparticipants(),textstyle);
 		// /* Number
 		// of Participants */
-		Interview.setValue(3, 10, wealthgroup.getWgnameeng(), borderStyle); /* Wealth Group */
+		interview.setValue(3, 10, wealthgroup.getWgnameeng(), borderStyle); /* Wealth Group */
 
-		// Interview.setValue(5, 2, community.getCinterviewdate(), datestyle);
-		// /* Date
-		// */
-		Interview.setValue(5, 4, community.getSite().getSubdistrict(), borderStyle); /* Sub District */
-		// Interview.setValue(5, 6, community.getInterviewers(), textstyle); /*
-		// Interviewers */
-		// Interview.setValue(5, 8, community.getCivm(), textstyle); /* Men */
-		// Interview.setValue(5, 10, wealthgroup.getWghhsize(),textstyle); /*
-		// Number in
-		// Household */
+		
+		/**********************/
+		/* Process each sheet */
+		/**********************/
+		
+		/* Asset Land  Sheet */
 
-		// Interview.setValue(7, 8, community.getCivf(), textstyle); /* Women */
-		// Interview.setValue(7, 10, " ", textstyle); /* Type of Year ??????????
-		// */
+		printAssetLand();
+		System.out.println("done assetLand");
+		
+		/* Asset Livestock  Sheet */
 
-		/* Asset Sheet */
-
-		Asset.setValue(2, 3, "Livestock Type", boldTopStyle);
-		Asset.setValue(3, 3, "Unit", boldTopStyle);
-		Asset.setValue(4, 3, "Number Owned", boldTopStyle);
-		Asset.setValue(5, 3, "Price Per Unit", boldTopStyle);
-		Asset.setValue(2, 16, "Land Type", boldTopStyle);
-		Asset.setValue(3, 16, "Unit", boldTopStyle);
-		Asset.setValue(4, 16, "Area", boldTopStyle);
-
-		i = 1;
-		while (i < 7) {
-			Asset.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-
-		/* set grid for data input */
-
-		col = 2;
-		row = 4;
-		while (col < 6) {
-			while (row < 28) {
-				if (row == 15) {
-					row = 17;
-				}
-
-				Asset.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-				if (col == 5 && row > 16) {
-					row = 30;
-				}
-
-			}
-			col++;
-			row = 4;
-		}
-		row = 4;
-		landrow = 17;
-		// get resource sub type //
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			if (rt.equals("Livestock")) {
-				Asset.setValue(2, row, resub, borderStyle);
-				Asset.setValue(3, row, rtunit, borderStyle);
-				row++;
-			}
-
-			if (rt.equals("Land")) {
-				Asset.setValue(2, landrow, resub, borderStyle);
-				Asset.setValue(3, landrow, rtunit, borderStyle);
-				landrow++;
-			}
-
-		}
-
+		printAssetLivestock();
+		
+		System.out.println("done  assetLivestock");
+		
 		/* Crop Sheet */
 
 		Crop.setValue(8, 3, "For Crops which are sold", boldTopStyle);
@@ -750,43 +731,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			}
 
 		}
-
-		/*
-		 * add some drop downs using POI
-		 * 
-		 */
-
-		HSSFWorkbook workbook = null;
-
-		/* convert OX jxls to HSSF */
-
-		workbook = (HSSFWorkbook) scenarioWB.createPOIWorkbook();
-		
-		/*
-		 * see
-		 * https://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/ss
-		 * /examples/LinkedDropDownLists.java
-		 */
-
-		Sheet sheet = workbook.createSheet("Validations");
-		buildDataSheet(sheet);
-
-		Sheet AssetSheet = workbook.getSheetAt(1); // Assets Sheet
-		System.out.println("done create sheet "+AssetSheet.getSheetName());
-		
-		
-		CellRangeAddressList addressList=null;
-		
-		for(int l = 3;l< 12;l++)
-		{
-		addressList = new CellRangeAddressList(1, l, 1, l);
-		DataValidationHelper dvHelper = sheet.getDataValidationHelper();
-		DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint("LIVESTOCK");
-		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
-		validation.setEmptyCellAllowed(true);
-		validation.setShowErrorBox(false);   // Allows for other values - combo style
-		AssetSheet.addValidationData(validation);
-		}
 		
 		
 		return scenarioWB;
@@ -794,22 +738,217 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		/* end XLS setup */
 
 	}
+	
+	/*
+	 * 
+	 * Handle each Sheet
+	 * 
+	 * 
+	 */
+	
+	private void printAssetLand()
+	{
+		
+		/* Asset Land  Sheet */
+	
 
-	private static void buildDataSheet(Sheet dataSheet) {
+		assetLand.setValue(2, 3, "Land Type", boldTopStyle);
+		assetLand.setValue(3, 3, "Unit e.g. Hectare", boldTopStyle);
+		assetLand.setValue(4, 3, "Number of Units", boldTopStyle);
+	
+		int i = 1;
+		while (i < 5) {
+			assetLand.setColumnWidths(i, width); /* set col widths */
+			i++;
+		}
+
+		/* set grid for data input */
+
+		int col = 2;
+		int row = 4;
+		while (col < 5) {
+			while (row < numrows) {
+				assetLand.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				row++;
+			}
+			col++;
+			row = 4;
+		}
+		row = 4;
+		int landrow = 4;
+		// get resource sub type //
+		for (int k = 0; k < chrs.size(); k++) {
+			/* Get Resource Sub Type */
+			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+					.find(WGCharacteristicsResource.class, chrs.get(k));
+			/* Get Resource Type */
+			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+			rt = rst.getResourcetypename();
+			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+			if (rt.equals("Land")) {
+				assetLand.setValue(2, landrow, resub, borderStyle);
+				assetLand.setValue(3, landrow, rtunit, borderStyle);
+				landrow++;
+			}
+
+		}
+
+		
+		System.out.println("about to create validation sheet ");
+		/* create hidden validation sheet for drop downs */
+		
+		
+		HSSFWorkbook workbook = (HSSFWorkbook) scenarioWB.createPOIWorkbook();
+		
+		
+		/* First time through create the validations sheet */
+		valSheet =     workbook.createSheet("Validations");
+		//valSheet =    (Sheet) scenarioWB.addSheet("Validations");
+		System.out.println("done create validation");
+		
+		//buildDataSheet(valSheet,"Land",1);
+
+		//Sheet AssetSheet = workbook.getSheetAt(1); // Assets LS Sheet
+		//System.out.println("done create sheet "+AssetSheet.getSheetName());
+		
+		
+		//CellRangeAddressList addressList=null;
+		/*
+		for(int l = 0;l< numrows;l++)
+		{
+		addressList = new CellRangeAddressList(3, l, 1, 1);
+		DataValidationHelper dvHelper = valSheet.getDataValidationHelper();
+		DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint("Land");
+		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(false);   // Allows for other values - combo style
+		AssetSheet.addValidationData(validation);
+		}
+		*/
+		
+		
+		
+	}
+	
+	private void printAssetLivestock()
+	{
+		 
+		/* Asset Livestock  Sheet */
+	
+		assetLivestock.setValue(2, 3, "Livestock Type", boldTopStyle);
+		assetLivestock.setValue(3, 3, "Unit", boldTopStyle);
+		assetLivestock.setValue(4, 3, "Owned at Start of", boldTopStyle);
+		assetLivestock.setValue(5, 3, "Price Per Unit", boldTopStyle);
+		
+		System.out.println("done asl create headings");
+		
+		int i = 1;
+		while (i < 6) {
+			assetLivestock.setColumnWidths(i, width); /* set col widths */
+			i++;
+		}
+
+		/* set grid for data input */
+
+		int col = 2;
+		int row = 4;
+		while (col < 6) {
+			while (row < numrows) {
+				assetLivestock.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				row++;
+
+
+			}
+			col++;
+			row = 4;
+		}
+		
+		System.out.println("asl set styles abd size");
+		
+		
+		row = 4;
+		int landrow = 5;
+		// get resource sub type //
+		for (int k = 0; k < chrs.size(); k++) {
+			/* Get Resource Sub Type */
+			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+					.find(WGCharacteristicsResource.class, chrs.get(k));
+			
+			/* Get Resource Type */
+			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+			rt = rst.getResourcetypename();
+			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+			if (rt.equals("Livestock")) {
+				assetLivestock.setValue(2, row, resub, borderStyle);
+				assetLivestock.setValue(3, row, rtunit, borderStyle);
+				row++;
+			}
+
+		}
+		
+		System.out.println("asl have data ");
+		
+		//HSSFWorkbook workbook = (HSSFWorkbook) scenarioWB;
+		//HSSFWorkbook workbook = (HSSFWorkbook) scenarioWB.createPOIWorkbook();
+		// HSSFSheet hssfsheet = (HSSFSheet) scenarioWB.getSheet(1);
+
+		System.out.println("about to create validation sheet ");
+		/* create hidden validation sheet for drop downs */
+		
+		//valSheet = workbook.getSheet("Validations");
+		
+		
+		//buildDataSheet(valSheet,"Livestock",10);
+		System.out.println("done create validation valsheet = "+valSheet.getSheetName());
+		
+		//System.out.println("AssetSheet = "+workbook.getSheetName(2));
+		
+		//Sheet AssetSheet = workbook.getSheetAt(2); // Assets LS Sheet
+		//System.out.println("done create sheet "+AssetSheet.getSheetName());
+		
+		
+		//CellRangeAddressList addressList=null;
+		
+		//for(int l = 3;l< numrows;l++)
+		//{
+		//addressList = new CellRangeAddressList(1, l, 1, l);
+		//DataValidationHelper dvHelper = valSheet.getDataValidationHelper();
+		//DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint("Livestock");
+		//DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		//validation.setEmptyCellAllowed(true);
+		//validation.setShowErrorBox(false);   // Allows for other values - combo style
+		//AssetSheet.addValidationData(validation);
+		//}
+		
+		
+	}
+	
+	
+	
+
+	private static void buildDataSheet(Sheet dataSheet, String rtype, int valrow) {
 		Row row = null;
 		Cell cell = null;
 		Name name = null;
 
 		List<ResourceSubType> rst = XPersistence.getManager().createQuery("from ResourceSubType").getResultList();
 
-		row = dataSheet.createRow(10); // Livestock
+		row = dataSheet.createRow(valrow); // Livestock
 
 		int j = 0;
 		for (int k = 0; k < rst.size(); k++) {
 			//System.out.println("subtype ="+rst.get(k).getResourcetypename());
 			//System.out.println("type ="+rst.get(k).getResourcetype().getResourcetypename());
 
-			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Livestock".toString())) {
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals(rtype.toString())) {
 				cell = row.createCell(j);
 				cell.setCellValue(rst.get(k).getResourcetypename());
 				j++;
@@ -818,10 +957,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		}
 		
-		System.out.println("done build list 1");
+		String col = getCharForNumber(j);   // Convert for drop list creation 
+		
+		System.out.println("done build list "+rtype);
 		name = dataSheet.getWorkbook().createName();
-		name.setRefersToFormula("Validations" + "!$A$11:$I$11"); //Need to allow for longer lists.. 
-		name.setNameName("LIVESTOCK");
+		valrow++;
+		name.setRefersToFormula("Validations" + "!$A$"+valrow+":$"+col+"$"+valrow); //Need to allow for longer lists.. 
+		name.setNameName(rtype);
 	}
 
 	private void populateDataSheet(Sheet worksheet) {
@@ -850,7 +992,11 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		}
 		return (columnIndex);
 	}
-
+	
+	public static String getCharForNumber(int i) {
+	    return i > 0 && i < 27 ? String.valueOf((char)(i + 'A' - 1)) : null;
+	}
+	
 	public String getForwardURI() {
 		return forwardURI;
 	}
