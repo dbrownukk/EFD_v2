@@ -46,12 +46,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	JxlsStyle boldRStyle = null;
 	JxlsStyle boldTopStyle = null;
 	JxlsStyle borderStyle = null;
-	JxlsStyle textstyle = null;
+	JxlsStyle textStyle = null;
 	JxlsStyle datestyle = null;
 	JxlsStyle numberStyle = null;
 	JxlsStyle f1Style = null;
 
 	int width = 30;
+	int numwidth = 15;
 	int numRows = 30;
 	List chrs = null;
 	String rt;
@@ -243,42 +244,39 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(filename);
 
 		boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
-		boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT);
+		boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT).setWrap(true);
 		borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN,
 				BORDER_THIN);
-		textstyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK);
+		textStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK).setWrap(true);
 		datestyle = scenarioWB.getDefaultDateStyle();
 		numberStyle = scenarioWB.addStyle(INTEGER).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN,
 				BORDER_THIN);
 		f1Style = scenarioWB.addStyle("0.0");
 
-		// System.out.println("done Jxl 1");
+	
 		/* XLS Sheets */
-
+		/*********************************************************************************************************************************************************/
+		/* Interview details sheet																													 */
+		/*********************************************************************************************************************************************************/
+		
+		
 		JxlsSheet interview = scenarioWB.addSheet("Interview Details");
 		JxlsSheet assetLand = scenarioWB.addSheet("Assets - Land");
 		JxlsSheet assetLivestock = scenarioWB.addSheet("Assets - Livestock");
-
 		JxlsSheet assetOtherTradeable = scenarioWB.addSheet("Assets - Other Tradeable");
 		JxlsSheet assetFoodStocks = scenarioWB.addSheet("Assets - Food Stocks");
-
 		JxlsSheet assetTrees = scenarioWB.addSheet("Assets - Trees");
 		JxlsSheet assetCash = scenarioWB.addSheet("Assets - Cash");
-
+		JxlsSheet crops = scenarioWB.addSheet("Crops");
 		JxlsSheet livestockSales = scenarioWB.addSheet("Livestock - Sales");
 		JxlsSheet livestockProducts = scenarioWB.addSheet("Livestock - Products");
-		JxlsSheet Crop = scenarioWB.addSheet("Crops");
-		JxlsSheet Wildfood = scenarioWB.addSheet("Wild Foods");
-		JxlsSheet Emp = scenarioWB.addSheet("Employment");
-		JxlsSheet Transfer = scenarioWB.addSheet("Transfers");
+		JxlsSheet emp = scenarioWB.addSheet("Employment");
+		JxlsSheet transfers = scenarioWB.addSheet("Transfers");
+		JxlsSheet wildfood = scenarioWB.addSheet("Wild Foods");
+		JxlsSheet foodPurchases = scenarioWB.addSheet("Purchase - Food");
+		JxlsSheet nonFoodPurchases = scenarioWB.addSheet("Purchase - NonFood");
 
-		JxlsSheet purchaseFood = scenarioWB.addSheet("Purchase - Food");
-		JxlsSheet purchaseNonFood = scenarioWB.addSheet("Purchase - NonFood");
-
-		// REMOVE THE FOLLOWING WHEN DONE....
-		JxlsSheet LS = scenarioWB.addSheet("Livestock Products");
-		JxlsSheet Foodpurchase = scenarioWB.addSheet("FOOD PURCHASE");
-		JxlsSheet Nonfoodpurchase = scenarioWB.addSheet("NON FOOD PURCHASE");
+	
 
 		interview.setColumnWidths(1, w, w, w, w, w); /* set col widths */
 
@@ -318,391 +316,28 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		interview.setValue(5, 4, community.getSite().getSubdistrict(), borderStyle); /* Sub District */
 
 		
-	
+		/*********************************************************************************************************************************************************/
+		/* Start print routines for resources 																													 */
+		/*********************************************************************************************************************************************************/
+
 		printAssetLand(assetLand);
 		printAssetLivestock(assetLivestock);
 		printAssetOtherTradeable(assetOtherTradeable);
 		printAssetFoodStocks(assetFoodStocks);
+		printAssetTrees(assetTrees);
+		printAssetCash(assetCash);
+		printCrops(crops);
+		printLivestockSales(livestockSales);
+		printLivestockProducts(livestockProducts);
+		printEmp(emp);
+		printTransfers(transfers);
+		printWildFood(wildfood);
+		printFoodPurchases(foodPurchases);
+		printNonFoodPurchases(nonFoodPurchases);
 		
+
+
 		
-		
-		
-		/* Crop Sheet */
-
-		Crop.setValue(8, 3, "For Crops which are sold", boldTopStyle);
-		Crop.setValue(2, 4, "Crop Type", boldTopStyle);
-		Crop.setValue(3, 4, "Unit", boldTopStyle);
-		Crop.setValue(4, 4, "Quantity Produced", boldTopStyle);
-		Crop.setValue(5, 4, "Quantity Sold", boldTopStyle);
-		Crop.setValue(6, 4, "Price per Unit", boldTopStyle);
-		Crop.setValue(7, 4, "Other Use", boldTopStyle);
-		Crop.setValue(8, 4, "Market 1", boldTopStyle);
-		Crop.setValue(9, 4, "% Trade at 1", boldTopStyle);
-		Crop.setValue(10, 4, "Market 2", boldTopStyle);
-		Crop.setValue(11, 4, "% Trade at 2", boldTopStyle);
-		Crop.setValue(12, 4, "Market 3", boldTopStyle);
-		Crop.setValue(13, 4, "% Trade at 3", boldTopStyle);
-
-		i = 2;
-		while (i < 14) {
-			Crop.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-
-		/* set grid for data input */
-
-		col = 2;
-		row = 5;
-		while (col < 14) {
-			while (row < 16) {
-				Crop.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-			}
-
-			col++;
-			row = 5;
-		}
-
-		row = 5;
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			if (rt.contains("Crops")) {
-				Crop.setValue(2, row, resub, borderStyle);
-				Crop.setValue(3, row, rtunit, borderStyle);
-				row++;
-			}
-
-		}
-
-		/* LS Sheet */
-
-		LS.setValue(2, 4, "Income Type i.e Milk", boldTopStyle);
-
-		LS.setValue(3, 4, "Livestock Type", boldTopStyle);
-		LS.setValue(4, 4, "Unit", boldTopStyle);
-		LS.setValue(5, 4, "Quantity Produced", boldTopStyle);
-		LS.setValue(6, 4, "Quantity Sold", boldTopStyle);
-		LS.setValue(7, 4, "Price per Unit", boldTopStyle);
-		LS.setValue(8, 4, "Other Use", boldTopStyle);
-		LS.setValue(9, 4, "Market 1", boldTopStyle);
-		LS.setValue(10, 4, "% Trade at 1", boldTopStyle);
-		LS.setValue(11, 4, "Market 2", boldTopStyle);
-		LS.setValue(12, 4, "% Trade at 2", boldTopStyle);
-		LS.setValue(13, 4, "Market 3", boldTopStyle);
-		LS.setValue(14, 4, "% Trade at 3", boldTopStyle);
-
-		i = 2;
-		while (i < 15) {
-			LS.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-		col = 2;
-		row = 5;
-		while (col < 14) {
-			while (row < 16) {
-				LS.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-			}
-			col++;
-			row = 5;
-		}
-
-		/* get data */
-		/* this needs pulling into hash table */
-
-		row = 5;
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			/* Not Livestock Asset - this is Use of Livestock */
-
-			if (rt.equals("Livestock Products")) {
-				LS.setValue(2, row, resub, borderStyle);
-				LS.setValue(4, row, rtunit, borderStyle);
-				row++;
-			}
-
-		}
-
-		/* EMP Sheet */
-
-		Emp.setValue(2, 3, "Employment Type", boldTopStyle);
-		Emp.setValue(3, 3, "Number of People Working", boldTopStyle);
-		Emp.setValue(4, 3, "Frequency e.g. per week, Month", boldTopStyle);
-		Emp.setValue(5, 3, "Pay Food kg", boldTopStyle);
-		Emp.setValue(6, 3, "Food Type", boldTopStyle);
-		Emp.setValue(7, 3, "Pay Cash", boldTopStyle);
-		Emp.setValue(8, 3, "Work Location 1", boldTopStyle);
-		Emp.setValue(9, 3, "% Work at 1", boldTopStyle);
-		Emp.setValue(10, 3, "Work Location 2", boldTopStyle);
-		Emp.setValue(11, 3, "% Work at 2", boldTopStyle);
-		Emp.setValue(12, 3, "Work Location 3", boldTopStyle);
-		Emp.setValue(13, 3, "% Trade at 3", boldTopStyle);
-
-		i = 2;
-		while (i < 14) {
-			Emp.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-
-		/* set grid for data input */
-
-		col = 2;
-		row = 4;
-		while (col < 14) {
-			while (row < 16) {
-				Emp.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-			}
-			col++;
-			row = 4;
-		}
-
-		row = 4;
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			if (rt.equals("Employment")) {
-				Emp.setValue(2, row, resub, borderStyle);
-				// LS.setValue(4, row,
-				// wgrloop.getResourcesubtype().getResourcesubtypeunit(),
-				// boldTopStyle);
-				row++;
-			}
-
-		}
-
-		/* Transfer Sheet */
-
-		Transfer.setValue(2, 3, "Transfer Type", boldTopStyle);
-		Transfer.setValue(3, 3, "Unit", boldTopStyle);
-		Transfer.setValue(4, 3, "Quantity Received", boldTopStyle);
-		Transfer.setValue(5, 3, "Quantity Sold", boldTopStyle);
-		Transfer.setValue(6, 3, "Price per Unit", boldTopStyle);
-		Transfer.setValue(7, 3, "Other Use", boldTopStyle);
-		Transfer.setValue(8, 3, "Market 1", boldTopStyle);
-		Transfer.setValue(9, 3, "% Trade at 1", boldTopStyle);
-		Transfer.setValue(10, 3, "Market 2", boldTopStyle);
-		Transfer.setValue(11, 3, "% Trade at 2", boldTopStyle);
-		Transfer.setValue(12, 3, "Market 3", boldTopStyle);
-		Transfer.setValue(13, 3, "% Trade at 3", boldTopStyle);
-
-		i = 2;
-		while (i < 14) {
-			Transfer.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-
-		/* set grid for data input */
-
-		col = 2;
-		row = 4;
-		while (col < 14) {
-			while (row < 16) {
-				Transfer.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-			}
-			col++;
-			row = 4;
-		}
-
-		row = 4;
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			if (rt.equals("Transfer")) {
-				Transfer.setValue(2, row, resub, borderStyle);
-				Transfer.setValue(3, row, rtunit, borderStyle);
-				row++;
-			}
-
-		}
-
-		/* Wildfood Sheet */
-
-		Wildfood.setValue(2, 3, "Wild Food Type", boldTopStyle);
-		Wildfood.setValue(3, 3, "Unit", boldTopStyle);
-		Wildfood.setValue(4, 3, "Quantity Received", boldTopStyle);
-		Wildfood.setValue(5, 3, "Quantity Sold", boldTopStyle);
-		Wildfood.setValue(6, 3, "Price per Unit", boldTopStyle);
-		Wildfood.setValue(7, 3, "Other Use", boldTopStyle);
-		Wildfood.setValue(8, 3, "Market 1", boldTopStyle);
-		Wildfood.setValue(9, 3, "% Trade at 1", boldTopStyle);
-		Wildfood.setValue(10, 3, "Market 2", boldTopStyle);
-		Wildfood.setValue(11, 3, "% Trade at 2", boldTopStyle);
-		Wildfood.setValue(12, 3, "Market 3", boldTopStyle);
-		Wildfood.setValue(13, 3, "% Trade at 3", boldTopStyle);
-
-		i = 2;
-		while (i < 14) {
-			Wildfood.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-
-		/* set grid for data input */
-
-		col = 2;
-		row = 4;
-		while (col < 14) {
-			while (row < 16) {
-				Wildfood.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-			}
-			col++;
-			row = 4;
-		}
-
-		row = 4;
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			if (rt.equals("Wild food")) {
-				Wildfood.setValue(2, row, resub, borderStyle);
-				Wildfood.setValue(3, row, rtunit, borderStyle);
-				row++;
-			}
-
-		}
-
-		/* Food Purchase Sheet */
-
-		Foodpurchase.setValue(2, 3, "Food Type", boldTopStyle);
-		Foodpurchase.setValue(3, 3, "Unit", boldTopStyle);
-		Foodpurchase.setValue(4, 3, "Quantity Purchased", boldTopStyle);
-		Foodpurchase.setValue(5, 3, "Price Per Unit", boldTopStyle);
-
-		i = 2;
-		while (i < 6) {
-			Foodpurchase.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-
-		/* set grid for data input */
-
-		col = 2;
-		row = 4;
-		while (col < 6) {
-			while (row < 16) {
-				Foodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-			}
-			col++;
-			row = 4;
-		}
-
-		row = 4;
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			if (rt.equals("Food Purchase")) {
-				Foodpurchase.setValue(2, row, resub, borderStyle);
-				Foodpurchase.setValue(3, row, rtunit, borderStyle);
-				row++;
-			}
-
-		}
-
-		/* Non Food Purchase Sheet */
-
-		Nonfoodpurchase.setValue(2, 3, "Item Purchased", boldTopStyle);
-		Nonfoodpurchase.setValue(3, 3, "Unit", boldTopStyle);
-		Nonfoodpurchase.setValue(4, 3, "Quantity Purchased", boldTopStyle);
-		Nonfoodpurchase.setValue(5, 3, "Price Per Unit", boldTopStyle);
-
-		i = 2;
-		while (i < 6) {
-			Nonfoodpurchase.setColumnWidths(i, w); /* set col widths */
-			i++;
-		}
-
-		/* set grid for data input */
-
-		col = 2;
-		row = 4;
-		while (col < 6) {
-			while (row < 16) {
-				Nonfoodpurchase.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-				row++;
-			}
-			col++;
-			row = 4;
-		}
-		row = 4;
-		for (k = 0; k < chrs.size(); k++) {
-			/* Get Resource Sub Type */
-			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-					.find(WGCharacteristicsResource.class, chrs.get(k));
-			/* Get Resource Type */
-			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
-
-			rt = rst.getResourcetypename();
-			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
-			if (rt.equals("Non Food Purchase")) {
-				Nonfoodpurchase.setValue(2, row, resub, borderStyle);
-				Nonfoodpurchase.setValue(3, row, rtunit, borderStyle);
-				row++;
-			}
-
-		}
-	
 		/*
 		 * add some drop downs and validations using POI have to map jxls wb to hssf wb
 		 * 
@@ -727,6 +362,17 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Sheet lsSheet = workbook.getSheetAt(2);
 		Sheet otSheet = workbook.getSheetAt(3);
 		Sheet fsSheet = workbook.getSheetAt(4);
+		Sheet treeSheet = workbook.getSheetAt(5);
+		Sheet cashSheet = workbook.getSheetAt(6);
+		Sheet cropSheet = workbook.getSheetAt(7);
+		Sheet lssSheet = workbook.getSheetAt(8);
+		Sheet lspSheet = workbook.getSheetAt(9);
+		Sheet empSheet = workbook.getSheetAt(10);
+		Sheet transSheet = workbook.getSheetAt(11);
+		Sheet wildfSheet = workbook.getSheetAt(12);
+		Sheet foodPurchaseSheet = workbook.getSheetAt(13);
+		Sheet nonFoodPurchaseSheet = workbook.getSheetAt(14);
+
 
 		/* Asset Land Type */
 
@@ -737,20 +383,88 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		/* Assets - Livestock Type */
 
 		addLOV(sheet, lsSheet, 3, numRows -1, 1, 1, "Livestock");
+		addLOV(sheet, lsSheet, 3, numRows -1, 2, 2, "Unit");
 		addNumberValidation(workbook, sheet, lsSheet, 3, numRows, 3, 3); // Number Owned
 		addNumberValidation(workbook, sheet, lsSheet, 3, numRows, 4, 4); // Price per unit
 
 		/* Assets - Other Tradeable Type */
 
 		addLOV(sheet,otSheet, 3, numRows -1 , 1, 1, "OtherTradeableGoods");
+		addLOV(sheet, otSheet, 3, numRows -1, 2, 2, "Unit");
 		addNumberValidation(workbook, sheet, otSheet, 3, numRows, 3, 3); // Number Owned
 		addNumberValidation(workbook, sheet, otSheet, 3, numRows, 4, 4); // Price per unit
 
 		/* Assets - Food Stocks */
 		addLOV(sheet, fsSheet, 3, numRows - 1, 1, 1, "FoodStocks");
+		addLOV(sheet, fsSheet, 3, numRows -1, 2, 2, "Unit");
 		addNumberValidation(workbook, sheet, fsSheet, 3, numRows, 3, 3);
 		
 		
+		/* Assets - Trees */
+		addLOV(sheet, treeSheet, 3, numRows - 1, 1, 1, "Trees");
+		addLOV(sheet, treeSheet, 3, numRows -1, 2, 2, "Unit");
+		addNumberValidation(workbook, sheet, treeSheet, 3, numRows, 3, 3);
+		addNumberValidation(workbook, sheet, treeSheet, 3, numRows, 4, 4);
+		
+		/* Assets - Cash */
+		addLOV(sheet, cashSheet, 3, numRows - 1, 1, 1, "Currency");
+		addNumberValidation(workbook, sheet, cashSheet, 3, numRows, 2, 2);
+		
+		/* Crops */
+		addLOV(sheet, cropSheet, 3, numRows - 1, 1, 1, "Crops");
+		addLOV(sheet, cropSheet, 3, numRows -1, 2, 2, "Unit");
+		addNumberValidation(workbook, sheet, cropSheet, 3, numRows, 3, 6);
+		addNumberValidation(workbook, sheet, cropSheet, 3, numRows, 8, 8 );
+		addNumberValidation(workbook, sheet, cropSheet, 3, numRows, 10, 10 );
+		addNumberValidation(workbook, sheet, cropSheet, 3, numRows, 12, 12 );
+		
+		/* Livestock Sales  */
+		
+		addLOV(sheet, lssSheet, 3, numRows - 1, 1, 1, "Livestock");
+		addLOV(sheet, lssSheet, 3, numRows -1, 2, 2, "Unit");
+		addNumberValidation(workbook, sheet, lssSheet, 3, numRows, 3, 6);
+		addNumberValidation(workbook, sheet, lssSheet, 3, numRows, 8, 8 );
+		addNumberValidation(workbook, sheet, lssSheet, 3, numRows, 10, 10 );
+		addNumberValidation(workbook, sheet, lssSheet, 3, numRows, 12, 12 );
+		
+		/* Livestock Products  */
+		
+		addLOV(sheet, lspSheet, 3, numRows - 1, 1, 1, "Livestock");
+		addLOV(sheet, lspSheet, 3, numRows -1, 2, 2, "Unit");
+		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 3, 6);
+		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 8, 8 );
+		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 10, 10 );
+		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 12, 12 );
+		
+		/* Employment  */
+		
+		addLOV(sheet, empSheet, 3, numRows - 1, 1, 1, "Employment");
+		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 2, 2);
+		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 4, 5 );
+		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 10, 10 );
+		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 12, 12 );
+		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 14, 14 );
+		
+		/* Transfers  */
+		
+		addLOV(sheet, transSheet, 3, numRows - 1, 1, 1, "TransferStyle");
+		addLOV(sheet, transSheet, 3, numRows - 1, 3, 3, "Transfers");
+		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 4, 6);
+		addLOV(sheet, transSheet, 3, numRows -1, 8, 8, "Unit");
+		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 9, 13 );
+		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 15, 15 );
+		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 17, 17 );
+		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 19, 19 );
+		
+		
+		/* Wild Foods  */
+		
+		addLOV(sheet, wildfSheet, 3, numRows - 1, 1, 1, "WildFoods");
+		addLOV(sheet, wildfSheet, 3, numRows -1, 2, 2, "Unit");
+		addNumberValidation(workbook, sheet, wildfSheet, 3, numRows, 3, 7);
+		addNumberValidation(workbook, sheet, wildfSheet, 3, numRows, 9, 9 );
+		addNumberValidation(workbook, sheet, wildfSheet, 3, numRows, 11, 11 );
+		addNumberValidation(workbook, sheet, wildfSheet, 3, numRows, 13, 13 );
 		
 		/* Return the spreadsheet */
 
@@ -772,11 +486,11 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
 
 		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
-				DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0", "10000");
+				DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0", "100000");
 
 		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
 		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
-		validation.createErrorBox("", "Number between 0 and 10000 only");
+		validation.createErrorBox("", "Enter a Number only");
 		validation.setEmptyCellAllowed(true);
 		validation.setShowErrorBox(true); // Allows for other values - combo style
 		iSheet.addValidationData(validation);
@@ -793,14 +507,14 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		style.setBorderTop(BORDER_THIN);
 		style.setBorderRight(BORDER_THIN);
 		style.setBorderLeft(BORDER_THIN);
-		System.out.println("formating region " + region.getNumberOfCells());
-		System.out.println("formating region 2 " + firstRow + " " + lastRow);
+		//System.out.println("formating region " + region.getNumberOfCells());
+		//System.out.println("formating region 2 " + firstRow + " " + lastRow);
 
 		for (int i = firstRow; i < lastRow - 1; i++) {
 
-			System.out.println("formating region 2 " + region.getFirstRow() + " " + region.getLastRow());
+			//System.out.println("formating region 2 " + region.getFirstRow() + " " + region.getLastRow());
 			Row row = iSheet.getRow(i);
-			System.out.println("format cell = " + i);
+			//System.out.println("format cell = " + i);
 			Cell cell = row.getCell(firstCol);
 			cell.setCellStyle(style);
 
@@ -838,7 +552,16 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int areaRowNum = 3;
 		int otRowNum = 4;
 		int fsRowNum = 5;
-
+		int unitRowNum = 6;
+		int treeRowNum = 7;
+		int currencyRowNum = 8;
+		int cropRowNum = 9;
+		int empRowNum = 10;
+		int transRowNum = 11;
+		int transStyleRowNum = 12;
+		int wildfRowNum = 13;
+		
+		
 		/* Land Types */
 		List<ResourceSubType> rst = XPersistence.getManager().createQuery("from ResourceSubType").getResultList();
 
@@ -847,6 +570,14 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Row areaRow = dataSheet.createRow(areaRowNum);
 		Row otRow = dataSheet.createRow(otRowNum);
 		Row fsRow = dataSheet.createRow(fsRowNum);
+		Row unitRow = dataSheet.createRow(unitRowNum);
+		Row treeRow = dataSheet.createRow(treeRowNum);
+		Row currencyRow = dataSheet.createRow(currencyRowNum);
+		Row cropRow = dataSheet.createRow(cropRowNum);
+		Row empRow = dataSheet.createRow(empRowNum);
+		Row transRow = dataSheet.createRow(transRowNum);
+		Row transStyleRow = dataSheet.createRow(transStyleRowNum);
+		Row wildfRow = dataSheet.createRow(wildfRowNum);
 
 		int j = 0;
 		int la = 0;
@@ -854,6 +585,15 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int ot =0;
 		int fs = 0;
 		int area = 0;
+		int unit = 0;
+		int tree = 0;
+		int currency = 0;
+		int crop = 0;
+		int emp = 0;
+		int trans = 0;
+		int transStyle = 0;
+		int wildf = 0;
+
 
 		for (int k = 0; k < rst.size(); k++) {
 			/* Land */
@@ -861,75 +601,150 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				cell = laRow.createCell(la);
 				cell.setCellValue(rst.get(k).getResourcetypename());
 				la++;
-				System.out.println("LA cell set to " + la + " " + cell.getStringCellValue());
+				
 			}
 			/* LiveStock */
 			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Livestock".toString())) {
 				cell = lsRow.createCell(ls);
 				cell.setCellValue(rst.get(k).getResourcetypename());
 				ls++;
-				System.out.println("LS cell set to " + ls + " " + cell.getStringCellValue());
+				
 			}
 			/* Other Tradeable  */
 			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Other Tradeable Goods".toString())) {
 				cell = otRow.createCell(ot);
 				cell.setCellValue(rst.get(k).getResourcetypename());
 				ot++;
-				System.out.println("OT cell set to " + ot + " " + cell.getStringCellValue());
+				
 			}
 			/* Asset Food Stocks   */
 			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Food Stocks".toString())) {
 				cell = fsRow.createCell(fs);
 				cell.setCellValue(rst.get(k).getResourcetypename());
 				fs++;
-				System.out.println("FS cell set to " + fs + " " + cell.getStringCellValue());
+				
+			}
+			/* Trees */
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Trees".toString())) {
+				cell = treeRow.createCell(tree);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				tree++;
+				
+			}
+			/* Crops */
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Crops".toString())) {
+				cell = cropRow.createCell(crop);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				crop++;
+				
+			}
+			/* Employment */
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Employment".toString())) {
+				cell = empRow.createCell(emp);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				emp++;
+				
+			}
+			/* Transfers */
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Transfers".toString())) {
+				cell = transRow.createCell(trans);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				trans++;
+				
+			}
+			/* Wild Foods */
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Wild Foods".toString())) {
+				cell = wildfRow.createCell(wildf);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				wildf++;
+				
 			}
 		}
 
-		String lacol = getCharForNumber(la); // Convert for drop list creation
-		String lscol = getCharForNumber(ls); // Convert for drop list creation
-		String otcol = getCharForNumber(ot); // Convert for drop list creation
-		String fscol = getCharForNumber(fs); // Convert for drop list creation
+		String lacol = getCharForNumber(la); 
+		String lscol = getCharForNumber(ls); 
+		String otcol = getCharForNumber(ot); 
+		String fscol = getCharForNumber(fs); 
+		String treecol = getCharForNumber(tree); // Convert for drop list creation
+		String cropcol = getCharForNumber(crop);
+		String empcol = getCharForNumber(emp);
+		String transcol = getCharForNumber(trans);
+		String wildfcol = getCharForNumber(wildf);
+		
 
 		/* Land */
 		name = dataSheet.getWorkbook().createName();
 		landRowNum++;
-		name.setRefersToFormula("Validations" + "!$A$" + landRowNum + ":$" + lacol + "$" + landRowNum); // Need to allow
-																										// for longer
-																										// lists..
+		name.setRefersToFormula("Validations" + "!$A$" + landRowNum + ":$" + lacol + "$" + landRowNum); 
+																																																// lists..
 		name.setNameName("Land");
 
 		/* LS */
 		name = dataSheet.getWorkbook().createName();
 		lsRowNum++;
-		name.setRefersToFormula("Validations" + "!$A$" + lsRowNum + ":$" + lscol + "$" + lsRowNum); // Need to allow for
-																									// longer lists..
+		name.setRefersToFormula("Validations" + "!$A$" + lsRowNum + ":$" + lscol + "$" + lsRowNum); 
+																									
 		name.setNameName("Livestock");
 
 		/* Other Tradeable */
 		name = dataSheet.getWorkbook().createName();
 		otRowNum++;
-		name.setRefersToFormula("Validations" + "!$A$" + otRowNum + ":$" + otcol + "$" + otRowNum); // Need to allow for
-																									// longer lists..
+		name.setRefersToFormula("Validations" + "!$A$" + otRowNum + ":$" + otcol + "$" + otRowNum); 
+																									
 		name.setNameName("OtherTradeableGoods");
 		
 
 		/* Asset Food Stocks  */
 		name = dataSheet.getWorkbook().createName();
 		fsRowNum++;
-		name.setRefersToFormula("Validations" + "!$A$" + fsRowNum + ":$" + fscol + "$" + fsRowNum); // Need to allow for
-																									// longer lists..
+		name.setRefersToFormula("Validations" + "!$A$" + fsRowNum + ":$" + fscol + "$" + fsRowNum); 
+																									
 		name.setNameName("FoodStocks");
 		
+		/* Asset Trees  */
+		name = dataSheet.getWorkbook().createName();
+		treeRowNum++;
+		name.setRefersToFormula("Validations" + "!$A$" + treeRowNum + ":$" + treecol + "$" + treeRowNum); 
+																									
+		name.setNameName("Trees");
 		
+		/* Crops  */
+		name = dataSheet.getWorkbook().createName();
+		cropRowNum++;
+		name.setRefersToFormula("Validations" + "!$A$" + cropRowNum + ":$" + cropcol + "$" + cropRowNum); 
+																									
+		name.setNameName("Crops");
+		
+		/* Emp  */
+		name = dataSheet.getWorkbook().createName();
+		empRowNum++;
+		name.setRefersToFormula("Validations" + "!$A$" + empRowNum + ":$" + empcol + "$" + empRowNum); 
+																									
+		name.setNameName("Employment");
+		
+		/* Transfers  */
+		name = dataSheet.getWorkbook().createName();
+		transRowNum++;
+		name.setRefersToFormula("Validations" + "!$A$" + transRowNum + ":$" + transcol + "$" + transRowNum); 
+																									
+		name.setNameName("Transfers");
+		
+		/* Wild Foods  */
+		name = dataSheet.getWorkbook().createName();
+		wildfRowNum++;
+		name.setRefersToFormula("Validations" + "!$A$" + wildfRowNum + ":$" + wildfcol + "$" + wildfRowNum); 
+																									
+		name.setNameName("WildFoods");
+		
+		/* From Reference Table */ 
 		/* Area */
 
-		List<ReferenceCode> referenceCode = XPersistence.getManager()
+		List<ReferenceCode> referenceCodeArea = XPersistence.getManager()
 				.createQuery("from ReferenceCode where ReferenceType = 'Area')").getResultList();
 		// Get ref codes for Area and add to Validations sheet
-		for (int k = 0; k < referenceCode.size(); k++) {
+		for (int k = 0; k < referenceCodeArea.size(); k++) {
 			cell = areaRow.createCell(area);
-			cell.setCellValue(referenceCode.get(k).getReferenceName());
+			cell.setCellValue(referenceCodeArea.get(k).getReferenceName());
 			area++;
 			System.out.println("LA cell set to " + area + " " + cell.getStringCellValue());
 		}
@@ -940,6 +755,82 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		name.setRefersToFormula("Validations" + "!$A$" + areaRowNum + ":$" + areacol + "$" + areaRowNum);
 		name.setNameName("Area");
 
+		
+		/* Unit */
+
+		
+		List<ReferenceCode> referenceCodeUnit = XPersistence.getManager()
+				.createQuery("from ReferenceCode where ReferenceType = 'Unit')").getResultList();
+		// Get ref codes for Unit and add to Validations sheet
+		for (int k = 0; k < referenceCodeUnit.size(); k++) {
+			cell = unitRow.createCell(unit);
+			cell.setCellValue(referenceCodeUnit.get(k).getReferenceName());
+			unit++;
+			System.out.println("Unit cell set to " + unit + " " + cell.getStringCellValue());
+		}
+
+		String unitcol = getCharForNumber(unit); // Convert for drop list creation
+		name = dataSheet.getWorkbook().createName();
+		unitRowNum++;
+		
+		System.out.println("Unit cell info  "+unitRowNum+" "+unitcol); 
+		
+		name.setRefersToFormula("Validations" + "!$A$" + unitRowNum + ":$" + unitcol + "$" + unitRowNum);
+		name.setNameName("Unit");
+		
+		
+		/* Transfer Style */
+
+		
+		List<ReferenceCode> referenceTStyle = XPersistence.getManager()
+				.createQuery("from ReferenceCode where ReferenceType = 'Transfer Style')").getResultList();
+		// Get ref codes for Transger Style Official / Unofficial and add to Validations sheet
+		for (int k = 0; k < referenceTStyle.size(); k++) {
+			cell = transStyleRow.createCell(transStyle);
+			cell.setCellValue(referenceTStyle.get(k).getReferenceName());
+			transStyle++;
+		}
+
+		String transStylecol = getCharForNumber(transStyle); // Convert for drop list creation
+		name = dataSheet.getWorkbook().createName();
+		transStyleRowNum++;
+		
+		name.setRefersToFormula("Validations" + "!$A$" + transStyleRowNum + ":$" + transStylecol + "$" + transStyleRowNum);
+		name.setNameName("TransferStyle");
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/* Cash from Currency Table */ 
+		
+		List<Country> country = XPersistence.getManager()
+				.createQuery("from Country").getResultList();      /* Currency unique - probably not */
+		// Get codes for Currency and add to Validations sheet
+		for (int k = 0; k < country.size(); k++) {
+			cell = currencyRow.createCell(currency);
+			cell.setCellValue(country.get(k).getCurrency());
+			currency++;
+			System.out.println("Currency cell set to " + currency + " " + cell.getStringCellValue());
+		}
+
+		String currencycol = getCharForNumber(currency); // Convert for drop list creation
+		name = dataSheet.getWorkbook().createName();
+		currencyRowNum++;
+		
+		name.setRefersToFormula("Validations" + "!$A$" + currencyRowNum + ":$" + currencycol + "$" + currencyRowNum);
+		name.setNameName("Currency");
+		
+		
 	}
 
 	public int populateRow(Row row, String label, String[] data) {
@@ -969,15 +860,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		int col = 2;
 		int row = 4;
-		sheet.setColumnWidths(2, width, width, width); /* set col widths */
+		sheet.setColumnWidths(2, width, numwidth, numwidth); /* set col widths */
 		while (col < 5) {
 
 			while (row < numRows) {
 				sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 				if (col == 4)
 					sheet.setColumnStyles(col, numberStyle);
-				// sheet.setValue(col, row, "", numberStyle); /* set number of Units to Number
-				// type */
 				row++;
 			}
 
@@ -1021,11 +910,11 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		sheet.setValue(2, 3, "Livestock Type", boldTopStyle);
 		sheet.setValue(3, 3, "Unit", boldTopStyle);
-		sheet.setValue(4, 3, "Owned at STart of Year", boldTopStyle);
+		sheet.setValue(4, 3, "Owned at Start of Year", boldTopStyle);
 		sheet.setValue(5, 3, "Price Per Unit", boldTopStyle);
 
 		System.out.println("done asl create headings");
-		sheet.setColumnWidths(2, width, width, width, width); /* set col widths */
+		sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth); /* set col widths */
 
 		/* set grid for data input */
 
@@ -1077,7 +966,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		sheet.setValue(3, 3, "Unit", boldTopStyle);
 		sheet.setValue(4, 3, "Number", boldTopStyle);
 		sheet.setValue(5, 3, "Price Per Unit", boldTopStyle);
-		sheet.setColumnWidths(2, width, width, width, width); /* set col widths */
+		sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth); /* set col widths */
 
 		/* set grid for data input */
 
@@ -1133,7 +1022,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		int col = 2;
 		int row = 4;
-		sheet.setColumnWidths(2, width, width, width); /* set col widths */
+		sheet.setColumnWidths(2, width, numwidth, numwidth); /* set col widths */
 		while (col < 5) {
 
 			while (row < numRows) {
@@ -1176,6 +1065,615 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		}
 
 	}
+	/**************************************************************************************************************************************************/
+	private void printAssetTrees(JxlsSheet sheet)
+	{
+		/* Asset Trees Sheet - Trees sold for timber  */
+
+		sheet.setValue(2, 3, "Tree Type", boldTopStyle);
+		sheet.setValue(3, 3, "Unit", boldTopStyle);
+		sheet.setValue(4, 3, "Number", boldTopStyle);
+		sheet.setValue(5, 3, "Price Per Unit", boldTopStyle);
+
+		System.out.println("done tree create headings");
+		sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth); /* set col widths */
+
+		/* set grid for data input */
+
+		int col = 2;
+		int row = 4;
+		while (col < 6) {
+			while (row < numRows) {
+				sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				row++;
+			}
+			col++;
+			row = 4;
+		}
+
+		System.out.println("tree set styles tree size");
+
+		row = 4;
+		int treerow = 5;
+		// get resource sub type //
+		for (int k = 0; k < chrs.size(); k++) {
+			/* Get Resource Sub Type */
+			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+					.find(WGCharacteristicsResource.class, chrs.get(k));
+
+			/* Get Resource Type */
+			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+			rt = rst.getResourcetypename();
+			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+			if (rt.equals("Trees")) {
+				sheet.setValue(2, row, resub, borderStyle);
+				sheet.setValue(3, row, rtunit, borderStyle);
+				row++;
+			}
+
+		}
+
+	}
+
+		
+	
+	/**************************************************************************************************************************************************/
+	private void printAssetCash(JxlsSheet sheet)
+	{
+		{
+			/* Cash Sheet -   */
+
+			sheet.setValue(2, 3, "Currency", boldTopStyle);
+			sheet.setValue(3, 3, "Amount", boldTopStyle);
+
+			sheet.setColumnWidths(2, 10, 10); /* set col widths */
+
+			/* set grid for data input */
+
+			int col = 2;
+			int row = 4;
+			while (col < 4) {
+				while (row < numRows) {
+					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+					row++;
+				}
+				col++;
+				row = 4;
+			}
+
+			System.out.println("tree set styles tree size");
+
+			row = 4;
+			int cashrow = 5;
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				rt = rst.getResourcetypename();
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+				if (rt.equals("Cash")) {
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+
+		}
+		
+	}
+	/**************************************************************************************************************************************************/
+	private void printCrops(JxlsSheet sheet)
+	{
+		{
+			/* Crops Sheet -   */
+
+		
+			sheet.setValue(2, 3, "Crop Type", boldTopStyle);
+			sheet.setValue(3, 3, "Unit", boldTopStyle);
+			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
+			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
+			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(7, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(8, 3, "Market 1", boldTopStyle);
+			sheet.setValue(9, 3, "% Trade at 1", boldTopStyle);
+			sheet.setValue(10, 3, "Market 2", boldTopStyle);
+			sheet.setValue(11, 3, "% Trade at 2", boldTopStyle);
+			sheet.setValue(12, 3, "Market 3", boldTopStyle);
+			sheet.setValue(13, 3, "% Trade at 3", boldTopStyle);
+
+			sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth, numwidth, width, width, numwidth, width, numwidth,width, numwidth); /* set col widths */
+
+			/* set grid for data input */
+
+			int col = 2;
+			int row = 4;
+			while (col < 14) {
+				while (row < numRows) {
+					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+					row++;
+				}
+				col++;
+				row = 4;
+			}
+
+			row = 4;
+			int cropsrow = 5;
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				rt = rst.getResourcetypename();
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+				if (rt.equals("Crops")) {
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+
+		}
+		
+	}
+	/**************************************************************************************************************************************************/
+	private void printLivestockSales(JxlsSheet sheet)
+	{
+		{
+			/* Livestock Sales  Sheet -   */
+
+		
+			sheet.setValue(2, 3, "Livestock Type", boldTopStyle);
+			sheet.setValue(3, 3, "Unit", boldTopStyle);
+			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
+			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
+			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(7, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(8, 3, "Market 1", boldTopStyle);
+			sheet.setValue(9, 3, "% Trade at 1", boldTopStyle);
+			sheet.setValue(10, 3, "Market 2", boldTopStyle);
+			sheet.setValue(11, 3, "% Trade at 2", boldTopStyle);
+			sheet.setValue(12, 3, "Market 3", boldTopStyle);
+			sheet.setValue(13, 3, "% Trade at 3", boldTopStyle);
+			
+
+			sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth, numwidth, width, width, numwidth, width, numwidth,width, numwidth); /* set col widths */
+
+			/* set grid for data input */
+
+			int col = 2;
+			int row = 4;
+			while (col < 14) {
+				while (row < numRows) {
+					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+					row++;
+				}
+				col++;
+				row = 4;
+			}
+
+			row = 4;
+			int lssrow = 5;
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				rt = rst.getResourcetypename();
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+				if (rt.equals("Livestock Sales")) {
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+
+		}
+		
+	}
+
+	/**************************************************************************************************************************************************/
+	private void printLivestockProducts(JxlsSheet sheet)
+	{
+		{
+			/* Livestock Products  Sheet -   */
+
+		
+			sheet.setValue(2, 3, "Livestock Type", boldTopStyle);
+			sheet.setValue(3, 3, "Unit", boldTopStyle);
+			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
+			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
+			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(7, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(8, 3, "Market 1", boldTopStyle);
+			sheet.setValue(9, 3, "% Trade at 1", boldTopStyle);
+			sheet.setValue(10, 3, "Market 2", boldTopStyle);
+			sheet.setValue(11, 3, "% Trade at 2", boldTopStyle);
+			sheet.setValue(12, 3, "Market 3", boldTopStyle);
+			sheet.setValue(13, 3, "% Trade at 3", boldTopStyle);
+			
+
+			sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth, numwidth, width, width,  numwidth, width, numwidth,width, numwidth); /* set col widths */
+
+			/* set grid for data input */
+
+			int col = 2;
+			int row = 4;
+			while (col < 14) {
+				while (row < numRows) {
+					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+					row++;
+				}
+				col++;
+				row = 4;
+			}
+
+			row = 4;
+			int lsprow = 5;
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				rt = rst.getResourcetypename();
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+				if (rt.equals("Livestock Products")) {
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+
+		}
+		
+	}
+	/**************************************************************************************************************************************************/
+	private void printEmp(JxlsSheet sheet)
+	{
+		{
+			/* Employment Sheet -   */
+
+			sheet.setValue(2, 3, "Employment Type", boldTopStyle);
+			sheet.setValue(3, 3, "Number of People Working", boldTopStyle);
+			sheet.setValue(4, 3, "Unit of Work  e.g. Day, Month", boldTopStyle);
+			sheet.setValue(5, 3, "Units worked  e.g. Days, Months", boldTopStyle);
+			sheet.setValue(6, 3, "Cash Pay:Amount", boldTopStyle);
+			sheet.setValue(7, 3, "Food Pay:Food Type", boldTopStyle);
+			sheet.setValue(8, 3, "Food Pay:Unit", boldTopStyle);
+			sheet.setValue(9, 3, "Food Pay:Units Paid / Work Unit", boldTopStyle);
+			sheet.setValue(10, 3, "Work Location 1", boldTopStyle);
+			sheet.setValue(11, 3, "% Work at 1", boldTopStyle);
+			sheet.setValue(12, 3, "Work Location 2", boldTopStyle);
+			sheet.setValue(13, 3, "% Work at 2", boldTopStyle);
+			sheet.setValue(14, 3, "Work Location 3", boldTopStyle);
+			sheet.setValue(15, 3, "% Trade at 3", boldTopStyle);
+
+			
+
+			sheet.setColumnWidths(2, width, numwidth,numwidth,numwidth,numwidth,width,numwidth,numwidth,width,numwidth,width,numwidth,width,numwidth); /* set col widths */
+
+			/* set grid for data input */
+
+			int col = 2;
+			int row = 4;
+			while (col < 16) {
+				while (row < numRows) {
+					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+					row++;
+				}
+				col++;
+				row = 4;
+			}
+
+			System.out.println("tree set styles tree size");
+
+			row = 4;
+			int emprow = 5;
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				rt = rst.getResourcetypename();
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+				if (rt.equals("Employment")) {
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+
+		}
+		
+	}
+	/**************************************************************************************************************************************************/
+
+	private void printTransfers(JxlsSheet sheet)
+	{
+		{
+			/* Transfers Sheet -   */
+			sheet.setValue(2, 3, "Official/Unofficial", boldTopStyle);
+			sheet.setValue(3, 3, "Source e.g. Kin", boldTopStyle);
+			sheet.setValue(4, 3, "Transfer Type (e.g. Food, Cash, Other)", boldTopStyle);
+			sheet.setValue(5, 3, "No. People Receiving", boldTopStyle);
+			sheet.setValue(6, 3, "No. of Times Received", boldTopStyle);
+			sheet.setValue(7, 3, "Cash Transfer Amount", boldTopStyle);
+			sheet.setValue(8, 3, "Food or Other Transfer:Type of food/other resource", boldTopStyle);
+			sheet.setValue(9, 3, "Unit", boldTopStyle);
+			sheet.setValue(10, 3, "Units Received / Transferred", boldTopStyle);
+			sheet.setValue(11, 3, "Units Sold", boldTopStyle);
+			sheet.setValue(12, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(13, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(14, 3, "Units Consumed", boldTopStyle);
+			sheet.setValue(15, 3, "Market 1", boldTopStyle);
+			sheet.setValue(16, 3, "% Trade at 1", boldTopStyle);
+			sheet.setValue(17, 3, "Market 2", boldTopStyle);
+			sheet.setValue(18, 3, "% Trade at 2", boldTopStyle);
+			sheet.setValue(19, 3, "Market 3", boldTopStyle);
+			sheet.setValue(20, 3, "% Trade at 3", boldTopStyle);
+
+			sheet.setColumnWidths(2, width, width, width,numwidth,numwidth,numwidth,width,numwidth,numwidth,numwidth,
+					numwidth,numwidth,numwidth,width,numwidth,width,numwidth,width,numwidth);
+
+			/* set grid for data input */
+
+			int col = 2;
+			int row = 4;
+			while (col < 21) {
+				while (row < numRows) {
+					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+					row++;
+				}
+				col++;
+				row = 4;
+			}
+
+
+			row = 4;
+			int trrow = 5;
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				rt = rst.getResourcetypename();
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+				if (rt.equals("Transfers")) {
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+
+		}
+		
+	}
+
+	/**************************************************************************************************************************************************/
+	private void printWildFood(JxlsSheet sheet)
+	{
+		{
+			/* Wildfood Sheet -   */
+
+			sheet.setValue(2, 3, "Wild Food Type", boldTopStyle);
+			sheet.setValue(3, 3, "Unit", boldTopStyle);
+			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
+			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
+			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
+			sheet.setValue(8, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(9, 3, "Market 1", boldTopStyle);
+			sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
+			sheet.setValue(11, 3, "Market 2", boldTopStyle);
+			sheet.setValue(12, 3, "% Trade at 2", boldTopStyle);
+			sheet.setValue(13, 3, "Market 3", boldTopStyle);
+			sheet.setValue(14, 3, "% Trade at 3", boldTopStyle);
+
+			sheet.setColumnWidths(2, width,width,numwidth,numwidth,numwidth,numwidth,numwidth,width,numwidth, width,numwidth,width,numwidth);
+			/* set grid for data input */
+
+			int col = 2;
+			int row = 4;
+			while (col < 15) {
+				while (row < numRows) {
+					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+					row++;
+				}
+				col++;
+				row = 4;
+			}
+
+
+			row = 4;
+			int wfrow = 5;
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				rt = rst.getResourcetypename();
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+				if (rt.equals("Wildfood")) {
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+
+		}
+		
+	}
+	/**************************************************************************************************************************************************/
+
+	private void printFoodPurchases(JxlsSheet sheet)
+	{
+	
+	/* Food Purchase Sheet */
+
+	sheet.setValue(2, 3, "Food Type", boldTopStyle);
+	sheet.setValue(3, 3, "Unit", boldTopStyle);
+	sheet.setValue(4, 3, "Units Purchased", boldTopStyle);
+	sheet.setValue(5, 3, "Price Per Unit", boldTopStyle);
+
+	
+	sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth); /* set col widths */
+
+	/* set grid for data input */
+
+	int col = 2;
+	int row = 4;
+	while (col < 6) {
+		while (row < numRows) {
+			sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+			row++;
+		}
+		col++;
+		row = 4;
+	}
+
+	System.out.println("asl set styles abd size");
+
+	row = 4;
+	int fprow = 5;
+	// get resource sub type //
+	for (int k = 0; k < chrs.size(); k++) {
+		/* Get Resource Sub Type */
+		WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+				.find(WGCharacteristicsResource.class, chrs.get(k));
+
+		/* Get Resource Type */
+		ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+				wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+		rt = rst.getResourcetypename();
+		resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+		rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+		if (rt.equals("Food Purchase")) {
+			sheet.setValue(2, row, resub, borderStyle);
+			sheet.setValue(3, row, rtunit, borderStyle);
+			row++;
+		}
+
+	}
+
+}
+	/**************************************************************************************************************************************************/
+
+	private void printNonFoodPurchases(JxlsSheet sheet)
+	{
+		
+	/* Non Food Purchase Sheet */
+
+	sheet.setValue(2, 3, "Item Purchased", boldTopStyle);
+	sheet.setValue(3, 3, "Unit", boldTopStyle);
+	sheet.setValue(4, 3, "Units Purchased", boldTopStyle);
+	sheet.setValue(5, 3, "Price Per Unit", boldTopStyle);
+
+	
+	sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth); /* set col widths */
+
+	/* set grid for data input */
+
+	int col = 2;
+	int row = 4;
+	while (col < 6) {
+		while (row < numRows) {
+			sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+			row++;
+		}
+		col++;
+		row = 4;
+	}
+
+
+	row = 4;
+	int nfprow = 5;
+	// get resource sub type //
+	for (int k = 0; k < chrs.size(); k++) {
+		/* Get Resource Sub Type */
+		WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+				.find(WGCharacteristicsResource.class, chrs.get(k));
+
+		/* Get Resource Type */
+		ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+				wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+		rt = rst.getResourcetypename();
+		resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+		rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+
+		if (rt.equals("Non Food Purchase")) {
+			sheet.setValue(2, row, resub, borderStyle);
+			sheet.setValue(3, row, rtunit, borderStyle);
+			row++;
+		}
+
+	}
+
+}
+	
+	
 	/**************************************************************************************************************************************************/
 
 	public static String getCharForNumber(int i) {
