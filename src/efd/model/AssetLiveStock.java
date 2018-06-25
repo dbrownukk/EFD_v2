@@ -5,6 +5,8 @@ import java.math.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.openxava.annotations.*;
+
 
 
 
@@ -17,18 +19,18 @@ import javax.validation.constraints.*;
 public class AssetLiveStock extends Asset{
 
 
-	@Column(name = "LiveStockTypeEnteredName", length = 50)
+	@Column(name = "LiveStockTypeEnteredName", length = 50, nullable=false)
+	@Required
 	private String liveStockTypeEnteredName;
-
-	@Column(name = "NumberOwned", nullable=false )
+	
+	@Column(name = "NumberOwnedAtStart", nullable=false )
+	@Required
 	@NotNull
-	private Integer numberOwned;
-	
-	@Column(name = "PricePerUnit" )
+	private Integer numberOwnedAtStart;
+
+	@Column(name = "PricePerUnit" ,precision=10, scale=2)
+	@Digits(integer=10,fraction=2)
 	private BigDecimal pricePerUnit;
-	
-	@Column(name = "UnitEntered", length = 50)
-	private String unitEntered;
 
 	public String getLiveStockTypeEnteredName() {
 		return liveStockTypeEnteredName;
@@ -38,12 +40,14 @@ public class AssetLiveStock extends Asset{
 		this.liveStockTypeEnteredName = liveStockTypeEnteredName;
 	}
 
-	public Integer getNumberOwned() {
-		return numberOwned;
+
+
+	public Integer getNumberOwnedAtStart() {
+		return numberOwnedAtStart;
 	}
 
-	public void setNumberOwned(Integer numberOwned) {
-		this.numberOwned = numberOwned;
+	public void setNumberOwnedAtStart(Integer numberOwnedAtStart) {
+		this.numberOwnedAtStart = numberOwnedAtStart;
 	}
 
 	public BigDecimal getPricePerUnit() {
@@ -53,18 +57,8 @@ public class AssetLiveStock extends Asset{
 	public void setPricePerUnit(BigDecimal pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
-
-	public String getUnitEntered() {
-		return unitEntered;
-	}
-
-	public void setUnitEntered(String unitEntered) {
-		this.unitEntered = unitEntered;
-	}
-
-
-
 	
+
 	
 	
 }

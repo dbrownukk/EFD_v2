@@ -37,6 +37,9 @@ import efd.actions.*;
 		Invalid, NotChecked, Valid
 	}
 
+	@Column(name = "Unit", length = 50, nullable=false)
+	@Required
+	private String unit;
 
 
 
@@ -54,6 +57,14 @@ import efd.actions.*;
 
 	public void setResourceSubType(ResourceSubType resourceSubType) {
 		this.resourceSubType = resourceSubType;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
 	}
 	
 

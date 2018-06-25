@@ -1,5 +1,10 @@
 package efd.model;
 
+import java.math.*;
+
+/* Asset Other Tradeable */
+
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
@@ -19,10 +24,12 @@ public class AssetTradeable extends Asset{
 	@Column(name = "TradeableTypeEnteredName", length = 50)
 	private String tradeableTypeEnteredName;
 
-	@Column(name = "Quantity", nullable=false )
+	@Column(name = "NumberOwned", nullable=false )
 	@NotNull
-	private Integer quantity;
+	private Integer numberOwned;
 
+	@Column(name = "PricePerUnit" )
+	private BigDecimal pricePerUnit;
 
 	public String getTradeableTypeEnteredName() {
 		return tradeableTypeEnteredName;
@@ -32,13 +39,25 @@ public class AssetTradeable extends Asset{
 		this.tradeableTypeEnteredName = tradeableTypeEnteredName;
 	}
 
-	public Integer getQuantity() {
-		return quantity;
+	public Integer getNumberOwned() {
+		return numberOwned;
 	}
 
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
+	public void setNumberOwned(Integer numberOwned) {
+		this.numberOwned = numberOwned;
 	}
+
+	public BigDecimal getPricePerUnit() {
+		return pricePerUnit;
+	}
+
+	public void setPricePerUnit(BigDecimal pricePerUnit) {
+		this.pricePerUnit = pricePerUnit;
+	}
+
+
+
+
 	
 	
 }

@@ -19,44 +19,35 @@ import efd.model.WealthGroupInterview.*;
 
 public class AssetFoodStock extends Asset {
 
-	
-	/* Boolean or either / or ?? */
+	@Column(name = "FoodTypeEnteredName", length = 50)
+	private String foodTypeEnteredName;
 	
 
-	
-	
-	//@Editor("ValidValuesRadioButton")
-	private WildFoodOrCropIndicator wildFoodOrCropIndicator;
-	public enum WildFoodOrCropIndicator { Wildfood, Crop };
-	
-	
-	@Column(name = "FoodName", nullable=false, length=50 )
-	private String foodName;
+	@Column(name = "Quantity" )
+	private BigDecimal quantity;
 
 
-
-	public WildFoodOrCropIndicator getWildFoodOrCropIndicator() {
-		return wildFoodOrCropIndicator;
+	public String getFoodTypeEnteredName() {
+		return foodTypeEnteredName;
 	}
 
 
-	public void setWildFoodOrCropIndicator(WildFoodOrCropIndicator wildFoodOrCropIndicator) {
-		this.wildFoodOrCropIndicator = wildFoodOrCropIndicator;
+	public void setFoodTypeEnteredName(String foodTypeEnteredName) {
+		this.foodTypeEnteredName = foodTypeEnteredName;
 	}
 
 
-	public String getFoodName() {
-		return foodName;
+	public BigDecimal getQuantity() {
+		return quantity;
 	}
 
 
-	public void setFoodName(String foodName) {
-		this.foodName = foodName;
+	public void setQuantity(BigDecimal quantity) {
+		this.quantity = quantity;
 	}
 
 
-
-
+    
 	
 	
 

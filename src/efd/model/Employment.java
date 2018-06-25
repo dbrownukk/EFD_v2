@@ -19,83 +19,122 @@ public class Employment extends Asset {
 	@Column(name = "EmploymentName", length = 50)
 	private String employmentName;
 
-
 	@Column(name = "PeopleCount", nullable = false)
 	private Integer peopleCount;
 
-	@Column(name = "Duration")
-	private Integer duration;
+	@Column(name = "UnitsWorked")
+	private Integer unitsWorked;
 	
-	@Column(name = "WorkUnit ", length = 45)
-	private String workUnit;
-	
-	@Column(name = "Frequency ", length = 45)
-	private String frequency;
-	
-	@Column(name = "CashPaymentPerUnit", precision = 10, scale = 2)
+	@Column(name = "CashPaymentAmount", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	private BigDecimal cashPaymentPerUnit;
+	private BigDecimal cashPaymentAmount;
 
-	@Column(name = "FoodPaymentPerUnit", precision = 10, scale = 2)
+	@Column(name = "FoodPaymentFoodType", length=50)
+	private String foodPaymentFoodType;
+
+	@Column(name = "FoodPaymentUnit", length=50)
+	private String foodPaymentUnit;
+	
+	@Column(name = "FoodPaymentUnitsPaidWork", length=50)
+	private String foodPaymentUnitsPaidWork;
+	
+	@Column(name = "WorkLocation1", length = 50)
+	private String workLocation1;
+	@Column(name = "PercentWorkLocation1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	private BigDecimal foodPaymentPerUnit;
-
+	private BigDecimal percentWorkLocation1;
+	
+	@Column(name = "WorkLocation2", length = 50)
+	private String workLocation2;
+	@Column(name = "PercentWorkLocation2", precision = 10, scale = 2)
+	@Digits(integer = 10, fraction = 2)
+	private BigDecimal percentWorkLocation2;
+	
+	@Column(name = "WorkLocation3", length = 50)
+	private String workLocation3;
+	@Column(name = "PercentWorkLocation3", precision = 10, scale = 2)
+	@Digits(integer = 10, fraction = 2)
+	private BigDecimal percentWorkLocation3;
 	public String getEmploymentName() {
 		return employmentName;
 	}
-
 	public void setEmploymentName(String employmentName) {
 		this.employmentName = employmentName;
 	}
-
 	public Integer getPeopleCount() {
 		return peopleCount;
 	}
-
 	public void setPeopleCount(Integer peopleCount) {
 		this.peopleCount = peopleCount;
 	}
-
-	public Integer getDuration() {
-		return duration;
+	public Integer getUnitsWorked() {
+		return unitsWorked;
 	}
-
-	public void setDuration(Integer duration) {
-		this.duration = duration;
+	public void setUnitsWorked(Integer unitsWorked) {
+		this.unitsWorked = unitsWorked;
 	}
-
-	public String getWorkUnit() {
-		return workUnit;
+	public BigDecimal getCashPaymentAmount() {
+		return cashPaymentAmount;
 	}
-
-	public void setWorkUnit(String workUnit) {
-		this.workUnit = workUnit;
+	public void setCashPaymentAmount(BigDecimal cashPaymentAmount) {
+		this.cashPaymentAmount = cashPaymentAmount;
 	}
-
-	public String getFrequency() {
-		return frequency;
+	public String getFoodPaymentFoodType() {
+		return foodPaymentFoodType;
 	}
-
-	public void setFrequency(String frequency) {
-		this.frequency = frequency;
+	public void setFoodPaymentFoodType(String foodPaymentFoodType) {
+		this.foodPaymentFoodType = foodPaymentFoodType;
 	}
-
-	public BigDecimal getCashPaymentPerUnit() {
-		return cashPaymentPerUnit;
+	public String getFoodPaymentUnit() {
+		return foodPaymentUnit;
 	}
-
-	public void setCashPaymentPerUnit(BigDecimal cashPaymentPerUnit) {
-		this.cashPaymentPerUnit = cashPaymentPerUnit;
+	public void setFoodPaymentUnit(String foodPaymentUnit) {
+		this.foodPaymentUnit = foodPaymentUnit;
 	}
-
-	public BigDecimal getFoodPaymentPerUnit() {
-		return foodPaymentPerUnit;
+	public String getFoodPaymentUnitsPaidWork() {
+		return foodPaymentUnitsPaidWork;
 	}
-
-	public void setFoodPaymentPerUnit(BigDecimal foodPaymentPerUnit) {
-		this.foodPaymentPerUnit = foodPaymentPerUnit;
+	public void setFoodPaymentUnitsPaidWork(String foodPaymentUnitsPaidWork) {
+		this.foodPaymentUnitsPaidWork = foodPaymentUnitsPaidWork;
 	}
-
+	public String getWorkLocation1() {
+		return workLocation1;
+	}
+	public void setWorkLocation1(String workLocation1) {
+		this.workLocation1 = workLocation1;
+	}
+	public BigDecimal getPercentWorkLocation1() {
+		return percentWorkLocation1;
+	}
+	public void setPercentWorkLocation1(BigDecimal percentWorkLocation1) {
+		this.percentWorkLocation1 = percentWorkLocation1;
+	}
+	public String getWorkLocation2() {
+		return workLocation2;
+	}
+	public void setWorkLocation2(String workLocation2) {
+		this.workLocation2 = workLocation2;
+	}
+	public BigDecimal getPercentWorkLocation2() {
+		return percentWorkLocation2;
+	}
+	public void setPercentWorkLocation2(BigDecimal percentWorkLocation2) {
+		this.percentWorkLocation2 = percentWorkLocation2;
+	}
+	public String getWorkLocation3() {
+		return workLocation3;
+	}
+	public void setWorkLocation3(String workLocation3) {
+		this.workLocation3 = workLocation3;
+	}
+	public BigDecimal getPercentWorkLocation3() {
+		return percentWorkLocation3;
+	}
+	public void setPercentWorkLocation3(BigDecimal percentWorkLocation3) {
+		this.percentWorkLocation3 = percentWorkLocation3;
+	}
+	
+	
 	
 	
 }

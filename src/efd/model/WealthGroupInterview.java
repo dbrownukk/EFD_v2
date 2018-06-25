@@ -21,8 +21,12 @@ import efd.model.*;
 		+ ",wgInterviewDate"
 		+ ";spreadsheet"
 		+ ",status]"
+		+  "Assets{"
 		+ ";LiveStock{assetLiveStock}"
 		+ ";Land{assetLand}"
+		+ "}"
+		
+		/*
 		+ ";Crops{crop}"
 		+ ";LiveStockUse{liveStockUse}"
 		+ ";Employment{employment}"
@@ -30,6 +34,7 @@ import efd.model.*;
 		+ ";WildFood{wildFood}"
 		+ ";Tradeable{assetTradeable}"
 		+ ";FoodStock{assetFoodStock}"
+		*/
 		),  
 @View(name="wg",members= "wealthgroup")
 })

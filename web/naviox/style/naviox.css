@@ -548,10 +548,14 @@ i {
 
 }
 
-.ox-list-pair div, .ox-list-odd div {
+.ox-list-pair div, .ox-list-odd div, .ox-total-cell {  
 	font-size: 14px;
 	padding-top: 3px;
 	padding-bottom: 3px;
+}
+
+.ox-cut-row {
+	opacity: 0.3;
 }
 
 .ox-module i, .ui-dialog i { 
@@ -1093,7 +1097,7 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 }
 
 .ox-total-row td { 
-	vertical-align: top;
+	vertical-align: baseline; 
 	padding-top: 5px;	
 }
 
@@ -1154,6 +1158,10 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 .ui-dialog-titlebar, .ui-dialog-titlebar button {  
 	border-style: none !important;
 	background: white !important;
+}
+
+.ui-dialog {
+	overflow: visible !important; /* For messages visible from dialogs in Chrome */	
 }
 
 .ox-messages-wrapper, .ox-errors-wrapper {
@@ -1265,23 +1273,43 @@ div.ox-subcontroller table{
 }
  
 #welcome {
-	margin: 20px;	
-	padding-left: 20px; 
-	padding-top: 5px; 	
-	font-size: 16px; 
+	background-image: url("../images/background.jpg"); 
+	background-position: left top;
+    background-size: auto 100vw;
+    background-repeat: no-repeat;
+	margin: 20px;
+	font-size: 25px; 
+	color: white; 
+	text-align: center; 
+}
+
+#welcome.mobile {
+	background-size:  auto 200vw;
 }
 
 #welcome h1 {
-	font-weight: normal; 
-	font-size: 25px; 
-	color: #DD4B39; 
-	margin-bottom: 5px;
+	font-weight: normal;  
+	font-size: 40px; 
+}
+
+#signin_tip {
+	margin-top: 20px;
+	font-size: 16px;	
 }
 
 #welcome h2 {
 	font-weight: normal; 
-	font-size: 16px; 
-	margin-top: 5px;
+	font-size: 25px; 
+}
+
+#welcome .ox-bottom-buttons {
+	text-align: center;
+}
+
+#welcome .ox-bottom-buttons input {
+	min-width: 240px;
+	font-size: 16px;
+	margin-left: 5px;
 }
 
 .feature-image {
@@ -1290,10 +1318,28 @@ div.ox-subcontroller table{
 }
 
 #sign_in_box {
-	float: right; 
-	padding: 20px 0px 25px 22px;  
-	margin: 30px 60px 20px 20px; 
 	background: #F1F1F1; 
+	margin-top: 20px;
+	padding: 20px 5px 5px 28px;
+	margin-right: auto;
+	margin-left: auto;
+	width: 283px;
+	width: fit-content;
+	width: -moz-fit-content;
+	
+}
+
+#sign_in_box .ox-bottom-buttons {
+	display: grid;
+}
+
+#sign_in_box .ox-bottom-buttons input {
+	margin-bottom: 15px;
+	width: 226px;
+}
+
+.firefox #sign_in_box .ox-bottom-buttons input, .ie #sign_in_box .ox-bottom-buttons input {
+	margin-left: 3px;
 }
 
 #sign_in_box .small-label { 
@@ -1316,6 +1362,12 @@ div.ox-subcontroller table{
 	box-shadow: 0 0 7px black;
 	-moz-box-shadow: 0 0 7px #000;
 	-webkit-box-shadow: 0 0 7px black;
+}
+
+.video iframe { 
+	width: 100%;
+	max-width: 840px;
+	height: 472px;
 }
 
 .screenshot, .video { 
@@ -1354,13 +1406,12 @@ div.ox-subcontroller table{
 	margin-left: 5px;
 }
 
-.ox-charts {
-	width: 0px;
-	margin-left: 20px; 
-}
-
 .ct-chart {
 	margin-top: -5px;
+	margin-left: -5px;
+}
+
+.firefox .ct-chart {
 	margin-left: -25px;
 }
 
@@ -1389,9 +1440,8 @@ div.ox-subcontroller table{
 
 .ox-chart-x-column select {
 	position: relative;
-	left: 758px;
-	top: -27px;
-	width: 180px; 
+	left: calc(50vw - 90px);
+	width: 270px; 
 }
 
 .ox-chart-type {
@@ -1426,6 +1476,10 @@ div.ox-subcontroller table{
 
 .ox-charts .ox-list-header {
 	display:none;
+}
+
+.ox-charts .ox-collection { 
+	margin-left: 15px;
 }
 
 .ox-charts .ox-element-collection {
@@ -1488,6 +1542,10 @@ i.ox-sort-indicator2 {
 .ui-autocomplete-input::-ms-clear, .ox-date-calendar ::-ms-clear, .ox-web-url ::-ms-clear {   
  	display: none; 
  }
+ 
+.ox-web-url { 
+	margin-right: -20px;
+}
  
 .ui-menu-item:hover, .ui-widget-content .ui-state-focus {
  	border-color: #DFF4FF !important; 
@@ -1662,6 +1720,10 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
     height: 0px;
 }
 
+div[id$="_Index__view"] .ox-list-title {
+	display: none;
+}
+
 .ox-money b {
 	width: 0px; 
 	position: relative;
@@ -1799,3 +1861,10 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
 	top: auto;
 }
 
+.ox-subscribed i {
+	color: blue; 
+}
+
+.ox-unsubscribed i {
+	color: lightgray; 
+}

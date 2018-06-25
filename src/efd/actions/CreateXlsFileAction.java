@@ -100,17 +100,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int j = 2;
 		int k = 0;
 		int w = 30;
-		int rows;
-		int landrow = 0;
-		int col;
-		Map key;
-		List wgl;
-		String rt;
-		String resub;
-		String rtunit;
-		ArrayList<Rtype> rtypes = new ArrayList<Rtype>();
-		String resourcesubtypeid;
-		String resourcetypeid;
+
 		String filename;
 		int interviewNumber = 1;
 
@@ -143,11 +133,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		List<WealthGroupInterview> wgi = querywgi.getResultList();
 
-		System.out.println("post query of wgi  " + wgi.toString());
-		System.out.println("post query of wgi empty?? " + wgi.isEmpty());
-
-		// List wgi = querywgi.getResultList();
-		System.out.println(" in Template, size = " + wgi.size());
 
 		if (wgi.isEmpty()) { /* New WGInter */
 			// addMessage("Generating WGI Record");
@@ -206,11 +191,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		/* Get Community Data */
 
-		// Community community = XPersistence.getManager().find(Community.class,
-		// wealthgroup.getCommunity().getCommunityid());
-		// System.out.println("In careetscenario 222");
+	
 		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
-		// System.out.println("In careetscenario 221");
+	
 		Site site = XPersistence.getManager().find(Site.class, community.getSite().getLocationid());
 
 		/******************
@@ -273,53 +256,17 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		JxlsSheet emp = scenarioWB.addSheet("Employment");
 		JxlsSheet transfers = scenarioWB.addSheet("Transfers");
 		JxlsSheet wildfood = scenarioWB.addSheet("Wild Foods");
-		JxlsSheet foodPurchases = scenarioWB.addSheet("Purchase - Food");
-		JxlsSheet nonFoodPurchases = scenarioWB.addSheet("Purchase - NonFood");
+		JxlsSheet foodPurchases = scenarioWB.addSheet("Food Purchases");
+		JxlsSheet nonFoodPurchases = scenarioWB.addSheet("Non-Food Purchases");
 
 	
 
-		interview.setColumnWidths(1, w, w, w, w, w); /* set col widths */
-
-		// System.out.println("done Jxl 2");
-		while (j < 11) {
-			interview.setValue(3, j, "", borderStyle); /* set borders for data input fields */
-			interview.setValue(5, j, "", borderStyle);
-			j += 2;
-		}
-		interview.setValue(7, 8, "", borderStyle);
-		interview.setValue(7, 10, "", borderStyle);
-
-		interview.setValue(1, 1, "Project Date: " + project.getPdate());
-		interview.setValue(2, 2, "Interview Number", boldRStyle);
-		interview.setValue(2, 4, "District", boldRStyle);
-		interview.setValue(2, 6, "Livelihood Zone", boldRStyle);
-		interview.setValue(2, 8, "Number of Particpants", boldRStyle);
-		interview.setValue(2, 10, "Wealth Group", boldRStyle);
-
-		interview.setValue(4, 2, "Date", boldRStyle);
-		interview.setValue(4, 4, "Village / Sub District", boldRStyle);
-		interview.setValue(4, 6, "Interviewers", boldRStyle);
-		interview.setValue(4, 8, "Men", boldRStyle);
-		interview.setValue(4, 10, "Number of People in Household", boldRStyle);
-
-		interview.setValue(6, 8, "Women", boldRStyle);
-		interview.setValue(6, 10, "Type of Year", boldRStyle);
-
-		/* Data */
-
-		interview.setValue(3, 4, community.getSite().getLocationdistrict(), borderStyle); /* District */
-		interview.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
-				borderStyle); /* Livelihood Zone */
-
-		interview.setValue(3, 10, wealthgroup.getWgnameeng(), borderStyle); /* Wealth Group */
-
-		interview.setValue(5, 4, community.getSite().getSubdistrict(), borderStyle); /* Sub District */
-
+		
 		
 		/*********************************************************************************************************************************************************/
 		/* Start print routines for resources 																													 */
 		/*********************************************************************************************************************************************************/
-
+		printInterview(interview, project, community, wealthgroup);
 		printAssetLand(assetLand);
 		printAssetLivestock(assetLivestock);
 		printAssetOtherTradeable(assetOtherTradeable);
@@ -466,6 +413,18 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, wildfSheet, 3, numRows, 11, 11 );
 		addNumberValidation(workbook, sheet, wildfSheet, 3, numRows, 13, 13 );
 		
+		/* Food Purchases  */
+		
+		addLOV(sheet, foodPurchaseSheet, 3, numRows - 1, 1, 1, "FoodPurchase");
+		addLOV(sheet, foodPurchaseSheet, 3, numRows -1, 2, 2, "Unit");
+		addNumberValidation(workbook, sheet, foodPurchaseSheet, 3, numRows, 3, 4);
+	
+		/* Food Purchases  */
+		
+		addLOV(sheet, nonFoodPurchaseSheet, 3, numRows - 1, 1, 1, "NonFoodPurchase");
+		addLOV(sheet, nonFoodPurchaseSheet, 3, numRows -1, 2, 2, "Unit");
+		addNumberValidation(workbook, sheet, nonFoodPurchaseSheet, 3, numRows, 3, 4);
+		
 		/* Return the spreadsheet */
 
 		return scenarioWB;
@@ -560,6 +519,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int transRowNum = 11;
 		int transStyleRowNum = 12;
 		int wildfRowNum = 13;
+		int foodpRowNum = 14;
+		int nonfpRowNum = 15;
 		
 		
 		/* Land Types */
@@ -578,6 +539,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Row transRow = dataSheet.createRow(transRowNum);
 		Row transStyleRow = dataSheet.createRow(transStyleRowNum);
 		Row wildfRow = dataSheet.createRow(wildfRowNum);
+		Row foodpRow = dataSheet.createRow(foodpRowNum);
+		Row nonfpRow = dataSheet.createRow(nonfpRowNum);
 
 		int j = 0;
 		int la = 0;
@@ -593,6 +556,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int trans = 0;
 		int transStyle = 0;
 		int wildf = 0;
+		int foodp = 0;
+		int nonfp = 0;
 
 
 		for (int k = 0; k < rst.size(); k++) {
@@ -659,6 +624,20 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				wildf++;
 				
 			}
+			/* Food Purchase */
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Food Purchase".toString())) {
+				cell = foodpRow.createCell(foodp);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				foodp++;
+				
+			}
+			/* Non Food Purchase */
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Non Food Purchase".toString())) {
+				cell = nonfpRow.createCell(nonfp);
+				cell.setCellValue(rst.get(k).getResourcetypename());
+				nonfp++;
+				
+			}
 		}
 
 		String lacol = getCharForNumber(la); 
@@ -670,6 +649,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		String empcol = getCharForNumber(emp);
 		String transcol = getCharForNumber(trans);
 		String wildfcol = getCharForNumber(wildf);
+		String foodpcol = getCharForNumber(foodp);
+		String nonfpcol = getCharForNumber(nonfp);
 		
 
 		/* Land */
@@ -735,6 +716,21 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		name.setRefersToFormula("Validations" + "!$A$" + wildfRowNum + ":$" + wildfcol + "$" + wildfRowNum); 
 																									
 		name.setNameName("WildFoods");
+		
+		/* Food Purchase  */
+		name = dataSheet.getWorkbook().createName();
+		foodpRowNum++;
+		name.setRefersToFormula("Validations" + "!$A$" + foodpRowNum + ":$" + foodpcol + "$" + foodpRowNum); 
+																									
+		name.setNameName("FoodPurchase");
+		
+		
+		/* Non Food Purchase  */
+		name = dataSheet.getWorkbook().createName();
+		nonfpRowNum++;
+		name.setRefersToFormula("Validations" + "!$A$" + nonfpRowNum + ":$" + nonfpcol + "$" + nonfpRowNum); 
+																									
+		name.setNameName("NonFoodPurchase");
 		
 		/* From Reference Table */ 
 		/* Area */
@@ -848,6 +844,59 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	/**************************************************************************************************************************************************/
 	/* Print Each Sheet 																															  */
 	/**************************************************************************************************************************************************/
+	private void printInterview(JxlsSheet sheet, Project project, Community community, WealthGroup wealthgroup) {
+	
+	int j = 2;
+		
+	sheet.setColumnWidths(2, width, width, width, width, width, numwidth); /* set col widths */
+
+	
+	while (j < 11) {
+		sheet.setValue(3, j, "", borderStyle); /* set borders for data input fields */
+		sheet.setValue(5, j, "", borderStyle);
+		j += 2;
+	}
+	sheet.setValue(7, 8, "", borderStyle);
+	sheet.setValue(7, 10, "", borderStyle);
+
+	sheet.setValue(1, 1, "Project Date: " + project.getPdate());
+	sheet.setValue(2, 2, "Interview Number", boldRStyle);
+	sheet.setValue(2, 4, "District", boldRStyle);
+	sheet.setValue(2, 6, "Livelihood Zone", boldRStyle);
+	sheet.setValue(2, 8, "Number of Particpants", boldRStyle);
+	sheet.setValue(2, 10, "Wealth Group", boldRStyle);
+
+	sheet.setValue(4, 2, "Date", boldRStyle);
+	sheet.setValue(4, 4, "Village / Sub District", boldRStyle);
+	sheet.setValue(4, 6, "Interviewers", boldRStyle);
+	sheet.setValue(4, 8, "Men", boldRStyle);
+	sheet.setValue(4, 10, "Number of People in Household", boldRStyle);
+
+	sheet.setValue(6, 8, "Women", boldRStyle);
+	sheet.setValue(6, 10, "Type of Year", boldRStyle);
+
+	/* Data */
+
+	sheet.setValue(3, 4, community.getSite().getLocationdistrict(), borderStyle); /* District */
+	sheet.setValue(3, 6, community.getSite().getLivelihoodZone().getLzname(),
+			borderStyle); /* Livelihood Zone */
+
+	sheet.setValue(3, 10, wealthgroup.getWgnameeng(), borderStyle); /* Wealth Group */
+
+	sheet.setValue(5, 4, community.getSite().getSubdistrict(), borderStyle); /* Sub District */
+	
+	
+	
+	
+	
+	}
+	
+	
+	
+	
+	
+	
+	/**************************************************************************************************************************************************/
 	private void printAssetLand(JxlsSheet sheet) {
 
 		/* Asset Land Sheet */
@@ -903,7 +952,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	}
 
 	/**************************************************************************************************************************************************/
-
 	private void printAssetLivestock(JxlsSheet sheet) {
 
 		/* Asset Livestock Sheet */
@@ -1091,7 +1139,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			row = 4;
 		}
 
-		System.out.println("tree set styles tree size");
+		
 
 		row = 4;
 		int treerow = 5;
@@ -1576,7 +1624,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	sheet.setValue(5, 3, "Price Per Unit", boldTopStyle);
 
 	
-	sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth); /* set col widths */
+	sheet.setColumnWidths(2, width, width, numwidth, numwidth); /* set col widths */
 
 	/* set grid for data input */
 
@@ -1590,8 +1638,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		col++;
 		row = 4;
 	}
-
-	System.out.println("asl set styles abd size");
 
 	row = 4;
 	int fprow = 5;
@@ -1631,7 +1677,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	sheet.setValue(5, 3, "Price Per Unit", boldTopStyle);
 
 	
-	sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth); /* set col widths */
+	sheet.setColumnWidths(2, width, width, numwidth, numwidth); /* set col widths */
 
 	/* set grid for data input */
 

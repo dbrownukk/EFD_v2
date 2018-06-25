@@ -16,22 +16,12 @@ import efd.model.Asset.*;
 
 public class AssetLand extends Asset{
 	
-
-
-
-
 	@Column(name = "LandTypeEnteredName", length = 50)
 	private String landTypeEnteredName;
 
-	@Column(name = "LandArea", nullable=false )
+	@Column(name = "NumberofUnits", nullable=false )
 	@NotNull
-	private Integer landArea;
-
-	@Column(name = "UnitEntered", length = 50)
-	private String unitEntered;
-
-
-	
+	private Integer numberOfUnits;	
 
 	public String getLandTypeEnteredName() {
 		return landTypeEnteredName;
@@ -41,21 +31,16 @@ public class AssetLand extends Asset{
 		this.landTypeEnteredName = landTypeEnteredName;
 	}
 
-	public Integer getLandArea() {
-		return landArea;
+	public Integer getNumberOfUnits() {
+		return numberOfUnits;
 	}
 
-	public void setLandArea(Integer landArea) {
-		this.landArea = landArea;
+	public void setNumberOfUnits(Integer numberOfUnits) {
+		this.numberOfUnits = numberOfUnits;
 	}
 
-	public String getUnitEntered() {
-		return unitEntered;
-	}
 
-	public void setUnitEntered(String unitEntered) {
-		this.unitEntered = unitEntered;
-	}
+
 
 
 
