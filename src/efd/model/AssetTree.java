@@ -2,41 +2,38 @@ package efd.model;
 
 import java.math.*;
 
-/* Asset Other Tradeable */
-
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
-
-
 @Embeddable
 
 
-@Table(name = "assettradeable")
+@Table(name = "assettree")
 
-public class AssetTradeable extends Asset{
+public class AssetTree extends Asset{
 
 
-
-	@Column(name = "TradeableTypeEnteredName", length = 50)
-	private String tradeableTypeEnteredName;
-
+	@Column(name = "TreeTypeEnteredName", length = 50, nullable=false)
+	@Required
+	private String treeTypeEnteredName;
+	
 	@Column(name = "NumberOwned", nullable=false )
+	@Required
 	@NotNull
 	private Integer numberOwned;
-
-	@Column(name = "PricePerUnit" )
+	
+	@Column(name = "PricePerUnit" ,precision=10, scale=2)
+	@Digits(integer=10,fraction=2)
 	private BigDecimal pricePerUnit;
 
-	public String getTradeableTypeEnteredName() {
-		return tradeableTypeEnteredName;
+	public String getTreeTypeEnteredName() {
+		return treeTypeEnteredName;
 	}
 
-	public void setTradeableTypeEnteredName(String tradeableTypeEnteredName) {
-		this.tradeableTypeEnteredName = tradeableTypeEnteredName;
+	public void setTreeTypeEnteredName(String treeTypeEnteredName) {
+		this.treeTypeEnteredName = treeTypeEnteredName;
 	}
 
 	public Integer getNumberOwned() {
@@ -54,10 +51,17 @@ public class AssetTradeable extends Asset{
 	public void setPricePerUnit(BigDecimal pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
+	
+	
+	
+	
 
 
 
 
+
+
+	
 	
 	
 }

@@ -12,7 +12,7 @@ import efd.model.Asset.*;
 @Embeddable
 
 
-@Table(name = "Asset_Land")
+@Table(name = "assetland")
 
 public class AssetLand extends Asset{
 	

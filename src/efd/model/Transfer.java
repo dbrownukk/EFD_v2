@@ -14,7 +14,7 @@ import efd.model.Asset.*;
 @Embeddable
 
 
-@Table(name = "Transfer")
+@Table(name = "transfer")
 
 public class Transfer extends Asset{
 

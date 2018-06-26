@@ -22,13 +22,17 @@ import efd.model.*;
 		+ ";spreadsheet"
 		+ ",status]"
 		+  "Assets{"
-		+ ";LiveStock{assetLiveStock}"
 		+ ";Land{assetLand}"
+		+ ";LiveStock{assetLiveStock}"
+		+ ";Tradeable{assetTradeable}"
+		+ ";FoodStock{assetFoodStock}"
+		+ ";Trees{assetTree}"
+		+ ";Cash{assetCash}"
 		+ "}"
-		
-		/*
 		+ ";Crops{crop}"
-		+ ";LiveStockUse{liveStockUse}"
+		+ ";LiveStockSales{livestockSales}"
+		+ ";LiveStockProducts{livestockProducts}"
+		/*
 		+ ";Employment{employment}"
 		+ ";Transfer{transfer}"
 		+ ";WildFood{wildFood}"
@@ -127,22 +131,259 @@ private String spreadsheet;
 
 /*  Collections of resource elements */
 
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,resourceSubType,liveStockTypeEnteredName,unitEntered,numberOwned,pricePerUnit")
+@ElementCollection     
+@ListProperties("status,resourceSubType,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
 @XOrderBy("status desc") 
 @OrderBy("Status desc")
 private Collection<AssetLiveStock> assetLiveStock;
 
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,resourceSubType,landTypeEnteredName,landArea,unitEntered")
+@ElementCollection     
+@ListProperties("status,resourceSubType,landTypeEnteredName,unit,numberOfUnits")
 private Collection<AssetLand> assetLand;
 
-@ElementCollection      // Note  problem with Descriptions list for resourcetype 
-@ListProperties("status,resourceSubType,cropName,localUnit,quantityProduced, quantitySold,pricePerUnit,otherUse"
-		+ ",janQP,febQP,marQP,aprQP,mayQP,junQP"
-		+ ",julQP,augQP,sepQP,octQP,novQP,decQP")
+@ElementCollection     
+@ListProperties("status,resourceSubType,tradeableTypeEnteredName,unit,numberOwned,pricePerUnit")
+private Collection<AssetTradeable> assetTradeable;
+
+@ElementCollection     
+@ListProperties("status,resourceSubType,foodTypeEnteredName,unit,quantity")
+private Collection<AssetFoodStock> assetFoodStock;
+
+@ElementCollection     
+@ListProperties("status,resourceSubType,treeTypeEnteredName,unit,numberOwned")
+private Collection<AssetTree> assetTree;
+
+@ElementCollection     
+@ListProperties("status,resourceSubType,currencyEnteredName,amount")
+private Collection<AssetCash> assetCash;
+
+
+@ElementCollection      
+@ListProperties("status,resourceSubType,cropType,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse")
 private Collection<Crop> crop;
 
+@ElementCollection     
+@ListProperties("status,resourceSubType,livestockType,unit,unitsAtStartofYear, unitsSold,pricePerUnit")
+private Collection<LivestockSales> livestockSales;
+
+@ElementCollection      
+@ListProperties("status,resourceSubType,livestockType,livestockProduct,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse")
+private Collection<LivestockProducts> livestockProducts;
+
+
+public String getWgiid() {
+	return wgiid;
+}
+
+
+public void setWgiid(String wgiid) {
+	this.wgiid = wgiid;
+}
+
+
+public Integer getWgInterviewNumber() {
+	return wgInterviewNumber;
+}
+
+
+public void setWgInterviewNumber(Integer wgInterviewNumber) {
+	this.wgInterviewNumber = wgInterviewNumber;
+}
+
+
+public String getWgInterviewers() {
+	return wgInterviewers;
+}
+
+
+public void setWgInterviewers(String wgInterviewers) {
+	this.wgInterviewers = wgInterviewers;
+}
+
+
+public Integer getWgIntervieweesCount() {
+	return wgIntervieweesCount;
+}
+
+
+public void setWgIntervieweesCount(Integer wgIntervieweesCount) {
+	this.wgIntervieweesCount = wgIntervieweesCount;
+}
+
+
+public Integer getWgFemaleIVees() {
+	return wgFemaleIVees;
+}
+
+
+public void setWgFemaleIVees(Integer wgFemaleIVees) {
+	this.wgFemaleIVees = wgFemaleIVees;
+}
+
+
+public Integer getWgMaleIVees() {
+	return wgMaleIVees;
+}
+
+
+public void setWgMaleIVees(Integer wgMaleIVees) {
+	this.wgMaleIVees = wgMaleIVees;
+}
+
+
+public Integer getWgAverageNumberInHH() {
+	return wgAverageNumberInHH;
+}
+
+
+public void setWgAverageNumberInHH(Integer wgAverageNumberInHH) {
+	this.wgAverageNumberInHH = wgAverageNumberInHH;
+}
+
+
+public String getWgYearType() {
+	return wgYearType;
+}
+
+
+public void setWgYearType(String wgYearType) {
+	this.wgYearType = wgYearType;
+}
+
+
+public Date getWgInterviewDate() {
+	return wgInterviewDate;
+}
+
+
+public void setWgInterviewDate(Date wgInterviewDate) {
+	this.wgInterviewDate = wgInterviewDate;
+}
+
+
+public Status getStatus() {
+	return status;
+}
+
+
+public void setStatus(Status status) {
+	this.status = status;
+}
+
+
+public WealthGroup getWealthgroup() {
+	return wealthgroup;
+}
+
+
+public void setWealthgroup(WealthGroup wealthgroup) {
+	this.wealthgroup = wealthgroup;
+}
+
+
+public String getSpreadsheet() {
+	return spreadsheet;
+}
+
+
+public void setSpreadsheet(String spreadsheet) {
+	this.spreadsheet = spreadsheet;
+}
+
+
+public Collection<AssetLiveStock> getAssetLiveStock() {
+	return assetLiveStock;
+}
+
+
+public void setAssetLiveStock(Collection<AssetLiveStock> assetLiveStock) {
+	this.assetLiveStock = assetLiveStock;
+}
+
+
+public Collection<AssetLand> getAssetLand() {
+	return assetLand;
+}
+
+
+public void setAssetLand(Collection<AssetLand> assetLand) {
+	this.assetLand = assetLand;
+}
+
+
+public Collection<AssetTradeable> getAssetTradeable() {
+	return assetTradeable;
+}
+
+
+public void setAssetTradeable(Collection<AssetTradeable> assetTradeable) {
+	this.assetTradeable = assetTradeable;
+}
+
+
+public Collection<AssetFoodStock> getAssetFoodStock() {
+	return assetFoodStock;
+}
+
+
+public void setAssetFoodStock(Collection<AssetFoodStock> assetFoodStock) {
+	this.assetFoodStock = assetFoodStock;
+}
+
+
+public Collection<AssetTree> getAssetTree() {
+	return assetTree;
+}
+
+
+public void setAssetTree(Collection<AssetTree> assetTree) {
+	this.assetTree = assetTree;
+}
+
+
+public Collection<AssetCash> getAssetCash() {
+	return assetCash;
+}
+
+
+public void setAssetCash(Collection<AssetCash> assetCash) {
+	this.assetCash = assetCash;
+}
+
+
+public Collection<Crop> getCrop() {
+	return crop;
+}
+
+
+public void setCrop(Collection<Crop> crop) {
+	this.crop = crop;
+}
+
+
+public Collection<LivestockSales> getLivestockSales() {
+	return livestockSales;
+}
+
+
+public void setLivestockSales(Collection<LivestockSales> livestockSales) {
+	this.livestockSales = livestockSales;
+}
+
+
+public Collection<LivestockProducts> getLivestockProducts() {
+	return livestockProducts;
+}
+
+
+public void setLivestockProducts(Collection<LivestockProducts> livestockProducts) {
+	this.livestockProducts = livestockProducts;
+}
+
+
+
+
+/*
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,resourceSubType,lsName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse,lsIncomeType,lsIncomeType2")
 private Collection<LiveStockUse> liveStockUse;
@@ -157,7 +398,7 @@ private Collection<Transfer> transfer;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,resourceSubType,wildFoodOrCropIndicator,foodName")
-private Collection<AssetFoodStock> assetFoodStock;
+private Collection<AssetFoodStock> assetFoodstock;
 
 @ElementCollection      // Note  problem with Descriptions list for resourcetype 
 @ListProperties("status,resourceSubType,wildFoodName,localUnit,quantityProduced,quantitySold,pricePerUnit,otherUse")
@@ -168,305 +409,7 @@ private Collection<WildFood> wildFood;
 private Collection<AssetTradeable> assetTradeable;
 
 
-
-
-public String getWgiid() {
-	return wgiid;
-}
-
-
-
-
-public void setWgiid(String wgiid) {
-	this.wgiid = wgiid;
-}
-
-
-
-
-public Integer getWgInterviewNumber() {
-	return wgInterviewNumber;
-}
-
-
-
-
-public void setWgInterviewNumber(Integer wgInterviewNumber) {
-	this.wgInterviewNumber = wgInterviewNumber;
-}
-
-
-
-
-public String getWgInterviewers() {
-	return wgInterviewers;
-}
-
-
-
-
-public void setWgInterviewers(String wgInterviewers) {
-	this.wgInterviewers = wgInterviewers;
-}
-
-
-
-
-public Integer getWgIntervieweesCount() {
-	return wgIntervieweesCount;
-}
-
-
-
-
-public void setWgIntervieweesCount(Integer wgIntervieweesCount) {
-	this.wgIntervieweesCount = wgIntervieweesCount;
-}
-
-
-
-
-public Integer getWgFemaleIVees() {
-	return wgFemaleIVees;
-}
-
-
-
-
-public void setWgFemaleIVees(Integer wgFemaleIVees) {
-	this.wgFemaleIVees = wgFemaleIVees;
-}
-
-
-
-
-public Integer getWgMaleIVees() {
-	return wgMaleIVees;
-}
-
-
-
-
-public void setWgMaleIVees(Integer wgMaleIVees) {
-	this.wgMaleIVees = wgMaleIVees;
-}
-
-
-
-
-public Integer getWgAverageNumberInHH() {
-	return wgAverageNumberInHH;
-}
-
-
-
-
-public void setWgAverageNumberInHH(Integer wgAverageNumberInHH) {
-	this.wgAverageNumberInHH = wgAverageNumberInHH;
-}
-
-
-
-
-public String getWgYearType() {
-	return wgYearType;
-}
-
-
-
-
-public void setWgYearType(String wgYearType) {
-	this.wgYearType = wgYearType;
-}
-
-
-
-
-public Date getWgInterviewDate() {
-	return wgInterviewDate;
-}
-
-
-
-
-public void setWgInterviewDate(Date wgInterviewDate) {
-	this.wgInterviewDate = wgInterviewDate;
-}
-
-
-
-
-public Status getStatus() {
-	return status;
-}
-
-
-
-
-public void setStatus(Status status) {
-	this.status = status;
-}
-
-
-
-
-public WealthGroup getWealthgroup() {
-	return wealthgroup;
-}
-
-
-
-
-public void setWealthgroup(WealthGroup wealthgroup) {
-	this.wealthgroup = wealthgroup;
-}
-
-
-
-
-public String getSpreadsheet() {
-	return spreadsheet;
-}
-
-
-
-
-public void setSpreadsheet(String spreadsheet) {
-	this.spreadsheet = spreadsheet;
-}
-
-
-
-
-public Collection<AssetLiveStock> getAssetLiveStock() {
-	return assetLiveStock;
-}
-
-
-
-
-public void setAssetLiveStock(Collection<AssetLiveStock> assetLiveStock) {
-	this.assetLiveStock = assetLiveStock;
-}
-
-
-
-
-public Collection<AssetLand> getAssetLand() {
-	return assetLand;
-}
-
-
-
-
-public void setAssetLand(Collection<AssetLand> assetLand) {
-	this.assetLand = assetLand;
-}
-
-
-
-
-public Collection<Crop> getCrop() {
-	return crop;
-}
-
-
-
-
-public void setCrop(Collection<Crop> crop) {
-	this.crop = crop;
-}
-
-
-
-
-public Collection<LiveStockUse> getLiveStockUse() {
-	return liveStockUse;
-}
-
-
-
-
-public void setLiveStockUse(Collection<LiveStockUse> liveStockUse) {
-	this.liveStockUse = liveStockUse;
-}
-
-
-
-
-public Collection<Employment> getEmployment() {
-	return employment;
-}
-
-
-
-
-public void setEmployment(Collection<Employment> employment) {
-	this.employment = employment;
-}
-
-
-
-
-public Collection<Transfer> getTransfer() {
-	return transfer;
-}
-
-
-
-
-public void setTransfer(Collection<Transfer> transfer) {
-	this.transfer = transfer;
-}
-
-
-
-
-public Collection<AssetFoodStock> getAssetFoodStock() {
-	return assetFoodStock;
-}
-
-
-
-
-public void setAssetFoodStock(Collection<AssetFoodStock> assetFoodStock) {
-	this.assetFoodStock = assetFoodStock;
-}
-
-
-
-
-public Collection<WildFood> getWildFood() {
-	return wildFood;
-}
-
-
-
-
-public void setWildFood(Collection<WildFood> wildFood) {
-	this.wildFood = wildFood;
-}
-
-
-
-
-public Collection<AssetTradeable> getAssetTradeable() {
-	return assetTradeable;
-}
-
-
-
-
-public void setAssetTradeable(Collection<AssetTradeable> assetTradeable) {
-	this.assetTradeable = assetTradeable;
-}
-
-
-
-
-
-
-
+*/
 
 
 // ----------------------------------------------------------------------------------------------//

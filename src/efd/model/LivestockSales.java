@@ -7,42 +7,27 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
-/*
-@Views({
-@View(members= "WildFood[#wildfoodname]")
-//@View(name="FullCountry",members= "idcountry,isocountrycode,currency,currencySymbol"),
-})
-*/
-//@Tab(editors = "List, Cards", properties = "wildfoodname")
-
 @Embeddable
 
-@Table(name = "wildfood")
 
-public class WildFood extends Asset{
+@Table(name = "livestocksale")
 
+public class LivestockSales extends Asset {
 
-	@Column(name = "WildFoodName", length = 50)
-	private String wildFoodName;
+	@Column(name = "LivestockType", length = 50)
+	@DisplaySize(20)
+	private String livestockType;
 
-	@Column(name = "UnitsProduced", length = 6)
-	@NotNull
-	@Min(value = 0)
-	private Integer unitsProduced;
+	
+	@Column(name = "UnitsAtStartofYear", nullable = false)
+	private Integer unitsAtStartofYear;
 
-	@Column(name = "UnitsSold", length = 6)
+	@Column(name = "UnitsSold")
 	private Integer unitsSold;
-	
-	
-	@Column(name = "PricePerUnit",precision=10, scale=2)
-	@Digits(integer=10,fraction=2)
-	private BigDecimal pricePerUnit;
 
-	@Column(name = "UnitsConsumed")
-	private Integer unitsconsumed;
-	
-	@Column(name = "OtherUse", length = 255)
-	private String otherUse;
+	@Column(name = "PricePerUnit", precision = 10, scale = 2)
+	@Digits(integer = 10, fraction = 2)
+	private BigDecimal pricePerUnit;
 
 	@Column(name = "Market1", length = 50)
 	private String market1;
@@ -61,17 +46,18 @@ public class WildFood extends Asset{
 	@Column(name = "PercentTradeMarket3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private BigDecimal percentTradeMarket3;
-	public String getWildFoodName() {
-		return wildFoodName;
+	
+	public String getLivestockType() {
+		return livestockType;
 	}
-	public void setWildFoodName(String wildFoodName) {
-		this.wildFoodName = wildFoodName;
+	public void setLivestockType(String livestockType) {
+		this.livestockType = livestockType;
 	}
-	public Integer getUnitsProduced() {
-		return unitsProduced;
+	public Integer getUnitsAtStartofYear() {
+		return unitsAtStartofYear;
 	}
-	public void setUnitsProduced(Integer unitsProduced) {
-		this.unitsProduced = unitsProduced;
+	public void setUnitsAtStartofYear(Integer unitsAtStartofYear) {
+		this.unitsAtStartofYear = unitsAtStartofYear;
 	}
 	public Integer getUnitsSold() {
 		return unitsSold;
@@ -84,18 +70,6 @@ public class WildFood extends Asset{
 	}
 	public void setPricePerUnit(BigDecimal pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
-	}
-	public Integer getUnitsconsumed() {
-		return unitsconsumed;
-	}
-	public void setUnitsconsumed(Integer unitsconsumed) {
-		this.unitsconsumed = unitsconsumed;
-	}
-	public String getOtherUse() {
-		return otherUse;
-	}
-	public void setOtherUse(String otherUse) {
-		this.otherUse = otherUse;
 	}
 	public String getMarket1() {
 		return market1;
@@ -134,9 +108,6 @@ public class WildFood extends Asset{
 		this.percentTradeMarket3 = percentTradeMarket3;
 	}
 	
-	
-
-
 
 
 

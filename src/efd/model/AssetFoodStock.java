@@ -15,7 +15,7 @@ import efd.model.WealthGroupInterview.*;
 @Embeddable
 
 
-@Table(name = "Asset_FoodStock")
+@Table(name = "assetfoodstock")
 
 public class AssetFoodStock extends Asset {
 
