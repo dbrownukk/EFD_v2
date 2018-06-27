@@ -12,6 +12,9 @@ import org.openxava.annotations.*;
 
 @Table(name = "employment")
 
+
+
+
 public class Employment extends Asset {
 
 	/* Note fk to resourcetype is in supertype Asset */

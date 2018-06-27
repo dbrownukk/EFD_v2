@@ -27,9 +27,9 @@
 
 	<controller name="ParseSpreadsheet">
 		<extends controller="TypicalNotResetOnSave" />
-		<action name="Parse Spreadsheet" label="Parse Interview Spreadsheet"
+		<action name="Parse Spreadsheet" label="Parse Interview Spreadsheet 2" 
 			icon="file-excel" mode="detail" in-each-row="false"
-			class="efd.actions.ParseXLSFile" />
+			class="efd.actions.ParseXLSFile2" />
 		<action name="Validate Asset Data" label="Validate Asset Data"
 			icon="marker-check" mode="detail" in-each-row="false"
 			class="efd.actions.ValidateXLSFile" />

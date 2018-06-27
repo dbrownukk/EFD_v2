@@ -39,7 +39,7 @@ public class WildFood extends Asset{
 	private BigDecimal pricePerUnit;
 
 	@Column(name = "UnitsConsumed")
-	private Integer unitsconsumed;
+	private Integer unitsConsumed;
 	
 	@Column(name = "OtherUse", length = 255)
 	private String otherUse;
@@ -85,11 +85,12 @@ public class WildFood extends Asset{
 	public void setPricePerUnit(BigDecimal pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
-	public Integer getUnitsconsumed() {
-		return unitsconsumed;
+
+	public Integer getUnitsConsumed() {
+		return unitsConsumed;
 	}
-	public void setUnitsconsumed(Integer unitsconsumed) {
-		this.unitsconsumed = unitsconsumed;
+	public void setUnitsConsumed(Integer unitsConsumed) {
+		this.unitsConsumed = unitsConsumed;
 	}
 	public String getOtherUse() {
 		return otherUse;

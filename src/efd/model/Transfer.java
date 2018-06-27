@@ -54,7 +54,7 @@ public class Transfer extends Asset{
 	private String otherUse;
 	
 	@Column(name = "UnitsConsumed")
-	private Integer unitsconsumed;
+	private Integer unitsConsumed;
 	
 	@Column(name = "Market1", length = 50)
 	private String market1;
@@ -140,11 +140,12 @@ public class Transfer extends Asset{
 	public void setOtherUse(String otherUse) {
 		this.otherUse = otherUse;
 	}
-	public Integer getUnitsconsumed() {
-		return unitsconsumed;
+	
+	public Integer getUnitsConsumed() {
+		return unitsConsumed;
 	}
-	public void setUnitsconsumed(Integer unitsconsumed) {
-		this.unitsconsumed = unitsconsumed;
+	public void setUnitsConsumed(Integer unitsConsumed) {
+		this.unitsConsumed = unitsConsumed;
 	}
 	public String getMarket1() {
 		return market1;
