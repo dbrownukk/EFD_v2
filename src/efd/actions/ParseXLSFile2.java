@@ -1,7 +1,6 @@
 package efd.actions;
 
 import java.io.*;
-import java.math.*;
 import java.sql.*;
 import java.text.*;
 
@@ -9,8 +8,6 @@ import javax.persistence.*;
 
 /* Read XLS Community Interview  spreadsheet */
 import java.util.*;
-import java.util.Date;
-
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
@@ -19,14 +16,61 @@ import org.openxava.web.editors.*;
 import efd.model.*;
 import efd.model.WealthGroupInterview.*;
 
-import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.text.*;
 import org.apache.poi.ss.usermodel.*;
-import org.jsoup.helper.*;
+//import org.apache.poi.hssf.record.formula.functions.*;
+//import org.apache.poi.ss.usermodel.*;
 
 public class ParseXLSFile2 extends CollectionBaseAction implements IForwardAction, JxlsConstants, IFilePersistor {
 
 	Boolean messaging = false;
+	/* define tab numbers in spreadsheet */
+	public static final int NUMBERSHEETS = 14;
+	public static final int ASSETLAND = 1;
+	public static final int ASSETLIVESTOCK = 2;
+	public static final int ASSETTRADEABLE = 3;
+	public static final int ASSETFOOD = 4;
+	public static final int ASSETTREE = 5;
+	public static final int ASSETCASH = 6;
+	public static final int CROPS = 7;
+	public static final int LIVESTOCKSALE = 8;
+	public static final int LIVESTOCKPRODUCT = 9;
+	public static final int EMPLOYMENT = 10;
+	public static final int TRANSFER = 11;
+	public static final int WILDFOOD = 12;
+	public static final int FOODPURCHASE = 13;
+	public static final int NONFOODPURCHASE = 14;
+
+	/* Define the spreadsheet structure */
+	public class Wsheet {
+		int wsheet;
+		String resourceType; // Type of resource i.e. Land, WildFoods
+		int numcols;
+
+		public Wsheet(int asheet, String rtype, int cols) {
+			this.wsheet = asheet;
+			this.resourceType = rtype;
+			this.numcols = cols;
+		}
+	}
+
+	ArrayList<Wsheet> ws = new ArrayList<>();
+
+	/* Cells to hold all spreadsheet values */
+	/* Sheet / Row / Col */
+
+	Cell cell[][][] = new Cell[15][60][60];
+
+	/* Class variable definition */
+
+	WealthGroupInterview wgi;
+	ResourceSubType rst = null;
+	AssetLiveStock als = null;
+	AssetLand al = null;
+	AssetTradeable atrade = null;
+	AssetFoodStock afood = null;
+	AssetTree atree = null;
+	AssetCash acash = null;
 
 	public void execute() throws Exception {
 
@@ -40,7 +84,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		Sheet sheet;
 		String[] cellArray;
 		int arrayCount = 0;
-		Cell cell;
+		// Cell cell;
 		Workbook wb;
 		String sdate;
 		String interviewers;
@@ -48,13 +92,34 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		String stest;
 		Boolean nullable = false;
 		Query query = null;
-		ResourceSubType rst = null;
+
+		/* Definition of spreadsheet to parse */
+		ws.add(new Wsheet(ASSETLAND, "Land", 3));
+		ws.add(new Wsheet(ASSETLIVESTOCK, "Livestock", 4));
+		ws.add(new Wsheet(ASSETTRADEABLE, "Other Tradeable Goods", 4));
+		ws.add(new Wsheet(ASSETFOOD, "Food Stocks", 3));
+		ws.add(new Wsheet(ASSETTREE, "Trees", 4));
+		ws.add(new Wsheet(ASSETCASH, "Cash", 2));
+		ws.add(new Wsheet(CROPS, "Crops", 13));
+		ws.add(new Wsheet(LIVESTOCKSALE, "Livestock Sales", 11));
+		ws.add(new Wsheet(LIVESTOCKPRODUCT, "Livestock Products", 14));
+		ws.add(new Wsheet(EMPLOYMENT, "Employment", 14));
+		ws.add(new Wsheet(TRANSFER, "Transfers", 19));
+		ws.add(new Wsheet(WILDFOOD, "Wild Food", 13));
+		ws.add(new Wsheet(FOODPURCHASE, "Food Purchase", 4));
+		ws.add(new Wsheet(NONFOODPURCHASE, "Non Food Purchase", 4));
+
+		/*
+		 * ws.add(new Wsheet(2, 3, 1, "Livestock Type")); ws.add(new Wsheet(2, 3, 2,
+		 * "Unit")); ws.add(new Wsheet(2, 3, 3, "Owned at Start of Year")); ws.add(new
+		 * Wsheet(2, 3, 3, "Price Per Unit"));
+		 */
 
 		// System.out.println("in xls parse ");
 
 		String wgiid = getView().getValueString("wgiid");
 
-		WealthGroupInterview wgi = XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
+		wgi = XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
 		if (wgi.getSpreadsheet().isEmpty()) {
 			addWarning("Upload completed Interview Spreadsheet before parsing");
 			return;
@@ -91,28 +156,17 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			InputStream input = rs.getBinaryStream("DATA"); /* get stream data as well */
 			// System.out.println("done inputstream ");
 
-			; /* Move to first row */
+			/* Move to first row */
 
 			String spreadsheetPkey = rs.getString(1);
 
 			spreadsfile = find(spreadsheetPkey);
 			// System.out.println("done attache file get");
+			ps.close();
 
 			wb = WorkbookFactory.create(input);
 
-			getInterviewDetails(wb, wgi);
-
-			ps.close();
-			getView().refresh();
-			addMessage("Spreadsheet Parsed");
-		}
-			
-			
-			/* delete previous assets for this wgi */
-			/* delete previous assets */
-
-
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			addError("Incomplete Spreadsheet data, correct spreadsheet and upload again", ex);
 			// You can throw any runtime exception here
 			throw new SystemException(ex);
@@ -122,6 +176,34 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			} catch (Exception ex) {
 			}
 		}
+
+		/* delete previous assets for this wgi */
+		/* delete previous assets */
+
+		wgi.getAssetLand().removeAll(wgi.getAssetLand());
+		wgi.getAssetLiveStock().removeAll(wgi.getAssetLiveStock());
+		wgi.getAssetTradeable().removeAll(wgi.getAssetTradeable());
+		wgi.getAssetFoodStock().removeAll(wgi.getAssetFoodStock());
+		wgi.getAssetTree().removeAll(wgi.getAssetTree());
+		wgi.getAssetCash().removeAll(wgi.getAssetCash());
+		wgi.getCrop().removeAll(wgi.getCrop());
+		wgi.getLivestockSales().removeAll(wgi.getLivestockSales());
+		wgi.getLivestockProducts().removeAll(wgi.getLivestockProducts());
+		wgi.getEmployment().removeAll(wgi.getEmployment());
+		wgi.getTransfer().removeAll(wgi.getTransfer());
+		wgi.getWildFood().removeAll(wgi.getWildFood());
+		wgi.getFoodPurchase().removeAll(wgi.getFoodPurchase());
+		wgi.getNonFoodPurchase().removeAll(wgi.getNonFoodPurchase());
+
+		/* Get the WS details */
+		getInterviewDetails(wb, wgi);
+
+		getWorkSheetDetail(wb, wgi); // Get cells from ss
+
+		setResource();    // populate resource intersection tables 
+
+		getView().refresh();
+		addMessage("Spreadsheet Parsed");
 
 	}
 
@@ -181,7 +263,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 	private void getInterviewDetails(Workbook wb, WealthGroupInterview wgi) {
 
-		Cell cell = null;
+		Cell icell = null;
 		Integer cellNumber = 2;
 		Integer rowNumber = 1;
 		String sdate = null;
@@ -191,8 +273,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		// System.out.println("to loop ");
 
 		Sheet sheet = wb.getSheetAt(0);
-		cellNumber = 2;
-		rowNumber = 1;
 		int n = 0;
 
 		System.out.println("get interview 111");
@@ -200,20 +280,20 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		/* Interview Number */
 		Boolean nullable = false;
 		if (checkCell("Interview Number", sheet, 2, 1, nullable))
-			cell = sheet.getRow(1).getCell(2, Row.CREATE_NULL_AS_BLANK);
+			icell = sheet.getRow(1).getCell(2, Row.CREATE_NULL_AS_BLANK);
 		else
 			return;
 
-		System.out.println("cell type " + cell.getCellType());
+		System.out.println("cell type " + icell.getCellType());
 
-		if (cell.getCellType() == 0) { /* Numeric */
+		if (icell.getCellType() == 0) { /* Numeric */
 			System.out.println("in Numeric ");
-			Double interviewNumberD = cell.getNumericCellValue();
+			Double interviewNumberD = icell.getNumericCellValue();
 			Integer interviewNumber = interviewNumberD.intValue();
 			wgi.setWgInterviewNumber(interviewNumber);
 
 		} else {
-			String interviewNumber = cell.getStringCellValue();
+			String interviewNumber = icell.getStringCellValue();
 			System.out.println("get interview 1 " + interviewNumber);
 			wgi.setWgInterviewNumber(Integer.parseInt(interviewNumber));
 		}
@@ -223,18 +303,18 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		/* Number of Participants */
 		nullable = false;
 		if (checkCell("Number of Participants", sheet, 2, 7, nullable))
-			cell = sheet.getRow(7).getCell(2, Row.CREATE_NULL_AS_BLANK);
+			icell = sheet.getRow(7).getCell(2, Row.CREATE_NULL_AS_BLANK);
 		else
 			return;
 
-		if (cell.getCellType() == 0) { /* Numeric */
+		if (icell.getCellType() == 0) { /* Numeric */
 			System.out.println("in Numeric ");
-			Double intervieweesD = cell.getNumericCellValue();
+			Double intervieweesD = icell.getNumericCellValue();
 			Integer interviewees = intervieweesD.intValue();
 			wgi.setWgIntervieweesCount(interviewees);
 		} else {
 			System.out.println("in String ");
-			String interviewees = cell.getStringCellValue();
+			String interviewees = icell.getStringCellValue();
 			System.out.println("done cell get ");
 			wgi.setWgIntervieweesCount(Integer.parseInt(interviewees));
 			System.out.println("wgi set throw in participants ");
@@ -246,15 +326,15 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		/* Date */
 		nullable = true;
 		if (checkCell("Interview Date", sheet, 4, 1, nullable))
-			cell = sheet.getRow(1).getCell(4, Row.CREATE_NULL_AS_BLANK);
+			icell = sheet.getRow(1).getCell(4, Row.CREATE_NULL_AS_BLANK);
 		else {
 			addError("Incomplete Spreadsheet data - Interview Date error ");
 			return;
 		}
 
-		if (cell.getCellType() == 0) { /* Numeric */
+		if (icell.getCellType() == 0) { /* Numeric */
 			System.out.println("in Numeric Date");
-			Double iDateD = cell.getNumericCellValue();
+			Double iDateD = icell.getNumericCellValue();
 			// Date iDate = (Date) DateUtil.getJavaDate(iDateD);
 
 			SimpleDateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
@@ -263,22 +343,18 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			wgi.setWgInterviewDate(new java.sql.Date(iDateD.longValue()));
 
 		} else {
-			sdate = cell.getStringCellValue();
+			sdate = icell.getStringCellValue();
 			System.out.println("get interview date 5555");
 			SimpleDateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
 			System.out.println("get interview date 5551");
-			
-		
-			
-			
+
 			try {
 				wgi.setWgInterviewDate(formatter1.parse(sdate));
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
+
 			System.out.println("get interview date 5552");
 
 		}
@@ -295,47 +371,47 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		/* Men */
 		nullable = true;
 		if (checkCell("Number of Men", sheet, 4, 7, nullable)) {
-			cell = sheet.getRow(7).getCell(4, Row.CREATE_NULL_AS_BLANK);
+			icell = sheet.getRow(7).getCell(4, Row.CREATE_NULL_AS_BLANK);
 
-			if (cell.getCellType() == 0) { /* Numeric */
+			if (icell.getCellType() == 0) { /* Numeric */
 				// System.out.println("in Numeric ");
-				Double menD = cell.getNumericCellValue();
+				Double menD = icell.getNumericCellValue();
 				Integer men = menD.intValue();
 				wgi.setWgMaleIVees(men);
 			} else {
-				String men = cell.getStringCellValue();
+				String men = icell.getStringCellValue();
 				wgi.setWgMaleIVees(Integer.parseInt(men));
 			}
 		}
 		/* Women */
 		nullable = true;
 		if (checkCell("Number of Women", sheet, 6, 7, nullable)) {
-			cell = sheet.getRow(7).getCell(6, Row.CREATE_NULL_AS_BLANK);
+			icell = sheet.getRow(7).getCell(6, Row.CREATE_NULL_AS_BLANK);
 
 			// System.out.println("women cell type " + cell.getCellType());
 
-			if (cell.getCellType() == 0) { /* Numeric */
+			if (icell.getCellType() == 0) { /* Numeric */
 				// System.out.println("in Numeric ");
-				Double womenD = cell.getNumericCellValue();
+				Double womenD = icell.getNumericCellValue();
 				Integer women = womenD.intValue();
 				wgi.setWgFemaleIVees(women);
 			} else {
-				String women = cell.getStringCellValue();
+				String women = icell.getStringCellValue();
 				wgi.setWgFemaleIVees(Integer.parseInt(women));
 			}
 		}
 		/* Average Number in HH */
 		nullable = true;
 		if (checkCell("Average Number in Household", sheet, 4, 9, nullable)) {
-			cell = sheet.getRow(9).getCell(4, Row.CREATE_NULL_AS_BLANK);
+			icell = sheet.getRow(9).getCell(4, Row.CREATE_NULL_AS_BLANK);
 
-			if (cell.getCellType() == 0) { /* Numeric */
+			if (icell.getCellType() == 0) { /* Numeric */
 				// System.out.println("in Numeric ");
-				Double numberOfPeopleInHHD = cell.getNumericCellValue();
+				Double numberOfPeopleInHHD = icell.getNumericCellValue();
 				Integer numberOfPeopleInHH = numberOfPeopleInHHD.intValue();
 				wgi.setWgAverageNumberInHH(numberOfPeopleInHH);
 			} else {
-				String numberOfPeopleInHH = cell.getStringCellValue();
+				String numberOfPeopleInHH = icell.getStringCellValue();
 				wgi.setWgAverageNumberInHH(Integer.parseInt(numberOfPeopleInHH));
 			}
 		}
@@ -351,9 +427,255 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			wgi.setStatus(Status.Parsed);
 		}
 		System.out.println("done wb setup ");
-		
 
 	}
+
+	/**************************************************************************************************************************************************************************************************/
+	public void getWorkSheetDetail(Workbook wb, WealthGroupInterview wgi) {
+
+		/* Load spreadsheet into multi dimensional Cell [sheet] [row] [col] */
+
+		int i = 0, j = 0, k = 0;
+		Sheet sheet = null;
+
+		/* get the details for this sheet */
+
+		for (k = ASSETLAND; k <= NUMBERSHEETS; k++) { // Sheets
+
+			sheet = wb.getSheetAt(k);
+			System.out.println("in get details sheet  = " + k);
+			for (i = 0; i < 40; i++) { // ROWS
+				for (j = 0; j < ws.get(k - 1).numcols; j++) {
+					// System.out.println("Cell = " + i + j + ws.get(k-1).numcols+"
+					// "+ws.get(k-1).resourceType); // COLS
+					// System.out.println("celltype = " + sheet.getRow(i + 3).getCell(j +
+					// 1).getCellType());
+
+					cell[k][i][j] = sheet.getRow(i + 3).getCell(j + 1);
+					// System.out.println("cell after get = " + cell[k][i][j].getCellType());
+
+					// if first column is blank then no more data in this sheet
+					if (cell[k][i][0].getCellType() == 3) {
+						System.out.println("No more data in this sheet " + k);
+						i = 100;
+						j = 100;
+						break;
+					}
+
+					if (cell[k][i][j].getCellType() == 0)
+						System.out.println("Numeric " + cell[k][i][j].getNumericCellValue());
+
+					else if (cell[k][i][j].getCellType() == 1) {
+						System.out.println("String " + cell[k][i][j].getStringCellValue());
+						if (cell[k][i][j].getStringCellValue().isEmpty()) {
+							System.out.println("EMPTY String ");
+							i = 40;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**************************************************************************************************************************************************************************************************/
+	private void setResource() {
+
+		ResourceType rtype = null;
+
+		int i = 0, j = 0, k = 0;
+	
+		/*
+		 * print cell array 
+		for (i = 1; i < 15; i++) {
+			for (j = 0; j < 10; j++) {
+				for (k = 0; k < 10; k++)
+					System.out.println("Cell at i j k = "  + i + j + k + " " + cell[i][j][k]);
+			}
+		}
+		*/
+
+		for (i = ASSETLAND; i <= ASSETTREE; i++) { // Sheet
+			// TODO ASSETCASH needs a default for EACH
+			// and other assets 30/6/18
+			breaksheet:
+			
+				for (j = 0; j < 35; j++) { // Row
+				System.out.println("sheet, row, cell  = " + i + j + k );
+
+				System.out.println("after rowbreak row = " + j);
+				for (k = 0; k < ws.get(i - 1).numcols; k++) {
+					System.out.println("cell == " + k);
+					System.out.println("celltype == " + cell[i][j][k].getCellType());
+					if (cell[i][j][k].getCellType() == 3) 
+					{
+						if (k == 0) { // first col is blank thus no more rows in this ws
+							System.out.println("i j  k at break = " + i + j + k);
+							System.out.println("cell = blank");
+							break breaksheet;
+						}
+					}
+					if (cell[i][j][k].getCellType() == 0)
+						System.out.println("Numeric " + cell[i][j][k].getNumericCellValue());
+					if (cell[i][j][k].getCellType() == 1)
+						System.out.println("cell = " + i + j + k + " " + cell[i][j][k].getStringCellValue());
+
+				}
+
+				/* In loop for sheets - swicth on which asset/resource */
+
+				if (j==0)   {// only need to set once per sheet 
+					System.out.println("get rtype = "+ ws.get(i - 1).resourceType);
+					rtype = (ResourceType) XPersistence.getManager()
+						.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
+						.getSingleResult();
+				}
+				
+				switch (i) {
+				case ASSETLAND:
+					al = new AssetLand();
+					System.out.println("in set assetLand cell = i =" + i);
+					al.setLandTypeEnteredName(cell[i][j][0].getStringCellValue());
+					al.setUnit(cell[i][j][1].getStringCellValue());
+					al.setNumberOfUnits(cell[i][j][2].getNumericCellValue());
+
+					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+							rtype.getIdresourcetype().toString())) != null) {
+						System.out.println("done al get =  " + rst.getResourcetypename());
+
+						al.setResourceSubType(rst);
+						al.setStatus(efd.model.Asset.Status.Valid);
+
+					} else {
+						al.setStatus(efd.model.Asset.Status.Invalid);
+					}
+					wgi.getAssetLand().add(al);
+					k = 100;
+					break;
+
+				case ASSETLIVESTOCK:
+					als = new AssetLiveStock();
+					System.out.println("in set assetLivestock cell = i =" + i);
+					als.setLiveStockTypeEnteredName(cell[i][j][0].getStringCellValue());
+					als.setUnit(cell[i][j][1].getStringCellValue());
+					als.setNumberOwnedAtStart(cell[i][j][2].getNumericCellValue());
+					als.setPricePerUnit(cell[i][j][3].getNumericCellValue());
+
+					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+							rtype.getIdresourcetype().toString())) != null) {
+						System.out.println("done als get =  " + rst.getResourcetypename());
+
+						als.setResourceSubType(rst);
+						als.setStatus(efd.model.Asset.Status.Valid);
+
+					} else {
+						als.setStatus(efd.model.Asset.Status.Invalid);
+					}
+					wgi.getAssetLiveStock().add(als);
+			
+					k = 100;
+					break;
+					
+				case ASSETTRADEABLE:
+					atrade = new AssetTradeable();
+					atrade.setTradeableTypeEnteredName(cell[i][j][0].getStringCellValue());
+					atrade.setUnit(cell[i][j][1].getStringCellValue());
+					atrade.setNumberOwned(cell[i][j][2].getNumericCellValue());
+					atrade.setPricePerUnit(cell[i][j][3].getNumericCellValue());
+
+					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+							rtype.getIdresourcetype().toString())) != null) {
+						System.out.println("done atrade get =  " + rst.getResourcetypename());
+
+						atrade.setResourceSubType(rst);
+						atrade.setStatus(efd.model.Asset.Status.Valid);
+
+					} else {
+						atrade.setStatus(efd.model.Asset.Status.Invalid);
+					}
+					wgi.getAssetTradeable().add(atrade);
+				;
+			
+					k = 100;
+					break;	
+					
+				case ASSETFOOD:
+					afood = new AssetFoodStock();
+					System.out.println("in set assetfoodstock cell = i =" + i);
+					afood.setFoodTypeEnteredName(cell[i][j][0].getStringCellValue());
+					afood.setUnit(cell[i][j][1].getStringCellValue());
+					afood.setQuantity(cell[i][j][2].getNumericCellValue());
+				
+					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+							rtype.getIdresourcetype().toString())) != null) {
+						System.out.println("done afood get =  " + rst.getResourcetypename());
+
+						afood.setResourceSubType(rst);
+						afood.setStatus(efd.model.Asset.Status.Valid);
+
+					} else {
+						afood.setStatus(efd.model.Asset.Status.Invalid);
+					}
+					wgi.getAssetFoodStock().add(afood);
+				
+					k = 100;
+					break;	
+					
+				case ASSETTREE:
+					atree = new AssetTree();
+					System.out.println("in set assettree cell = i =" + i);
+					atree.setTreeTypeEnteredName(cell[i][j][0].getStringCellValue());
+					atree.setUnit(cell[i][j][1].getStringCellValue());
+					atree.setNumberOwned(cell[i][j][2].getNumericCellValue());
+					atree.setPricePerUnit(cell[i][j][3].getNumericCellValue());
+				
+				
+					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+							rtype.getIdresourcetype().toString())) != null) {
+						System.out.println("done atree get =  " + rst.getResourcetypename());
+
+						atree.setResourceSubType(rst);
+						atree.setStatus(efd.model.Asset.Status.Valid);
+
+					} else {
+						atree.setStatus(efd.model.Asset.Status.Invalid);
+					}
+					wgi.getAssetTree().add(atree);
+					//j = 100;
+					k = 100;
+					break;		
+					
+				case ASSETCASH:
+					acash = new AssetCash();
+					System.out.println("in set assetcash cell = i =" + i);
+					acash.setCurrencyEnteredName(cell[i][j][0].getStringCellValue());
+					acash.setUnit("each");   // a default value 
+					acash.setAmount(cell[i][j][1].getNumericCellValue());
+				
+				
+					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+							rtype.getIdresourcetype().toString())) != null) {
+						System.out.println("done acash get =  " + rst.getResourcetypename());
+
+						acash.setResourceSubType(rst);
+						acash.setStatus(efd.model.Asset.Status.Valid);
+
+					} else {
+						acash.setStatus(efd.model.Asset.Status.Invalid);
+					}
+					wgi.getAssetCash().add(acash);
+					//j = 100;
+					k = 100;
+					break;	
+					
+					
+				} // end switch
+				
+			}
+		}
+	}
+
+	/**************************************************************************************************************************************************************************************************/
 
 	private ResourceSubType checkSubType(String var1, String resourceType) {
 		try {

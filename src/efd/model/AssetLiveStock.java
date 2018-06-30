@@ -26,11 +26,11 @@ public class AssetLiveStock extends Asset{
 	@Column(name = "NumberOwnedAtStart", nullable=false )
 	@Required
 	@NotNull
-	private Integer numberOwnedAtStart;
+	private Double numberOwnedAtStart;
 
 	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
-	private BigDecimal pricePerUnit;
+	private Double pricePerUnit;
 
 	public String getLiveStockTypeEnteredName() {
 		return liveStockTypeEnteredName;
@@ -42,21 +42,25 @@ public class AssetLiveStock extends Asset{
 
 
 
-	public Integer getNumberOwnedAtStart() {
+
+
+	public Double getNumberOwnedAtStart() {
 		return numberOwnedAtStart;
 	}
 
-	public void setNumberOwnedAtStart(Integer numberOwnedAtStart) {
+	public void setNumberOwnedAtStart(Double numberOwnedAtStart) {
 		this.numberOwnedAtStart = numberOwnedAtStart;
 	}
 
-	public BigDecimal getPricePerUnit() {
+	public Double getPricePerUnit() {
 		return pricePerUnit;
 	}
 
-	public void setPricePerUnit(BigDecimal pricePerUnit) {
+	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
+
+
 	
 
 	

@@ -26,10 +26,10 @@ public class AssetTradeable extends Asset{
 
 	@Column(name = "NumberOwned", nullable=false )
 	@NotNull
-	private Integer numberOwned;
+	private Double numberOwned;
 
 	@Column(name = "PricePerUnit" )
-	private BigDecimal pricePerUnit;
+	private Double pricePerUnit;
 
 	public String getTradeableTypeEnteredName() {
 		return tradeableTypeEnteredName;
@@ -39,24 +39,21 @@ public class AssetTradeable extends Asset{
 		this.tradeableTypeEnteredName = tradeableTypeEnteredName;
 	}
 
-	public Integer getNumberOwned() {
+	public Double getNumberOwned() {
 		return numberOwned;
 	}
 
-	public void setNumberOwned(Integer numberOwned) {
+	public void setNumberOwned(Double numberOwned) {
 		this.numberOwned = numberOwned;
 	}
 
-	public BigDecimal getPricePerUnit() {
+	public Double getPricePerUnit() {
 		return pricePerUnit;
 	}
 
-	public void setPricePerUnit(BigDecimal pricePerUnit) {
+	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
-
-
-
 
 	
 	

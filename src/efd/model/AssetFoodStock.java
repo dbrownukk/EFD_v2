@@ -24,7 +24,7 @@ public class AssetFoodStock extends Asset {
 	
 
 	@Column(name = "Quantity" )
-	private BigDecimal quantity;
+	private Double quantity;
 
 
 	public String getFoodTypeEnteredName() {
@@ -37,12 +37,12 @@ public class AssetFoodStock extends Asset {
 	}
 
 
-	public BigDecimal getQuantity() {
+	public Double getQuantity() {
 		return quantity;
 	}
 
 
-	public void setQuantity(BigDecimal quantity) {
+	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}
 

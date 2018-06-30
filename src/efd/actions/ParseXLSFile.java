@@ -269,7 +269,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 			wgi.getAssetTradeable().removeAll(wgi.getAssetTradeable());
 			wgi.getCrop().removeAll(wgi.getCrop());
 			wgi.getEmployment().removeAll(wgi.getEmployment());
-			wgi.getLiveStockUse().removeAll(wgi.getLiveStockUse());
+			//wgi.getLiveStockUse().removeAll(wgi.getLiveStockUse());
 			wgi.getTransfer().removeAll(wgi.getTransfer());
 			wgi.getWildFood().removeAll(wgi.getWildFood());
 
@@ -331,10 +331,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Assets = 44 ");
 				als.setLiveStockTypeEnteredName(var1);
 				System.out.println("Assets = 45 ");
-				als.setUnitEntered(var2);
+			//	als.setUnitEntered(var2);
 
 				if (d1 != null)
-					als.setNumberOwned(d1.intValue());
+			//		als.setNumberOwned(d1.intValue());
 				System.out.println("Assets = 46 ");
 				if (d2 != null)
 					als.setPricePerUnit(BigDecimal.valueOf(d2));
@@ -405,10 +405,10 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Land = 44 ");
 				al.setLandTypeEnteredName(var1);
 				System.out.println("Land = 45 ");
-				al.setUnitEntered(var2);
+				//al.setUnitEntered(var2);
 
 				if (d1 != null)
-					al.setLandArea(d1.intValue());
+			//		al.setLandArea(d1.intValue());
 				System.out.println("Land = 46 ");
 
 				System.out.println("asset resource type = " + land.getResourcetypename());
@@ -469,7 +469,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 				afs.setStatus(efd.model.Asset.Status.NotChecked);
 				System.out.println("Food = 44 ");
-				afs.setFoodName(var1);
+			//	afs.setFoodName(var1);
 				/*******************************************************/
 				/* No place to hold Unit/Quantity/ppu in FOOD PURCHASE */
 				/*******************************************************/
@@ -589,15 +589,15 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("Crop = 33 ");
 
 				ac.setStatus(efd.model.Asset.Status.NotChecked);
-				ac.setCropName(var1);
+			//	ac.setCropName(var1);
 				System.out.println("Crop = 33c ");
-				ac.setLocalUnit(var2);
+			//	ac.setLocalUnit(var2);
 				System.out.println("Crop = 33b ");
-				ac.setQuantityProduced(d1.intValue());
+			//	ac.setQuantityProduced(d1.intValue());
 
 				System.out.println("Crop = 33a ");
 
-				ac.setQuantitySold(d2.intValue());
+			//	ac.setQuantitySold(d2.intValue());
 
 				System.out.println("Crop = 3356__9 ");
 				//if (d3.isNaN())
@@ -609,7 +609,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				ac.setPricePerUnit(BigDecimal.valueOf(d3));
 
 				System.out.println("Crop = 3356 ");
-				ac.setOtherUse(var3);
+		//		ac.setOtherUse(var3);
 				System.out.println("Crop = 3357 ");
 				/****************************/
 				/* Where is the market data */
@@ -701,12 +701,12 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				System.out.println("TF = 33 ");
 
 				tf.setStatus(efd.model.Asset.Status.NotChecked);
-				tf.setTransferredResourceName(var1);
-				tf.setLocalUnit(var2);
+			//	tf.setTransferredResourceName(var1);
+				//tf.setLocalUnit(var2);
 				System.out.println("TF = 34 ");
-				tf.setQuantityReceived(d1.intValue());
-				tf.setQuantitySold(d2.intValue());
-				System.out.println("TF = 35 ");
+			//	tf.setQuantityReceived(d1.intValue());
+			//	tf.setQuantitySold(d2.intValue());
+		//		System.out.println("TF = 35 ");
 				tf.setPricePerUnit(BigDecimal.valueOf(d3));
 				System.out.println("TF = 36 ");
 				tf.setOtherUse(var3);
@@ -848,7 +848,7 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				
 				
 
-				wgi.getLiveStockUse().add(lsu);
+	//			wgi.getLiveStockUse().add(lsu);
 			}
 			localMessage("Done LS Use");
 			/*************************************************************************************************/
@@ -910,9 +910,9 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 
 				wf.setStatus(efd.model.Asset.Status.NotChecked);
 				wf.setWildFoodName(var1);
-				wf.setLocalUnit(var2);
-				wf.setQuantityProduced(d1.intValue());
-				wf.setQuantitySold(d2.intValue());
+	//			wf.setLocalUnit(var2);
+	//			wf.setQuantityProduced(d1.intValue());
+	//			wf.setQuantitySold(d2.intValue());
 				wf.setPricePerUnit(BigDecimal.valueOf(d3));
 				wf.setOtherUse(var4);
 
@@ -995,13 +995,13 @@ public class ParseXLSFile extends CollectionBaseAction implements IForwardAction
 				emp.setStatus(efd.model.Asset.Status.NotChecked);
 				emp.setEmploymentName(var1);
 				emp.setPeopleCount(d1.intValue());
-				emp.setFrequency(Double.toString(d4));
-				emp.setDuration(d2.intValue());
+		//		emp.setFrequency(Double.toString(d4));
+		///		emp.setDuration(d2.intValue());
 				// emp.setFoodPaymentPerUnit(var3);
 
 				/* No Food payment type and Pay Food should be Varchar */
 
-				emp.setCashPaymentPerUnit(BigDecimal.valueOf(d3));
+		//		emp.setCashPaymentPerUnit(BigDecimal.valueOf(d3));
 
 				/****************************/
 				/* Where is the work location data */

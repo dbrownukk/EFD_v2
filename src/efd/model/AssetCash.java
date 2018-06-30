@@ -21,7 +21,7 @@ public class AssetCash extends Asset{
 	
 	@Column(name = "Amount" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
-	private BigDecimal amount;
+	private Double amount;
 
 	public String getCurrencyEnteredName() {
 		return currencyEnteredName;
@@ -31,13 +31,15 @@ public class AssetCash extends Asset{
 		this.currencyEnteredName = currencyEnteredName;
 	}
 
-	public BigDecimal getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(BigDecimal amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
+
+
 
 
 	

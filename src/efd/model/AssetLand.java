@@ -21,7 +21,7 @@ public class AssetLand extends Asset{
 
 	@Column(name = "NumberofUnits", nullable=false )
 	@NotNull
-	private Integer numberOfUnits;	
+	private Double numberOfUnits;
 
 	public String getLandTypeEnteredName() {
 		return landTypeEnteredName;
@@ -31,13 +31,15 @@ public class AssetLand extends Asset{
 		this.landTypeEnteredName = landTypeEnteredName;
 	}
 
-	public Integer getNumberOfUnits() {
+	public Double getNumberOfUnits() {
 		return numberOfUnits;
 	}
 
-	public void setNumberOfUnits(Integer numberOfUnits) {
+	public void setNumberOfUnits(Double numberOfUnits) {
 		this.numberOfUnits = numberOfUnits;
-	}
+	}	
+
+
 
 
 
