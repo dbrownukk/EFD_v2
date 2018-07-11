@@ -29,16 +29,16 @@ if (title == null) title = metaApplication.getLabel();
 <head>
 	<title><%=title%></title>
 	<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1'>
-	<link href="<%=request.getContextPath()%>/naviox/style/naviox.css?ox=<%=oxVersion%>" rel="stylesheet" type="text/css">
+	<link href="<%=request.getContextPath()%>/naviox/style/naviox.css?ox=<%=oxVersion%>" rel="stylesheet" type="text/css"> 
 </head>
 
 <body id="welcome" <%=NaviOXStyle.getBodyClass(request)%>>
 
 <h1><%=metaApplication.getLabel()%></h1>
 <p><%=metaApplication.getDescription()%></p>
-<p><xava:message key="welcome_point1"/></p> 
-<p><xava:message key="welcome_point2"/></p> 
 
+
+<p id="welcome_point1"><xava:message key="welcome_point1"/></p> 
 <p id="signin_tip"><xava:message key="signin_tip"/></p> 
 
 
