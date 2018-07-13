@@ -17,8 +17,8 @@ public class FilteredLZ extends ReferenceSearchAction  {
 		
 		/* If in standalone Site the filter is not needed */
 		
-		//System.out.println("In Filter1 "+getView().getMembersNames());
-		//System.out.println("In Filter2 "+getView().getBaseModelName());
+		System.out.println("In Filter1 "+getView().getMembersNames());
+		System.out.println("In Filter2 "+getView().getBaseModelName());
 		
 		//System.out.println("vnames"+getView().);
 

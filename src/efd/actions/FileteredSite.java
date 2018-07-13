@@ -28,13 +28,11 @@ public class FileteredSite extends ReferenceSearchAction {
 
 	public void execute() throws Exception {
 
-		// System.out.println("current proj "
-		// +getView().getValue("projectlz.projectid"));
+		System.out.println("current proj " + getView().getValue("projectlz.projectid"));
 		// System.out.println("current site "
 		// +getView().getValue("site.locationid"));
 
-		// System.out.println("In Site Filter from Comm
-		// "+getView().getSearchKeyName());
+		// System.out.println("In Site Filter from Comm "+getView().getSearchKeyName());
 
 		/* need to set project context */
 		if (getView().getValueString("projectlz.projectid").isEmpty()) {
@@ -52,8 +50,7 @@ public class FileteredSite extends ReferenceSearchAction {
 		// System.out.println("locid = "+locid);
 		// System.out.println("cprojectid = "+cprojectid);
 		/*
-		 * select sites that are valid for current LZ in project LZ for this
-		 * Project
+		 * select sites that are valid for current LZ in project LZ for this Project
 		 */
 
 		Query query = XPersistence.getManager().createQuery("select lz.lzid from LivelihoodZone lz join lz.project pr "
@@ -61,14 +58,15 @@ public class FileteredSite extends ReferenceSearchAction {
 		List<LivelihoodZone> lzs = query.getResultList();
 		String lzs1 = lzs.toString().replace("[]", " ");
 		// System.out.println("LZS = " + lzs + lzs.size() + lzs1);
+
 		String inlist = "";
 		for (int k = 0; k < lzs.size(); k++) {
-			// System.out.println("in loop 1"+lzs.get(k));
+			System.out.println("in loop 1 " + lzs.get(k));
 			inlist += "'" + lzs.get(k) + "'";
 			if (k + 1 == lzs.size())
 				break;
 			inlist += ",";
-			// System.out.println(k);
+			System.out.println(k);
 
 		}
 
@@ -84,15 +82,14 @@ public class FileteredSite extends ReferenceSearchAction {
 		String alist = "";
 
 		for (int j = 0; j < com.size(); j++) {
-			// System.out.println("in loop");
+			// System.out.println("in loop alist");
 
 			// System.out.println("in loop2");
 			// System.out.println("Comsiteid = "+com.get(j).getSite());
 			// System.out.println("ComProjid = "+com.get(j).getProjectlz());
 
 			// System.out.println("ComSite = "+com.get(j).getSite().toString());
-			// System.out.println("in loop
-			// 1"+com.get(j).getSite().getLocationid());
+			// System.out.println("in loop 1"+com.get(j).getSite().getLocationid());
 			alist += "'" + com.get(j).getSite().getLocationid() + "'";
 			if (j + 1 == com.size())
 				break;
@@ -107,20 +104,24 @@ public class FileteredSite extends ReferenceSearchAction {
 		// ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
 		// + " where pr.projectid = '" + cprojectid + ")'");
 
-		
-		if (lzs.isEmpty() && com.isEmpty()) /* No existing Sites/LZS in this project 	*/
+		if (lzs.isEmpty() && com.isEmpty()) /* No existing Sites/LZS in this project */
 		{
+			// System.out.println("In setbasecondition 1");
 			getTab().setBaseCondition("${locationid} != '" + locid + "'");
-		}
-		else if (com.isEmpty())     /* No previously used sites in this project - show all sites from this proj */
+		} else if (com.isEmpty()) /* No previously used sites in this project - show all sites from this proj */
 		{
-			getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")");
-		}
-		else	/* Show all relavent sites */ 
+			// System.out.println("In setbasecondition 2");
+			getTab().setBaseCondition(
+					"${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")");
+			// getTab().setBaseCondition("${locationid} != '" + locid);
+		} else /* Show all relevant sites */
 		{
-		getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")"
-				+ "and ${locationid} not in ( " + alist + ")");
+			// System.out.println("In setbasecondition 3");
+			getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist
+					+ ")" + "and ${locationid} not in ( " + alist + ")");
+			// getTab().setBaseCondition("${locationid} != '" + locid);
+			System.out.println("In setbasecondition 4");
 		}
-	
+
 	}
 }

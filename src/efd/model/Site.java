@@ -10,8 +10,10 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
-@Views({ @View(members = "Site[#livelihoodZone;locationdistrict;subdistrict;gpslocation]"),
-		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone;"),
+//@Views({ @View(members = "Site[#livelihoodZone;locationdistrict;subdistrict;gpslocation]"),
+	@Views({ @View(members = "Site[locationdistrict;subdistrict;gpslocation]"),
+		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation"),
+//		@View(name = "SimpleSite", members = "locationdistrict"),
 		@View(name = "LZSite", members = "locationdistrict;subdistrict;gpslocation"),
 		@View(name = "FromWealthGroup", members = "locationdistrict,subdistrict,livelihoodZone;"),
 		@View(name = "NewlineSite", members = "locationdistrictsubdistrict;gpslocation;livelihoodZone;") })
@@ -21,7 +23,8 @@ import org.openxava.annotations.*;
 @Tab(editors = "List, Cards, Charts"
 , rowStyles = @RowStyle(style = "row-highlight"
 , property = "type", value = "steady")
-, properties = "livelihoodZone.project.projecttitle,livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"
+, properties = "livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"
+// , properties = "livelihoodZone.project.projecttitle,livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"  // cannot show project as there maybe more than 1 for this LZ / Site combo
 , defaultOrder = "${livelihoodZone.lzname} asc,${locationdistrict} asc,${subdistrict} asc")
 
 
