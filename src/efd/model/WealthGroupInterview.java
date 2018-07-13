@@ -173,7 +173,7 @@ private Collection<LivestockProducts> livestockProducts;
 
 
 @ElementCollection     
-@ListProperties("status,resourceSubType,employmentName,peopleCount,unitsWorked,cashPaymentAmount,foodPaymentFoodType,foodPaymentUnit"
+@ListProperties("status,resourceSubType,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodPaymentFoodType,foodPaymentUnit"
 		+ ",workLocation1,percentWorkLocation1,workLocation2,percentWorkLocation2,workLocation3,percentWorkLocation3")
 private Collection<Employment> employment;
 

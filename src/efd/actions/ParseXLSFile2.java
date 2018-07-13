@@ -71,6 +71,15 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 	AssetFoodStock afood = null;
 	AssetTree atree = null;
 	AssetCash acash = null;
+	LivestockSales alss = null;
+	LivestockProducts alsp = null;
+	Employment aemp = null;
+	Transfer at = null;
+	WildFood awf = null;
+	FoodPurchase afp = null;
+	NonFoodPurchase anfp = null;
+
+	Crop acrop = null;
 
 	public void execute() throws Exception {
 
@@ -200,9 +209,11 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		getWorkSheetDetail(wb, wgi); // Get cells from ss
 
-		setResource();    // populate resource intersection tables 
+		setResource(); // populate resource intersection tables
 
 		getView().refresh();
+		getView().refreshCollections();
+
 		addMessage("Spreadsheet Parsed");
 
 	}
@@ -484,31 +495,26 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		ResourceType rtype = null;
 
 		int i = 0, j = 0, k = 0;
-	
-		/*
-		 * print cell array 
-		for (i = 1; i < 15; i++) {
-			for (j = 0; j < 10; j++) {
-				for (k = 0; k < 10; k++)
-					System.out.println("Cell at i j k = "  + i + j + k + " " + cell[i][j][k]);
-			}
-		}
-		*/
 
-		for (i = ASSETLAND; i <= ASSETTREE; i++) { // Sheet
+		/*
+		 * print cell array for (i = 1; i < 15; i++) { for (j = 0; j < 10; j++) { for (k
+		 * = 0; k < 10; k++) System.out.println("Cell at i j k = " + i + j + k + " " +
+		 * cell[i][j][k]); } }
+		 */
+
+		for (i = ASSETLAND; i <= EMPLOYMENT; i++) { // Sheet
 			// TODO ASSETCASH needs a default for EACH
 			// and other assets 30/6/18
 			breaksheet:
-			
-				for (j = 0; j < 35; j++) { // Row
-				System.out.println("sheet, row, cell  = " + i + j + k );
+
+			for (j = 0; j < 35; j++) { // Row
+				System.out.println("sheet, row, cell  = " + i + j + k);
 
 				System.out.println("after rowbreak row = " + j);
 				for (k = 0; k < ws.get(i - 1).numcols; k++) {
 					System.out.println("cell == " + k);
 					System.out.println("celltype == " + cell[i][j][k].getCellType());
-					if (cell[i][j][k].getCellType() == 3) 
-					{
+					if (cell[i][j][k].getCellType() == 3) {
 						if (k == 0) { // first col is blank thus no more rows in this ws
 							System.out.println("i j  k at break = " + i + j + k);
 							System.out.println("cell = blank");
@@ -524,153 +530,384 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 				/* In loop for sheets - swicth on which asset/resource */
 
-				if (j==0)   {// only need to set once per sheet 
-					System.out.println("get rtype = "+ ws.get(i - 1).resourceType);
+				if (j == 0) {// only need to set once per sheet
+					System.out.println("get rtype = " + ws.get(i - 1).resourceType);
 					rtype = (ResourceType) XPersistence.getManager()
-						.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
-						.getSingleResult();
+							.createQuery(
+									"from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
+							.getSingleResult();
 				}
-				
+
 				switch (i) {
+
 				case ASSETLAND:
-					al = new AssetLand();
-					System.out.println("in set assetLand cell = i =" + i);
-					al.setLandTypeEnteredName(cell[i][j][0].getStringCellValue());
-					al.setUnit(cell[i][j][1].getStringCellValue());
-					al.setNumberOfUnits(cell[i][j][2].getNumericCellValue());
+					try {
+						al = new AssetLand();
+						System.out.println("in set assetLand cell = i =" + i);
+						al.setLandTypeEnteredName(cell[i][j][0].getStringCellValue());
+						al.setUnit(cell[i][j][1].getStringCellValue());
+						al.setNumberOfUnits(cell[i][j][2].getNumericCellValue());
 
-					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-							rtype.getIdresourcetype().toString())) != null) {
-						System.out.println("done al get =  " + rst.getResourcetypename());
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done al get =  " + rst.getResourcetypename());
 
-						al.setResourceSubType(rst);
-						al.setStatus(efd.model.Asset.Status.Valid);
+							al.setResourceSubType(rst);
+							al.setStatus(efd.model.Asset.Status.Valid);
 
-					} else {
-						al.setStatus(efd.model.Asset.Status.Invalid);
+						} else {
+							al.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getAssetLand().add(al);
+						k = 100;
+						break;
+
 					}
-					wgi.getAssetLand().add(al);
-					k = 100;
-					break;
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Land Asset worksheet");
+						break;
+					}
 
 				case ASSETLIVESTOCK:
-					als = new AssetLiveStock();
-					System.out.println("in set assetLivestock cell = i =" + i);
-					als.setLiveStockTypeEnteredName(cell[i][j][0].getStringCellValue());
-					als.setUnit(cell[i][j][1].getStringCellValue());
-					als.setNumberOwnedAtStart(cell[i][j][2].getNumericCellValue());
-					als.setPricePerUnit(cell[i][j][3].getNumericCellValue());
+					try {
+						als = new AssetLiveStock();
+						System.out.println("in set assetLivestock cell = i =" + i);
+						als.setLiveStockTypeEnteredName(cell[i][j][0].getStringCellValue());
+						als.setUnit(cell[i][j][1].getStringCellValue());
+						als.setNumberOwnedAtStart(cell[i][j][2].getNumericCellValue());
+						als.setPricePerUnit(cell[i][j][3].getNumericCellValue());
 
-					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-							rtype.getIdresourcetype().toString())) != null) {
-						System.out.println("done als get =  " + rst.getResourcetypename());
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done als get =  " + rst.getResourcetypename());
 
-						als.setResourceSubType(rst);
-						als.setStatus(efd.model.Asset.Status.Valid);
+							als.setResourceSubType(rst);
+							als.setStatus(efd.model.Asset.Status.Valid);
 
-					} else {
-						als.setStatus(efd.model.Asset.Status.Invalid);
+						} else {
+							als.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getAssetLiveStock().add(als);
+
+						k = 100;
+						break;
+
 					}
-					wgi.getAssetLiveStock().add(als);
-			
-					k = 100;
-					break;
-					
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Livestock worksheet");
+						break;
+					}
+
 				case ASSETTRADEABLE:
-					atrade = new AssetTradeable();
-					atrade.setTradeableTypeEnteredName(cell[i][j][0].getStringCellValue());
-					atrade.setUnit(cell[i][j][1].getStringCellValue());
-					atrade.setNumberOwned(cell[i][j][2].getNumericCellValue());
-					atrade.setPricePerUnit(cell[i][j][3].getNumericCellValue());
+					try {
+						atrade = new AssetTradeable();
+						atrade.setTradeableTypeEnteredName(cell[i][j][0].getStringCellValue());
+						atrade.setUnit(cell[i][j][1].getStringCellValue());
+						atrade.setNumberOwned(cell[i][j][2].getNumericCellValue());
+						atrade.setPricePerUnit(cell[i][j][3].getNumericCellValue());
 
-					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-							rtype.getIdresourcetype().toString())) != null) {
-						System.out.println("done atrade get =  " + rst.getResourcetypename());
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done atrade get =  " + rst.getResourcetypename());
 
-						atrade.setResourceSubType(rst);
-						atrade.setStatus(efd.model.Asset.Status.Valid);
+							atrade.setResourceSubType(rst);
+							atrade.setStatus(efd.model.Asset.Status.Valid);
 
-					} else {
-						atrade.setStatus(efd.model.Asset.Status.Invalid);
+						} else {
+							atrade.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getAssetTradeable().add(atrade);
+						;
+
+						k = 100;
+						break;
+
 					}
-					wgi.getAssetTradeable().add(atrade);
-				;
-			
-					k = 100;
-					break;	
-					
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Other Tradeable worksheet");
+						break;
+					}
+
 				case ASSETFOOD:
-					afood = new AssetFoodStock();
-					System.out.println("in set assetfoodstock cell = i =" + i);
-					afood.setFoodTypeEnteredName(cell[i][j][0].getStringCellValue());
-					afood.setUnit(cell[i][j][1].getStringCellValue());
-					afood.setQuantity(cell[i][j][2].getNumericCellValue());
-				
-					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-							rtype.getIdresourcetype().toString())) != null) {
-						System.out.println("done afood get =  " + rst.getResourcetypename());
+					try {
+						afood = new AssetFoodStock();
+						System.out.println("in set assetfoodstock cell = i =" + i);
+						afood.setFoodTypeEnteredName(cell[i][j][0].getStringCellValue());
+						afood.setUnit(cell[i][j][1].getStringCellValue());
+						afood.setQuantity(cell[i][j][2].getNumericCellValue());
 
-						afood.setResourceSubType(rst);
-						afood.setStatus(efd.model.Asset.Status.Valid);
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done afood get =  " + rst.getResourcetypename());
 
-					} else {
-						afood.setStatus(efd.model.Asset.Status.Invalid);
+							afood.setResourceSubType(rst);
+							afood.setStatus(efd.model.Asset.Status.Valid);
+
+						} else {
+							afood.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getAssetFoodStock().add(afood);
+
+						k = 100;
+						break;
+
 					}
-					wgi.getAssetFoodStock().add(afood);
-				
-					k = 100;
-					break;	
-					
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Food Stock worksheet");
+						break;
+					}
+
 				case ASSETTREE:
-					atree = new AssetTree();
-					System.out.println("in set assettree cell = i =" + i);
-					atree.setTreeTypeEnteredName(cell[i][j][0].getStringCellValue());
-					atree.setUnit(cell[i][j][1].getStringCellValue());
-					atree.setNumberOwned(cell[i][j][2].getNumericCellValue());
-					atree.setPricePerUnit(cell[i][j][3].getNumericCellValue());
-				
-				
-					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-							rtype.getIdresourcetype().toString())) != null) {
-						System.out.println("done atree get =  " + rst.getResourcetypename());
+					try {
+						atree = new AssetTree();
+						System.out.println("in set assettree cell = i =" + i);
+						atree.setTreeTypeEnteredName(cell[i][j][0].getStringCellValue());
+						atree.setUnit(cell[i][j][1].getStringCellValue());
+						atree.setNumberOwned(cell[i][j][2].getNumericCellValue());
+						atree.setPricePerUnit(cell[i][j][3].getNumericCellValue());
 
-						atree.setResourceSubType(rst);
-						atree.setStatus(efd.model.Asset.Status.Valid);
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done atree get =  " + rst.getResourcetypename());
 
-					} else {
-						atree.setStatus(efd.model.Asset.Status.Invalid);
+							atree.setResourceSubType(rst);
+							atree.setStatus(efd.model.Asset.Status.Valid);
+
+						} else {
+							atree.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getAssetTree().add(atree);
+						// j = 100;
+						k = 100;
+						break;
+
 					}
-					wgi.getAssetTree().add(atree);
-					//j = 100;
-					k = 100;
-					break;		
-					
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Tree worksheet");
+						break;
+					}
+
 				case ASSETCASH:
-					acash = new AssetCash();
-					System.out.println("in set assetcash cell = i =" + i);
-					acash.setCurrencyEnteredName(cell[i][j][0].getStringCellValue());
-					acash.setUnit("each");   // a default value 
-					acash.setAmount(cell[i][j][1].getNumericCellValue());
-				
-				
-					if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-							rtype.getIdresourcetype().toString())) != null) {
-						System.out.println("done acash get =  " + rst.getResourcetypename());
+					try {
+						acash = new AssetCash();
+						System.out.println("in set assetcash cell = i =" + i);
+						acash.setCurrencyEnteredName(cell[i][j][0].getStringCellValue());
+						acash.setUnit("each"); // a default value - not used elsewhere
 
-						acash.setResourceSubType(rst);
-						acash.setStatus(efd.model.Asset.Status.Valid);
+						acash.setAmount(cell[i][j][1].getNumericCellValue());
 
-					} else {
-						acash.setStatus(efd.model.Asset.Status.Invalid);
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done acash get =  " + rst.getResourcetypename());
+
+							acash.setResourceSubType(rst);
+							acash.setStatus(efd.model.Asset.Status.Valid);
+
+						} else {
+							acash.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getAssetCash().add(acash);
+
+						k = 100;
+						break;
+
 					}
-					wgi.getAssetCash().add(acash);
-					//j = 100;
-					k = 100;
-					break;	
-					
-					
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Cash worksheet");
+						break;
+					}
+
+				case CROPS:
+					try {
+						acrop = new Crop();
+
+						acrop.setCropType((cell[i][j][0].getStringCellValue()));
+						acrop.setUnit(cell[i][j][1].getStringCellValue());
+						acrop.setUnitsProduced(cell[i][j][2].getNumericCellValue());
+						acrop.setUnitsSold(cell[i][j][3].getNumericCellValue());
+						acrop.setPricePerUnit(cell[i][j][4].getNumericCellValue());
+						acrop.setUnitsConsumed(cell[i][j][5].getNumericCellValue());
+						acrop.setUnitsOtherUse((cell[i][j][6].getStringCellValue()));
+						acrop.setMarket1(cell[i][j][7].getStringCellValue());
+						acrop.setPercentTradeMarket1(cell[i][j][8].getNumericCellValue());
+						acrop.setMarket2(cell[i][j][9].getStringCellValue());
+						acrop.setPercentTradeMarket2(cell[i][j][10].getNumericCellValue());
+
+						acrop.setMarket3(cell[i][j][11].getStringCellValue());
+						acrop.setPercentTradeMarket3(cell[i][j][12].getNumericCellValue());
+
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done acrop get =  " + rst.getResourcetypename());
+
+							acrop.setResourceSubType(rst);
+							acrop.setStatus(efd.model.Asset.Status.Valid);
+
+						} else {
+							acrop.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getCrop().add(acrop);
+						// j = 100;
+						k = 100;
+						break;
+
+					}
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Crops worksheet");
+						break;
+					}
+
+				case LIVESTOCKSALE:
+
+					try {
+						alss = new LivestockSales();
+						System.out.println("in ls sales cell = i =" + i);
+						alss.setLivestockType((cell[i][j][0].getStringCellValue()));
+						alss.setUnit(cell[i][j][1].getStringCellValue());
+
+						alss.setUnitsAtStartofYear(cell[i][j][2].getNumericCellValue()); // is this units at start of
+																							// year
+																							// or units produced??
+
+						alss.setUnitsSold(cell[i][j][3].getNumericCellValue());
+						alss.setPricePerUnit(cell[i][j][4].getNumericCellValue());
+
+						alss.setMarket1(cell[i][j][5].getStringCellValue());
+						alss.setPercentTradeMarket1(cell[i][j][6].getNumericCellValue());
+
+						alss.setMarket2(cell[i][j][7].getStringCellValue());
+						alss.setPercentTradeMarket2(cell[i][j][8].getNumericCellValue());
+
+						alss.setMarket3(cell[i][j][9].getStringCellValue());
+						alss.setPercentTradeMarket3(cell[i][j][10].getNumericCellValue());
+
+						System.out.println("rtype = " + rtype.getIdresourcetype().toString());
+
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done alss get =  " + rst.getResourcetypename());
+
+							alss.setResourceSubType(rst);
+							alss.setStatus(efd.model.Asset.Status.Valid);
+
+						} else {
+							alss.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getLivestockSales().add(alss);
+
+						k = 100;
+						break;
+
+					}
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Livestock Sales worksheet");
+						break;
+					}
+
+				case LIVESTOCKPRODUCT:
+					try {
+						alsp = new LivestockProducts();
+						System.out.println("in ls products cell = i =" + i);
+						alsp.setLivestockType((cell[i][j][0].getStringCellValue()));
+						alsp.setLivestockProduct(cell[i][j][1].getStringCellValue());
+						alsp.setUnit(cell[i][j][2].getStringCellValue());
+						alsp.setUnitsProduced(cell[i][j][3].getNumericCellValue()); // is this units at start of year
+																					// or units produced??
+
+						alsp.setUnitsSold(cell[i][j][4].getNumericCellValue());
+						alsp.setPricePerUnit(cell[i][j][5].getNumericCellValue());
+						alsp.setUnitsConsumed(cell[i][j][6].getNumericCellValue());
+						alsp.setUnitsOtherUse(cell[i][j][7].getNumericCellValue());
+
+						alsp.setMarket1(cell[i][j][8].getStringCellValue());
+						alsp.setPercentTradeMarket1(cell[i][j][9].getNumericCellValue());
+						alsp.setMarket2(cell[i][j][10].getStringCellValue());
+						alsp.setPercentTradeMarket2(cell[i][j][11].getNumericCellValue());
+
+						alsp.setMarket3(cell[i][j][12].getStringCellValue());
+						alsp.setPercentTradeMarket3(cell[i][j][13].getNumericCellValue());
+
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done alsp get =  " + rst.getResourcetypename());
+
+							alsp.setResourceSubType(rst);
+							alsp.setStatus(efd.model.Asset.Status.Valid);
+
+						} else {
+							alsp.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getLivestockProducts().add(alsp);
+
+						k = 100;
+						break;
+
+					}
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Livestock Products worksheet");
+						break;
+					}
+
+				case EMPLOYMENT:
+					try {
+						aemp = new Employment();
+						int l = 0;
+						System.out.println("in ls products cell = i =" + i);
+						aemp.setEmploymentName((cell[i][j][l++].getStringCellValue()));
+						aemp.setPeopleCount(cell[i][j][l++].getNumericCellValue());
+						System.out.println("in ls products cell = l = " + l);
+						aemp.setUnit((cell[i][j][l++].getStringCellValue()));
+						System.out.println("in ls products cell = l = " + l);
+						aemp.setUnitsWorked(cell[i][j][l++].getNumericCellValue());
+						System.out.println("in ls products cell = l = " + l);
+						aemp.setCashPaymentAmount(cell[i][j][l++].getNumericCellValue());
+						System.out.println("in ls products cell = l = " + l);
+						aemp.setFoodPaymentFoodType((cell[i][j][l++].getStringCellValue()));
+						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
+						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
+
+						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
+						aemp.setPercentWorkLocation1(cell[i][j][l++].getNumericCellValue());
+						System.out.println("in ls products cell = l = " + l);
+						aemp.setWorkLocation2(cell[i][j][l++].getStringCellValue());
+						aemp.setPercentWorkLocation2(cell[i][j][l++].getNumericCellValue());
+
+						aemp.setWorkLocation3(cell[i][j][l++].getStringCellValue());
+						aemp.setPercentWorkLocation3(cell[i][j][l++].getNumericCellValue());
+
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+								rtype.getIdresourcetype().toString())) != null) {
+							System.out.println("done emp get =  " + rst.getResourcetypename());
+
+							aemp.setResourceSubType(rst);
+							aemp.setStatus(efd.model.Asset.Status.Valid);
+
+						} else {
+							aemp.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						wgi.getEmployment().add(aemp);
+
+						k = 100;
+						break;
+
+					}
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Employee worksheet");
+						break;
+					}
+
 				} // end switch
-				
+
 			}
 		}
 	}
@@ -680,6 +917,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 	private ResourceSubType checkSubType(String var1, String resourceType) {
 		try {
 			var1 = WordUtils.capitalize(var1);
+
 			ResourceSubType rst = (ResourceSubType) XPersistence.getManager()
 					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'"
 							+ "and resourcetypename = '" + var1 + "'")
