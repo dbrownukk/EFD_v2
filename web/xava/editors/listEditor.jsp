@@ -16,7 +16,7 @@
 <%@ page import="org.openxava.web.Actions" %>
 <%@ page import="org.openxava.util.Users" %>
 <%@ page import="java.util.prefs.Preferences" %>
-<%@ page import="org.openxava.util.XavaResources"%> 
+<%@ page import="org.openxava.util.XavaResources" %> 
 
 <jsp:useBean id="errors" class="org.openxava.util.Messages" scope="request"/>
 <jsp:useBean id="context" class="org.openxava.controller.ModuleContext" scope="session"/>
@@ -67,6 +67,10 @@ String cssCurrentRow = style.getCurrentRow();
 int totalSize = -1; 
 if (request.getAttribute(org.openxava.tab.Tab.TAB_RESETED_PREFIX + tab) == null) {
 	tab.setRequest(request);
+	if (!Is.emptyString(collection)) {
+		tab.setTabObject(tabObject);
+		tab.setConditionParameters();
+	}
 	tab.reset();
 	request.setAttribute(org.openxava.tab.Tab.TAB_RESETED_PREFIX + tab, Boolean.TRUE); 
 }
@@ -84,93 +88,6 @@ if (grouping) action = null;
 
 <input type="hidden" name="xava_list<%=tab.getTabName()%>_filter_visible"/>
 
-<%
-if (collection == null || collection.equals("")) { 	
-%>
-<table width="100%" class=<%=style.getListTitleWrapper()%>>
-<tr><td class=<%=style.getListTitle()%>>
-<% if (style.isShowModuleDescription()) { %>
-<%=manager.getModuleDescription()%>
-<% } %>
-<xava:action action="List.changeConfiguration"/>
-<select onchange="openxava.executeAction('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '', false, 'List.filter','<%=collectionArgv%>,configurationId=' + this.value)">
-	<% String confName = tab.getConfigurationName();%>
-	<option value=""><%=confName%>&nbsp;&nbsp;&#9662;&nbsp;</option>
-	<% 
-	int count = 1; 
-	for (Tab.Configuration conf: tab.getConfigurations()) {
-		if (!confName.equals(conf.getName())) {
-			if (++count > Tab.MAX_CONFIGURATIONS_COUNT) break; 
-	%>
-	<option value="<%=conf.getId()%>"><%=conf.getName()%></option>
-	<% 
-		}
-	} 
-	%>
-</select>
-<% 
-if (tab.isTitleVisible()) { 
-%> 
-<% if (style.isShowModuleDescription()) { %> - <% } %>
-<span id="list-title"><%=tab.getTitle()%></span> 
-<%
-}
-%>
-<% if (style.isShowRowCountOnTop() && !grouping) { // && grouping 
-	totalSize = tab.getTotalSize();
-	int finalIndex = Math.min(totalSize, tab.getFinalIndex());
-%>
-<span class="<%=style.getHeaderListCount()%>">
-<%=XavaResources.getString(request, "header_list_count", new Integer(tab.getInitialIndex() + 1), new Integer(finalIndex), new Integer(totalSize))%>
-</span>
-<% } %>
-<% if (manager.getDialogLevel() == 0) { %>
-<select onchange="openxava.executeAction('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '', false, 'List.groupBy','property=' + this.value)">
-	<option value=""><%=grouping?XavaResources.getString("no_grouping"):XavaResources.getString("no_grouping") + "&nbsp;&nbsp;&#9662;&nbsp;"%></option>
-	<% 
-	for (MetaProperty property: tab.getMetaPropertiesBeforeGrouping()) {
-		String selected = "";
-		String handle = "";
-		if (groupBy.equals(property.getQualifiedName())) {
-			selected = "selected";
-			handle = "&nbsp;&nbsp;&#9662;&nbsp;";
-		}
-	%>
-	<option value="<%=property.getQualifiedName()%>" <%=selected%>><xava:message key="group_by"/> <%=property.getQualifiedLabel(request).toLowerCase()%><%=handle%></option>
-	<%
-		if (property.getType().isAssignableFrom(java.util.Date.class)) {
-			if (groupBy.equals(property.getQualifiedName() + "[month]")) {
-				selected = "selected";
-				handle = "&nbsp;&nbsp;&#9662;&nbsp;";
-			}
-			else {
-				selected = "";
-				handle = "";
-			}
-	%>
-	<option value="<%=property.getQualifiedName()%>[month]" <%=selected%>><xava:message key="group_by_month_of"/> <%=property.getQualifiedLabel(request).toLowerCase()%><%=handle%></option>
-	<%
-			if (groupBy.equals(property.getQualifiedName() + "[year]")) {
-				selected = "selected";
-				handle = "&nbsp;&nbsp;&#9662;&nbsp;";
-			}
-			else {
-				selected = "";
-				handle = "";
-			}
-	%>		
-	<option value="<%=property.getQualifiedName()%>[year]" <%=selected%>><xava:message key="group_by_year_of"/> <%=property.getQualifiedLabel(request).toLowerCase()%><%=handle%></option> 
-	<%		
-		}
-	} 
-	%>
-</select> 
-<% } %>
-</td></tr>
-</table>
-<%
-} 
-%>
 <% if (scrollSupported) { %>
 <%String resizeColumnClass = resizeColumns?style.getResizeColumns():""; %>
 <div class="<xava:id name='<%=scrollId%>'/> <%=resizeColumnClass%>" style="<%=styleOverflow%>">
@@ -441,7 +358,7 @@ if (tab.isRowsHidden()) {
 else {
 IXTableModel model = tab.getTableModel(); 
 totalSize = totalSize < 0?tab.getTotalSize():totalSize; 
-if (totalSize > 0) {
+if (totalSize > 0 || !Is.emptyString(collection)) { 
 int finalIndex = simple?Integer.MAX_VALUE:tab.getFinalIndex();
 for (int f=tab.getInitialIndex(); f<model.getRowCount() && f < finalIndex; f++) {
 	String checked=tab.isSelected(f)?"checked='true'":"";	
@@ -537,7 +454,8 @@ for (int c=0; c<model.getColumnCount(); c++) {
 	String width = columnWidth<0 || !resizeColumns?"":"width: " + columnWidth + "px";
 	
 	if (tab.hasTotal(c)) {
-		String ftotal = WebEditors.format(request, p, tab.getTotal(c), errors, view.getViewName(), true);
+		Object total = tab.getTotal(c); 
+		String ftotal = WebEditors.format(request, p, total, errors, view.getViewName(), true);
 	%>
 	<td class="<%=style.getTotalCell()%>" style="<%=cellStyle%>; padding-right: 0px">
 		<div class="<xava:id name='<%=id%>'/>_col<%=c%>" style="overflow: hidden; <%=width%>">
@@ -545,9 +463,21 @@ for (int c=0; c<model.getColumnCount(); c++) {
 			<% if (!tab.isFixedTotal(c) && XavaPreferences.getInstance().isSummationInList()) { %>
 				<xava:action action='List.removeColumnSum' argv='<%="property="+p.getQualifiedName() + collectionArgv%>'/>
 			<% } %>
+			<%
+			if (view.isRepresentsCollection()) {
+				org.openxava.view.View rootView = view.getParent().getCollectionRootOrRoot();
+				String sumProperty =  collection + "." + p.getName() + "_SUM_";
+				if (rootView.isPropertyUsedInCalculation(sumProperty)) {
+					String script = org.openxava.web.Collections.sumPropertyScript(request, rootView, sumProperty);
+			%>
+					<input id="<xava:id name='<%=sumProperty%>'/>" type="hidden" value="<%=total%>" <%=script%>/>
+			<%
+				}
+			}
+			%>
 			<%=ftotal%>&nbsp;
 			</nobr>
-		</div>		
+		</div>
 	</td>	
 	<%	
 	}
@@ -592,15 +522,16 @@ for (int c=0; c<model.getColumnCount(); c++) {
 	int columnWidth = tab.getColumnWidth(c);		 		
 	String width = columnWidth<0 || !resizeColumns?"":"width: " + columnWidth + "px";
 	if (tab.hasTotal(i, c)) {
-		String ftotal = WebEditors.format(request, p, tab.getTotal(i, c), errors, view.getViewName(), true);
 	%> 	
-	<td class="<%=style.getTotalCell()%>" style="<%=cellStyle%>">
-		<div class="<xava:id name='<%=id%>'/>_col<%=c%>" style="overflow: hidden; <%=width%>">
-			<nobr>
-			<%=ftotal%>&nbsp;
-			</nobr>	
-		</div>	
-	</td>	
+		<td class="<%=style.getTotalCell()%>" style="<%=cellStyle%>">
+			<div class="<xava:id name='<%=id%>'/>_col<%=c%>" style="overflow: hidden; <%=width%>">
+				<jsp:include page="collectionTotal.jsp">
+					<jsp:param name="row" value="<%=i%>"/>
+					<jsp:param name="column" value="<%=c%>"/>
+					<jsp:param name="viewObject" value="xava_view"/>
+				</jsp:include>
+			</div>	
+		</td>	
 	<%	
 	}
 	else if (tab.hasTotal(i, c + 1)) { 
@@ -609,6 +540,7 @@ for (int c=0; c<model.getColumnCount(); c++) {
 		<div class="<xava:id name='<%=id%>'/>_col<%=c%>" style="overflow: hidden; <%=width%>">		
 		<%=tab.getTotalLabel(i, c + 1)%>&nbsp;
 		</div>
+		<%@ include file="listEditorTotalActionsExt.jsp"%>
 	</td>
 	<%	
 	}
@@ -624,7 +556,9 @@ for (int c=0; c<model.getColumnCount(); c++) {
 </tr>
 <%
 } // for additionalTotalsCount 
-
+%>
+<%@ include file="listEditorLastRowExt.jsp"%>
+<%
 }
 else {
 %>

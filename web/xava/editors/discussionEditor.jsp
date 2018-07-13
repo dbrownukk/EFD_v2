@@ -54,6 +54,7 @@ for (DiscussionComment comment: comments) {
 	<input type="button" tabindex="1" class="<%=style.getButton()%>" style="display: none;" 
 		onclick="discussionEditor.postMessage('<%=request.getParameter("application")%>', '<%=request.getParameter("module")%>', '<%=discussionId%>')" value="<xava:label key="addComment"/>"/>
 	<input type="button" tabindex="1" class="<%=style.getButton()%>" style="display: none;" 
+		onclick="discussionEditor.cancel('<%=discussionId%>')" 
 		value="<xava:label key="cancel"/>"/>
 </div>
 <% } %>	

@@ -1,4 +1,3 @@
-<%@page import="org.openxava.controller.meta.MetaControllerElement"%>
 <%@ include file="imports.jsp"%>
 
 <%@ page import="org.openxava.controller.meta.MetaAction" %>
@@ -7,6 +6,9 @@
 <%@ page import="org.openxava.controller.meta.MetaSubcontroller"%>
 <%@ page import="java.util.Collection"%>
 <%@ page import="org.openxava.web.Ids"%>
+<%@ page import="org.openxava.util.EmailNotifications"%> 
+<%@ page import="org.openxava.controller.meta.MetaControllerElement"%>
+
 
 <jsp:useBean id="context" class="org.openxava.controller.ModuleContext" scope="session"/>
 <jsp:useBean id="style" class="org.openxava.web.style.Style" scope="request"/>
@@ -141,30 +143,49 @@ if (manager.isButtonBarVisible()) {
 		}
 	}	
 
-	String language = request.getLocale().getLanguage();
-	String href = XavaPreferences.getInstance().getHelpPrefix(); 
-	String suffix = XavaPreferences.getInstance().getHelpSuffix(); 
-	String target = XavaPreferences.getInstance().isHelpInNewWindow() ? "_blank" : "";
-	if (href.startsWith("http:") || href.startsWith("https:")) {
-		if (href.endsWith("_")) href = href + language;
-		if (!Is.emptyString(suffix)) href = href + suffix;
+	
+	if (EmailNotifications.isEnabled(manager.getModuleName())) {
+		if (EmailNotifications.isSubscribedCurrentUserToModule(manager.getModuleName())) {
+	%>
+			<span class="<%=style.getSubscribed()%>"> 
+				<xava:image action='EmailNotifications.unsubscribe'/>
+			</span>
+	<%  
+		}
+		else {
+	%>	
+			<span class="<%=style.getUnsubscribed()%>"> 
+				<xava:image action='EmailNotifications.subscribe'/>
+			</span> 	
+	<%
+		}
 	}
-	else {
-		href = 
-			"/" + manager.getApplicationName() + "/" + 
-			href +
-			manager.getModuleName() +
-			"_" + language + 
-			suffix;
-	} 	
-	if (XavaPreferences.getInstance().isHelpAvailable() && style.isHelpAvailable()) { 	
+
+	
+	if (XavaPreferences.getInstance().isHelpAvailable() && style.isHelpAvailable()) {
+		String language = request.getLocale().getLanguage();
+		String href = XavaPreferences.getInstance().getHelpPrefix(); 
+		String suffix = XavaPreferences.getInstance().getHelpSuffix(); 
+		String target = XavaPreferences.getInstance().isHelpInNewWindow() ? "_blank" : "";
+		if (href.startsWith("http:") || href.startsWith("https:")) {
+			if (href.endsWith("_")) href = href + language;
+			if (!Is.emptyString(suffix)) href = href + suffix;
+		}
+		else {
+			href = 
+				"/" + manager.getApplicationName() + "/" + 
+				href +
+				manager.getModuleName() +
+				"_" + language + 
+				suffix;
+		}
 		String helpImage = null;
 		if (style.getHelpImage() != null) helpImage = !style.getHelpImage().startsWith("/")?request.getContextPath() + "/" + style.getHelpImage():style.getHelpImage();
 	%>
 		<span class="<%=style.getHelp()%>">  
 			<a href="<%=href%>" target="<%=target%>">
 				<% if (helpImage == null) { %>
-				<i class="mdi mdi-help-circle"/></i>
+				<i class="mdi mdi-help-circle"></i>
 				<% } else { %>
 				<a href="<%=href%>" target="<%=target%>"><img src="<%=helpImage%>"/></a>
 				<% } %>

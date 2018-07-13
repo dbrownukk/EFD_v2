@@ -80,7 +80,7 @@ input {
 	text-shadow: 0px 2px 1px #E8E8E9; 	
 }
 
-.ox-button-bar, .ox-section, .modules-list-header, #modules_list_search_header {  
+.ox-button-bar, .modules-list-header, #modules_list_search_header {  
 	height: 32px;
 }
 
@@ -114,6 +114,14 @@ input {
 	font-size: 0.9em;
 	text-decoration: none;
 	text-shadow:1px 0px 0px #EDEDED;
+	display: inline-block;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.phone-frame .phone-reference-actions .ox-action-link {
+	display: inline;
+	margin-top: 0px;
 }
 
 .ox-section>table { 
@@ -417,6 +425,10 @@ input[type="text"], input[type="password"] {
 	position: relative;
 	top: -6px;
 	padding: 0px 12px 0 12px;
+}
+
+.ox-section-tab {
+	line-height: 30px;
 }
 
 .ox-section-link, .ox-active .ox-section-tab { 

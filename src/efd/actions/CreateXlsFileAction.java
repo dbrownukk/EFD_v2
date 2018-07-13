@@ -489,7 +489,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	{
 		CellRangeAddressList addressList = null;
 		for (int l = 3; l < lastRow; l++) {
-			System.out.println("LOV = "+rType);
+			// System.out.println("LOV = "+rType);
 			addressList = new CellRangeAddressList(firstRow, l, firstCol, lastCol);
 			DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
 			DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint(rType);
@@ -1029,7 +1029,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			row = 4;
 		}
 
-		System.out.println("asl set styles and size 33");
 
 		row = 4;
 		int landrow = 5;
@@ -1047,7 +1046,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
-			if (rt.equals("OtherTradeableGoods")) {
+			if (rt.equals("Other Tradeable Goods")) {
 				sheet.setValue(2, row, resub, borderStyle);
 				sheet.setValue(3, row, rtunit, borderStyle);
 				row++;

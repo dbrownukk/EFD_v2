@@ -480,6 +480,10 @@ a.ox-selected-list-format, a.ox-selected-list-format:hover {
 	margin-right: -6px;
 }
 
+.ox-cut-row {
+	opacity: 0.3;
+}
+
 .ox-button-bar a:focus {
 	outline: none;
 }
@@ -611,10 +615,6 @@ span.ox-subcontroller-select a{
 	-webkit-box-sizing: border-box;
 }
 
-.ox-charts {
-	width: 0px;
-}
-
 .ct-chart {
 	margin-top: -5px;
 	margin-left: -25px;
@@ -640,9 +640,8 @@ span.ox-subcontroller-select a{
 
 .ox-chart-x-column select {
 	position: relative;
-	left: 780px;
-	top: -27px;
-	width: 180px; 
+	left: calc(45vw - 290px);
+	width: 270px; 
 }
 
 .ox-chart-type {
@@ -674,7 +673,7 @@ span.ox-subcontroller-select a{
 	box-shadow: 0px 0px 7px #CCCCCC inset;  
 }
 
-.ox-charts .portlet-section-header { 
+.ox-charts .portlet-section-header, .ox-charts .frame {  
 	display: none;
 }
 
@@ -683,6 +682,9 @@ span.ox-subcontroller-select a{
 	background-color: transparent !important;
 }
 
+.ct-chart { 
+	margin-top: 20px;
+}
 
 .ox-charts .ox-element-collection {
 	width: 200px;
@@ -1104,4 +1106,17 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
 .arrow.top:after {
 	bottom: 20px;
 	top: auto;
+}
+
+.ox-subscribed i, .ox-unsubscribed i {
+	vertical-align: 3px;
+
+}
+
+.ox-subscribed i {
+	color: blue; 
+}
+
+.ox-unsubscribed i {
+	color: lightgray; 
 }

@@ -25,7 +25,6 @@ if (title == null) title = modules.getCurrentModuleDescription(request);
 
 <head>
 	<title><%=title%></title>
-	
 	<link href="<%=request.getContextPath()%>/xava/style/layout.css?ox=<%=oxVersion%>" rel="stylesheet" type="text/css"> 
 	<link href="<%=request.getContextPath()%>/naviox/style/naviox.css?ox=<%=oxVersion%>" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/xava/style/materialdesignicons.css?ox=<%=oxVersion%>">
@@ -60,17 +59,10 @@ if (title == null) title = modules.getCurrentModuleDescription(request);
 			<td valign="top">
 				<div class="module-wrapper">
 					<div id="module_description">
-
-	<%-- 
-	Bookmark and heading not needed 
-	
-						<% =modules.getCurrentModuleDescription(request) %> 
-
+						<%=modules.getCurrentModuleDescription(request)%> 
 						<a href="javascript:naviox.bookmark()" title="<xava:message key='<%=modules.isCurrentBookmarked()?"unbookmark_module":"bookmark_module"%>'/>">
 							<img id="bookmark" src="<%=request.getContextPath()%>/naviox/images/bookmark-<%=modules.isCurrentBookmarked()?"on":"off"%>.png"/>
-	
 						</a>
-	--%>
 					</div>				
 					<% if ("SignIn".equals(module)) {  %>
 					<jsp:include page='signIn.jsp'/>

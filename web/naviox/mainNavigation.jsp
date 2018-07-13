@@ -38,8 +38,7 @@ for (Iterator it= modules.getTopModules().iterator(); it.hasNext();) {
 %>		
 	<a  href="<%=modules.getModuleURI(request, module)%>?retainOrder=true" class="<%=selected%>">
 		<%=module.getLabel(request.getLocale())%>
-	</a>
-	
+	</a>	
 <%
 }
 %>

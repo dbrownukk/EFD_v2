@@ -218,6 +218,15 @@ public class User implements java.io.Serializable {
 		passwordRecoveringDate = new Date();
 	}
 	
+	public void addDefaultRole() { 
+		if (roles == null || roles.isEmpty()) {
+			Role userRole = Role.find("user");
+			if (userRole != null) {
+				addRole(userRole);
+			}
+		}
+	}
+	
 	@PrePersist
 	private void prePersit() { 
 		creationDate = new Date();
@@ -259,10 +268,20 @@ public class User implements java.io.Serializable {
         String ldapPort = getProperties().getProperty("ldapPort", "").trim();
         String ldapDN =  getProperties().getProperty("ldapDN", "").trim();
         
-        String ldapURL = String.format("ldap://%s:%s/%s", ldapHost, ldapPort, ldapDN);        
-        String securityPrincipal = String.format("%s%s%s", ldapDomain, 
-        		                                           ldapDomain.equals("")?"":"\\", 
-        		                                           this.name);
+        String ldapURL;        
+        String securityPrincipal;
+        if (Is.emptyString(ldapDomain)) {
+        	ldapURL = String.format("ldap://%s:%s", ldapHost, ldapPort);        
+        	securityPrincipal = String.format("%s%s%s", "uid=" + this.name, 		
+   														ldapDN.equals("")?"":",", 
+   														ldapDN);	
+        }
+        else {
+	        ldapURL = String.format("ldap://%s:%s/%s", ldapHost, ldapPort, ldapDN);        
+	        securityPrincipal = String.format("%s%s%s", ldapDomain, 
+	     	                                           ldapDomain.equals("")?"":"\\", 
+	     	                                           this.name);
+        }
         
         props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         props.put(Context.PROVIDER_URL, ldapURL);

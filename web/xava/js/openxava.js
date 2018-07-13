@@ -178,6 +178,9 @@ openxava.refreshPage = function(result) {
 	openxava.propertiesUsedInCalculationsChange(result); 
 	$('#xava_loading').hide(); 
 	$('#xava_loading2').hide();
+	if (result.postJS != null) {
+		eval(result.postJS);
+	}
 	document.body.style.cursor='auto';
 	if (openxava.postRefreshPage != null) openxava.postRefreshPage(); 
 	openxava.setUrlParam(result);	
@@ -269,6 +272,9 @@ openxava.propertiesUsedInCalculationsChange = function(result) {
 	if (result.propertiesUsedInCalculations != null) {
 		for (var i=0; i<result.propertiesUsedInCalculations.length; i++) {
 			$('#' + openxava.decorateId(result.application, result.module, result.propertiesUsedInCalculations[i])).change();
+			if (/_SUM_$/.test(result.propertiesUsedInCalculations[i])) {
+				openxava.executeAction(result.application, result.module, false, false, "CollectionTotals.save", "sumProperty=" + result.propertiesUsedInCalculations[i]);
+			}
 		}
 	}	
 }
@@ -770,9 +776,10 @@ openxava.calculate = function(application, module, propertyId, scale) {
 	var calculation = $('#' + propertyId + "_CALCULATION_").val();
 	var value = eval(calculation).toFixed(scale).replace(".", openxava.decimalSeparator);
 	$('#' + propertyId).val(value);
+	$('#' + propertyId).change(); 
 }
 
-openxava.getNumber = function(application, module, property) { 
+openxava.getNumber = function(application, module, property) {
 	var val = $('#' + openxava.decorateId(application, module, property)).val();
 	if (val == '') return 0; 	
 	return openxava.parseFloat(val); 
@@ -1094,3 +1101,10 @@ openxava.filterColumns = function() {
 openxava.refreshColumnsList = function(columnsList) { 
 	$('#xava_add_columns').html(columnsList);
 }
+
+openxava.markRowAsCut = function(collectionId, rowId) {
+	$('#' + collectionId).find(".ox-cut-row").removeClass("ox-cut-row");
+	if (rowId != null) $('#' + rowId).addClass('ox-cut-row'); 
+	else $('#' + collectionId).find("._XAVA_SELECTED_ROW_").addClass('ox-cut-row');
+}
+

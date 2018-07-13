@@ -13,9 +13,9 @@
 <%@page import="org.openxava.web.dwr.Module"%>
 <%@page import="org.openxava.web.servlets.Servlets"%>
 <%@page import="org.openxava.web.Ids"%>
+<%@page import="org.openxava.web.Requests"%> 
 <%@page import="org.apache.commons.logging.LogFactory" %>
 <%@page import="org.apache.commons.logging.Log" %>
-
 
 <%!private static Log log = LogFactory.getLog("module.jsp");
 
@@ -51,7 +51,6 @@
 	Locales.setCurrent(request);	
 	request.getSession().setAttribute("xava.user",
 			request.getRemoteUser());
-	Users.setCurrent(request); 
 	String app = request.getParameter("application");
 	String module = context.getCurrentModule(request);
 	String contextPath = (String) request.getAttribute("xava.contextPath");
@@ -86,8 +85,9 @@
 	String version = org.openxava.controller.ModuleManager.getVersion();
 	String realPath = request.getSession().getServletContext()
 			.getRealPath("/");			
-	manager.resetPersistence();
-	org.openxava.util.SessionData.setCurrent(request); 
+	Requests.init(request, app, module); 
+	manager.log(request, "MODULE:" + module);
+	manager.setModuleURL(request); 
 %>
 <jsp:include page="execute.jsp"/>
 <%

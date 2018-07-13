@@ -7,7 +7,9 @@
 <%@page import="com.openxava.naviox.web.NaviOXStyle"%>
 <%@page import="com.openxava.naviox.util.Organizations"%>
 <%@page import="com.openxava.phone.web.Users"%>
+<%@page import="org.openxava.util.SessionData"%>
 
+<% org.openxava.util.Users.setCurrent(request); %>
 <% if (Users.currentNeedsToChangePassword()) { %>
 	<jsp:forward page="/p/ChangePassword"/>
 <% } %>
@@ -18,6 +20,7 @@
 <%
 Organizations.setPersistenceDefaultSchema(request.getSession()); 
 Locales.setCurrent(request);
+SessionData.setCurrent(request);
 String version = org.openxava.controller.ModuleManager.getVersion();
 folders.setApplicationNameAsRootLabel(true);
 %>

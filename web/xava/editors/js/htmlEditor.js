@@ -30,27 +30,16 @@ openxava.addEditorInitFunction(function() {
 	};
 	$('.ox-simple-ckeditor').ckeditor(simpleConfig);
 	
-	$('.xava-new-comment').each( function () {
-		 
-		var editor = CKEDITOR.instances[this.id];
-		
+	$('.xava-new-comment').each( function () {		 
+		var editor = CKEDITOR.instances[this.id];		
 		if (editor !== undefined) {
-		
 		 	editor.on( 'focus', function( e ) {			
 				var id = "#" + $(e.editor.element).attr("id") + "_buttons";
 				$(id + " input").fadeIn();
 				$('.ox-bottom-buttons').fadeOut();
+				$('.ox-button-bar-button').fadeOut(); 
 			});
-			 
-		 	editor.on( 'blur', function( e ) {
-				var id = "#" + $(e.editor.element).attr("id") + "_buttons";
-				$(id + " input").fadeOut();
-				$('.ox-bottom-buttons').fadeIn();
-				e.editor.setData('');
-			})
-			
 		}
-		 
 	 });
 
 });

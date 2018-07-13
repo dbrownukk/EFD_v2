@@ -84,16 +84,4 @@ PhoneManager phoneManager = new PhoneManager(manager);
 		<%=phoneManager.getTitle(request)%>
 	</span>
 	
-	<% 
-	MetaAction defaultAction = phoneManager.getDefaultMetaAction(); 
-	if (defaultAction != null) { 
-	%>
-	<xava:link action="<%=defaultAction.getQualifiedName()%>">
-		<div class="phone-default-action">					
-			<p><%=defaultAction.getLabel()%></p>			
-		</div>
-	</xava:link>
-	<%
-	} 
-	%>
 </div>

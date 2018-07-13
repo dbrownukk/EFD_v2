@@ -118,7 +118,7 @@ naviox.refreshSearchModulesList = function(modulesList) {
 
 naviox.refreshFolderModulesList = function(modulesList) {
 	if (modulesList == null) {
-		window.location=openxava.location=".."
+		window.location=openxava.location="../m/SignIn";
 		return;
 	}
 	$('#modules_list_content').append("<td></td>"); 

@@ -24,6 +24,7 @@ public class Configuration implements java.io.Serializable {
 	private int passwordMinLength;
 	
 	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
+	@Column(name="forceLetterAndNumbersInPasswd") 
 	private boolean forceLetterAndNumbersInPassword;
 	
 	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
@@ -39,6 +40,7 @@ public class Configuration implements java.io.Serializable {
 	private int loginAttemptsBeforeLocking; 
 	
 	@Max(999)
+	@Column(name="inactiveDaysBeforeDisUser") 
 	private int inactiveDaysBeforeDisablingUser;  
 	
 	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
@@ -46,12 +48,12 @@ public class Configuration implements java.io.Serializable {
 	private boolean guestCanCreateAccount;  
 	
 	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
-	@Column(columnDefinition="varchar(1) default 'Y' not null")
+	@Column(name="guestCanCreateAccountInOrgs", columnDefinition="varchar(1) default 'Y' not null") 
 	private boolean guestCanCreateAccountInOrganizations;  
 	
 	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
-	@Column(columnDefinition="varchar(1) default 'N' not null")
-	private boolean sharedUsersBetweenOrganizations; 
+	@Column(name="sharedUsersBetweenOrgs", columnDefinition="varchar(1) default 'N' not null") 
+	private boolean sharedUsersBetweenOrganizations;
 	
 
 	@Hidden

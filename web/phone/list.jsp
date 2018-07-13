@@ -16,4 +16,8 @@ if (isNotCollection) {
 </div>
 <% if (isNotCollection) { %>
 </div>
+<% } else { %>
+<div class="phone-frame">
+	<jsp:include page="collectionTotals.jsp"/>
+</div>
 <% } %>

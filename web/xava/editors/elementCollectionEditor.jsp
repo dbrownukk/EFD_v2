@@ -122,7 +122,7 @@ for (int f=0; f < rowCount; f++) {
 	String actionsStyle = subview.isCollectionEditable() && f >= rowCount - 2?"style='visibility:hidden;'":"";
 	String app = request.getParameter("application");
 	String module = request.getParameter("module");
-	boolean hasTotals = subview.getCollectionTotalsCount() > 0;
+	boolean hasTotals = subview.hasCollectionTotals();
 	String sortableClass = subview.isCollectionEditable() && f >= rowCount - 2?"":"xava_sortable_element_row";
 %>
 <tr id="<%=idRow%>" class="<%=cssClass%> <%=sortableClass%>" <%=events%> style="border-bottom: 1px solid; <%=newRowStyle%>">
@@ -187,7 +187,7 @@ for (int f=0; f < rowCount; f++) {
 		<div class="<xava:id name='<%=idCollection%>'/>_col<%=columnIndex%>" style="overflow: hidden; <%=width%>" <%=lastRowEvent%>>
 		<%if (resizeColumns) {%><nobr><%}%>
 		<% if (!subview.isCollectionMembersEditables()) {%>
-		<%=fvalue%>
+		<%=fvalue%>&nbsp;
 		<% } else if (referenceName != null) { %>
 		<xava:descriptionsList reference="<%=referenceName%>"/>
 		<% } else { %>
