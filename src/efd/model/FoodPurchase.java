@@ -22,11 +22,11 @@ public class FoodPurchase extends Asset{
 	@Column(name = "UnitsPurchased", nullable=false )
 	@Required
 	@NotNull
-	private Integer unitsPurchased;
+	private Double unitsPurchased;
 
 	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
-	private BigDecimal pricePerUnit;
+	private Double pricePerUnit;
 
 	public String getFoodTypeTypeEnteredName() {
 		return foodTypeTypeEnteredName;
@@ -36,21 +36,22 @@ public class FoodPurchase extends Asset{
 		this.foodTypeTypeEnteredName = foodTypeTypeEnteredName;
 	}
 
-	public Integer getUnitsPurchased() {
+	public Double getUnitsPurchased() {
 		return unitsPurchased;
 	}
 
-	public void setUnitsPurchased(Integer unitsPurchased) {
+	public void setUnitsPurchased(Double unitsPurchased) {
 		this.unitsPurchased = unitsPurchased;
 	}
 
-	public BigDecimal getPricePerUnit() {
+	public Double getPricePerUnit() {
 		return pricePerUnit;
 	}
 
-	public void setPricePerUnit(BigDecimal pricePerUnit) {
+	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
+
 
 
 	

@@ -34,7 +34,7 @@ public class Crop extends Asset {
 
 	@Column(name = "UnitsOtherUse", length = 255)
 	@DisplaySize(10)
-	private String unitsOtherUse;
+	private Double unitsOtherUse;
 
 	@Column(name = "Market1", length = 50)
 	private String market1;
@@ -84,10 +84,11 @@ public class Crop extends Asset {
 	public void setUnitsConsumed(Double unitsConsumed) {
 		this.unitsConsumed = unitsConsumed;
 	}
-	public String getUnitsOtherUse() {
+
+	public Double getUnitsOtherUse() {
 		return unitsOtherUse;
 	}
-	public void setUnitsOtherUse(String unitsOtherUse) {
+	public void setUnitsOtherUse(Double unitsOtherUse) {
 		this.unitsOtherUse = unitsOtherUse;
 	}
 	public String getMarket1() {

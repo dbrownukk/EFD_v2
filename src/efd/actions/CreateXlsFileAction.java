@@ -1233,21 +1233,22 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
 			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
 			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
-			sheet.setValue(7, 3, "Units Other Use", boldTopStyle);
-			sheet.setValue(8, 3, "Market 1", boldTopStyle);
-			sheet.setValue(9, 3, "% Trade at 1", boldTopStyle);
-			sheet.setValue(10, 3, "Market 2", boldTopStyle);
-			sheet.setValue(11, 3, "% Trade at 2", boldTopStyle);
-			sheet.setValue(12, 3, "Market 3", boldTopStyle);
-			sheet.setValue(13, 3, "% Trade at 3", boldTopStyle);
+			sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
+			sheet.setValue(8, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(9, 3, "Market 1", boldTopStyle);
+			sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
+			sheet.setValue(11, 3, "Market 2", boldTopStyle);
+			sheet.setValue(12, 3, "% Trade at 2", boldTopStyle);
+			sheet.setValue(13, 3, "Market 3", boldTopStyle);
+			sheet.setValue(14, 3, "% Trade at 3", boldTopStyle);
 
-			sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth, numwidth, width, width, numwidth, width, numwidth,width, numwidth); /* set col widths */
+			sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth, numwidth, numwidth, width, width, numwidth, width, numwidth,width, numwidth); /* set col widths */
 
 			/* set grid for data input */
 
 			int col = 2;
 			int row = 4;
-			while (col < 14) {
+			while (col < 15) {
 				while (row < numRows) {
 					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
 					row++;

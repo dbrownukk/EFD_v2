@@ -28,52 +28,51 @@ public class Transfer extends Asset{
 	private String transferType;
 
 	@Column(name = "PeopleReceiving")
-	private Integer peopleReceiving;
+	private Double peopleReceiving;
 	
 	@Column(name = "TimesReceived")
-	private Integer timesReceived;
+	private Double timesReceived;
 	
 	@Column(name = "CashTransferAmount" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
-	private BigDecimal cashTransferAmount;
+	private Double cashTransferAmount;
 	
 	@Column(name = "TransferFoodOtherType", length = 50)
 	private String transferFoodOtherType;
 	
 	@Column(name = "UnitesTransferred")
-	private Integer unitsTransferred;
+	private Double unitsTransferred;
 	
 	@Column(name = "UnitsSold")
-	private Integer unitsSold;
+	private Double unitsSold;
 	
 	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
-	private BigDecimal pricePerUnit;
+	private Double pricePerUnit;
 	
 	@Column(name = "OtherUse", length = 255)
-	private String otherUse;
+	private Double otherUse;
 	
 	@Column(name = "UnitsConsumed")
-	private Integer unitsConsumed;
+	private Double unitsConsumed;
 	
 	@Column(name = "Market1", length = 50)
 	private String market1;
 	@Column(name = "PercentTradeMarket1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	private BigDecimal percentTradeMarket1;
+	private Double percentTradeMarket1;
 	
 	@Column(name = "Market2", length = 50)
 	private String market2;
 	@Column(name = "PercentTradeMarket2", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	private BigDecimal percentTradeMarket2;
+	private Double percentTradeMarket2;
 	
 	@Column(name = "Market3", length = 50)
 	private String market3;
 	@Column(name = "PercentTradeMarket3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	private BigDecimal percentTradeMarket3;
-	
+	private Double percentTradeMarket3;
 	public Boolean getIsOfficial() {
 		return isOfficial;
 	}
@@ -92,22 +91,22 @@ public class Transfer extends Asset{
 	public void setTransferType(String transferType) {
 		this.transferType = transferType;
 	}
-	public Integer getPeopleReceiving() {
+	public Double getPeopleReceiving() {
 		return peopleReceiving;
 	}
-	public void setPeopleReceiving(Integer peopleReceiving) {
+	public void setPeopleReceiving(Double peopleReceiving) {
 		this.peopleReceiving = peopleReceiving;
 	}
-	public Integer getTimesReceived() {
+	public Double getTimesReceived() {
 		return timesReceived;
 	}
-	public void setTimesReceived(Integer timesReceived) {
+	public void setTimesReceived(Double timesReceived) {
 		this.timesReceived = timesReceived;
 	}
-	public BigDecimal getCashTransferAmount() {
+	public Double getCashTransferAmount() {
 		return cashTransferAmount;
 	}
-	public void setCashTransferAmount(BigDecimal cashTransferAmount) {
+	public void setCashTransferAmount(Double cashTransferAmount) {
 		this.cashTransferAmount = cashTransferAmount;
 	}
 	public String getTransferFoodOtherType() {
@@ -116,35 +115,35 @@ public class Transfer extends Asset{
 	public void setTransferFoodOtherType(String transferFoodOtherType) {
 		this.transferFoodOtherType = transferFoodOtherType;
 	}
-	public Integer getUnitsTransferred() {
+	public Double getUnitsTransferred() {
 		return unitsTransferred;
 	}
-	public void setUnitsTransferred(Integer unitsTransferred) {
+	public void setUnitsTransferred(Double unitsTransferred) {
 		this.unitsTransferred = unitsTransferred;
 	}
-	public Integer getUnitsSold() {
+	public Double getUnitsSold() {
 		return unitsSold;
 	}
-	public void setUnitsSold(Integer unitsSold) {
+	public void setUnitsSold(Double unitsSold) {
 		this.unitsSold = unitsSold;
 	}
-	public BigDecimal getPricePerUnit() {
+	public Double getPricePerUnit() {
 		return pricePerUnit;
 	}
-	public void setPricePerUnit(BigDecimal pricePerUnit) {
+	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
-	public String getOtherUse() {
+
+	public Double getOtherUse() {
 		return otherUse;
 	}
-	public void setOtherUse(String otherUse) {
+	public void setOtherUse(Double otherUse) {
 		this.otherUse = otherUse;
 	}
-	
-	public Integer getUnitsConsumed() {
+	public Double getUnitsConsumed() {
 		return unitsConsumed;
 	}
-	public void setUnitsConsumed(Integer unitsConsumed) {
+	public void setUnitsConsumed(Double unitsConsumed) {
 		this.unitsConsumed = unitsConsumed;
 	}
 	public String getMarket1() {
@@ -153,10 +152,10 @@ public class Transfer extends Asset{
 	public void setMarket1(String market1) {
 		this.market1 = market1;
 	}
-	public BigDecimal getPercentTradeMarket1() {
+	public Double getPercentTradeMarket1() {
 		return percentTradeMarket1;
 	}
-	public void setPercentTradeMarket1(BigDecimal percentTradeMarket1) {
+	public void setPercentTradeMarket1(Double percentTradeMarket1) {
 		this.percentTradeMarket1 = percentTradeMarket1;
 	}
 	public String getMarket2() {
@@ -165,10 +164,10 @@ public class Transfer extends Asset{
 	public void setMarket2(String market2) {
 		this.market2 = market2;
 	}
-	public BigDecimal getPercentTradeMarket2() {
+	public Double getPercentTradeMarket2() {
 		return percentTradeMarket2;
 	}
-	public void setPercentTradeMarket2(BigDecimal percentTradeMarket2) {
+	public void setPercentTradeMarket2(Double percentTradeMarket2) {
 		this.percentTradeMarket2 = percentTradeMarket2;
 	}
 	public String getMarket3() {
@@ -177,12 +176,13 @@ public class Transfer extends Asset{
 	public void setMarket3(String market3) {
 		this.market3 = market3;
 	}
-	public BigDecimal getPercentTradeMarket3() {
+	public Double getPercentTradeMarket3() {
 		return percentTradeMarket3;
 	}
-	public void setPercentTradeMarket3(BigDecimal percentTradeMarket3) {
+	public void setPercentTradeMarket3(Double percentTradeMarket3) {
 		this.percentTradeMarket3 = percentTradeMarket3;
 	}
+	
 	
 	
 }
