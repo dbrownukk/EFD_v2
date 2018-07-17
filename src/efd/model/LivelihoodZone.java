@@ -24,7 +24,7 @@ import org.openxava.annotations.*;
 
 public class LivelihoodZone {
 
-
+	
 	
 	
 	@Id

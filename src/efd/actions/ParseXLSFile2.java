@@ -211,8 +211,9 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		setResource(); // populate resource intersection tables
 
-		getView().refresh();
+		
 		getView().refreshCollections();
+		getView().refresh();
 
 		addMessage("Spreadsheet Parsed");
 
@@ -517,11 +518,12 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							break breaksheet;
 						}
 					}
+					/*
 					if (cell[i][j][k].getCellType() == 0)
 						System.out.println("Numeric " + cell[i][j][k].getNumericCellValue());
 					if (cell[i][j][k].getCellType() == 1)
 						System.out.println("cell = " + i + j + k + " " + cell[i][j][k].getStringCellValue());
-
+					*/
 				}
 
 				/* In loop for sheets - swicth on which asset/resource */
@@ -546,7 +548,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype.getIdresourcetype().toString())) != null) {
-							System.out.println("done al get =  " + rst.getResourcetypename());
+							//System.out.println("done al get =  " + rst.getResourcetypename());
 
 							al.setResourceSubType(rst);
 							al.setStatus(efd.model.Asset.Status.Valid);

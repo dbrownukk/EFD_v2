@@ -10,9 +10,9 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 
-//@Views({ @View(members = "Site[#livelihoodZone;locationdistrict;subdistrict;gpslocation]"),
-	@Views({ @View(members = "Site[locationdistrict;subdistrict;gpslocation]"),
-		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation"),
+@Views({ @View(members = "Site[#livelihoodZone;locationdistrict;subdistrict;gpslocation]"),
+//	@Views({ @View(members = "Site[locationdistrict;subdistrict;gpslocation]"),
+		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone"),
 //		@View(name = "SimpleSite", members = "locationdistrict"),
 		@View(name = "LZSite", members = "locationdistrict;subdistrict;gpslocation"),
 		@View(name = "FromWealthGroup", members = "locationdistrict,subdistrict,livelihoodZone;"),

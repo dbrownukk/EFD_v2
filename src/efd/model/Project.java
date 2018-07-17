@@ -74,7 +74,7 @@ public class Project {
 	//@NewActions({
 	//@NewAction(forViews="DEFAULT", value="LivelihoodZone.new LZ"), /* Check projectid is not empty */ 
 	//})
-	//@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */ 
+	@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */ 
 	//@AddAction("LivelihoodZone.add")
 	@NewAction("ManyToMany.new") 
 	@ManyToMany

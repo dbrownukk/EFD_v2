@@ -21,15 +21,15 @@
 		value="false"/> </action> </controller> -->
 	<controller name="Spreadsheet">
 		<extends controller="TypicalRealExcel" />
-		<action name="Template Spreadsheet" mode="detail" in-each-row="false"
-			class="efd.actions.CreateXlsFileAction" />
+		<action name="Template Spreadsheet" mode="detail"
+			in-each-row="false" class="efd.actions.CreateXlsFileAction" />
 	</controller>
 
 	<controller name="ParseSpreadsheet">
 		<extends controller="TypicalNotResetOnSave" />
-		<action name="Parse Spreadsheet" label="Parse Interview Spreadsheet 2" 
-			icon="file-excel" mode="detail" in-each-row="false"
-			class="efd.actions.ParseXLSFile2" />
+		<action name="Parse Spreadsheet"
+			label="Parse Interview Spreadsheet 2" icon="file-excel" mode="detail"
+			in-each-row="false" class="efd.actions.ParseXLSFile2" />
 		<action name="Validate Asset Data" label="Validate Asset Data"
 			icon="marker-check" mode="detail" in-each-row="false"
 			class="efd.actions.ValidateXLSFile" />
@@ -42,10 +42,10 @@
 	<controller name="ReportsList">
 		<action name="Country" label="Country Report" icon="view-list"
 			class="efd.reports.ReportCountrys" />
-			<action name="Projects" label="Project Report" icon="view-list"
+		<action name="Projects" label="Project Report" icon="view-list"
 			class="efd.reports.ReportProjects" />
-			<action name="Sites By Country" label="Sites By Country" icon="view-list"
-			class="efd.actions.RunRestReport" />
+		<action name="Sites By Country" label="Sites By Country"
+			icon="view-list" class="efd.actions.RunRestReport" />
 	</controller>
 
 
@@ -56,35 +56,52 @@
 		<extends controller="EFD_v2" />
 		<action name="filteredsearch" hidden="true" image="search.gif"
 			class="efd.actions.FilteredLZ" />
-
+		<action name="add" hidden="true"
+			icon="table-row-plus-after" class="efd.actions.AddLZ" />
 	</controller>
+
+
 	<!-- <extends controller="EFD_v2"/> <action name="new LZ" image="new.gif" 
 		hidden="true" icon="library-plus" class="efd.actions.NewLZ"/> <action name="add 
 		LZ" hidden="true" icon="table-row-plus-after" class="efd.actions.AddLZ"/> 
 		<action name="filteredsearch" hidden="true" image="search.gif" class="efd.actions.FilteredLZ"/> 
 		</controller> -->
+
+
 	<controller name="Community">
 		<extends controller="EFD_v2" />
-		<action name="filteredSitesearch" hidden="true" image="search.gif"
-			class="efd.actions.FileteredSite" />
+		<action name="filteredSitesearch" hidden="true"
+			image="search.gif" class="efd.actions.FileteredSite" />
 	</controller>
 
 	<controller name="Sections">
-		<action name="change" class="efd.actions.AssetChangeSectionAction"
-			keystroke="Control 1..9" />
+		<action name="change"
+			class="efd.actions.AssetChangeSectionAction" keystroke="Control 1..9" />
 	</controller>
 
 
 	<controller name="WealthGroupInterview">
 		<extends controller="EFD_v2" />
-		<action name="resourceSubTypeFilter" hidden="false" image="search.gif"
-			class="efd.actions.ResourceSubTypeFilter" />
+		<action name="resourceSubTypeFilter" hidden="false"
+			image="search.gif" class="efd.actions.ResourceSubTypeFilter" />
 
 
-		<action name="change" class="efd.actions.AssetChangeSectionAction"
-			keystroke="Control 1..9">
+		<action name="change"
+			class="efd.actions.AssetChangeSectionAction" keystroke="Control 1..9">
 			<use-object name="xava_activeSection" />
 		</action>
+
+		<controller name="CollectionCopyPaste">
+
+			<action name="cut" icon="content-cut" image="cut.gif"
+				in-each-row="true" hidden="true"
+				class="org.openxava.actions.CutElementsFromCollectionAction" />
+
+			<action name="paste" icon="content-paste" image="paste.gif"
+				hidden="true"
+				class="org.openxava.actions.PasteElementsIntoCollectionAction" />
+
+		</controller>
 
 
 

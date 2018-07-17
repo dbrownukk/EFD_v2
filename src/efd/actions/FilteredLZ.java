@@ -19,7 +19,7 @@ public class FilteredLZ extends ReferenceSearchAction  {
 		
 		System.out.println("In Filter1 "+getView().getMembersNames());
 		System.out.println("In Filter2 "+getView().getBaseModelName());
-		
+
 		//System.out.println("vnames"+getView().);
 
 		
