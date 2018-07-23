@@ -132,7 +132,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		if (wgi.getSpreadsheet().isEmpty()) {
 			addWarning("Upload completed Interview Spreadsheet before parsing");
 			return;
-		} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Parsed)) {
+		} else if ((wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.PartParsed) ||
+				wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.FullyParsed))){
 			addWarning("Cannot Parse Interview Spreadsheet - Already Parsed");
 			return;
 		} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Validated)) {
@@ -211,7 +212,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		setResource(); // populate resource intersection tables
 
-		
 		getView().refreshCollections();
 		getView().refresh();
 
@@ -436,7 +436,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 			wgi.setWgYearType(typeOfYear);
 
-			wgi.setStatus(Status.Parsed);
+			wgi.setStatus(Status.PartParsed);
 		}
 		System.out.println("done wb setup ");
 
@@ -491,9 +491,16 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		ResourceType rtype = null;
 
+		/* Get list of currencies for validation of Cash Asset */
+		List<Country> currency = XPersistence.getManager().createQuery("from Country").getResultList();
+
+		int icurr = 0;
 		int i = 0, j = 0, k = 0;
+		String s1 = null, s2 = null;
 
 		/*
+		 * Note that a cell matrix is used - populated in getWorkSheetDetail above
+		 * 
 		 * print cell array for (i = 1; i < 15; i++) { for (j = 0; j < 10; j++) { for (k
 		 * = 0; k < 10; k++) System.out.println("Cell at i j k = " + i + j + k + " " +
 		 * cell[i][j][k]); } }
@@ -519,11 +526,11 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						}
 					}
 					/*
-					if (cell[i][j][k].getCellType() == 0)
-						System.out.println("Numeric " + cell[i][j][k].getNumericCellValue());
-					if (cell[i][j][k].getCellType() == 1)
-						System.out.println("cell = " + i + j + k + " " + cell[i][j][k].getStringCellValue());
-					*/
+					 * if (cell[i][j][k].getCellType() == 0) System.out.println("Numeric " +
+					 * cell[i][j][k].getNumericCellValue()); if (cell[i][j][k].getCellType() == 1)
+					 * System.out.println("cell = " + i + j + k + " " +
+					 * cell[i][j][k].getStringCellValue());
+					 */
 				}
 
 				/* In loop for sheets - swicth on which asset/resource */
@@ -548,7 +555,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype.getIdresourcetype().toString())) != null) {
-							//System.out.println("done al get =  " + rst.getResourcetypename());
+							// System.out.println("done al get = " + rst.getResourcetypename());
 
 							al.setResourceSubType(rst);
 							al.setStatus(efd.model.Asset.Status.Valid);
@@ -699,15 +706,18 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						acash.setAmount(cell[i][j][1].getNumericCellValue());
 
-						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
-							System.out.println("done acash get =  " + rst.getResourcetypename());
+						/* check against currency */
 
-							acash.setResourceSubType(rst);
-							acash.setStatus(efd.model.Asset.Status.Valid);
+						for (icurr = 0; icurr < currency.size(); icurr++) {
+							if (currency.get(icurr).getCurrency().equals(cell[i][j][0].getStringCellValue())) {
+								rst = checkSubType("Cash", rtype.getIdresourcetype().toString());
+								acash.setStatus(efd.model.Asset.Status.Valid);
+								acash.setResourceSubType(rst);
+								break;
+							} else {
+								acash.setStatus(efd.model.Asset.Status.Invalid);
+							}
 
-						} else {
-							acash.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getAssetCash().add(acash);
 
@@ -717,7 +727,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 					}
 
 					catch (Exception ex) {
-						addMessage("Problem parsing Cash worksheet");
+						addMessage("Problem parsing Cash worksheet" + ex);
 						break;
 					}
 
@@ -1068,7 +1078,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'"
 							+ "and resourcetypename = '" + var1 + "'")
 					.getSingleResult();
-			System.out.println("done asset sub type query " + rst.getResourcetypename() + var1);
+			// System.out.println("done asset sub type query " + rst.getResourcetypename() +
+			// var1);
 			return rst;
 		}
 

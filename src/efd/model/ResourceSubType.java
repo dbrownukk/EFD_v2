@@ -47,6 +47,7 @@ public class ResourceSubType {
 	private  ResourceSubType resourcesubtypesynonym;
 	
 	@Column(name = "ResourceSubTypeUnit", length=20)  
+	@Required   // change DRB 23/8/18
 	private String resourcesubtypeunit;
 	
 	@Column(name = "ResourceSubTypeKCal")  

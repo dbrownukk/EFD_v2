@@ -19,7 +19,8 @@ import efd.actions.*;
 	
 	@JoinColumn(name="ResourceSubType")
 
-	@DescriptionsList(descriptionProperties="resourcetype.resourcetypename,resourcetypename")
+	//@DescriptionsList(descriptionProperties="resourcetype.resourcetypename,resourcetypename")
+	@DescriptionsList(descriptionProperties="resourcetypename")
 	private ResourceSubType resourceSubType;
 	
 	

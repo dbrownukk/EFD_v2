@@ -104,8 +104,9 @@ private Date wgInterviewDate;
 //@Editor("ValidValuesRadioButton")
 //@ReadOnly
 @Column(name="WGIStatus")
+@Required // removes the blank
 private Status status;
-public enum Status { Generated, Uploaded, Parsed, Validated };
+public enum Status { Generated, Uploaded, PartParsed, FullyParsed, Validated };
 
 @ManyToOne(fetch = FetchType.LAZY, optional = false)
 @JoinColumn(name = "WGID")
