@@ -8,7 +8,7 @@ import org.openxava.annotations.*;
 
 
 
-@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap],site"),
+@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap]"),
 		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
 		@View(name = "CreateLZ", members = "Livelihood Zone[lzname;country;lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname,country;lzzonemap"),
@@ -62,6 +62,8 @@ public class LivelihoodZone {
 	private byte[] lzzonemap;
 
 	@OneToMany(mappedBy = "livelihoodZone")
+	@NewAction("")
+	@NoCreate
 	@ListProperties("locationdistrict,subdistrict,gpslocation")
 	@CollectionView("LZSite")
 	private Collection<Site> site;

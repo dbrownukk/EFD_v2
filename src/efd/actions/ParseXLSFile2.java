@@ -127,6 +127,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		// System.out.println("in xls parse ");
 
 		String wgiid = getView().getValueString("wgiid");
+		
+		getView().refresh();
 
 		wgi = XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
 		if (wgi.getSpreadsheet().isEmpty()) {
@@ -143,9 +145,9 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		/* Otherwise. delete assets from this wealthgroupinterview */
 
-		// System.out.println("in xls parse " + getView().getValueString("wgiid"));
+		System.out.println("in xls parse " + getView().getValueString("wgiid"));
 
-		// System.out.println("in xls 2 " + wgi.getSpreadsheet());
+		System.out.println("in xls 2 " + wgi.getSpreadsheet());
 
 		String spreadsheetId = wgi.getSpreadsheet();
 
@@ -155,8 +157,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 			PreparedStatement ps = con
 					.prepareStatement("select id,data from OXFILES where ID = '" + spreadsheetId + "'");
-			// System.out.println("prepped statment = " + ps.toString());
-			// System.out.println("prepped");
+			System.out.println("prepped statment = " + ps.toString());
+			System.out.println("prepped");
 			ResultSet rs = ps.executeQuery();
 			// System.out.println("queried");
 
@@ -171,7 +173,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			String spreadsheetPkey = rs.getString(1);
 
 			spreadsfile = find(spreadsheetPkey);
-			// System.out.println("done attache file get");
+			System.out.println("done attache file get");
 			ps.close();
 
 			wb = WorkbookFactory.create(input);
