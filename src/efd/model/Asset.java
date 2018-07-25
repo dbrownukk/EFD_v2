@@ -18,8 +18,9 @@ import efd.actions.*;
 	@ManyToOne
 	
 	@JoinColumn(name="ResourceSubType")
-
+	 @javax.inject.Inject
 	//@DescriptionsList(descriptionProperties="resourcetype.resourcetypename,resourcetypename")
+	//@DescriptionsList(descriptionProperties="resourcetypename", condition="resourcetype.resourcetypename = ")
 	@DescriptionsList(descriptionProperties="resourcetypename")
 	private ResourceSubType resourceSubType;
 	

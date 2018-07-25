@@ -6,8 +6,8 @@
 
 
 	<object name="xava_activeSection" class="java.lang.Integer"
-		value="0" />
-§
+		value="0"  scope="global"/>
+
 
 	<controller name="EFD_v2">
 		<extends controller="TypicalNotResetOnSave" />

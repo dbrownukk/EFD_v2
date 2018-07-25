@@ -10,8 +10,12 @@ import efd.model.*;
 
 
 
-public class AssetChangeSectionAction extends ChangeSectionAction implements IModuleContextAction{
-	
+// public class AssetChangeSectionAction extends ChangeSectionAction implements IModuleContextAction{
+//public class AssetChangeSectionAction extends OnChangePropertyBaseAction {
+	public class AssetChangeSectionAction extends ChangeSectionAction  {
+
+
+
 	public void execute() throws Exception {
 	
 		int irst = 0;
@@ -37,8 +41,9 @@ public class AssetChangeSectionAction extends ChangeSectionAction implements IMo
 		
 		int activeSection = this.getActiveSection();
 		
-		
 		System.out.println("in change section"+activeSection+asection);
+		
+		//getView().setDescriptionsListCondition("resourceSubType","resourcetype.resourcetypename = 'Crops'");
 	
 	/*
 	  rt = (ResourceType) XPersistence.getManager().createQuery("from ResourceType where ResourceTypeName = '"+rType[activeSection]+"'").getSingleResult();

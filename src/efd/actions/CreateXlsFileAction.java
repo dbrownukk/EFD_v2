@@ -888,15 +888,21 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		// get resource sub type //
 		for (int k = 0; k < chrs.size(); k++) {
 			/* Get Resource Sub Type */
+			
 			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
 					.find(WGCharacteristicsResource.class, chrs.get(k));
+			
+			
+			//System.out.println("characteristic rst = "+wgcharacteristicsresource.getResourcesubtype().getResourcetypename());
+			
+			
 			/* Get Resource Type */
 			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
 					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 			if (rt.equals("Land")) {
 				sheet.setValue(2, landrow, resub, borderStyle);
@@ -950,7 +956,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 			if (rt.equals("Livestock")) {
 				sheet.setValue(2, row, resub, borderStyle);
@@ -1000,7 +1006,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 			if (rt.equals("Other Tradeable Goods")) {
 				sheet.setValue(2, row, resub, borderStyle);
@@ -1057,7 +1063,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 			if (rt.equals("Food Stocks")) {
 				sheet.setValue(2, fsrow, resub, borderStyle);
@@ -1108,7 +1114,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 			if (rt.equals("Trees")) {
 				sheet.setValue(2, row, resub, borderStyle);
@@ -1159,7 +1165,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 				if (rt.equals("Cash")) {
 					sheet.setValue(2, row, resub, borderStyle);
@@ -1222,9 +1228,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
+				//rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
-				if (rt.equals("Crops")) {
+				if (rt.contains("Crops")) {
 					sheet.setValue(2, row, resub, borderStyle);
 					sheet.setValue(3, row, rtunit, borderStyle);
 					row++;
@@ -1284,7 +1291,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 				if (rt.equals("Livestock Sales")) {
 					sheet.setValue(2, row, resub, borderStyle);
@@ -1346,7 +1353,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 				if (rt.equals("Livestock Products")) {
 					sheet.setValue(2, row, resub, borderStyle);
@@ -1412,7 +1419,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 				if (rt.equals("Employment")) {
 					sheet.setValue(2, row, resub, borderStyle);
@@ -1481,8 +1488,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
+				
 				if (rt.equals("Transfers")) {
 					sheet.setValue(2, row, resub, borderStyle);
 					sheet.setValue(3, row, rtunit, borderStyle);
@@ -1543,7 +1550,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 				if (rt.equals("Wildfood")) {
 					sheet.setValue(2, row, resub, borderStyle);
@@ -1597,7 +1604,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 			if (rt.equals("Food Purchase")) {
 				sheet.setValue(2, row, resub, borderStyle);
@@ -1649,7 +1656,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-			rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
 
 			if (rt.equals("Non Food Purchase")) {
 				sheet.setValue(2, row, resub, borderStyle);

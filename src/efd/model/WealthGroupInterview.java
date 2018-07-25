@@ -119,8 +119,9 @@ public enum Status { Generated, Uploaded, PartParsed, FullyParsed, Validated };
 private WealthGroup wealthgroup;
 
 
+//@OnChange(OnChangeSetWGIStatus.class)
+
 @Stereotype("FILE")
-// @OnChange(OnChangeSetWGIStatus.class)
 @Column(length=32,name="WGISpreadsheet")
 private String spreadsheet;
 

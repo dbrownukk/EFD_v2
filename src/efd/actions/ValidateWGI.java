@@ -76,129 +76,128 @@ public class ValidateWGI extends CollectionBaseAction implements IForwardAction 
 		List<FoodPurchase> fp = (List<FoodPurchase>) wgi.getFoodPurchase();
 		List<NonFoodPurchase> nfp = (List<NonFoodPurchase>) wgi.getNonFoodPurchase();
 
+		System.out.println("DONE LISTS ");
+		
 		for (i = 0; i < al.size(); i++) {
-			if (al.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Land Assets still set to Invalid ");
+			if (!al.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Land Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
 		}
+		//System.out.println("DONE LAND ");
 		for (i = 0; i < als.size(); i++) {
 
-			if (als.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Livestock Assets still set to Invalid ");
+			if (!als.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Land Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
 		}
+		//System.out.println("DONE LS ");
 		for (i = 0; i < at.size(); i++) {
 	
-			if (at.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Tradeable Assets still set to Invalid ");
+			if (!at.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Land Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
 		}
+		//System.out.println("DONE Trade ");
 		for (i = 0; i < afs.size(); i++) {
-			if (afs.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Food Stock Assets still set to Invalid ");
+			if (!afs.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Food Stock Assets still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
-		
+		//System.out.println("DONE FS ");
 		for (i = 0; i < atree.size(); i++) {
-			if (atree.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Tree Assets still set to Invalid ");
+			if (!atree.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Tree Assets still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
+		//System.out.println("DONE TREE ");
 		for (i = 0; i < ac.size(); i++) {
-			if (ac.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Cash Assets still set to Invalid ");
+			if (!ac.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Cash Assets still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
-		
+		//System.out.println("DONE CASH ");
 		
 		for (i = 0; i < crop.size(); i++) {
-			if (crop.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Crop Assets still set to Invalid ");
+			if (!crop.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Crop Assets still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
 		for (i = 0; i < lss.size(); i++) {
-			if (lss.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Livestock Sales still set to Invalid ");
+			if (!lss.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Livestock Sales still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
 		
 		for (i = 0; i < lsp.size(); i++) {
-			if (lsp.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Livestock Products still set to Invalid ");
+			if (!lsp.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Livestock Products still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
 		for (i = 0; i < emp.size(); i++) {
-			if (emp.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Employment still set to Invalid ");
+			if (!emp.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Employment still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
 		
 		for (i = 0; i < tran.size(); i++) {
-			if (tran.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Transfers still set to Invalid ");
+			if (!tran.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Transfers still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
 		}
+		//System.out.println("DONE TRANS ");
 		for (i = 0; i < wf.size(); i++) {
-			if (wf.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Wild Food still set to Invalid ");
+			if (!wf.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Wild Food still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
-		
+		//System.out.println("DONE WF ");
 		for (i = 0; i < fp.size(); i++) {
-			if (fp.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Food Purchase still set to Invalid ");
+			if (!fp.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Food Purchase still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
+		//System.out.println("DONE FP ");
 		for (i = 0; i < nfp.size(); i++) {
-			if (nfp.get(i).getStatus().toString().equals("Invalid")) {
-				addMessage("Non Food Purchase still set to Invalid ");
+			if (!nfp.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Non Food Purchase still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
-		
+		//System.out.println("DONE NFP ");
 		if (isinvalid)
 			addMessage("Validation Complete with Invalid Assets");
 		else 
 		{
-			wgi.setStatus(WealthGroupInterview.Status.Validated);
-			/*
-			View vw;
-			vw = getCollectionElementView();
-			vw.setEditable("AssetLand.status", false);
-		
-			*/
-			removeActions("TypicalNotResetOnSave");
-			
-			
-			
+			wgi.setStatus(WealthGroupInterview.Status.Validated);		
 			getView().refresh();
+			addMessage("Validation Complete");
 		}
 		
 		return;
