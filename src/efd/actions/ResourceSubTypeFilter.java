@@ -11,6 +11,7 @@ import efd.model.*;
 
 public class ResourceSubTypeFilter extends  OnChangePropertyBaseAction   {
 
+
 	public void execute() throws Exception {
 		
 		  /* Note that these run the risk of being changed in ResourceType Table
@@ -44,11 +45,13 @@ public class ResourceSubTypeFilter extends  OnChangePropertyBaseAction   {
 		
 		
 	/* Filter Resource Sub Type to correct Resource Type for WealthGroupInterview element collection */
-		
+super.executeBefore();		
 
-		  
+		  System.out.println("in filter 1");
 		  
 		  irst = getView().getActiveSection();
+		  
+		  System.out.println("in filter 2");
 
 		  rt = (ResourceType) XPersistence.getManager().createQuery("from ResourceType where ResourceTypeName = '"+rType[irst]+"'").getSingleResult();
 		  System.out.println("in condition for sub resource type");

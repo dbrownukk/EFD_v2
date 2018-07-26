@@ -42,6 +42,10 @@ public class LiveStockUse extends Asset{
 	@Column(name="LSIncomeType2")
 	private String lsIncomeType2;
 
+	@ManyToOne
+	@JoinColumn(name = "ResourceSubType")
+	//@DescriptionsList(descriptionProperties="resourcetypename", depends="currentTab", condition="${resourcetype.resourcetypename}=?")
+	private ResourceSubType resourceSubType;
 
 
 	public String getLsName() {
@@ -106,6 +110,14 @@ public class LiveStockUse extends Asset{
 
 	public void setLsIncomeType2(String lsIncomeType2) {
 		this.lsIncomeType2 = lsIncomeType2;
+	}
+
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
 	}
 	
 	

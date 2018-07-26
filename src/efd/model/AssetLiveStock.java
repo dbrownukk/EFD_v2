@@ -31,6 +31,11 @@ public class AssetLiveStock extends Asset{
 	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
 	private Double pricePerUnit;
+	
+	@ManyToOne
+	@JoinColumn(name = "ResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename}='Livestock'")
+	private ResourceSubType resourceSubType;
 
 	public String getLiveStockTypeEnteredName() {
 		return liveStockTypeEnteredName;
@@ -58,6 +63,14 @@ public class AssetLiveStock extends Asset{
 
 	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
+	}
+
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
 	}
 
 

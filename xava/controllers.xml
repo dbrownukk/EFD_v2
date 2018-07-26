@@ -5,9 +5,9 @@
 <controllers>
 
 
-	<object name="xava_activeSection" class="java.lang.Integer"
-		value="0"  scope="global"/>
-
+	<object name="activesectionchar" class="java.lang.String" value="Crops" scope="global" />
+	<object name="EFD_v2_sessionTab" class="java.lang.String" value="Employment" scope="global" />
+	
 
 	<controller name="EFD_v2">
 		<extends controller="TypicalNotResetOnSave" />
@@ -56,8 +56,8 @@
 		<extends controller="EFD_v2" />
 		<action name="filteredsearch" hidden="true" image="search.gif"
 			class="efd.actions.FilteredLZ" />
-		<action name="add" hidden="true"
-			icon="table-row-plus-after" class="efd.actions.AddLZ" />
+		<action name="add" hidden="true" icon="table-row-plus-after"
+			class="efd.actions.AddLZ" />
 	</controller>
 
 
@@ -73,23 +73,20 @@
 		<action name="filteredSitesearch" hidden="true"
 			image="search.gif" class="efd.actions.FileteredSite" />
 	</controller>
-
+  
+  <!-- 
 	<controller name="Sections">
-		<action name="change"
+		<action name="change" hidden="true"
 			class="efd.actions.AssetChangeSectionAction" keystroke="Control 1..9" />
 	</controller>
 
+	<controller name="Sections">
+		<action name="change" hidden="true"
+			class="efd.actions.ResourceSubTypeFilter" keystroke="Control 1..9" />
+	</controller>
+ 	-->	
 
-	<controller name="WealthGroupInterview">
-		<extends controller="EFD_v2" />
-		<action name="resourceSubTypeFilter" hidden="false"
-			image="search.gif" class="efd.actions.ResourceSubTypeFilter" />
 
-
-		<action name="change"
-			class="efd.actions.AssetChangeSectionAction" keystroke="Control 1..9">
-			<use-object name="xava_activeSection" />
-		</action>
 
 		<controller name="CollectionCopyPaste">
 
@@ -107,6 +104,6 @@
 
 
 
-	</controller>
+
 
 </controllers>

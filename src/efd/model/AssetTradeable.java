@@ -30,6 +30,11 @@ public class AssetTradeable extends Asset{
 
 	@Column(name = "PricePerUnit" )
 	private Double pricePerUnit;
+	
+	@ManyToOne
+	@JoinColumn(name = "ResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename} like '%Tradeable%'")
+	private ResourceSubType resourceSubType;
 
 	public String getTradeableTypeEnteredName() {
 		return tradeableTypeEnteredName;
@@ -53,6 +58,14 @@ public class AssetTradeable extends Asset{
 
 	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
+	}
+
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
 	}
 
 	

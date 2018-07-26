@@ -22,6 +22,11 @@ public class AssetCash extends Asset{
 	@Column(name = "Amount" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
 	private Double amount;
+	
+	@ManyToOne
+	@JoinColumn(name = "ResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename}='Cash'")
+	private ResourceSubType resourceSubType;
 
 	public String getCurrencyEnteredName() {
 		return currencyEnteredName;
@@ -37,6 +42,14 @@ public class AssetCash extends Asset{
 
 	public void setAmount(Double amount) {
 		this.amount = amount;
+	}
+
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
 	}
 
 

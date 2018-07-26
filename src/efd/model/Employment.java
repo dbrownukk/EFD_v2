@@ -58,6 +58,12 @@ public class Employment extends Asset {
 	@Column(name = "PercentWorkLocation3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private Double percentWorkLocation3;
+	
+	@ManyToOne
+	@JoinColumn(name = "ResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename} like '%Employment%'")
+	private ResourceSubType resourceSubType;
+	
 	public String getEmploymentName() {
 		return employmentName;
 	}
@@ -135,6 +141,12 @@ public class Employment extends Asset {
 	}
 	public void setPercentWorkLocation3(Double percentWorkLocation3) {
 		this.percentWorkLocation3 = percentWorkLocation3;
+	}
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
 	}
 	
 	

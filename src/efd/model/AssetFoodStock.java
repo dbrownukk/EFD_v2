@@ -25,6 +25,11 @@ public class AssetFoodStock extends Asset {
 
 	@Column(name = "Quantity" )
 	private Double quantity;
+	
+	@ManyToOne
+	@JoinColumn(name = "ResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename} like 'Food%'")
+	private ResourceSubType resourceSubType;
 
 
 	public String getFoodTypeEnteredName() {
@@ -46,6 +51,18 @@ public class AssetFoodStock extends Asset {
 		this.quantity = quantity;
 	}
 
+
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+
+
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
+	}
+
+	
+	
 
     
 	
