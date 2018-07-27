@@ -30,7 +30,7 @@ public class NonFoodPurchase extends Asset{
 
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
-	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename} like '%Non Food%'")
+	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename} in ('Non Food Purchase','Other Tradeable Goods')")
 	private ResourceSubType resourceSubType;
 	
 
