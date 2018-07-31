@@ -101,7 +101,10 @@
 		</controller>
 
 
-
+	<controller name="UploadFile">
+		<action name="uploadFile" class="efd.actions.WgiUploadFileAction" />
+		<action name="cancel" class="org.openxava.actions.CancelAction" />
+	</controller>
 
 
 

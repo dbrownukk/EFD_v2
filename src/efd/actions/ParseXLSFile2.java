@@ -103,18 +103,18 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		Query query = null;
 
 		/* Definition of spreadsheet to parse */
-		ws.add(new Wsheet(ASSETLAND, "Land", 3));
+		ws.add(new Wsheet(ASSETLAND, "Land", 3)); // 0
 		ws.add(new Wsheet(ASSETLIVESTOCK, "Livestock", 4));
 		ws.add(new Wsheet(ASSETTRADEABLE, "Other Tradeable Goods", 4));
-		ws.add(new Wsheet(ASSETFOOD, "Food Stocks", 3));
+		ws.add(new Wsheet(ASSETFOOD, "Food Stocks", 3)); // 3
 		ws.add(new Wsheet(ASSETTREE, "Trees", 4));
 		ws.add(new Wsheet(ASSETCASH, "Cash", 2));
 		ws.add(new Wsheet(CROPS, "Crops", 13));
-		ws.add(new Wsheet(LIVESTOCKSALE, "Livestock Sales", 11));
-		ws.add(new Wsheet(LIVESTOCKPRODUCT, "Livestock Products", 14));
+		ws.add(new Wsheet(LIVESTOCKSALE, "Livestock", 11));
+		ws.add(new Wsheet(LIVESTOCKPRODUCT, "Livestock", 14));
 		ws.add(new Wsheet(EMPLOYMENT, "Employment", 14));
 		ws.add(new Wsheet(TRANSFER, "Transfers", 19));
-		ws.add(new Wsheet(WILDFOOD, "Wild Foods", 13));
+		ws.add(new Wsheet(WILDFOOD, "Wild Foods", 13)); // 11
 		ws.add(new Wsheet(FOODPURCHASE, "Food Purchase", 4));
 		ws.add(new Wsheet(NONFOODPURCHASE, "Non Food Purchase", 4));
 
@@ -127,15 +127,15 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		// System.out.println("in xls parse ");
 
 		String wgiid = getView().getValueString("wgiid");
-		
+
 		getView().refresh();
 
 		wgi = XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
 		if (wgi.getSpreadsheet().isEmpty()) {
 			addWarning("Upload completed Interview Spreadsheet before parsing");
 			return;
-		} else if ((wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.PartParsed) ||
-				wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.FullyParsed))){
+		} else if ((wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.PartParsed)
+				|| wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.FullyParsed))) {
 			addWarning("Cannot Parse Interview Spreadsheet - Already Parsed");
 			return;
 		} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Validated)) {
@@ -491,7 +491,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 	/**************************************************************************************************************************************************************************************************/
 	private void setResource() {
 
-		ResourceType rtype = null;
+		ResourceType[] rtype = new ResourceType[15];
 
 		/* Get list of currencies for validation of Cash Asset */
 		List<Country> currency = XPersistence.getManager().createQuery("from Country").getResultList();
@@ -508,41 +508,30 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		 * cell[i][j][k]); } }
 		 */
 
+		/* set validation rtypes array */
+		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) {
+
+			rtype[i] = (ResourceType) XPersistence.getManager()
+					.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
+					.getSingleResult();
+
+		}
+
 		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) { // Sheet
-			// TODO ASSETCASH needs a default for EACH
-			// and other assets 30/6/18
+
 			breaksheet:
 
 			for (j = 0; j < 35; j++) { // Row
-				// System.out.println("sheet, row, cell = " + i + j + k);
 
-				// System.out.println("after rowbreak row = " + j);
 				for (k = 0; k < ws.get(i - 1).numcols; k++) {
-					// System.out.println("cell == " + k);
-					// System.out.println("celltype == " + cell[i][j][k].getCellType());
+
 					if (cell[i][j][k].getCellType() == 3) {
 						if (k == 0) { // first col is blank thus no more rows in this ws
-							// System.out.println("i j k at break = " + i + j + k);
-							// System.out.println("cell = blank");
+
 							break breaksheet;
 						}
 					}
-					/*
-					 * if (cell[i][j][k].getCellType() == 0) System.out.println("Numeric " +
-					 * cell[i][j][k].getNumericCellValue()); if (cell[i][j][k].getCellType() == 1)
-					 * System.out.println("cell = " + i + j + k + " " +
-					 * cell[i][j][k].getStringCellValue());
-					 */
-				}
 
-				/* In loop for sheets - swicth on which asset/resource */
-
-				if (j == 0) {// only need to set once per sheet
-					System.out.println("get rtype = " + ws.get(i - 1).resourceType);
-					rtype = (ResourceType) XPersistence.getManager()
-							.createQuery(
-									"from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
-							.getSingleResult();
 				}
 
 				switch (i) {
@@ -556,7 +545,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						al.setNumberOfUnits(cell[i][j][2].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							// System.out.println("done al get = " + rst.getResourcetypename());
 
 							al.setResourceSubType(rst);
@@ -566,6 +555,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							al.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getAssetLand().add(al);
+						getView().getSubview("assetLand").refresh();
 						k = 100;
 						break;
 
@@ -586,7 +576,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						als.setPricePerUnit(cell[i][j][3].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done als get =  " + rst.getResourcetypename());
 
 							als.setResourceSubType(rst);
@@ -596,6 +586,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							als.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getAssetLiveStock().add(als);
+						getView().getSubview("assetLiveStock").refresh();
 
 						k = 100;
 						break;
@@ -616,7 +607,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						atrade.setPricePerUnit(cell[i][j][3].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done atrade get =  " + rst.getResourcetypename());
 
 							atrade.setResourceSubType(rst);
@@ -626,7 +617,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							atrade.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getAssetTradeable().add(atrade);
-						;
+						getView().getSubview("assetTradeable").refresh();
 
 						k = 100;
 						break;
@@ -647,7 +638,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						afood.setQuantity(cell[i][j][2].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done afood get =  " + rst.getResourcetypename());
 
 							afood.setResourceSubType(rst);
@@ -657,6 +648,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							afood.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getAssetFoodStock().add(afood);
+						getView().getSubview("assetFood").refresh();
 
 						k = 100;
 						break;
@@ -678,7 +670,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						atree.setPricePerUnit(cell[i][j][3].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done atree get =  " + rst.getResourcetypename());
 
 							atree.setResourceSubType(rst);
@@ -688,7 +680,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							atree.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getAssetTree().add(atree);
-						// j = 100;
+						getView().getSubview("assetTree").refresh();
 						k = 100;
 						break;
 
@@ -712,7 +704,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						for (icurr = 0; icurr < currency.size(); icurr++) {
 							if (currency.get(icurr).getCurrency().equals(cell[i][j][0].getStringCellValue())) {
-								rst = checkSubType("Cash", rtype.getIdresourcetype().toString());
+								rst = checkSubType("Cash", rtype[i].getIdresourcetype().toString());
 								acash.setStatus(efd.model.Asset.Status.Valid);
 								acash.setResourceSubType(rst);
 								break;
@@ -722,6 +714,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						}
 						wgi.getAssetCash().add(acash);
+						getView().getSubview("assetCash").refresh();
 
 						k = 100;
 						break;
@@ -753,7 +746,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						acrop.setPercentTradeMarket3(cell[i][j][12].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done acrop get =  " + rst.getResourcetypename());
 
 							acrop.setResourceSubType(rst);
@@ -763,7 +756,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							acrop.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getCrop().add(acrop);
-						// j = 100;
+						getView().getSubview("crop").refresh();
 						k = 100;
 						break;
 
@@ -798,10 +791,10 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						alss.setMarket3(cell[i][j][9].getStringCellValue());
 						alss.setPercentTradeMarket3(cell[i][j][10].getNumericCellValue());
 
-						System.out.println("rtype = " + rtype.getIdresourcetype().toString());
+						System.out.println("rtype = " + rtype[i].getIdresourcetype().toString());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done alss get =  " + rst.getResourcetypename());
 
 							alss.setResourceSubType(rst);
@@ -811,7 +804,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							alss.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getLivestockSales().add(alss);
-
+						getView().getSubview("livestockSales").refresh();
 						k = 100;
 						break;
 
@@ -846,7 +839,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						alsp.setPercentTradeMarket3(cell[i][j][13].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done alsp get =  " + rst.getResourcetypename());
 
 							alsp.setResourceSubType(rst);
@@ -856,6 +849,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							alsp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getLivestockProducts().add(alsp);
+						getView().getSubview("livestockProducts").refresh();
 
 						k = 100;
 						break;
@@ -889,7 +883,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						aemp.setPercentWorkLocation3(cell[i][j][l++].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done emp get =  " + rst.getResourcetypename());
 
 							aemp.setResourceSubType(rst);
@@ -899,7 +893,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							aemp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getEmployment().add(aemp);
-
+						getView().getSubview("employment").refresh();
 						k = 100;
 						break;
 
@@ -937,7 +931,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						at.setPercentTradeMarket3(cell[i][j][l++].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done transfers get =  " + rst.getResourcetypename());
 
 							at.setResourceSubType(rst);
@@ -947,7 +941,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							at.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getEmployment().add(aemp);
-
+						getView().getSubview("transfer").refresh();
 						k = 100;
 						break;
 
@@ -979,7 +973,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						awf.setPercentTradeMarket3(cell[i][j][l++].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done wildfood get =  " + rst.getResourcetypename());
 
 							awf.setResourceSubType(rst);
@@ -989,6 +983,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							awf.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getWildFood().add(awf);
+						getView().getSubview("wildFood").refresh();
 
 						k = 100;
 						break;
@@ -1006,22 +1001,47 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						int l = 0;
 
 						afp.setFoodTypeTypeEnteredName(cell[i][j][l++].getStringCellValue());
+
 						afp.setUnit(cell[i][j][l++].getStringCellValue());
+
 						afp.setUnitsPurchased(cell[i][j][l++].getNumericCellValue());
+
 						afp.setPricePerUnit(cell[i][j][l++].getNumericCellValue());
 
-						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
-							System.out.println("done Food Purchase get =  " + rst.getResourcetypename());
+						/*
+						 * Need to check if FoodPurchase is a valid Food Purchase,Crops,Food Stocks,
+						 * Wild Foods
+						 */
+
+						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // Food Purchase
+								rtype[i].getIdresourcetype().toString())) != null) {
 
 							afp.setResourceSubType(rst);
 							afp.setStatus(efd.model.Asset.Status.Valid);
+						}
 
-						} else {
+						else if ((rst = checkSubType(cell[i][j][0].getStringCellValue(),
+								rtype[7].getIdresourcetype())) != null) {
+
+							afp.setResourceSubType(rst);
+							afp.setStatus(efd.model.Asset.Status.Valid);
+						} else if ((rst = checkSubType(cell[i][j][0].getStringCellValue(),
+								rtype[4].getIdresourcetype())) != null) {
+
+							afp.setResourceSubType(rst);
+							afp.setStatus(efd.model.Asset.Status.Valid);
+						} else if ((rst = checkSubType(cell[i][j][0].getStringCellValue(),
+								rtype[12].getIdresourcetype())) != null) {
+
+							afp.setResourceSubType(rst);
+							afp.setStatus(efd.model.Asset.Status.Valid);
+						}
+
+						else {
 							afp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getFoodPurchase().add(afp);
-
+						getView().getSubview("foodPurchase").refresh();
 						k = 100;
 						break;
 
@@ -1043,7 +1063,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						anfp.setPricePerUnit(cell[i][j][l++].getNumericCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype.getIdresourcetype().toString())) != null) {
+								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done Non Food Purchase get =  " + rst.getResourcetypename());
 
 							anfp.setResourceSubType(rst);
@@ -1053,7 +1073,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							anfp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						wgi.getNonFoodPurchase().add(anfp);
-
+						getView().getSubview("nonFoodPurchase").refresh();
 						k = 100;
 						break;
 
@@ -1076,21 +1096,24 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		try {
 			var1 = WordUtils.capitalize(var1);
 
-			ResourceSubType rst = (ResourceSubType) XPersistence.getManager()
+			System.out.println("In checkSubType" + resourceType + " " + var1);
+			ResourceSubType rsty = (ResourceSubType) XPersistence.getManager()
 					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'"
 							+ "and resourcetypename = '" + var1 + "'")
 					.getSingleResult();
-			// System.out.println("done asset sub type query " + rst.getResourcetypename() +
-			// var1);
-			return rst;
+
+			return rsty;
 		}
 
 		catch (Exception ex) {
+			System.out.println("Failed checkSubType");
 			return null; // no record found to match data entered
 
 		}
 
 	}
+
+	/**************************************************************************************************************************************************************************************************/
 
 	private Boolean checkCell(String cname, Sheet sheet, int x, int y, Boolean nullable) /* Is spreadsheet Cell Valid */
 	{
