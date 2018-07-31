@@ -1032,7 +1032,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							afp.setStatus(efd.model.Asset.Status.Valid);
 						} else if ((rst = checkSubType(cell[i][j][0].getStringCellValue(),
 								rtype[12].getIdresourcetype())) != null) {
-
+ 
 							afp.setResourceSubType(rst);
 							afp.setStatus(efd.model.Asset.Status.Valid);
 						}
