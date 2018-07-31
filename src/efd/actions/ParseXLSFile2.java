@@ -1034,7 +1034,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 								rtype[12].getIdresourcetype())) != null) {
  
 							afp.setResourceSubType(rst);
-							afp.setStatus(efd.model.Asset.Status.Valid);
+							afp.setStatus(efd.model.Asset.Status.Valid );
 						}
 
 						else {
