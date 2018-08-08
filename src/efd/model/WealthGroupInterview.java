@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 
 import efd.validations.*;
@@ -91,7 +92,8 @@ public class WealthGroupInterview {
 	@DescriptionsList(descriptionProperties = "community.site.livelihoodZone.lzname,community.site.locationdistrict,community.site.subdistrict,wgnameeng")
 	private WealthGroup wealthgroup;
 
-	// @OnChange(OnChangeSetWGIStatus.class)
+	//@OnChange(value=OnChangeSetWGIStatus.class)
+
 
 	@Stereotype("FILE")
 	@Column(length = 32, name = "WGISpreadsheet")
