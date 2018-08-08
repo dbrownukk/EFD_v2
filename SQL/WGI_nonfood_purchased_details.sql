@@ -1,6 +1,6 @@
 CREATE OR REPLACE VIEW WGInterview_nonfoodpurchased_details AS
     SELECT 
-        project.ProjectTitle Project,
+        project.ProjectTitle Project, 
         DATE_FORMAT(project.pdate, '%d/%m/%y') ProjectDate,
         project.altExchangeRate ExchangeRate,
         livelihoodzone.LZName LZName,
