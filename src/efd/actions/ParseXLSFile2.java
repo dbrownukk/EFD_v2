@@ -1,5 +1,3 @@
-/* Comment for commit */
-
 package efd.actions;
 
 import java.io.*;
@@ -27,6 +25,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 	Boolean messaging = false;
 	/* define tab numbers in spreadsheet */
+
 	public static final int NUMBERSHEETS = 14;
 	public static final int ASSETLAND = 1;
 	public static final int ASSETLIVESTOCK = 2;
