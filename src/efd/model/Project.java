@@ -37,7 +37,7 @@ import org.openxava.tab.*;
 
 @Table(name = "Project")
 public class Project {
-	
+	//@Version 	
 	@Id
 	@Hidden
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier

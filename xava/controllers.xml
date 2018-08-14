@@ -40,12 +40,12 @@
 	</controller>
 
 	<controller name="ReportsList">
-		<action name="Country" label="Country Report" icon="view-list"
-			class="efd.reports.ReportCountrys" />
-		<action name="Projects" label="Project Report" icon="view-list"
-			class="efd.reports.ReportProjects" />
+		<action name="Assets" label="Asset Chart" mode="detail" icon="view-list"
+			class="efd.reports.AssetChart" />
+		<!--   <action name="Projects" label="Project Report" icon="view-list"
+			class="efd.reports.RESTV2Test" /> -->
 		<action name="Sites By Country" label="Sites By Country"
-			icon="view-list" class="efd.actions.RunRestReport" />
+			icon="view-list" class="efd.reports.ReportCountrys" /> 
 	</controller>
 
 

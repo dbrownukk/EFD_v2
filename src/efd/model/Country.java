@@ -52,8 +52,7 @@ public class Country {
 	
 	@Column(name="CurrencySymbol",length=1)
 	private String currencySymbol;
-	
-	
+
 	public String getIdcountry() {
 		return idcountry;
 	}
@@ -93,7 +92,12 @@ public class Country {
 	public void setCurrencySymbol(String currencySymbol) {
 		this.currencySymbol = currencySymbol;
 	}
+	
+	
+	/***************************************************************************************************************************/
+	/***************************************************************************************************************************/
 
+	
 
 
 

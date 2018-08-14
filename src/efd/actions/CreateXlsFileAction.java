@@ -1393,7 +1393,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			sheet.setValue(3, 3, "Number of People Working", boldTopStyle);
 			sheet.setValue(4, 3, "Unit of Work  e.g. Day, Month", boldTopStyle);
 			sheet.setValue(5, 3, "Units worked  e.g. Days, Months", boldTopStyle);
-			sheet.setValue(6, 3, "Cash Pay:Amount", boldTopStyle);
+			sheet.setValue(6, 3, "Cash Pay:Amount per Unit of Work", boldTopStyle);
 			sheet.setValue(7, 3, "Food Pay:Food Type", boldTopStyle);
 			sheet.setValue(8, 3, "Food Pay:Unit", boldTopStyle);
 			sheet.setValue(9, 3, "Food Pay:Units Paid / Work Unit", boldTopStyle);

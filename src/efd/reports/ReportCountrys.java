@@ -31,7 +31,7 @@ public class ReportCountrys extends JasperReportBaseAction {           // 1
     }
 
 	public boolean inNewWindow() {
-		return false;
+		return true;
 	}
     
     
