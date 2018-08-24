@@ -1,0 +1,81 @@
+package efd.model;
+
+import java.math.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.*;
+
+import org.openxava.annotations.*;
+
+
+
+
+//@Entity
+@Embeddable
+
+
+@Table(name = "assetliveStock")
+
+public class AssetLiveStock extends Asset{
+
+
+	@Column(name = "LiveStockTypeEnteredName", length = 50, nullable=false)
+	@Required
+	private String liveStockTypeEnteredName;
+	
+	@Column(name = "NumberOwnedAtStart", nullable=false )
+	//@Required
+	@NotNull
+	private Double numberOwnedAtStart;
+
+	@Column(name = "PricePerUnit" ,precision=10, scale=2)
+	@Digits(integer=10,fraction=2)
+	private Double pricePerUnit;
+	
+	@ManyToOne
+	@JoinColumn(name = "ResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename", condition="${resourcetype.resourcetypename}='Livestock'")
+	private ResourceSubType resourceSubType;
+
+	public String getLiveStockTypeEnteredName() {
+		return liveStockTypeEnteredName;
+	}
+
+	public void setLiveStockTypeEnteredName(String liveStockTypeEnteredName) {
+		this.liveStockTypeEnteredName = liveStockTypeEnteredName;
+	}
+
+
+
+
+
+	public Double getNumberOwnedAtStart() {
+		return numberOwnedAtStart;
+	}
+
+	public void setNumberOwnedAtStart(Double numberOwnedAtStart) {
+		this.numberOwnedAtStart = numberOwnedAtStart;
+	}
+
+	public Double getPricePerUnit() {
+		return pricePerUnit;
+	}
+
+	public void setPricePerUnit(Double pricePerUnit) {
+		this.pricePerUnit = pricePerUnit;
+	}
+
+	public ResourceSubType getResourceSubType() {
+		return resourceSubType;
+	}
+
+	public void setResourceSubType(ResourceSubType resourceSubType) {
+		this.resourceSubType = resourceSubType;
+	}
+
+
+	
+
+	
+	
+}
