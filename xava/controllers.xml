@@ -1,0 +1,157 @@
+<?xml version = "1.0" encoding = "ISO-8859-1"?>
+
+<!DOCTYPE controllers SYSTEM "dtds/controllers.dtd">
+
+<controllers>
+
+
+	<object name="activesectionchar" class="java.lang.String"
+		value="Crops" scope="global" />
+	<object name="EFD_v2_sessionTab" class="java.lang.String"
+		value="Employment" scope="global" />
+
+
+	<controller name="EFD_v2">
+		<extends controller="TypicalNotResetOnSave" />
+	</controller>
+	<!-- <controller name="EFD_v2"> <extends controller="Typical" /> </controller> -->
+
+
+	<!-- <controller name="Project"> <extends controller="Typical"/> <action 
+		name="save" mode="detail" class="org.openxava.actions.SaveAction" by-default="if-possible" 
+		image="save.gif" icon="content-save" keystroke="Control S"> <set property="resetAfter" 
+		value="false"/> </action> </controller> -->
+	<controller name="Spreadsheet">
+		<extends controller="TypicalRealExcel" />
+		<action name="Template Spreadsheet" mode="detail"
+			in-each-row="false" class="efd.actions.CreateXlsFileAction" />
+	</controller>
+
+	<controller name="ParseSpreadsheet">
+		<extends controller="TypicalNotResetOnSave" />
+		<action name="Parse Spreadsheet"
+			label="Parse Interview Spreadsheet 2" icon="file-excel" mode="detail"
+			in-each-row="false" class="efd.actions.ParseXLSFile2" />
+		<action name="Validate Asset Data" label="Validate Asset Data"
+			icon="marker-check" mode="detail" in-each-row="false"
+			class="efd.actions.ValidateWGI" />
+	</controller>
+
+	<controller name="ChartList">
+		<subcontroller controller="Charts" icon="menu" />
+	</controller>
+
+	<controller name="Charts">
+		<action name="Assets" label="Asset Chart" mode="detail"
+			icon="view-list" class="efd.reports.AssetChart" />
+		<action name="Assets(Normalised)"
+			label="Asset Chart (Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.AssetChartNormalised" />
+<!-- 
+		<action name="AssetsLand" label="AssetsLand Chart"
+			mode="detail" icon="view-list" class="efd.reports.AssetLandChart" />
+		<action name="AssetsLand(Normalised)" label="AssetsLand Chart (Normalised)" 
+		mode="detail" icon="view-list" class="efd.reports.AssetLandChartNormalised" />
+
+		<action name="AssetsFoodStocks" label="AssetsFoodStocks Chart"
+			mode="detail" icon="view-list" class="efd.reports.AssetFoodStocksChart" />
+		<action name="AssetsFoodStocks(Normalised)" label="AssetsFoodStocks Chart (Normalised)" 
+		mode="detail" icon="view-list" class="efd.reports.AssetFoodStocksChartNormalised" />
+ -->
+		<action name="Food Expenditure" label="Food Expenditure"
+			mode="detail" icon="view-list"
+			class="efd.reports.FoodExpenditureChart" />
+		<action name="Food Expenditure(Normalised)"
+			label="Food Expenditure(Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.FoodExpenditureChartNormalised" />
+		<action name="Non-Food Expenditure"
+			label="Non-Food Expenditure" mode="detail" icon="view-list"
+			class="efd.reports.NonFoodExpenditureChart" />
+		<action name="Non-Food Expenditure(Normalised)"
+			label="Non-Food Expenditure(Normalised)" mode="detail"
+			icon="view-list"
+			class="efd.reports.NonFoodExpenditureChartNormalised" />
+		<action name="Food Consumed" label="Food Consumed"
+			mode="detail" icon="view-list" class="efd.reports.FoodConsumedChart" />
+		<action name="Food Consumed(Normalised)"
+			label="Food Consumed(Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.FoodConsumedChartNormalised" />
+		<action name="Cash Income" label="Cash Income" mode="detail"
+			icon="view-list" class="efd.reports.CashIncomeChart" />
+		<action name="Cash Income(Normalised)"
+			label="Cash Income(Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.CashIncomeChartNormalised" />
+	</controller>
+
+	<controller name="ReportList">
+		<subcontroller controller="Reports" icon="menu" />
+	</controller>
+
+	<controller name="Reports">
+		<action name="WealthgroupIncome" label="WealthgroupIncome"
+			mode="detail" icon="view-list" class="efd.reports.CashIncomeReport"
+			image="excel.gif" />
+	</controller>
+
+
+	<controller name="ProjectReports">
+	<extends controller="EFD_v2" />
+		<action name="ProjectExcel" label="ProjectExcel"
+		    icon="excel" class="efd.reports.ProjectExcel"
+			image="excel.gif" mode="detail"/>
+	</controller>
+
+
+
+	<controller name="LivelihoodZone">
+		<extends controller="EFD_v2" />
+		<action name="filteredsearch" hidden="true" image="search.gif"
+			class="efd.actions.FilteredLZ" />
+		<action name="add" hidden="true" icon="table-row-plus-after"
+			class="efd.actions.AddLZ" />
+	</controller>
+
+
+	<!-- <extends controller="EFD_v2"/> <action name="new LZ" image="new.gif" 
+		hidden="true" icon="library-plus" class="efd.actions.NewLZ"/> <action name="add 
+		LZ" hidden="true" icon="table-row-plus-after" class="efd.actions.AddLZ"/> 
+		<action name="filteredsearch" hidden="true" image="search.gif" class="efd.actions.FilteredLZ"/> 
+		</controller> -->
+
+
+	<controller name="Community">
+		<extends controller="EFD_v2" />
+		<action name="filteredSitesearch" hidden="true"
+			image="search.gif" class="efd.actions.FileteredSite" />
+	</controller>
+
+	<!-- <controller name="Sections"> <action name="change" hidden="true" class="efd.actions.AssetChangeSectionAction" 
+		keystroke="Control 1..9" /> </controller> <controller name="Sections"> <action 
+		name="change" hidden="true" class="efd.actions.ResourceSubTypeFilter" keystroke="Control 
+		1..9" /> </controller> -->
+
+
+
+	<controller name="CollectionCopyPaste">
+
+		<action name="cut" icon="content-cut" image="cut.gif"
+			in-each-row="true" hidden="true"
+			class="org.openxava.actions.CutElementsFromCollectionAction" />
+
+		<action name="paste" icon="content-paste" image="paste.gif"
+			hidden="true"
+			class="org.openxava.actions.PasteElementsIntoCollectionAction" />
+
+	</controller>
+
+
+	<controller name="UploadFile">
+		<action name="uploadFile"
+			class="efd.actions.WgiUploadFileAction" />
+		<action name="cancel" class="org.openxava.actions.CancelAction" />
+	</controller>
+
+
+
+
+</controllers>

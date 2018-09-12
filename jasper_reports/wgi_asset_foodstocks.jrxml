@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="wgi_asset" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7b3fc1c9-a216-4b02-a291-7e7c64e00dac">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
+	<property name="ireport.jasperserver.url" value="http://idaps.walker.ac.uk:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="efd"/>
+	<parameter name="communityid" class="java.lang.String"/>
+	<parameter name="wgAverageNumberInHH" class="java.lang.Integer" isForPrompting="false">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
+	<queryString language="SQL">
+		<![CDATA[select * from efd.wginterview_assets
+where   resourcetype  in  ('Food Stocks', 'Food Purchase')
+and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
+	</queryString>
+	<field name="Project" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Project"/>
+	</field>
+	<field name="ProjectDate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ProjectDate"/>
+	</field>
+	<field name="ExchangeRate" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ExchangeRate"/>
+	</field>
+	<field name="LZName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LZName"/>
+	</field>
+	<field name="Country" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Country"/>
+	</field>
+	<field name="District" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="District"/>
+	</field>
+	<field name="SubDistrict" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SubDistrict"/>
+	</field>
+	<field name="WGNameEng" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGNameEng"/>
+	</field>
+	<field name="WGHHSize" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WGHHSize"/>
+	</field>
+	<field name="WGNameLoc" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGNameLoc"/>
+	</field>
+	<field name="WGOrder" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGOrder"/>
+	</field>
+	<field name="WGPercent" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGPercent"/>
+	</field>
+	<field name="WGWives" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WGWives"/>
+	</field>
+	<field name="CommunityID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CommunityID"/>
+	</field>
+	<field name="WGID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGID"/>
+	</field>
+	<field name="WGIIID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGIIID"/>
+	</field>
+	<field name="WGInterviewDate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGInterviewDate"/>
+	</field>
+	<field name="WGIntervieweesCount" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGIntervieweesCount"/>
+	</field>
+	<field name="WGInterviewers" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGInterviewers"/>
+	</field>
+	<field name="WGInterviewNumber" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGInterviewNumber"/>
+	</field>
+	<field name="WGISpreadsheet" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGISpreadsheet"/>
+	</field>
+	<field name="WGIStatus" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGIStatus"/>
+	</field>
+	<field name="WGMaleIVees" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGMaleIVees"/>
+	</field>
+	<field name="WGFemaleIVees" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGFemaleIVees"/>
+	</field>
+	<field name="WGYearType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGYearType"/>
+	</field>
+	<field name="ResourceType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceType"/>
+	</field>
+	<field name="ResourceSubTypeName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceSubTypeName"/>
+	</field>
+	<field name="ResourceUnit" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceUnit"/>
+	</field>
+	<field name="ResourceKCal" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceKCal"/>
+	</field>
+	<field name="unit" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="unit"/>
+	</field>
+	<field name="status" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="status"/>
+	</field>
+	<field name="xx" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="xx"/>
+	</field>
+	<sortField name="WGOrder"/>
+	<sortField name="ResourceType"/>
+	<sortField name="ResourceSubTypeName"/>
+	<group name="Project">
+		<groupExpression><![CDATA[$F{Project}]]></groupExpression>
+		<groupHeader>
+			<band height="310">
+				<stackedBarChart>
+					<chart evaluationTime="Group" evaluationGroup="Project">
+						<reportElement x="80" y="0" width="600" height="310" uuid="c8b96952-37cb-42c5-ad7d-c8732084eae6"/>
+						<chartTitle/>
+						<chartSubtitle/>
+						<chartLegend/>
+					</chart>
+					<categoryDataset>
+						<dataset resetType="Group" resetGroup="Project"/>
+						<categorySeries>
+							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
+							<valueExpression><![CDATA[$P{wgAverageNumberInHH}==1?$F{xx}/$P{wgAverageNumberInHH}:
+$F{xx}/$F{WGHHSize}.intValueExact()]]></valueExpression>
+							<labelExpression><![CDATA[$F{ResourceUnit}]]></labelExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot>
+						<plot/>
+						<itemLabel/>
+						<categoryAxisFormat>
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+						</valueAxisFormat>
+					</barPlot>
+				</stackedBarChart>
+				<staticText>
+					<reportElement x="30" y="120" width="50" height="30" uuid="7466a30b-41c3-4dfa-bfdb-6b2d9523a719"/>
+					<text><![CDATA[Kgs]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="LZName">
+		<groupExpression><![CDATA[$F{LZName}]]></groupExpression>
+	</group>
+	<group name="District">
+		<groupExpression><![CDATA[$F{District}]]></groupExpression>
+	</group>
+	<group name="SubDistrict">
+		<groupExpression><![CDATA[$F{SubDistrict}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="134" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout"/>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="791" height="66" backcolor="#009CCC" uuid="21e282f3-08cb-4fc6-a3ef-d59888e7be59"/>
+				<staticText>
+					<reportElement x="20" y="3" width="710" height="47" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
+					<box topPadding="4" leftPadding="4" bottomPadding="4" rightPadding="4">
+						<pen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="20" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ EFD OHEA - Validated Wealthgroup - Food Stock Assets ]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="30" y="50" width="249" height="16" forecolor="#FFFFFF" uuid="1768d8cc-3227-4dad-9989-6c9cbfc04be1"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$P{normalisationMessage}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="82" width="792" height="20" forecolor="#000000" backcolor="#009CCC" uuid="b935b773-b548-4459-b884-0b7b73943c0f"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="640" y="0" width="144" height="20" forecolor="#FFFFFF" uuid="86bdcb85-d863-4d3b-9586-a94d756bb312"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="10" y="0" width="540" height="20" forecolor="#FFFFFF" uuid="6728a62e-62df-43d1-ad69-038ea4079ded"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{Project}+" "+$F{LZName}+" "+$F{District}+" "+$F{SubDistrict}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+	<noData>
+		<band height="55">
+			<staticText>
+				<reportElement x="150" y="0" width="430" height="55" uuid="5b141625-c090-469a-be5c-5b2f1866f307"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No Validated Wealthgroups with Food Stocks for this Community]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

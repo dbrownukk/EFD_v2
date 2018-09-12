@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="i18n"/>
+	<classpathentry kind="src" path="jasper_reports"/>
+	<classpathentry kind="src" path="properties"/>
+	<classpathentry kind="src" path="persistence"/>
+	<classpathentry kind="src" path="xava"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/OpenXava/lib/hsqldb.jar"/>
+	<classpathentry kind="src" path="/OpenXava"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Addons"/>
+	<classpathentry kind="output" path="web/WEB-INF/classes"/>
+</classpath>
