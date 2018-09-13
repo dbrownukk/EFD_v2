@@ -9,7 +9,7 @@
 	<parameter name="communityid" class="java.lang.String">
 		<property name="newproperty_1" value="8a808484623f85560162403b9ce70002"/>
 	</parameter>
-	<parameter name="wgAverageNumberInHH" class="java.lang.Integer" isForPrompting="false"/>
+	<parameter name="normalise" class="java.lang.Boolean" isForPrompting="false"/>
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
 		<![CDATA[select * from  efd.wginterview_food_consumed_details 
@@ -111,6 +111,9 @@ where   efd.wginterview_food_consumed_details.`CommunityID`
 		<property name="com.jaspersoft.studio.field.label" value="WGFemaleIVees"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="wginterview_foodpurchased_details"/>
 	</field>
+	<field name="WGAverageNumberInHH" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGAverageNumberInHH"/>
+	</field>
 	<field name="WGYearType" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="WGYearType"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="wginterview_foodpurchased_details"/>
@@ -160,7 +163,7 @@ where   efd.wginterview_food_consumed_details.`CommunityID`
 			<band height="388">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="LZName">
-						<reportElement x="90" y="20" width="590" height="320" uuid="4c255d85-be24-45c2-a6ce-83893ac53a48"/>
+						<reportElement x="90" y="20" width="590" height="320" uuid="c817ea62-5e31-4814-a76a-915c8957ef1a"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend/>
@@ -170,7 +173,7 @@ where   efd.wginterview_food_consumed_details.`CommunityID`
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
 							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
-							<valueExpression><![CDATA[$F{val4}/$P{wgAverageNumberInHH}]]></valueExpression>
+							<valueExpression><![CDATA[$P{normalise}?$F{val4}/$F{WGAverageNumberInHH}:$F{val4}]]></valueExpression>
 							<labelExpression><![CDATA[$F{ResourceSubTypeName}]]></labelExpression>
 						</categorySeries>
 					</categoryDataset>

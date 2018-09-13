@@ -2,7 +2,9 @@ package efd.reports;
  
 import java.text.*;
 import java.util.*;
- 
+
+import javax.inject.*;
+
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.*;
 
@@ -29,7 +31,7 @@ public class AssetChart extends JasperConcatReportBaseAction {
 	public static String RTF = "rtf";
 	public static String HTML = "html";
 	
-	
+   
 	
 	WealthGroupInterview wealthGroupInterview;
 	WealthGroup wealthGroup;
@@ -38,19 +40,16 @@ public class AssetChart extends JasperConcatReportBaseAction {
 	protected String[] getJRXMLs() throws Exception {      
 		System.out.println("in assetchart"); 
 		setFormat("pdf");
-				
+		
 		String[] reports = new String[] {"wgi_asset.jrxml", "wgi_asset_foodstocks.jrxml" ,"wgi_asset_land.jrxml"}; 
     	return reports; 
-    	
     	
     }
     
 	public boolean inNewWindow() {
 		return true;
 	}
-	
 
-	
 	
 	@Override
 	public Map getParameters() throws Exception  {
@@ -58,6 +57,7 @@ public class AssetChart extends JasperConcatReportBaseAction {
 		wealthGroupInterview = (WealthGroupInterview) MapFacade.findEntity("WealthGroupInterview", getView().getValues());
 		String communityid = wealthGroupInterview.getWealthgroup().getCommunity().getCommunityid();
 	
+		
 		Map parameters = new HashMap();			
 		//String wgiid = getView().getValueString("wgiid");
 
@@ -65,9 +65,9 @@ public class AssetChart extends JasperConcatReportBaseAction {
 		
 		//Integer wgAverageNumberInHH =  wealthGroupInterview.getWgAverageNumberInHH();
 		
-		Integer wgAverageNumberInHH = 1;   // non normalised data 
+		Boolean normalise = false;   // non normalised data 
 		parameters.put("communityid", communityid);
-		parameters.put("wgAverageNumberInHH", wgAverageNumberInHH);
+		parameters.put("normalise", normalise);
 		parameters.put("normalisationMessage","");
 		
 		return parameters;

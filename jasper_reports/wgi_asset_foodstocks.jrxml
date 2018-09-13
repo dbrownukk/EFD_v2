@@ -6,8 +6,8 @@
 	<property name="ireport.jasperserver.url" value="http://idaps.walker.ac.uk:8080/jasperserver/"/>
 	<property name="ireport.jasperserver.user" value="efd"/>
 	<parameter name="communityid" class="java.lang.String"/>
-	<parameter name="wgAverageNumberInHH" class="java.lang.Integer" isForPrompting="false">
-		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	<parameter name="normalise" class="java.lang.Boolean" isForPrompting="false">
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
 	</parameter>
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
@@ -29,6 +29,9 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 	</field>
 	<field name="Country" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="Country"/>
+	</field>
+	<field name="currency" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="currency"/>
 	</field>
 	<field name="District" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="District"/>
@@ -87,6 +90,9 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 	<field name="WGFemaleIVees" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.label" value="WGFemaleIVees"/>
 	</field>
+	<field name="WGAverageNumberInHH" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGAverageNumberInHH"/>
+	</field>
 	<field name="WGYearType" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="WGYearType"/>
 	</field>
@@ -108,8 +114,17 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 	<field name="status" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.label" value="status"/>
 	</field>
+	<field name="priceperunit" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="priceperunit"/>
+	</field>
+	<field name="localcurrency" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="localcurrency"/>
+	</field>
 	<field name="xx" class="java.lang.Double">
 		<property name="com.jaspersoft.studio.field.label" value="xx"/>
+	</field>
+	<field name="amount" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="amount"/>
 	</field>
 	<sortField name="WGOrder"/>
 	<sortField name="ResourceType"/>
@@ -120,7 +135,7 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 			<band height="310">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="Project">
-						<reportElement x="80" y="0" width="600" height="310" uuid="c8b96952-37cb-42c5-ad7d-c8732084eae6"/>
+						<reportElement x="80" y="0" width="600" height="310" uuid="2c103763-d499-4db5-af86-d86cfe2ae72a"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend/>
@@ -130,8 +145,7 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
 							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
-							<valueExpression><![CDATA[$P{wgAverageNumberInHH}==1?$F{xx}/$P{wgAverageNumberInHH}:
-$F{xx}/$F{WGHHSize}.intValueExact()]]></valueExpression>
+							<valueExpression><![CDATA[$P{normalise}?$F{xx} /$F{WGAverageNumberInHH}:$F{xx}]]></valueExpression>
 							<labelExpression><![CDATA[$F{ResourceUnit}]]></labelExpression>
 						</categorySeries>
 					</categoryDataset>

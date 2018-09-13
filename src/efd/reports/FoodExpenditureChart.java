@@ -45,12 +45,12 @@ public class FoodExpenditureChart extends JasperReportBaseAction {
 		
 		
 		Map parameters = new HashMap();			
-		String wgiid = getView().getValueString("wgiid");
 		
-		Integer wgAverageNumberInHH = 1;   // non normalised data 
+		Boolean normalise = false; // normalised data
 		parameters.put("communityid", communityid);
-		parameters.put("wgAverageNumberInHH", wgAverageNumberInHH);
-		parameters.put("normalisationMessage","");
+		parameters.put("normalise", normalise);
+
+		parameters.put("normalisationMessage", "");
 		
 		return parameters;
 	}

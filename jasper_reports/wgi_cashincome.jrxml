@@ -5,7 +5,9 @@
 	<property name="com.jaspersoft.studio.report.description" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
 	<parameter name="communityid" class="java.lang.String"/>
-	<parameter name="wgAverageNumberInHH" class="java.lang.Integer" isForPrompting="false"/>
+	<parameter name="normalise" class="java.lang.Boolean" isForPrompting="false">
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
+	</parameter>
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
 		<![CDATA[select * from   efd.wginterview_cash_income_details 
@@ -106,6 +108,9 @@ where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]
 		<property name="com.jaspersoft.studio.field.label" value="WGFemaleIVees"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="wginterview_foodpurchased_details"/>
 	</field>
+	<field name="WGAverageNumberInHH" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGAverageNumberInHH"/>
+	</field>
 	<field name="WGYearType" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="WGYearType"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="wginterview_foodpurchased_details"/>
@@ -155,7 +160,7 @@ where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]
 			<band height="320">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="Project">
-						<reportElement x="80" y="0" width="600" height="320" uuid="7e571f9e-1d34-4643-816e-5dd6464a18b0"/>
+						<reportElement x="80" y="0" width="600" height="320" uuid="a7b052a0-9856-4e35-911a-6f3e9543f52b"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend/>
@@ -165,7 +170,8 @@ where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
 							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
-							<valueExpression><![CDATA[$F{val4}/$P{wgAverageNumberInHH}]]></valueExpression>
+							<valueExpression><![CDATA[$P{normalise}?$F{val4} /$F{WGAverageNumberInHH}:$F{val4}
+]]></valueExpression>
 						</categorySeries>
 					</categoryDataset>
 					<barPlot>

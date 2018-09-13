@@ -42,8 +42,8 @@
 	</controller>
 
 	<controller name="Charts">
-		<action name="Assets" label="Asset Chart" mode="detail"
-			icon="view-list" class="efd.reports.AssetChart" />
+		<action name="Assets" label="Asset Chart" mode="detail" icon="view-list" class="efd.reports.AssetChart" >
+		</action>
 		<action name="Assets(Normalised)"
 			label="Asset Chart (Normalised)" mode="detail" icon="view-list"
 			class="efd.reports.AssetChartNormalised" />

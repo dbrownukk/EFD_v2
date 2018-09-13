@@ -45,14 +45,11 @@ public class FoodExpenditureChartNormalised extends JasperReportBaseAction {
 		
 		
 		Map parameters = new HashMap();			
-		String wgiid = getView().getValueString("wgiid");
-		
-		Integer wgAverageNumberInHH =  wealthGroupInterview.getWgAverageNumberInHH();
-		System.out.println("wgAverageNumberInHH = "+wgAverageNumberInHH);
-		//Integer wgAverageNumberInHH = 1;   // non normalised data 
+		Boolean normalise = true; // normalised data
 		parameters.put("communityid", communityid);
-		parameters.put("wgAverageNumberInHH", wgAverageNumberInHH);
-		parameters.put("normalisationMessage","Normalised by Average in Household");
+		parameters.put("normalise", normalise);
+
+		parameters.put("normalisationMessage", "Normalised by Average in Household");
 		
 		return parameters;
 	}
