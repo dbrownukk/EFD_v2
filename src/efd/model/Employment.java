@@ -31,6 +31,11 @@ public class Employment extends Asset {
 	@Column(name = "CashPaymentAmount", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private Double cashPaymentAmount;
+	
+	@ManyToOne
+	@JoinColumn(name = "FoodResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops')")
+	private ResourceSubType foodResourceSubType;
 
 	@Column(name = "FoodPaymentFoodType", length=50)
 	private String foodPaymentFoodType;
@@ -147,6 +152,12 @@ public class Employment extends Asset {
 	}
 	public void setResourceSubType(ResourceSubType resourceSubType) {
 		this.resourceSubType = resourceSubType;
+	}
+	public ResourceSubType getFoodResourceSubType() {
+		return foodResourceSubType;
+	}
+	public void setFoodResourceSubType(ResourceSubType foodResourceSubType) {
+		this.foodResourceSubType = foodResourceSubType;
 	}
 	
 	

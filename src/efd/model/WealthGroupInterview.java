@@ -183,12 +183,12 @@ public class WealthGroupInterview {
 	private Collection<LivestockProducts> livestockProducts;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodPaymentFoodType,foodPaymentUnit"
+	@ListProperties("status, resourceSubType,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodResourceSubType,foodPaymentFoodType,foodPaymentUnit,foodPaymentUnitsPaidWork"
 			+ ",workLocation1,percentWorkLocation1,workLocation2,percentWorkLocation2,workLocation3,percentWorkLocation3")
 	private Collection<Employment> employment;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,transferFoodOtherType,"
+	@ListProperties("status,resourceSubType, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType,transferFoodOtherType,"
 			+ " unit, unitsTransferred,unitsSold,pricePerUnit,otherUse,unitsConsumed"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Transfer> transfer;

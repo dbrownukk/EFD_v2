@@ -37,6 +37,13 @@ public class Transfer extends Asset{
 	@Digits(integer=10,fraction=2)
 	private Double cashTransferAmount;
 	
+	
+	@ManyToOne
+	@JoinColumn(name = "FoodResourceSubType")
+	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops')")
+	private ResourceSubType foodResourceSubType;
+	
+	
 	@Column(name = "TransferFoodOtherType", length = 50)
 	private String transferFoodOtherType;
 	
@@ -115,6 +122,14 @@ public class Transfer extends Asset{
 	}
 	public void setCashTransferAmount(Double cashTransferAmount) {
 		this.cashTransferAmount = cashTransferAmount;
+	}
+
+
+	public ResourceSubType getFoodResourceSubType() {
+		return foodResourceSubType;
+	}
+	public void setFoodResourceSubType(ResourceSubType foodResourceSubType) {
+		this.foodResourceSubType = foodResourceSubType;
 	}
 	public String getTransferFoodOtherType() {
 		return transferFoodOtherType;
