@@ -140,7 +140,7 @@ public class WealthGroupInterview {
 	
 
 	/* Collections of resource elements */
-
+	
 	@ElementCollection
 	@ListProperties("status,resourceSubType,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
 	@XOrderBy("status desc")

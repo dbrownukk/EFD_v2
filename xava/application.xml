@@ -5,16 +5,25 @@
 		<controller name="EFD_v2" />
 	</default-module>	<!-- <module name="Reports"> </module> -->
 	<module name="WealthGroupInterview">
+		<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange"/>
 		<model name="WealthGroupInterview" />
 		<controller name="ParseSpreadsheet" />
 		<controller name="ChartList" />
 		<controller name="ReportList" />
+		<!-- 
+		<controller name="SetReadOnly"/>		
+		<controller name="SetEditable"/>	
+		-->
 	</module>	
 	
 		<module name="Project">
 		<model name="Project" />
 		<controller name="ProjectReports" />
 		</module>	
+		
+
+		
+		
 		
 		
 </application>

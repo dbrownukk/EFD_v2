@@ -195,7 +195,9 @@ public class ValidateWGI extends CollectionBaseAction implements IForwardAction 
 			addMessage("Validation Complete with Invalid Assets");
 		else 
 		{
-			wgi.setStatus(WealthGroupInterview.Status.Validated);		
+			wgi.setStatus(WealthGroupInterview.Status.Validated);	
+			getView().setEditable(false);
+			addActions("SetEditable.SetEditable");
 			getView().refresh();
 			addMessage("Validation Complete");
 		}

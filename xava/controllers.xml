@@ -42,22 +42,19 @@
 	</controller>
 
 	<controller name="Charts">
-		<action name="Assets" label="Asset Chart" mode="detail" icon="view-list" class="efd.reports.AssetChart" >
+		<action name="Assets" label="Asset Chart" mode="detail"
+			icon="view-list" class="efd.reports.AssetChart">
 		</action>
 		<action name="Assets(Normalised)"
 			label="Asset Chart (Normalised)" mode="detail" icon="view-list"
 			class="efd.reports.AssetChartNormalised" />
-<!-- 
-		<action name="AssetsLand" label="AssetsLand Chart"
-			mode="detail" icon="view-list" class="efd.reports.AssetLandChart" />
-		<action name="AssetsLand(Normalised)" label="AssetsLand Chart (Normalised)" 
-		mode="detail" icon="view-list" class="efd.reports.AssetLandChartNormalised" />
-
-		<action name="AssetsFoodStocks" label="AssetsFoodStocks Chart"
-			mode="detail" icon="view-list" class="efd.reports.AssetFoodStocksChart" />
-		<action name="AssetsFoodStocks(Normalised)" label="AssetsFoodStocks Chart (Normalised)" 
-		mode="detail" icon="view-list" class="efd.reports.AssetFoodStocksChartNormalised" />
- -->
+		<!-- <action name="AssetsLand" label="AssetsLand Chart" mode="detail" icon="view-list" 
+			class="efd.reports.AssetLandChart" /> <action name="AssetsLand(Normalised)" 
+			label="AssetsLand Chart (Normalised)" mode="detail" icon="view-list" class="efd.reports.AssetLandChartNormalised" 
+			/> <action name="AssetsFoodStocks" label="AssetsFoodStocks Chart" mode="detail" 
+			icon="view-list" class="efd.reports.AssetFoodStocksChart" /> <action name="AssetsFoodStocks(Normalised)" 
+			label="AssetsFoodStocks Chart (Normalised)" mode="detail" icon="view-list" 
+			class="efd.reports.AssetFoodStocksChartNormalised" /> -->
 		<action name="Food Expenditure" label="Food Expenditure"
 			mode="detail" icon="view-list"
 			class="efd.reports.FoodExpenditureChart" />
@@ -95,10 +92,9 @@
 
 
 	<controller name="ProjectReports">
-	<extends controller="EFD_v2" />
-		<action name="ProjectExcel" label="ProjectExcel"
-		    icon="excel" class="efd.reports.ProjectExcel"
-			image="excel.gif" mode="detail"/>
+		<extends controller="EFD_v2" />
+		<action name="ProjectExcel" label="ProjectExcel" icon="excel"
+			class="efd.reports.ProjectExcel" image="excel.gif" mode="detail" />
 	</controller>
 
 
@@ -149,6 +145,25 @@
 		<action name="uploadFile"
 			class="efd.actions.WgiUploadFileAction" />
 		<action name="cancel" class="org.openxava.actions.CancelAction" />
+	</controller>
+
+
+
+	<controller name="SetReadOnly">
+		<action name="readOnly" class="efd.actions.SetWGIReadOnly"
+			hidden="true" mode="detail" after-each-request="true">
+		</action>
+	</controller>
+
+	<controller name="SetEditable">
+		<action name="SetEditable" class="efd.actions.SetWGIEditable"
+			hidden="true" mode="detail" icon="pencil">
+		</action>
+	</controller>
+		<controller name="ShowButton">
+		<action name="ShowButton" class="efd.actions.ShowWGIEditButton"
+			hidden="true" mode="detail" after-each-request="true">
+		</action>
 	</controller>
 
 

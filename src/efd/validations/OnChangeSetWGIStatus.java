@@ -18,11 +18,19 @@ import com.openxava.phone.web.*;
 import efd.model.*;
 import efd.model.WealthGroupInterview.*;
 
+/*
+ * Prevent Status change to Validated by User using LOV
+ * If Set to Validated then make fields readonly and add button which is used to set to Editable - could be controlled by Role
+ * DRB 16/8/18
+ */
+
 
 public class OnChangeSetWGIStatus extends OnChangePropertyBaseAction {
 	public void execute() throws Exception {
 
-		System.out.println("In change for ss");
+		
+		removeActions("SetEditable.SetEditable");
+		System.out.println("In change for WGIstatus");
 
 		EntityManager em = XPersistence.createManager();
 
@@ -34,21 +42,27 @@ public class OnChangeSetWGIStatus extends OnChangePropertyBaseAction {
 		Query querywgi = em.createQuery("select status from WealthGroupInterview where wgiid = '" + wgiid + "'");
 		Object wgistatus = querywgi.getSingleResult();
 
-		System.out.println("XPers singleresult wgistatus =    " + wgistatus.toString());
+	
+		/* If changed to Validated, disallow and reset to previous 
+		 * Need to use 'Validate Asset Data to set to Validate */
 
-		System.out.println("New Value =  " + getNewValue());
-
-		/* If changed to Validated, disallow and reset to previous */
-
-		if (getNewValue().toString().equals("Validated")) {
+		if (getNewValue().toString().equals("Validated") && wgistatus.toString() != "Validated") {
 			addError("To set Wealthgroup to Validated run Validate Asset Data");
 			wgint.setStatus((Status) wgistatus);
 			getView().refresh();
 		}
-		Role myrole = Role.findJoinedRole();
 		
+		if(wgint.getStatus() == (efd.model.WealthGroupInterview.Status.Validated))
+		{
+			System.out.println("set to read only in On Change");
+			getView().setEditable(false);
+			addActions("SetEditable.SetEditable");
+		}
 		
+		System.out.println("sub in change - section = "+getView().getSectionView(3).isCollectionEditable());
+		//getView().getSectionView(0).setHidden("resourceSubType", true);
 		
+	
 		
 		em.close(); 
 	}
