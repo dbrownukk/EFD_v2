@@ -92,7 +92,8 @@ public class WealthGroup {
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//
 
-	
+	@OneToMany(mappedBy = "wealthgroup", cascade=CascadeType.REMOVE)
+	private List<WealthGroupInterview> wealthGroupInterview;
 	
 
 	public String getWgid() {

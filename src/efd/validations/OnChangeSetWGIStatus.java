@@ -6,7 +6,8 @@ import javax.persistence.*;
 
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
-
+import org.openxava.tab.*;
+import org.openxava.view.*;
 
 import com.openxava.naviox.*;
 import com.openxava.naviox.model.*;
@@ -59,9 +60,19 @@ public class OnChangeSetWGIStatus extends OnChangePropertyBaseAction {
 			addActions("SetEditable.SetEditable");
 		}
 		
-		System.out.println("sub in change - section = "+getView().getSectionView(3).isCollectionEditable());
-		//getView().getSectionView(0).setHidden("resourceSubType", true);
 		
+		System.out.println("sub in change section = "+getView().getSectionView(0).getSectionView(0).getViewName());
+		
+		
+		try {
+			getView().setHidden("resourceSubType", true);
+		}
+		catch			(Exception ex)
+		{
+			System.out.println("Exception thrown  :" + ex);
+		}
+		
+		//getView().getSectionView(3).getAllValues().
 	
 		
 		em.close(); 
