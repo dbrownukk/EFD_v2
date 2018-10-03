@@ -9,51 +9,52 @@ import org.openxava.annotations.*;
 
 @Entity
 
+@Views({ @View(members = "resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
+		@View(name = "SimpleSubtype", members = "resourcetypename") })
 
+@Tab(properties = "resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
 
-@Views({
-	 @View(members="resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
-	 @View(name="SimpleSubtype", members="resourcetypename")
-	})
-
-
-@Tab(properties="resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
-
-
-
-@Table(name = "ResourceSubType",uniqueConstraints=@UniqueConstraint(columnNames={"ReourceType","ResourceTypeName"}))
+@Table(name = "ResourceSubType", uniqueConstraints = @UniqueConstraint(columnNames = { "ReourceType",
+		"ResourceTypeName" }))
 public class ResourceSubType {
 
-	@Id	
+	@PrePersist
+	@PreUpdate
+	private void calcKcal() {
+		if (resourcesubtypesynonym != null) {
+			System.out.println("in kcal JPA persist");
+			resourcesubtypekcal = 0;
+		}
+	}
+
+	@Id
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "IDResourceSubType", length = 32, unique = true)
 	private String idresourcesubtype;
-	
-	@ManyToOne     
+
+	@ManyToOne
 	@Required
 	@JoinColumn(name = "ReourceType")
-	@DescriptionsList(descriptionProperties="resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetypename")
 	private ResourceType resourcetype;
-	
-	
-	@Column(name = "ResourceTypeName", length=255, unique=true )  // ? ResosurceSubTypeName ?
+
+	@Column(name = "ResourceTypeName", length = 255, unique = true) // ? ResosurceSubTypeName ?
 	@Required
 	private String resourcetypename;
-	
+
 	@ManyToOne
-    //@Column(name = "ResourceSubTypeSynonym")  // Cannot define Column name in ManyToOne JPA 	
-	@DescriptionsList(descriptionProperties="resourcetypename")
-	private  ResourceSubType resourcesubtypesynonym;
-	
-	@Column(name = "ResourceSubTypeUnit", length=20)  
-	@Required   // change DRB 23/8/18
+	// @Column(name = "ResourceSubTypeSynonym") // Cannot define Column name in
+	// ManyToOne JPA
+	@DescriptionsList(descriptionProperties = "resourcetypename")
+	private ResourceSubType resourcesubtypesynonym;
+
+	@Column(name = "ResourceSubTypeUnit", length = 20)
+	@Required // change DRB 23/8/18
 	private String resourcesubtypeunit;
-	
-	@Column(name = "ResourceSubTypeKCal")  
+
+	@Column(name = "ResourceSubTypeKCal")
 	private int resourcesubtypekcal;
-
-
 
 	public ResourceType getResourcetype() {
 		return resourcetype;
@@ -92,7 +93,7 @@ public class ResourceSubType {
 	}
 
 	public void setResourcesubtypekcal(int resourcesubtypekcal) {
-		this.resourcesubtypekcal = resourcesubtypekcal;
+			this.resourcesubtypekcal = resourcesubtypekcal;
 	}
 
 	public String getIdresourcesubtype() {
@@ -103,10 +104,4 @@ public class ResourceSubType {
 		this.idresourcesubtype = idresourcesubtype;
 	}
 
-	
-
-
-
-	
-	
 }
