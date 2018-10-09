@@ -97,7 +97,10 @@
 			class="efd.reports.ProjectExcel" image="excel.gif" mode="detail" />
 	</controller>
 
-
+	<controller name="RemoteDatabaseDump">
+		<action name="DatabaseExport" label="DatabaseExport" icon="database"
+			class="efd.actions.RemoteMysqlDump" mode="detail" />
+	</controller>
 
 	<controller name="LivelihoodZone">
 		<extends controller="EFD_v2" />
@@ -151,7 +154,7 @@
 
 	<controller name="SetReadOnly">
 		<action name="readOnly" class="efd.actions.SetWGIReadOnly"
-			hidden="true" mode="detail" after-each-request="true">
+			hidden="true" mode="detail" >
 		</action>
 	</controller>
 
@@ -162,7 +165,7 @@
 	</controller>
 		<controller name="ShowButton">
 		<action name="ShowButton" class="efd.actions.ShowWGIEditButton"
-			hidden="true" mode="detail" after-each-request="true">
+			hidden="true" mode="detail" >
 		</action>
 	</controller>
 

@@ -56,8 +56,10 @@ public class OnChangeSetWGIStatus extends OnChangePropertyBaseAction {
 		if(wgint.getStatus() == (efd.model.WealthGroupInterview.Status.Validated))
 		{
 			System.out.println("set to read only in On Change 3");
+			
 			getView().setEditable(false);
-			getView().displayAsDescriptionsListAndReferenceView();
+			//getView().setViewName("ReadOnly");
+			//getView().displayAsDescriptionsListAndReferenceView();
 			addActions("SetEditable.SetEditable");			
 		}
 		
@@ -66,7 +68,7 @@ public class OnChangeSetWGIStatus extends OnChangePropertyBaseAction {
 		try {
 			// not working - still have hex value
 			System.out.println("sub in change section = "+getView().getActiveSection());
-			getView().setHidden("resourceSubType", true);
+			//getView().setHidden("resourceSubType", true);
 		}
 		catch			(Exception ex)
 		{

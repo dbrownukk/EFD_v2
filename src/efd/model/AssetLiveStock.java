@@ -9,9 +9,10 @@ import org.openxava.annotations.*;
 
 
 
-//@Views({
-//	@View(name="Simple", members = "status,resourceSubType,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
-//})
+@Views({
+	@View(name="ReadOnly", members = "status")
+//	,resourceSubType,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
+})
 //@Entity
 @Embeddable
 

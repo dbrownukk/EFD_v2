@@ -7,6 +7,8 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
+import com.openxava.naviox.model.*;
+
 
 @Views({
 	 @View(members="resourcetypename;resourcesubtype"),
@@ -16,6 +18,7 @@ import org.openxava.annotations.*;
 
 @Entity
 public class ResourceType {
+	
 	//----------------------------------------------------------------------------------------------//
 	@Id
 	@Hidden // The property is not shown to the user. It's an internal identifier
@@ -58,13 +61,5 @@ public class ResourceType {
 	public void setResourcesubtype(Collection<ResourceSubType> resourcesubtype) {
 		this.resourcesubtype = resourcesubtype;
 	}
-
-		// get / set
-
-
-	
-
-	
-	
 	
 }

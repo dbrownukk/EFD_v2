@@ -23,6 +23,13 @@ import efd.model.*;
 		+ ";Trees{assetTree}" + ";Cash{assetCash}" + "}" + ";Crops{crop}" + ";LiveStockSales{livestockSales}"
 		+ ";LiveStockProducts{livestockProducts}" + ";Employment{employment}" + ";Transfer{transfer}"
 		+ ";WildFood{wildFood}" + ";FoodPurchase{foodPurchase}" + ";NonFoodPurchase{nonFoodPurchase}"),
+	@View(name="ReadOnly",members = "Wealth_Group_Interview[# wealthgroup" + ";wgInterviewNumber" + ",wgInterviewers"
+			+ ",wgIntervieweesCount" + ";wgFemaleIVees" + ",wgMaleIVees" + ",wgAverageNumberInHH" + ";wgYearType"
+			+ ",wgInterviewDate," + "notes ;spreadsheet" + ",status]" + "Assets{" + ";Land{assetLand}"
+			+ ";LiveStock{assetLiveStock}" + ";Tradeable{assetTradeable}" + ";FoodStock{assetFoodStock}"
+			+ ";Trees{assetTree}" + ";Cash{assetCash}" + "}" + ";Crops{crop}" + ";LiveStockSales{livestockSales}"
+			+ ";LiveStockProducts{livestockProducts}" + ";Employment{employment}" + ";Transfer{transfer}"
+			+ ";WildFood{wildFood}" + ";FoodPurchase{foodPurchase}" + ";NonFoodPurchase{nonFoodPurchase}"),
 		@View(name = "wg", members = "wealthgroup") })
 
 @Tabs({ @Tab(editors = "List, Detail", properties = "wealthgroup.community.projectlz.projecttitle,wealthgroup.community.site.livelihoodZone.lzname, "
@@ -142,68 +149,75 @@ public class WealthGroupInterview {
 	/* Collections of resource elements */
 	
 	@ElementCollection
-	@ListProperties("status,resourceSubType,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
-	@XOrderBy("status desc")
-	@OrderBy("Status desc")
-	private Collection<AssetLiveStock> assetLiveStock;
+	// Workaround from Javier https://sourceforge.net/p/openxava/discussion/419690/thread/b6535530de/
 
-	@ElementCollection
-	@ListProperties("status,resourceSubType, landTypeEnteredName,unit,numberOfUnits")
+	@ListProperties("status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
+	
+	
+	//@ListsProperties({
+	//	@ListProperties(forViews="ReadOnly", value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit"),
+	//	@ListProperties(forViews="DEFAULT",value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
+	//})
+	private Collection<AssetLiveStock> assetLiveStock;	
+	
+
+	@ElementCollection 
+	@ListProperties("status,resourceSubType.resourcetypename, landTypeEnteredName,unit,numberOfUnits")
 	private Collection<AssetLand> assetLand;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType,tradeableTypeEnteredName,unit,numberOwned,pricePerUnit")
+	@ListProperties("status, resourceSubType.resourcetypename,tradeableTypeEnteredName,unit,numberOwned,pricePerUnit")
 	private Collection<AssetTradeable> assetTradeable;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType,foodTypeEnteredName,unit,quantity")
+	@ListProperties("status, resourceSubType.resourcetypename,foodTypeEnteredName,unit,quantity")
 	private Collection<AssetFoodStock> assetFoodStock;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType,treeTypeEnteredName,unit,numberOwned,pricePerUnit")
+	@ListProperties("status,resourceSubType.resourcetypename,treeTypeEnteredName,unit,numberOwned,pricePerUnit")
 	private Collection<AssetTree> assetTree;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType,currencyEnteredName,amount")
+	@ListProperties("status, resourceSubType.resourcetypename,currencyEnteredName,amount")
 	private Collection<AssetCash> assetCash;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType,cropType,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status, resourceSubType.resourcetypename,cropType,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Crop> crop;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType, livestockType,unit,unitsAtStartofYear, unitsSold,pricePerUnit"
+	@ListProperties("status,resourceSubType.resourcetypename, livestockType,unit,unitsAtStartofYear, unitsSold,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<LivestockSales> livestockSales;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType, livestockType,livestockProduct,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status,resourceSubType.resourcetypename, livestockType,livestockProduct,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<LivestockProducts> livestockProducts;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodResourceSubType,foodPaymentFoodType,foodPaymentUnit,foodPaymentUnitsPaidWork"
+	@ListProperties("status, resourceSubType.resourcetypename,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodResourceSubType,foodPaymentFoodType,foodPaymentUnit,foodPaymentUnitsPaidWork"
 			+ ",workLocation1,percentWorkLocation1,workLocation2,percentWorkLocation2,workLocation3,percentWorkLocation3")
 	private Collection<Employment> employment;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType,transferFoodOtherType,"
+	@ListProperties("status,resourceSubType.resourcetypename, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType,transferFoodOtherType,"
 			+ " unit, unitsTransferred,unitsSold,pricePerUnit,otherUse,unitsConsumed"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Transfer> transfer;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType,wildFoodName,unit,unitsProduced,unitsSold,pricePerUnit,unitsConsumed,otherUse"
+	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,pricePerUnit,unitsConsumed,otherUse"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<WildFood> wildFood;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType,foodTypeTypeEnteredName,unit,unitsPurchased,pricePerUnit")
+	@ListProperties("status, resourceSubType.resourcetypename,foodTypeTypeEnteredName,unit,unitsPurchased,pricePerUnit")
 	private Collection<FoodPurchase> foodPurchase;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType,itemPurchased,unit,unitsPurchased,pricePerUnit")
+	@ListProperties("status,resourceSubType.resourcetypename,itemPurchased,unit,unitsPurchased,pricePerUnit")
 	private Collection<NonFoodPurchase> nonFoodPurchase;
 
 	public String getWgiid() {

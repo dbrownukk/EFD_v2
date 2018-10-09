@@ -1,11 +1,13 @@
 package efd.model;
 
+import com.openxava.naviox.model.*;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
+import org.openxava.util.*;
 
 @Entity
 
@@ -20,15 +22,35 @@ public class ResourceSubType {
 
 	@PrePersist
 	@PreUpdate
+
 	private void calcKcal() {
 		if (resourcesubtypesynonym != null) {
-			System.out.println("in kcal JPA persist");
 			resourcesubtypekcal = 0;
 		}
+		System.out.println("About to get Roles  = ");
+
+		String userName = Users.getCurrent();
+		User user = User.find(userName);
+
+		System.out.println("Roles done = ");
+
+		// if Role is efd_remote then this is standalone and user can create an RST but
+		// must be a synonym for some other RST
+		// This assumes XavaPro is used
+
+		System.out.println("Role = " + user.hasRole("efd_remote"));
+		System.out.println("Synonym = " + getResourcesubtypesynonym());
+
+		if (user.hasRole("efd_remote") && resourcesubtypesynonym == null) {
+			System.out.println("Need to stop update");
+			throw new javax.validation.ValidationException(
+					XavaResources.getString("Field Users must enter a SubType Synonym"));
+		}
+
 	}
 
 	@Id
-	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
+	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "IDResourceSubType", length = 32, unique = true)
 	private String idresourcesubtype;
@@ -39,18 +61,17 @@ public class ResourceSubType {
 	@DescriptionsList(descriptionProperties = "resourcetypename")
 	private ResourceType resourcetype;
 
-	@Column(name = "ResourceTypeName", length = 255, unique = true) // ? ResosurceSubTypeName ?
+	@Column(name = "ResourceTypeName", length = 255, unique = true)
 	@Required
 	private String resourcetypename;
 
 	@ManyToOne
-	// @Column(name = "ResourceSubTypeSynonym") // Cannot define Column name in
-	// ManyToOne JPA
+
 	@DescriptionsList(descriptionProperties = "resourcetypename")
 	private ResourceSubType resourcesubtypesynonym;
 
 	@Column(name = "ResourceSubTypeUnit", length = 20)
-	@Required // change DRB 23/8/18
+	@Required
 	private String resourcesubtypeunit;
 
 	@Column(name = "ResourceSubTypeKCal")
@@ -93,7 +114,7 @@ public class ResourceSubType {
 	}
 
 	public void setResourcesubtypekcal(int resourcesubtypekcal) {
-			this.resourcesubtypekcal = resourcesubtypekcal;
+		this.resourcesubtypekcal = resourcesubtypekcal;
 	}
 
 	public String getIdresourcesubtype() {

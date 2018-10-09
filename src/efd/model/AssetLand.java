@@ -5,6 +5,7 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 
+
 import efd.model.Asset.*;
 
 
@@ -27,9 +28,11 @@ public class AssetLand extends Asset{
 	@NotNull
 	private Double numberOfUnits;
 	
-	@ManyToOne
+	
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Land'")
+
 	private ResourceSubType resourceSubType;
 
 	public String getLandTypeEnteredName() {

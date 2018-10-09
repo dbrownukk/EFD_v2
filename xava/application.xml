@@ -19,6 +19,7 @@
 		<module name="Project">
 		<model name="Project" />
 		<controller name="ProjectReports" />
+		<controller name="RemoteDatabaseDump" />
 		</module>	
 		
 
