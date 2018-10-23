@@ -19,11 +19,14 @@ import org.openxava.jpa.*;
 import org.openxava.model.*;
 import org.openxava.util.jxls.*;
 import org.openxava.web.servlets.*;
+
+import efd.actions.*;
+
 import org.openxava.tab.*;
 
 @Entity
 
-	@Views({ @View(members = "Project[projecttitle,pdate,altCurrency,altExchangeRate;notes];livelihoodZone"),
+	@Views({ @View(members = "Project[projecttitle,pdate,altCurrency,altExchangeRate;notes,stageFile];livelihoodZone"),
 		@View(name="Proj",members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
 		@View(name="NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate"),
@@ -48,6 +51,7 @@ public class Project {
 	
 	/***********************************************************************************************/
 	@Column(name = "ProjectTitle", length = 255, unique = true)
+	@OnChange(value = LoadRemoteToOrg.class)
 	@Required	
 	private String projecttitle;
 	
@@ -93,7 +97,14 @@ public class Project {
 	private String notes;
 	
 	
+	@Stereotype("FILE")
 	
+	@Column(length = 32, name = "StageFile")
+	private String stageFile;
+	
+
+
+
 	/***********************************************************************************************/
 
 	public String getProjectid() {
@@ -163,6 +174,16 @@ public class Project {
 
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+
+
+	public String getStageFile() {
+		return stageFile;
+	}
+
+
+	public void setStageFile(String stageFile) {
+		this.stageFile = stageFile;
 	}
 
 

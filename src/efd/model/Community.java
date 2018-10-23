@@ -50,32 +50,14 @@ public class Community {
 	@Column(name = "CID", length = 32, unique = true)
 	private String communityid;
 	// ----------------------------------------------------------------------------------------------//
-
-	@ManyToOne  //(fetch = FetchType.LAZY, optional = false)
-	@SearchAction("Community.filteredSitesearch")
-	// need a new LZ create check @AddAction("LivelihoodZone.add LZ")
-	@NoFrame(forViews = "FromWGCommunity")
-	//@ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "SimpleSite"),
-		//	@ReferenceView(forViews = "FromWGCommunity", value = "FromWealthGroup") })
 	
-	@ReferenceView("SimpleSite")
-	@JoinColumn(name = "CLocation")
-	private Site site;
+	@Stereotype("DATE")
+	@Column(name = "CInterviewDate")
+	
+	private java.util.Date cinterviewdate;
 	// ----------------------------------------------------------------------------------------------//
+	
 
-	
-	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = false)
-	@Required
-	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
-	@JoinColumn(name = "CProject")
-	@OnChange(OnChangeClearCommunity.class)
-	@ReferenceView("SimpleProject")
-	@NoCreate
-	@NoModify
-	
-	private Project projectlz;
-	// ----------------------------------------------------------------------------------------------//
 
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
 	@RowAction("Spreadsheet.Template Spreadsheet")
@@ -92,15 +74,50 @@ public class Community {
 	
 	private Integer cinterviewsequence;
 	// ----------------------------------------------------------------------------------------------//
-
-	@Stereotype("DATE")
-	@Column(name = "CInterviewDate")
 	
-	private java.util.Date cinterviewdate;
+
+	@Column(name = "CIVM")
+	private Integer civm;
 	// ----------------------------------------------------------------------------------------------//
+
+	@Column(name = "CIVF")
+	private Integer civf;
+	// ----------------------------------------------------------------------------------------------//	
+
 
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
+	
+	// ----------------------------------------------------------------------------------------------//
+
+	
+	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
+			optional = false)
+	@Required
+	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
+	@JoinColumn(name = "CProject")
+	@OnChange(OnChangeClearCommunity.class)
+	@ReferenceView("SimpleProject")
+	@NoCreate
+	@NoModify
+	
+	private Project projectlz;	
+	// ----------------------------------------------------------------------------------------------//
+	
+
+	@ManyToOne  //(fetch = FetchType.LAZY, optional = false)
+	@SearchAction("Community.filteredSitesearch")
+	// need a new LZ create check @AddAction("LivelihoodZone.add LZ")
+	@NoFrame(forViews = "FromWGCommunity")
+	//@ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "SimpleSite"),
+		//	@ReferenceView(forViews = "FromWGCommunity", value = "FromWealthGroup") })
+	
+	@ReferenceView("SimpleSite")
+	@JoinColumn(name = "CLocation")
+	private Site site;
+
+	// ----------------------------------------------------------------------------------------------//
+	
 
 	// ----------------------------------------------------------------------------------------------//
 	// Is total above 100%
@@ -136,15 +153,7 @@ public class Community {
 		return null;
 	}
 
-	// ----------------------------------------------------------------------------------------------//
 
-	@Column(name = "CIVM")
-	private Integer civm;
-	// ----------------------------------------------------------------------------------------------//
-
-	@Column(name = "CIVF")
-	private Integer civf;
-	// ----------------------------------------------------------------------------------------------//
 	@ReadOnly
 	@Column(name = "CIVparticipants")
 	@Calculation("civm+civf")

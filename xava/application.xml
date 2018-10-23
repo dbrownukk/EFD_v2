@@ -20,6 +20,8 @@
 		<model name="Project" />
 		<controller name="ProjectReports" />
 		<controller name="RemoteDatabaseDump" />
+		<controller name="LoadRemoteToStage" />
+		<controller name="LoadStageToOrg" />
 		</module>	
 		
 

@@ -49,8 +49,10 @@ public class WgiUploadFileAction extends ViewBaseAction implements INavigationAc
 			}
 		}
 		closeDialog();
-		getView().setValue("status",efd.model.WealthGroupInterview.Status.Uploaded);
-			}
+		System.out.println("model = "+getView().getModelName());
+		if(getView().getModelName().equals("WealthGroupInterview"))
+			getView().setValue("status",efd.model.WealthGroupInterview.Status.Uploaded);
+	}
 
 	@SuppressWarnings("rawtypes")
 	public List getFileItems() {

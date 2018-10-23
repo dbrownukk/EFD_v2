@@ -99,8 +99,19 @@
 
 	<controller name="RemoteDatabaseDump">
 		<action name="DatabaseExport" label="DatabaseExport" icon="database"
-			class="efd.actions.RemoteMysqlDump" mode="detail" />
+			class="efd.actions.RemoteMysqlDump"  />
 	</controller>
+	
+	<controller name="LoadRemoteToStage">
+		<action name="LoadRemoteToStage" label="DatabaseStageImport" icon="database" confirm="true"
+			class="efd.actions.LoadRemoteToStage"   />
+	</controller>
+	<controller name="LoadStageToOrg">
+		<action name="LoadStageToOrg" label="LoadStageToOrg" icon="database" hidden="true"
+			class="efd.actions.LoadStageToOrg"   />
+	</controller>
+	
+	
 
 	<controller name="LivelihoodZone">
 		<extends controller="EFD_v2" />
