@@ -21,7 +21,7 @@
 		<controller name="ProjectReports" />
 		<controller name="RemoteDatabaseDump" />
 		<controller name="LoadRemoteToStage" />
-		<controller name="LoadStageToOrg" />
+		<controller name="MergeProject" /> 
 		</module>	
 		
 

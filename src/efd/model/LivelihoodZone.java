@@ -22,7 +22,7 @@ import org.openxava.annotations.*;
 
 @Table(name = "LivelihoodZone", uniqueConstraints = @UniqueConstraint(columnNames = { "LZName", "LZCountry" }))
 
-public class LivelihoodZone {
+public class LivelihoodZone  {
 
 	
 	

@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.annotations.NewAction;
 import org.openxava.annotations.Tab;
+import org.openxava.calculators.*;
 import org.openxava.validators.*;
 import org.openxava.actions.*;
 
@@ -26,7 +27,7 @@ import org.openxava.tab.*;
 
 @Entity
 
-	@Views({ @View(members = "Project[projecttitle,pdate,altCurrency,altExchangeRate;notes,stageFile];livelihoodZone"),
+	@Views({ @View(members = "Project[projecttitle,pdate,altCurrency,altExchangeRate;notes];livelihoodZone"),
 		@View(name="Proj",members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
 		@View(name="NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate"),
@@ -51,7 +52,7 @@ public class Project {
 	
 	/***********************************************************************************************/
 	@Column(name = "ProjectTitle", length = 255, unique = true)
-	@OnChange(value = LoadRemoteToOrg.class)
+	//@OnChange(value = LoadRemoteToOrg.class)
 	@Required	
 	private String projecttitle;
 	
@@ -71,6 +72,7 @@ public class Project {
 	/***********************************************************************************************/
 	@Column(precision=10, scale=5)
 	@Digits(integer=10,fraction=5)
+	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 
 	private BigDecimal altExchangeRate;
 	
@@ -97,10 +99,17 @@ public class Project {
 	private String notes;
 	
 	
+	
+	/* removed until save to web file is fixed */
+	/*
+	 * 
+	 * 
+	 
 	@Stereotype("FILE")
 	
 	@Column(length = 32, name = "StageFile")
 	private String stageFile;
+	*/
 	
 
 
@@ -177,14 +186,6 @@ public class Project {
 	}
 
 
-	public String getStageFile() {
-		return stageFile;
-	}
-
-
-	public void setStageFile(String stageFile) {
-		this.stageFile = stageFile;
-	}
 
 
 
