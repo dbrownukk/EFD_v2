@@ -31,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.format.*;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.DataValidationConstraint.*;
 import org.apache.poi.ss.util.*;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -43,7 +44,6 @@ import org.apache.poi.hssf.usermodel.DVConstraint;
 
 import org.apache.poi.ss.util.CellRangeAddress;
 
-
 //public class CreateXlsFileAction2 extends CollectionElementViewBaseAction implements IForwardAction, JxlsConstants { // 1
 public class CreateXlsFileAction extends CollectionBaseAction implements IForwardAction, JxlsConstants {
 
@@ -51,7 +51,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	JxlsStyle boldTopStyle = null;
 	JxlsStyle borderStyle = null;
 	JxlsStyle textStyle = null;
-	JxlsStyle datestyle = null;
+	JxlsStyle dateStyle = null;
 	JxlsStyle numberStyle = null;
 	JxlsStyle f1Style = null;
 
@@ -71,17 +71,17 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		System.out.println("in xls gen ");
 
 		try {
-			System.out.println("In spreadsheet 1");
+			
 			JxlsWorkbook scenario = createScenario();
-			System.out.println("In spreadsheet 2");
+			
 			if (scenario.equals(null)) {
-				// System.out.println("In spreadsheet exit");
+			
 				addError("Template failed to be created");
 			}
 			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
-			System.out.println("In spreadsheet 3");
+			
 			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
-			System.out.println("In spreadsheet 4");
+			
 		} catch (NullPointerException em) {
 			addError("Template failed to be created - ");
 		}
@@ -228,15 +228,28 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(filename);
 
+		System.out.println("created workbook ");
+
 		boldRStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(RIGHT);
 		boldTopStyle = scenarioWB.addStyle(TEXT).setBold().setAlign(LEFT).setWrap(true);
 		borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN,
 				BORDER_THIN);
 		textStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setCellColor(WHITE).setTextColor(BLACK).setWrap(true);
-		datestyle = scenarioWB.getDefaultDateStyle();
+		
+		scenarioWB.setDateFormat("dd/MM/yyyy");
+		System.out.println("date style = "+scenarioWB.getDateFormat());
+		
+		dateStyle = scenarioWB.addStyle(scenarioWB.getDateFormat()).setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN,BORDER_THIN);
+		//dateStyle = scenarioWB.getDefaultDateStyle();
+		
+		
+		
+		
 		numberStyle = scenarioWB.addStyle(INTEGER).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN,
 				BORDER_THIN);
 		f1Style = scenarioWB.addStyle("0.0");
+
+		System.out.println("about to create Sheets");
 
 		/* XLS Sheets */
 		/*********************************************************************************************************************************************************/
@@ -259,6 +272,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		JxlsSheet foodPurchases = scenarioWB.addSheet("Food Purchases");
 		JxlsSheet nonFoodPurchases = scenarioWB.addSheet("Non-Food Purchases");
 
+		System.out.println(" created Sheets");
+
 		/*********************************************************************************************************************************************************/
 		/* Start print routines for resources */
 		/*********************************************************************************************************************************************************/
@@ -277,7 +292,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		printWildFood(wildfood);
 		printFoodPurchases(foodPurchases);
 		printNonFoodPurchases(nonFoodPurchases);
-
+		
 		/*
 		 * add some drop downs and validations using POI have to map jxls wb to hssf wb
 		 * 
@@ -289,17 +304,26 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		workbook = (HSSFWorkbook) scenarioWB.createPOIWorkbook();
 
-		// set number validation and format style
-		
-		CellStyle style = workbook.createCellStyle();
-		//DataFormat format = workbook.createDataFormat();
+		System.out.println("created workbook 1313");
 
+		// set number validation and format style
+
+		CellStyle style = workbook.createCellStyle();
+		CellStyle datestyle = workbook.createCellStyle();
+		
+		CreationHelper createHelper = workbook.getCreationHelper();
+			
+		datestyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+		
+		// DataFormat format = workbook.createDataFormat();
+
+		
 		style.setDataFormat(HSSFDataFormat.getBuiltinFormat("2"));
 		style.setBorderBottom(CellStyle.BORDER_THIN);
 		style.setBorderTop(CellStyle.BORDER_THIN);
 		style.setBorderRight(CellStyle.BORDER_THIN);
 		style.setBorderLeft(CellStyle.BORDER_THIN);
-		
+
 		
 
 		/*
@@ -307,12 +331,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		 * https://svn.apache.org/repos/asf/poi/trunk/src/examples/src/org/apache/poi/ss
 		 * /examples/LinkedDropDownLists.java
 		 */
-
+		System.out.println("about to do validations ");
 		Sheet sheet = workbook.createSheet("Validations");
+		System.out.println("done validations");
 		buildValidationSheet(sheet);
+
 		
-		System.out.println("done build validation 999");
-		
+		Sheet interviewSheet = workbook.getSheetAt(0);
 		Sheet landSheet = workbook.getSheetAt(1);
 		Sheet lsSheet = workbook.getSheetAt(2);
 		Sheet otSheet = workbook.getSheetAt(3);
@@ -328,7 +353,12 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Sheet foodPurchaseSheet = workbook.getSheetAt(13);
 		Sheet nonFoodPurchaseSheet = workbook.getSheetAt(14);
 
-		System.out.println("done build validation 101");
+		
+
+		/* Interview Validations */
+		
+		addDateValidation(workbook, sheet, interviewSheet, 1, 1, 4, 4, datestyle);
+		
 		
 		/* Asset Land Type */
 
@@ -378,8 +408,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, cropSheet, 3, numRows, 13, 13, style);
 
 		
-		System.out.println("done build validation 102");
-		
+
 		/* Livestock Sales */
 
 		addLOV(sheet, lssSheet, 3, numRows - 1, 1, 1, "Livestock");
@@ -391,11 +420,11 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, lssSheet, 3, numRows, 9, 9, style);
 		addNumberValidation(workbook, sheet, lssSheet, 3, numRows, 11, 11, style);
 
-		System.out.println("done build validation 103");
-		
+	
+
 		/* Livestock Products */
 
-		addLOV(sheet, lspSheet, 3, numRows - 1, 1, 1, "Livestock"); 
+		addLOV(sheet, lspSheet, 3, numRows - 1, 1, 1, "Livestock");
 		addLOV(sheet, lspSheet, 3, numRows - 1, 3, 3, "Unit");
 		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 4, 4, style);
 		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 5, 5, style);
@@ -406,13 +435,14 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 12, 12, style);
 		addNumberValidation(workbook, sheet, lspSheet, 3, numRows, 14, 14, style);
 
-		System.out.println("done build validation 104");
-		
+	
+
 		/* Employment */
 
 		addLOV(sheet, empSheet, 3, numRows - 1, 1, 1, "Employment");
 		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 2, 2, style);
-		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 3, 3, style);
+		addLOV(sheet,empSheet,3, numRows - 1, 3, 3, "EmpUnit");
+		//addNumberValidation(workbook, sheet, empSheet, 3, numRows, 3, 3, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 4, 4, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 5, 5, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 10, 10, style);
@@ -431,7 +461,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 10, 10, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 11, 11, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 12, 12, style);
-		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 13, 13, style);;
+		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 13, 13, style);
+		;
 		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 15, 15, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 17, 17, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, numRows, 19, 19, style);
@@ -456,7 +487,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, foodPurchaseSheet, 3, numRows, 3, 3, style);
 		addNumberValidation(workbook, sheet, foodPurchaseSheet, 3, numRows, 4, 4, style);
 
-
 		/* Food Purchases */
 
 		addLOV(sheet, nonFoodPurchaseSheet, 3, numRows - 1, 1, 1, "NonFoodPurchase");
@@ -465,7 +495,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, nonFoodPurchaseSheet, 3, numRows, 4, 4, style);
 
 		/* Return the spreadsheet */
-
+		System.out.println("printed ss ");
 		return scenarioWB;
 
 		/* end XLS setup */
@@ -491,43 +521,68 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
 		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
 		validation.createErrorBox("", "Enter a Number only");
-		validation.setEmptyCellAllowed(true); 
-		validation.setShowErrorBox(true); 
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(true);
 		iSheet.addValidationData(validation);
 
 		/*
 		 * the above sets the validation but need to set the cell format to be Number
 		 */
-		
-		//CellRangeAddress region = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
 
-		
-		System.out.println("set botttom style = "+style.getBorderBottom());
-		
+		// CellRangeAddress region = new CellRangeAddress(firstRow, lastRow, firstCol,
+		// lastCol);
+
+		//System.out.println("set botttom style = " + style.getBorderBottom());
+
 		// System.out.println("formating region " + region.getNumberOfCells());
 		// System.out.println("formating region 2 " + firstRow + " " + lastRow);
-		
-		
-		
-		System.out.println("firstrow, lastrow, firstCol = "+firstRow+" "+lastRow+" "+firstCol);
-		for (i = firstRow; i < lastRow -1; i++) {
-			if(i==firstRow) {
-			System.out.println("formating number cells, col - "+firstCol+" "+iSheet.getSheetName());		
-			System.out.println("i and firstRow = "+i+" "+firstRow);
-			System.out.println("style = "+style.getBorderBottom());
-			}
+
+		//System.out.println("firstrow, lastrow, firstCol = " + firstRow + " " + lastRow + " " + firstCol);
+		for (i = firstRow; i < lastRow - 1; i++) {
+			//if (i == firstRow) {
+			//	System.out.println("formating number cells, col - " + firstCol + " " + iSheet.getSheetName());
+			//	System.out.println("i and firstRow = " + i + " " + firstRow);
+			//	System.out.println("style = " + style.getBorderBottom());
+			//}
 			Row row = iSheet.getRow(i);
-			System.out.println("format cell = " + i);
-		
+			// System.out.println("format cell = " + i);
+
 			Cell cell = row.getCell(firstCol);
-			System.out.println("cell col, row = "+cell.getColumnIndex()+" "+cell.getRowIndex());
+			// System.out.println("cell col, row = "+cell.getColumnIndex()+"
+			// "+cell.getRowIndex());
 			cell.setCellStyle(style);
-			
-			
+
 		}
 
 	}
+	/**************************************************************************************************************************************************/
 
+	private void addDateValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
+			int firstCol, int lastCol, CellStyle style) {
+
+		CellRangeAddressList addressList = null;
+		int i = 0;
+
+		addressList = new CellRangeAddressList(firstRow, numRows, firstCol, lastCol);
+		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
+
+		DataValidationConstraint dvConstraint = DVConstraint.createDateConstraint(OperatorType.BETWEEN,"01/01/2000", "01/01/2100", "dd/mm/yyyy");
+		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+		validation.createErrorBox("", "Enter a Date only");
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(true);
+		iSheet.addValidationData(validation);
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	private void addLOV(Sheet vsheet, Sheet iSheet, int firstRow, int lastRow, int firstCol, int lastCol, String rType)
 	/*
 	 * vsheet validation sheet iSheet input sheet rstype type of validation
@@ -553,6 +608,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Name name = null;
 
 		/* row for validation data on Validations sheet */
+		int interviewRowNum = 0;
 		int landRowNum = 1;
 		int lsRowNum = 2;
 		int areaRowNum = 3;
@@ -568,10 +624,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int wildfRowNum = 13;
 		int foodpRowNum = 14;
 		int nonfpRowNum = 15;
+		int empUnitRowNum = 16;
+		
 
 		/* Land Types */
 		List<ResourceSubType> rst = XPersistence.getManager().createQuery("from ResourceSubType").getResultList();
 
+		Row interviewRow = dataSheet.createRow(interviewRowNum);
 		Row laRow = dataSheet.createRow(landRowNum);
 		Row lsRow = dataSheet.createRow(lsRowNum);
 		Row areaRow = dataSheet.createRow(areaRowNum);
@@ -587,6 +646,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		Row wildfRow = dataSheet.createRow(wildfRowNum);
 		Row foodpRow = dataSheet.createRow(foodpRowNum);
 		Row nonfpRow = dataSheet.createRow(nonfpRowNum);
+		Row empUnitRow = dataSheet.createRow(empUnitRowNum);
+
+		System.out.println("Section 1");
 
 		int j = 0;
 		int la = 0;
@@ -604,6 +666,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int wildf = 0;
 		int foodp = 0;
 		int nonfp = 0;
+		int empUnit = 0;
 
 		for (int k = 0; k < rst.size(); k++) {
 			/* Land */
@@ -691,7 +754,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		String otcol = getCharForNumber(ot);
 		String fscol = getCharForNumber(fs);
 		String treecol = getCharForNumber(tree); // Convert for drop list creation
+
 		String cropcol = getCharForNumber(crop);
+
 		String empcol = getCharForNumber(emp);
 		String transcol = getCharForNumber(trans);
 		String wildfcol = getCharForNumber(wildf);
@@ -735,7 +800,12 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		/* Crops */
 		name = dataSheet.getWorkbook().createName();
+
 		cropRowNum++;
+
+		System.out.println("cropRowNum = " + cropRowNum);
+		System.out.println("cropcol = " + cropcol);
+
 		name.setRefersToFormula("Validations" + "!$A$" + cropRowNum + ":$" + cropcol + "$" + cropRowNum);
 
 		name.setNameName("Crops");
@@ -775,6 +845,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		name.setNameName("NonFoodPurchase");
 
+	
+
 		/* From Reference Table */
 		/* Area */
 
@@ -803,9 +875,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			cell = unitRow.createCell(unit);
 			cell.setCellValue(referenceCodeUnit.get(k).getReferenceName());
 			unit++;
-			System.out.println("Unit cell set to " + unit + " " + cell.getStringCellValue());
+			
 		}
-
+		
+		
 		String unitcol = getCharForNumber(unit); // Convert for drop list creation
 		name = dataSheet.getWorkbook().createName();
 		unitRowNum++;
@@ -813,7 +886,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		System.out.println("Unit cell info  " + unitRowNum + " " + unitcol);
 
 		name.setRefersToFormula("Validations" + "!$A$" + unitRowNum + ":$" + unitcol + "$" + unitRowNum);
+		
 		name.setNameName("Unit");
+		
 
 		/* Transfer Style */
 
@@ -835,6 +910,31 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				"Validations" + "!$A$" + transStyleRowNum + ":$" + transStylecol + "$" + transStyleRowNum);
 		name.setNameName("TransferStyle");
 
+		
+		
+		/* Emp work Units */
+		System.out.println("Emp Unit 441" );
+		List<ReferenceCode> referenceCodeEmpUnit = XPersistence.getManager()
+				.createQuery("from ReferenceCode where ReferenceType = 'EmpUnit')").getResultList();
+		// Get ref codes for Unit and add to Validations sheet
+		for (int k = 0; k < referenceCodeEmpUnit.size(); k++) {
+			cell = empUnitRow.createCell(empUnit);
+			cell.setCellValue(referenceCodeEmpUnit.get(k).getReferenceName());
+			System.out.println("cell = "+referenceCodeEmpUnit.get(k).getReferenceName());
+			empUnit++;
+			
+		}
+		
+		
+		String empUnitcol = getCharForNumber(empUnit); // Convert for drop list creation
+		name = dataSheet.getWorkbook().createName();
+		empUnitRowNum++;
+
+		name.setRefersToFormula(
+				"Validations" + "!$A$" + empUnitRowNum + ":$" + empUnitcol + "$" + empUnitRowNum);
+		name.setNameName("EmpUnit");
+	
+		
 		/* Cash from Currency Table */
 
 		List<Country> country = XPersistence.getManager().createQuery("from Country")
@@ -844,7 +944,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			cell = currencyRow.createCell(currency);
 			cell.setCellValue(country.get(k).getCurrency());
 			currency++;
-			System.out.println("Currency cell set to " + currency + " " + cell.getStringCellValue());
+			//System.out.println("Currency cell set to " + currency + " " + cell.getStringCellValue());
 		}
 
 		String currencycol = getCharForNumber(currency); // Convert for drop list creation
@@ -892,7 +992,12 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		sheet.setValue(2, 8, "Number of Particpants", boldRStyle);
 		sheet.setValue(2, 10, "Wealth Group", boldRStyle);
 
+		/* date validation */
 		sheet.setValue(4, 2, "Date", boldRStyle);
+		sheet.setValue(5, 2, "",dateStyle);
+		
+		
+		
 		sheet.setValue(4, 4, "Village / Sub District", boldRStyle);
 		sheet.setValue(4, 6, "Interviewers", boldRStyle);
 		sheet.setValue(4, 8, "Men", boldRStyle);
@@ -947,14 +1052,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		// get resource sub type //
 		for (int k = 0; k < chrs.size(); k++) {
 			/* Get Resource Sub Type */
-			
+
 			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
 					.find(WGCharacteristicsResource.class, chrs.get(k));
-			
-			
-			//System.out.println("characteristic rst = "+wgcharacteristicsresource.getResourcesubtype().getResourcetypename());
-			
-			
+
+			// System.out.println("characteristic rst =
+			// "+wgcharacteristicsresource.getResourcesubtype().getResourcetypename());
+
 			/* Get Resource Type */
 			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
 					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
@@ -962,7 +1066,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getWgresourceunit();
-			if(rtunit.isEmpty())
+			if (rtunit.isEmpty())
 				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			if (rt.equals("Land")) {
@@ -1018,7 +1122,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getWgresourceunit();
-			if(rtunit.isEmpty())
+			if (rtunit.isEmpty())
 				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			if (rt.equals("Livestock")) {
@@ -1070,7 +1174,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getWgresourceunit();
-			if(rtunit.isEmpty())
+			if (rtunit.isEmpty())
 				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			if (rt.equals("Other Tradeable Goods")) {
@@ -1129,7 +1233,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getWgresourceunit();
-			if(rtunit.isEmpty())
+			if (rtunit.isEmpty())
 				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			if (rt.equals("Food Stocks")) {
@@ -1182,7 +1286,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getWgresourceunit();
-			if(rtunit.isEmpty())
+			if (rtunit.isEmpty())
 				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			if (rt.equals("Trees")) {
@@ -1218,7 +1322,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				row = 4;
 			}
 
-			System.out.println("tree set styles tree size");
+			//System.out.println("tree set styles tree size CASH");
 
 			row = 4;
 			int cashrow = 5;
@@ -1235,13 +1339,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if(rtunit.isEmpty())
+				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 				if (rt.equals("Cash")) {
 					sheet.setValue(2, row, resub, borderStyle);
-					//sheet.setValue(3, row, rtunit, borderStyle);   
-					// Need to remove Unit for Asset Cash 
+					// sheet.setValue(3, row, rtunit, borderStyle);
+					// Need to remove Unit for Asset Cash
 					row++;
 				}
 
@@ -1301,7 +1405,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if(rtunit.isEmpty())
+				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 				if (rt.contains("Crops")) {
@@ -1364,7 +1468,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if(rtunit.isEmpty())
+				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 				if (rt.equals("Livestock Sales")) {
@@ -1384,8 +1488,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		{
 			/* Livestock Products Sheet - */
 
-		
-			
 			sheet.setValue(2, 3, "Livestock Type", boldTopStyle);
 			sheet.setValue(3, 3, "Product (e.g. Milk", boldTopStyle);
 			sheet.setValue(4, 3, "Unit", boldTopStyle);
@@ -1401,8 +1503,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			sheet.setValue(14, 3, "Market 3", boldTopStyle);
 			sheet.setValue(15, 3, "% Trade at 3", boldTopStyle);
 
-			sheet.setColumnWidths(2, width, width,width, numwidth, numwidth, numwidth, numwidth, numwidth, width, numwidth, width,
-					numwidth, width, numwidth); /* set col widths */
+			sheet.setColumnWidths(2, width, width, width, numwidth, numwidth, numwidth, numwidth, numwidth, width,
+					numwidth, width, numwidth, width, numwidth); /* set col widths */
 
 			/* set grid for data input */
 
@@ -1432,7 +1534,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if(rtunit.isEmpty())
+				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 				if (rt.equals("Livestock Products")) {
@@ -1452,9 +1554,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		{
 			/* Employment Sheet - */
 
-			sheet.setValue(2, 3, "Employment Type", boldTopStyle);	
-			sheet.setValue(3, 3, "Unit of Work  e.g. Day, Month", boldTopStyle);	
-			sheet.setValue(4, 3, "Number of People Working", boldTopStyle);
+			sheet.setValue(2, 3, "Employment Type", boldTopStyle);
+			sheet.setValue(3, 3, "Number of People Working", boldTopStyle);
+			sheet.setValue(4, 3, "Unit of Work  e.g. Day, Month", boldTopStyle);
 			sheet.setValue(5, 3, "Units worked  e.g. Days, Months", boldTopStyle);
 			sheet.setValue(6, 3, "Cash Pay:Amount per Unit of Work", boldTopStyle);
 			sheet.setValue(7, 3, "Food Pay:Food Type", boldTopStyle);
@@ -1483,25 +1585,31 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				row = 4;
 			}
 
-			System.out.println("tree set styles tree size");
-
 			row = 4;
+			
 			int emprow = 5;
+			
 			// get resource sub type //
+
 			for (int k = 0; k < chrs.size(); k++) {
-				/* Get Resource Sub Type */
+
+				
 				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
 						.find(WGCharacteristicsResource.class, chrs.get(k));
+				
 
-				/* Get Resource Type */
 				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
 						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+				
 
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if(rtunit.isEmpty())
+				
+
+				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				
 
 				if (rt.equals("Employment")) {
 					sheet.setValue(2, row, resub, borderStyle);
@@ -1571,9 +1679,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if(rtunit.isEmpty())
+				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-				
+
 				if (rt.equals("Transfers")) {
 					sheet.setValue(4, row, resub, borderStyle);
 					sheet.setValue(9, row, rtunit, borderStyle);
@@ -1635,7 +1743,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				rt = rst.getResourcetypename();
 				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if(rtunit.isEmpty())
+				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 				if (rt.equals("Wild Foods")) {
@@ -1691,7 +1799,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getWgresourceunit();
-			if(rtunit.isEmpty())
+			if (rtunit.isEmpty())
 				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			if (rt.equals("Food Purchase")) {
@@ -1745,7 +1853,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			rt = rst.getResourcetypename();
 			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
 			rtunit = wgcharacteristicsresource.getWgresourceunit();
-			if(rtunit.isEmpty())
+			if (rtunit.isEmpty())
 				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
 			if (rt.equals("Non Food Purchase")) {
@@ -1759,9 +1867,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	}
 
 	/**************************************************************************************************************************************************/
-
+	/* convert number to alpha bet numbered character i.e. 3 =C */
 	public static String getCharForNumber(int i) {
-		return i > 0 && i < 27 ? String.valueOf((char) (i + 'A' - 1)) : null;
+
+		String columnLetter = CellReference.convertNumToColString(i);
+
+		return columnLetter;
+
 	}
 
 	public String getForwardURI() {

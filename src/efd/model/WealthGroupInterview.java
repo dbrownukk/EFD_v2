@@ -202,7 +202,7 @@ public class WealthGroupInterview {
 	private Collection<Employment> employment;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType.resourcetypename, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType,transferFoodOtherType,"
+	@ListProperties("status,resourceSubType.resourcetypename, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType.resourcetypename,transferFoodOtherType,"
 			+ " unit, unitsTransferred,unitsSold,pricePerUnit,otherUse,unitsConsumed"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Transfer> transfer;

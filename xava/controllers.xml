@@ -32,7 +32,7 @@
 		<action name="Parse Spreadsheet"
 			label="Parse Interview Spreadsheet 2" icon="file-excel" mode="detail"
 			in-each-row="false" class="efd.actions.ParseXLSFile2" />
-		<action name="Validate Asset Data" label="Validate Asset Data"
+		<action name="Validate" label="Validate"
 			icon="marker-check" mode="detail" in-each-row="false"
 			class="efd.actions.ValidateWGI" />
 	</controller>
@@ -158,11 +158,17 @@
 
 
 	<controller name="UploadFile">
-		<action name="uploadFile"
-			class="efd.actions.WgiUploadFileAction" />
+		<action name="uploadFile" 
+			class="efd.actions.WgiUploadFileAction"  />
 		<action name="cancel" class="org.openxava.actions.CancelAction" />
 	</controller>
 
+	<controller name="AttachedFiles"> 
+		<action name="add" class="org.openxava.actions.AddFileToFilesetAction" 
+			icon="attachment" image="attach.gif" takes_long="true"/>
+		<action name="remove" class="org.openxava.actions.RemoveFileFromFilesetAction" 
+			icon="delete" image="delete.gif" confirm="true" />	
+	</controller>
 
 
 	<controller name="SetReadOnly">

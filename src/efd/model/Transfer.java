@@ -24,9 +24,12 @@ public class Transfer extends Asset{
 	@Column(name = "Source", length = 50)
 	private String source;
 	
-	@Column(name = "TransferType", length = 50)
-	private String transferType;
+	@Column(name = "TransferType", length = 50, nullable = false)
+	private TransferType transferType;
+	public enum TransferType {Food, Cash, Other}
 
+	
+	
 	@Column(name = "PeopleReceiving")
 	private Double peopleReceiving;
 	
@@ -40,7 +43,7 @@ public class Transfer extends Asset{
 	
 	@ManyToOne
 	@JoinColumn(name = "FoodResourceSubType")
-	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops')")
+	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops','Livestock','Livestock Products','Other Tradeable Goods')")
 	private ResourceSubType foodResourceSubType;
 	
 	
@@ -99,10 +102,11 @@ public class Transfer extends Asset{
 	public void setSource(String source) {
 		this.source = source;
 	}
-	public String getTransferType() {
+
+	public TransferType getTransferType() {
 		return transferType;
 	}
-	public void setTransferType(String transferType) {
+	public void setTransferType(TransferType transferType) {
 		this.transferType = transferType;
 	}
 	public Double getPeopleReceiving() {

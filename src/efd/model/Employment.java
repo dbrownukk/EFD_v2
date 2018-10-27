@@ -34,7 +34,7 @@ public class Employment extends Asset {
 	
 	@ManyToOne
 	@JoinColumn(name = "FoodResourceSubType")
-	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops')")
+	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops','Livestock Products')")
 	private ResourceSubType foodResourceSubType;
 
 	@Column(name = "FoodPaymentFoodType", length=50)

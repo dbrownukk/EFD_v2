@@ -58,28 +58,10 @@ public class Site {
 	@SearchAction(value="LivelihoodZone.filteredsearch")
 	
 	@ReferenceView("SimpleLZnomap")
-	//@ReferenceViews({
-	//@ReferenceView(forViews="SimpleSite", value="SimpleLZnomap"),
-	//@ReferenceView(forViews="DEFAULT", value="UpdateLZ"),
-	//})
+
 	@NoCreate
 	@NoModify
 	@JoinColumn(name = "LZ")
-	//@DescriptionsList(descriptionProperties="lzname", notForViews="SimpleSite,DEFAULT")
-	
-	
-	//@DescriptionsList(
-		//	descriptionProperties = "lzname", forViews="DEFAULT"
-			//condition="e.lzid in (select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${community.cproject})"
-			//)
-	/*
-	worked e.lzid in (select lzid from LivelihoodZone
-	select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${projectid}
-	*/
-	
-	
-	// was condition="${lzid} = (select lz.lzid from LivelihoodZone lz join lz.project pr where pr.projectid = ${projectid}")
-
 	private LivelihoodZone livelihoodZone;
 
 	@OneToMany(mappedBy = "site", cascade = CascadeType.REMOVE)
