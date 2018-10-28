@@ -1,12 +1,16 @@
 package efd.model;
 
 import com.openxava.naviox.model.*;
+
+import efd.validations.*;
+
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 import org.openxava.util.*;
 
 @Entity
@@ -23,11 +27,13 @@ public class ResourceSubType {
 	@PrePersist
 	@PreUpdate
 
+	
+	
 	private void calcKcal() {
 		if (resourcesubtypesynonym != null) {
 			resourcesubtypekcal = 0;
 		}
-		System.out.println("About to get Roles  = ");
+		//System.out.println("About to get Roles  = ");
 
 		String userName = Users.getCurrent();
 		User user = User.find(userName);
@@ -75,6 +81,8 @@ public class ResourceSubType {
 	@Required
 	private String resourcesubtypeunit;
 
+	@DefaultValueCalculator(IntegerCalculator.class)
+	@OnChange(value = OnChangeRSTkcal.class)
 	@Column(name = "ResourceSubTypeKCal")
 	private int resourcesubtypekcal;
 

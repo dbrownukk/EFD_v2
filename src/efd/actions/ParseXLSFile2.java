@@ -117,7 +117,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		ws.add(new Wsheet(ASSETTREE, "Trees", 4, 0));
 		ws.add(new Wsheet(ASSETCASH, "Cash", 2, 0));
 		ws.add(new Wsheet(CROPS, "Crops", 13, 0));
-		ws.add(new Wsheet(LIVESTOCKSALE, "Livestock Sales", 11, 0));
+		ws.add(new Wsheet(LIVESTOCKSALE, "Livestock", 11, 0));
 		ws.add(new Wsheet(LIVESTOCKPRODUCT, "Livestock Products", 14, 0));
 		ws.add(new Wsheet(EMPLOYMENT, "Employment", 14, 0));
 		ws.add(new Wsheet(TRANSFER, "Transfers", 19, 0));
@@ -378,7 +378,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			}
 
 		}
-		System.out.println("get interview date 5552");
+		
 		/* Interviewers */
 		nullable = false;
 		if (checkCell("Interviewers", sheet, 4, 5, nullable))
@@ -442,10 +442,10 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 			wgi.setWgYearType(typeOfYear);
 
-			wgi.setStatus(Status.PartParsed);
+			
 		}
 		System.out.println("done wb setup ");
-
+		wgi.setStatus(Status.PartParsed);
 	}
 
 	/**************************************************************************************************************************************************************************************************/
@@ -460,13 +460,21 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		/* get the details for this sheet */
 
 		for (k = ASSETLAND; k < NUMBERSHEETS; k++) { // Sheets ---- was <= DRB
+			
 			try {
+				
 				sheet = wb.getSheetAt(k);
-				// System.out.println("in get details sheet = " + k);
+				
 				for (i = 0; i < 40; i++) { // ROWS
+					
+					
+					
 					for (j = 0; j < ws.get(k - 1).numcols; j++) {
 
+						
 						cell[k][i][j] = sheet.getRow(i + 3).getCell(j + 1);
+						
+						
 						/*
 						 * if (k == TRANSFER) {
 						 * 
@@ -480,7 +488,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						// if first column is blank then no more data in this sheet
 
 						if (cell[k][i][0].getCellType() == 3) {
-							// System.out.println("No more data in this sheet " + k + " " + i);
+							 System.out.println("No more data in this sheet " + k + " " + i);
 							numberRows[k] = i;
 							i = 100;
 							j = 100;
@@ -491,10 +499,10 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						// if first col check if empty, if so then end of rows on this sheet
 
 						if (j == 0 && cell[k][i][0].getStringCellValue().isEmpty()) {
-							// System.out.println("EMPTY String " + k + " " + i);
-							// record numrows in each sheet
+							System.out.println("EMPTY String " + k + " " + i);
+						// record numrows in each sheet
 							numberRows[k] = i;
-							// System.out.println("numberrows = " + numberRows[k]);
+							System.out.println("numberrows = " + numberRows[k]);
 							i = 100;
 							break;
 						}
@@ -502,7 +510,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 				}
 			} catch (Exception ex) {
 				addError("Error in number of columns in Sheet = " + k);
-
+			
 			}
 		}
 
@@ -1007,8 +1015,18 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						at.setSource(cell[i][j][l++].getStringCellValue());
 
-						at.setTransferType(cell[i][j][l++].getStringCellValue());
-
+						// Handle the enum 
+						
+						//System.out.println("Transfer Type = "+cell[i][j][l++].getStringCellValue());
+						
+						if(cell[i][j][l].getStringCellValue().equals("Cash"))
+								at.setTransferType(efd.model.Transfer.TransferType.Cash);
+						else if(cell[i][j][l].getStringCellValue().equals("Other"))
+							at.setTransferType(efd.model.Transfer.TransferType.Other);						
+						if(cell[i][j][l].getStringCellValue().equals("Food"))
+							at.setTransferType(efd.model.Transfer.TransferType.Food);
+						l++;
+						
 						at.setPeopleReceiving(getCellDouble(cell[i][j][l++]));
 
 						at.setTimesReceived(getCellDouble(cell[i][j][l++]));
@@ -1253,9 +1271,9 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			String var2 = stripS(var1);
 			String var3 = addS(var1);
 
-			System.out.println("var 1 = " + var1);
-			System.out.println("var 2 = " + var2);
-			System.out.println("var 3 = " + var3);
+			//System.out.println("var 1 = " + var1);
+			//System.out.println("var 2 = " + var2);
+			//System.out.println("var 3 = " + var3);
 
 			ResourceSubType rsty = (ResourceSubType) XPersistence.getManager()
 					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'" + "and ("
@@ -1263,7 +1281,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							+ "'" + ") ")
 					.setMaxResults(1).getSingleResult();
 
-			System.out.println("rsty = " + rsty.getResourcetypename());
+			//System.out.println("rsty = " + rsty.getResourcetypename());
 
 			/*
 			 * check RST synonym
@@ -1282,7 +1300,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 				return rsty;
 			}
 
-			System.out.println("done rst get syn query in check sub type ");
+			//System.out.println("done rst get syn query in check sub type ");
 
 			// otherwise get the RST for the Synonym
 
@@ -1292,7 +1310,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		}
 
 		catch (Exception ex) {
-			System.out.println("Failed checkSubType " + ex);
+			//System.out.println("Failed checkSubType " + ex);
 			return null; // no record found to match data entered
 
 		}

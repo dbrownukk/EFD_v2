@@ -79,7 +79,8 @@ public class ValidateWGI extends CollectionBaseAction implements IForwardAction 
 		System.out.println("DONE LISTS ");
 		
 		for (i = 0; i < al.size(); i++) {
-			if (!al.get(i).getStatus().toString().equals("Valid")) {
+			if (!al.get(i).getStatus().equals(efd.model.Asset.Status.Valid)) {
+				
 				addMessage("Land Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
@@ -89,7 +90,7 @@ public class ValidateWGI extends CollectionBaseAction implements IForwardAction 
 		for (i = 0; i < als.size(); i++) {
 
 			if (!als.get(i).getStatus().toString().equals("Valid")) {
-				addMessage("Land Assets still Invalid or Unchecked");
+				addMessage("Livestock Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
@@ -98,7 +99,7 @@ public class ValidateWGI extends CollectionBaseAction implements IForwardAction 
 		for (i = 0; i < at.size(); i++) {
 	
 			if (!at.get(i).getStatus().toString().equals("Valid")) {
-				addMessage("Land Assets still Invalid or Unchecked");
+				addMessage("Tradeable Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
