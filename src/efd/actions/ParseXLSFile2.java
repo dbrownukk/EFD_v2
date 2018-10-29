@@ -549,6 +549,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			rtype[i] = (ResourceType) XPersistence.getManager()
 					.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
 					.getSingleResult();
+			
+			
 
 		}
 
@@ -981,15 +983,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							aemp.setStatus(efd.model.Asset.Status.Valid);
 
 						// Now need to check food unit is valid
-						/*
-						 * 
-						 * 
-						 * CONTINUE HERE
-						 * 
-						 * 
-						 * 
-						 * 
-						 */
+						if (!checkSubTypeEntered(aemp.getFoodPaymentUnit(), rst))
+							aemp.setStatus(efd.model.Asset.Status.Invalid);
 
 						wgi.getEmployment().add(aemp);
 						getView().refreshCollections();
@@ -1019,11 +1014,16 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						
 						//System.out.println("Transfer Type = "+cell[i][j][l++].getStringCellValue());
 						
-						if(cell[i][j][l].getStringCellValue().equals("Cash"))
+						
+						String upperCaseTransferType=upperCaseFirst(cell[i][j][l].getStringCellValue());
+				
+						
+						
+						if(upperCaseTransferType .equals("Cash"))
 								at.setTransferType(efd.model.Transfer.TransferType.Cash);
-						else if(cell[i][j][l].getStringCellValue().equals("Other"))
+						else if(upperCaseTransferType.equals("Other"))
 							at.setTransferType(efd.model.Transfer.TransferType.Other);						
-						if(cell[i][j][l].getStringCellValue().equals("Food"))
+						if(upperCaseTransferType.equals("Food"))
 							at.setTransferType(efd.model.Transfer.TransferType.Food);
 						l++;
 						
@@ -1034,6 +1034,9 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						at.setTransferFoodOtherType((cell[i][j][l++].getStringCellValue()));
 
 						at.setUnit(cell[i][j][l++].getStringCellValue());
+						if(at.getUnit().isEmpty())
+								at.setUnit("?");    // seem to have many examples where this is left blank..
+						
 						at.setUnitsTransferred(getCellDouble(cell[i][j][l++]));
 						at.setUnitsSold(getCellDouble(cell[i][j][l++]));
 						at.setPricePerUnit(getCellDouble(cell[i][j][l++]));
@@ -1065,6 +1068,42 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						}
 
+						/* Need to check if Transfer Type of Food is valid if entered in column 6*/ 
+						/* Need to check if Valid Food */
+						/*
+						 * Crops, Wild Food, Food Purchases, Livestock, Livestock Products
+						 */
+						
+						if (((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
+								rtype[CROPS].getIdresourcetype().toString())) != null)
+								||
+								((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
+										rtype[WILDFOOD].getIdresourcetype().toString())) != null)
+							||
+							((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
+									rtype[FOODPURCHASE].getIdresourcetype().toString())) != null)
+							
+							||
+							((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
+									rtype[LIVESTOCKPRODUCT].getIdresourcetype().toString())) != null)
+							
+							)
+						
+						{    // set FoodRST and check Unit entered 
+
+							at.setFoodResourceSubType(rst);
+							at.setStatus(efd.model.Asset.Status.Valid);
+							if (!checkSubTypeEntered(at.getUnit(), rst))
+									at.setStatus(efd.model.Asset.Status.Invalid);
+
+						} else {
+							at.setStatus(efd.model.Asset.Status.Invalid);
+
+						}
+						
+						
+						
+						
 						wgi.getTransfer().add(at);
 						getView().refreshCollections();
 						k = 100;
@@ -1379,6 +1418,16 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 	}
 
+	/**************************************************************************************************************************************************************************************************/
+    public static String upperCaseFirst(String value) {
+
+        // Convert String to char array.
+        char[] array = value.toCharArray();
+        // Modify first element in array.
+        array[0] = Character.toUpperCase(array[0]);
+        // Return string.
+        return new String(array);
+    }
 	/**************************************************************************************************************************************************************************************************/
 
 	private Boolean checkCell(String cname, Sheet sheet, int x, int y, Boolean nullable) /* Is spreadsheet Cell Valid */

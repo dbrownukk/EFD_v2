@@ -166,8 +166,7 @@ where efd.wginterview_nonfoodpurchased_details.`CommunityID`   =  $P{communityid
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
 							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
-							<valueExpression><![CDATA[$P{normalise}?$F{UnitsPurchased}*$F{PricePerUnit} /$F{WGAverageNumberInHH}:$F{UnitsPurchased}*$F{PricePerUnit}
-]]></valueExpression>
+							<valueExpression><![CDATA[$P{normalise}?$F{UnitsPurchased}*$F{PricePerUnit} /$F{WGAverageNumberInHH}:$F{UnitsPurchased}*$F{PricePerUnit}]]></valueExpression>
 						</categorySeries>
 					</categoryDataset>
 					<barPlot>
@@ -250,7 +249,7 @@ where efd.wginterview_nonfoodpurchased_details.`CommunityID`   =  $P{communityid
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[No Validated Wealthgroups for this Community]]></text>
+				<text><![CDATA[No data is available for non-food expenditure]]></text>
 			</staticText>
 		</band>
 	</noData>

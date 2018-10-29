@@ -197,7 +197,7 @@ public class WealthGroupInterview {
 	private Collection<LivestockProducts> livestockProducts;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType.resourcetypename,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodResourceSubType,foodPaymentFoodType,foodPaymentUnit,foodPaymentUnitsPaidWork"
+	@ListProperties("status, resourceSubType.resourcetypename,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodResourceSubType.resourcetypename,foodPaymentFoodType,foodPaymentUnit,foodPaymentUnitsPaidWork"
 			+ ",workLocation1,percentWorkLocation1,workLocation2,percentWorkLocation2,workLocation3,percentWorkLocation3")
 	private Collection<Employment> employment;
 

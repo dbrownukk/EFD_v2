@@ -135,7 +135,7 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 			<band height="310">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="Project">
-						<reportElement x="80" y="0" width="600" height="310" uuid="65cb4b5a-5b80-41b2-ac24-d074bde5f41c"/>
+						<reportElement x="80" y="0" width="600" height="310" uuid="233bfe29-ac8f-4356-93ff-5847f69272bf"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend/>
@@ -145,7 +145,7 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
 							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
-							<valueExpression><![CDATA[$P{normalise}?$F{xx} /$F{WGAverageNumberInHH}:$F{xx}]]></valueExpression>
+							<valueExpression><![CDATA[$P{normalise}?$F{amount} /$F{WGAverageNumberInHH}:$F{amount}]]></valueExpression>
 						</categorySeries>
 					</categoryDataset>
 					<barPlot>

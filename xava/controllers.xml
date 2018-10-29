@@ -48,13 +48,6 @@
 		<action name="Assets(Normalised)"
 			label="Asset Chart (Normalised)" mode="detail" icon="view-list"
 			class="efd.reports.AssetChartNormalised" />
-		<!-- <action name="AssetsLand" label="AssetsLand Chart" mode="detail" icon="view-list" 
-			class="efd.reports.AssetLandChart" /> <action name="AssetsLand(Normalised)" 
-			label="AssetsLand Chart (Normalised)" mode="detail" icon="view-list" class="efd.reports.AssetLandChartNormalised" 
-			/> <action name="AssetsFoodStocks" label="AssetsFoodStocks Chart" mode="detail" 
-			icon="view-list" class="efd.reports.AssetFoodStocksChart" /> <action name="AssetsFoodStocks(Normalised)" 
-			label="AssetsFoodStocks Chart (Normalised)" mode="detail" icon="view-list" 
-			class="efd.reports.AssetFoodStocksChartNormalised" /> -->
 		<action name="Food Expenditure" label="Food Expenditure"
 			mode="detail" icon="view-list"
 			class="efd.reports.FoodExpenditureChart" />

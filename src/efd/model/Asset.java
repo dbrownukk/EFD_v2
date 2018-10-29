@@ -22,6 +22,10 @@ public class Asset {
 	}
 
 	/* Unit should be set to Nullable in Cash asset database table */
+	@DefaultValueCalculator(
+			value=org.openxava.calculators.StringCalculator.class,
+			properties={ @PropertyValue(name="string", value="?") }
+			)
 	@Column(name = "Unit", length = 50, nullable = false)
 	@Required
 	private String unit;
