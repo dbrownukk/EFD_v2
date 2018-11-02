@@ -32,7 +32,7 @@ public class AssetChartNormalised extends JasperConcatReportBaseAction {
 		System.out.println("in assetchart");
 		setFormat("pdf");
 
-		String[] reports = new String[] { "wgi_asset.jrxml", "wgi_asset_foodstocks.jrxml", "wgi_asset_land.jrxml" };
+		String[] reports = new String[] { "wgi_asset.jrxml", "wgi_asset_foodstocks3.jrxml", "wgi_asset_land.jrxml" };
 		return reports;
 
 	}
@@ -54,7 +54,7 @@ public class AssetChartNormalised extends JasperConcatReportBaseAction {
 		parameters.put("communityid", communityid);
 		parameters.put("normalise", normalise);
 
-		parameters.put("normalisationMessage", "Normalised by Average in Household");
+		parameters.put("normalisationMessage", "Normalised by Average in Household in Wealthgroup");
 
 		return parameters;
 	}

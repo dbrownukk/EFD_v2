@@ -43,7 +43,7 @@ public class Transfer extends Asset{
 	
 	@ManyToOne
 	@JoinColumn(name = "FoodResourceSubType")
-	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops','Livestock','Livestock Products')")
+	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops','Livestock','Livestock Products','Other Tradeable Goods')")
 	private ResourceSubType foodResourceSubType;
 	
 	

@@ -306,7 +306,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		else
 			return;
 
-		System.out.println("cell type " + icell.getCellType());
+		// System.out.println("cell type " + icell.getCellType());
 
 		if (icell.getCellType() == 0) { /* Numeric */
 			// System.out.println("in Numeric ");
@@ -319,8 +319,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			// System.out.println("get interview 1 " + interviewNumber);
 			wgi.setWgInterviewNumber(Integer.parseInt(interviewNumber));
 		}
-
-		System.out.println("get interview 333");
 
 		/* Number of Participants */
 		nullable = false;
@@ -378,7 +376,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			}
 
 		}
-		
+
 		/* Interviewers */
 		nullable = false;
 		if (checkCell("Interviewers", sheet, 4, 5, nullable))
@@ -386,7 +384,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		else
 			return;
 		wgi.setWgInterviewers(interviewers);
-		System.out.println("get interview " + n++);
 
 		/* Men */
 		nullable = true;
@@ -442,7 +439,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 			wgi.setWgYearType(typeOfYear);
 
-			
 		}
 		System.out.println("done wb setup ");
 		wgi.setStatus(Status.PartParsed);
@@ -460,21 +456,17 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		/* get the details for this sheet */
 
 		for (k = ASSETLAND; k < NUMBERSHEETS; k++) { // Sheets ---- was <= DRB
-			
+
 			try {
-				
+
 				sheet = wb.getSheetAt(k);
-				
+
 				for (i = 0; i < 40; i++) { // ROWS
-					
-					
-					
+
 					for (j = 0; j < ws.get(k - 1).numcols; j++) {
 
-						
 						cell[k][i][j] = sheet.getRow(i + 3).getCell(j + 1);
-						
-						
+
 						/*
 						 * if (k == TRANSFER) {
 						 * 
@@ -488,7 +480,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						// if first column is blank then no more data in this sheet
 
 						if (cell[k][i][0].getCellType() == 3) {
-							 System.out.println("No more data in this sheet " + k + " " + i);
+							// System.out.println("No more data in this sheet " + k + " " + i);
 							numberRows[k] = i;
 							i = 100;
 							j = 100;
@@ -499,10 +491,10 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						// if first col check if empty, if so then end of rows on this sheet
 
 						if (j == 0 && cell[k][i][0].getStringCellValue().isEmpty()) {
-							System.out.println("EMPTY String " + k + " " + i);
-						// record numrows in each sheet
+							// System.out.println("EMPTY String " + k + " " + i);
+							// record numrows in each sheet
 							numberRows[k] = i;
-							System.out.println("numberrows = " + numberRows[k]);
+							// System.out.println("numberrows = " + numberRows[k]);
 							i = 100;
 							break;
 						}
@@ -510,7 +502,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 				}
 			} catch (Exception ex) {
 				addError("Error in number of columns in Sheet = " + k);
-			
+
 			}
 		}
 
@@ -549,21 +541,14 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			rtype[i] = (ResourceType) XPersistence.getManager()
 					.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
 					.getSingleResult();
-			
-			
 
 		}
 
 		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) { // Sheet
 
-			System.out.println(" if 0 then it skips = numrows = " + numberRows[i]);
 			// breaksheet: for (j = 0; j < 35; j++) { // Row
 			breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
 
-				System.out.println("in parse loop 2 = ijk =" + " " + i + " " + j + " " + k);
-				if (i == TRANSFER) {
-					System.out.println("in Transfer Loop");
-				}
 				switch (i) {
 
 				case ASSETLAND:
@@ -613,8 +598,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						als.setNumberOwnedAtStart(getCellDouble(cell[i][j][2]));
 						als.setPricePerUnit(getCellDouble(cell[i][j][3]));
 
-						System.out.println("ALS type = " + cell[i][j][0].getStringCellValue());
-						System.out.println("ALS type ID = " + rtype[i].getIdresourcetype().toString());
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
 							// System.out.println("done als get = " + rst.getResourcetypename());
@@ -651,7 +634,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							System.out.println("done atrade get = " + rst.getResourcetypename());
+							// System.out.println("done atrade get = " + rst.getResourcetypename());
 
 							atrade.setResourceSubType(rst);
 							atrade.setStatus(efd.model.Asset.Status.Valid);
@@ -689,7 +672,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							System.out.println("done afood get = " + rst.getResourcetypename());
+							// System.out.println("done afood get = " + rst.getResourcetypename());
 
 							afood.setResourceSubType(rst);
 							afood.setStatus(efd.model.Asset.Status.Valid);
@@ -754,8 +737,9 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						acash.setCurrencyEnteredName(cell[i][j][0].getStringCellValue());
 						acash.setUnit("each"); // a default value - not used elsewhere
 
-						System.out.println("in set assetcash amount cell type =" + cell[i][j][1].getCellType() + " "
-								+ cell[i][j][1].getStringCellValue());
+						// System.out.println("in set assetcash amount cell type =" +
+						// cell[i][j][1].getCellType() + " "
+						// + cell[i][j][1].getStringCellValue());
 						warnMessage = "Currency Amount";
 						acash.setAmount(getCellDouble(cell[i][j][1]));
 
@@ -798,7 +782,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						acrop.setUnitsConsumed(getCellDouble(cell[i][j][5]));
 						acrop.setUnitsOtherUse(getCellDouble(cell[i][j][6]));
 
-						System.out.println("in crop 5 = ");
 						warnMessage = "Market 1";
 						acrop.setMarket1(cell[i][j][7].getStringCellValue());
 						warnMessage = "Percent Trade Market 1";
@@ -814,10 +797,10 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						warnMessage = "Percent Trade Market 3";
 						acrop.setPercentTradeMarket3(getCellDouble(cell[i][j][12]));
 
-						System.out.println("in crop = " + cell[i][j][1].getStringCellValue());
+						// System.out.println("in crop = " + cell[i][j][1].getStringCellValue());
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							System.out.println("done acrop get = " + rst.getResourcetypename());
+							// System.out.println("done acrop get = " + rst.getResourcetypename());
 
 							acrop.setResourceSubType(rst);
 							acrop.setStatus(efd.model.Asset.Status.Valid);
@@ -916,7 +899,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							System.out.println("done alsp get = " + rst.getResourcetypename());
+							// System.out.println("done alsp get = " + rst.getResourcetypename());
 
 							alsp.setResourceSubType(rst);
 							alsp.setStatus(efd.model.Asset.Status.Valid);
@@ -952,40 +935,47 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						aemp.setFoodPaymentFoodType((cell[i][j][l++].getStringCellValue()));
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
 						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
-
+						System.out.println("in emp  cell = i =" + i);
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation1(getCellDouble(cell[i][j][l++]));
 						aemp.setWorkLocation2(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation2(getCellDouble(cell[i][j][l++]));
 						aemp.setWorkLocation3(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation3(getCellDouble(cell[i][j][l++]));
-
+						System.out.println("in emp  cell = l =" + l);
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
 							// System.out.println("done emp get = " + rst.getResourcetypename());
-
+							System.out.println("in emp  status is valid 1");
 							aemp.setResourceSubType(rst);
 
 							aemp.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(aemp.getUnit(), rst))
 								aemp.setStatus(efd.model.Asset.Status.Invalid);
-
+							System.out.println("in emp  status is invalid 1");
 						} else {
+
 							aemp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
-						/* check Food as payment entered is valid */
-						if ((checkSubType(aemp.getFoodPaymentFoodType(), "Crop") != null) // then it is a valid
-								|| (checkSubType(aemp.getFoodPaymentFoodType(), "Wild Foods") != null)
-								|| (checkSubType(aemp.getFoodPaymentFoodType(), "Livestock Product") != null)
-								|| (checkSubType(aemp.getFoodPaymentFoodType(), "Food Purchase") != null))
+						// If there is a food payment then need to validate food payment rst
 
-							aemp.setStatus(efd.model.Asset.Status.Valid);
+						if (!aemp.getFoodPaymentFoodType().isEmpty()) {
+							/* check Food as payment entered is valid */
+							if ((checkSubType(aemp.getFoodPaymentFoodType(), "Crop") != null) // then it is a valid
+									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Wild Foods") != null)
+									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Livestock Product") != null)
+									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Food Purchase") != null)) {
+								aemp.setStatus(efd.model.Asset.Status.Valid);
+							}
 
-						// Now need to check food unit is valid
-						if (!checkSubTypeEntered(aemp.getFoodPaymentUnit(), rst))
-							aemp.setStatus(efd.model.Asset.Status.Invalid);
+							// Now need to check food unit is valid
 
+							if (!checkSubTypeEntered(aemp.getFoodPaymentUnit(), rst))
+								aemp.setStatus(efd.model.Asset.Status.Invalid);
+						}
+
+						System.out.println("in emp  33");
 						wgi.getEmployment().add(aemp);
 						getView().refreshCollections();
 						k = 100;
@@ -995,6 +985,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 					catch (Exception ex) {
 						addMessage("Problem parsing Employee worksheet");
+						System.out.println("Error in Emp = " + ex);
 						k = 100;
 						break breaksheet;
 					}
@@ -1010,23 +1001,20 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						at.setSource(cell[i][j][l++].getStringCellValue());
 
-						// Handle the enum 
-						
-						//System.out.println("Transfer Type = "+cell[i][j][l++].getStringCellValue());
-						
-						
-						String upperCaseTransferType=upperCaseFirst(cell[i][j][l].getStringCellValue());
-				
-						
-						
-						if(upperCaseTransferType .equals("Cash"))
-								at.setTransferType(efd.model.Transfer.TransferType.Cash);
-						else if(upperCaseTransferType.equals("Other"))
-							at.setTransferType(efd.model.Transfer.TransferType.Other);						
-						if(upperCaseTransferType.equals("Food"))
+						// Handle the enum
+
+						// System.out.println("Transfer Type = "+cell[i][j][l++].getStringCellValue());
+
+						String upperCaseTransferType = upperCaseFirst(cell[i][j][l].getStringCellValue());
+
+						if (upperCaseTransferType.equals("Cash"))
+							at.setTransferType(efd.model.Transfer.TransferType.Cash);
+						else if (upperCaseTransferType.equals("Other"))
+							at.setTransferType(efd.model.Transfer.TransferType.Other);
+						if (upperCaseTransferType.equals("Food"))
 							at.setTransferType(efd.model.Transfer.TransferType.Food);
 						l++;
-						
+
 						at.setPeopleReceiving(getCellDouble(cell[i][j][l++]));
 
 						at.setTimesReceived(getCellDouble(cell[i][j][l++]));
@@ -1034,9 +1022,9 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						at.setTransferFoodOtherType((cell[i][j][l++].getStringCellValue()));
 
 						at.setUnit(cell[i][j][l++].getStringCellValue());
-						if(at.getUnit().isEmpty())
-								at.setUnit("?");    // seem to have many examples where this is left blank..
-						
+						if (at.getUnit().isEmpty())
+							at.setUnit("?"); // seem to have many examples where this is left blank..
+
 						at.setUnitsTransferred(getCellDouble(cell[i][j][l++]));
 						at.setUnitsSold(getCellDouble(cell[i][j][l++]));
 						at.setPricePerUnit(getCellDouble(cell[i][j][l++]));
@@ -1061,49 +1049,43 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							at.setResourceSubType(rst);
 							at.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(at.getUnit(), rst))
-									at.setStatus(efd.model.Asset.Status.Invalid);
+								at.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
 							at.setStatus(efd.model.Asset.Status.Invalid);
 
 						}
 
-						/* Need to check if Transfer Type of Food is valid if entered in column 6*/ 
+						/* Need to check if Transfer Type of Food is valid if entered in column 6 */
 						/* Need to check if Valid Food */
 						/*
 						 * Crops, Wild Food, Food Purchases, Livestock, Livestock Products
 						 */
-						
-						if (((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
+
+						if (((rst = checkSubType(cell[i][j][6].getStringCellValue(),
 								rtype[CROPS].getIdresourcetype().toString())) != null)
-								||
-								((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
+								|| ((rst = checkSubType(cell[i][j][6].getStringCellValue(),
 										rtype[WILDFOOD].getIdresourcetype().toString())) != null)
-							||
-							((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
-									rtype[FOODPURCHASE].getIdresourcetype().toString())) != null)
-							
-							||
-							((rst = checkSubType(cell[i][j][6].getStringCellValue(), 								
-									rtype[LIVESTOCKPRODUCT].getIdresourcetype().toString())) != null)
-							
-							)
-						
-						{    // set FoodRST and check Unit entered 
+								|| ((rst = checkSubType(cell[i][j][6].getStringCellValue(),
+										rtype[FOODPURCHASE].getIdresourcetype().toString())) != null)
+
+								|| ((rst = checkSubType(cell[i][j][6].getStringCellValue(),
+										rtype[LIVESTOCKPRODUCT].getIdresourcetype().toString())) != null)
+								|| ((rst = checkSubType(cell[i][j][6].getStringCellValue(),
+										rtype[ASSETTRADEABLE].getIdresourcetype().toString())) != null))
+
+						{ // set FoodRST and check Unit entered
 
 							at.setFoodResourceSubType(rst);
 							at.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(at.getUnit(), rst))
-									at.setStatus(efd.model.Asset.Status.Invalid);
+								at.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
 							at.setStatus(efd.model.Asset.Status.Invalid);
 
 						}
-						
-						
-						
-						
+
 						wgi.getTransfer().add(at);
 						getView().refreshCollections();
 						k = 100;
@@ -1275,11 +1257,13 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		 * 
 		 * kg = kgs +acres etc.
 		 */
-		if(unitEntered == "" || unitEntered.equals(null))
-		{
+
+		// Change to use .isEmpty
+
+		if (unitEntered.isEmpty() || unitEntered.equals(null)) {
 			// empty thus invalid
 			return false;
-			
+
 		}
 		String unitRst = stripS(rst.getResourcesubtypeunit());
 
@@ -1310,9 +1294,9 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			String var2 = stripS(var1);
 			String var3 = addS(var1);
 
-			//System.out.println("var 1 = " + var1);
-			//System.out.println("var 2 = " + var2);
-			//System.out.println("var 3 = " + var3);
+			// System.out.println("var 1 = " + var1);
+			// System.out.println("var 2 = " + var2);
+			// System.out.println("var 3 = " + var3);
 
 			ResourceSubType rsty = (ResourceSubType) XPersistence.getManager()
 					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'" + "and ("
@@ -1320,7 +1304,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							+ "'" + ") ")
 					.setMaxResults(1).getSingleResult();
 
-			//System.out.println("rsty = " + rsty.getResourcetypename());
+			// System.out.println("rsty = " + rsty.getResourcetypename());
 
 			/*
 			 * check RST synonym
@@ -1339,7 +1323,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 				return rsty;
 			}
 
-			//System.out.println("done rst get syn query in check sub type ");
+			// System.out.println("done rst get syn query in check sub type ");
 
 			// otherwise get the RST for the Synonym
 
@@ -1349,7 +1333,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		}
 
 		catch (Exception ex) {
-			//System.out.println("Failed checkSubType " + ex);
+			// System.out.println("Failed checkSubType " + ex);
 			return null; // no record found to match data entered
 
 		}
@@ -1419,15 +1403,16 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 	}
 
 	/**************************************************************************************************************************************************************************************************/
-    public static String upperCaseFirst(String value) {
+	public static String upperCaseFirst(String value) {
 
-        // Convert String to char array.
-        char[] array = value.toCharArray();
-        // Modify first element in array.
-        array[0] = Character.toUpperCase(array[0]);
-        // Return string.
-        return new String(array);
-    }
+		// Convert String to char array.
+		char[] array = value.toCharArray();
+		// Modify first element in array.
+		array[0] = Character.toUpperCase(array[0]);
+		// Return string.
+		return new String(array);
+	}
+
 	/**************************************************************************************************************************************************************************************************/
 
 	private Boolean checkCell(String cname, Sheet sheet, int x, int y, Boolean nullable) /* Is spreadsheet Cell Valid */

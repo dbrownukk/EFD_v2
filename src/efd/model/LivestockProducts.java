@@ -59,7 +59,7 @@ public class LivestockProducts extends Asset {
 	
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
-	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Livestock%'")
+	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like 'Livestock Products'")
 	private ResourceSubType resourceSubType;
 	
 	

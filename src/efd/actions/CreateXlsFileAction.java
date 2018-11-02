@@ -563,7 +563,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		CellRangeAddressList addressList = null;
 		int i = 0;
 
-		addressList = new CellRangeAddressList(firstRow, numRows, firstCol, lastCol);
+		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
 		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
 
 		DataValidationConstraint dvConstraint = DVConstraint.createDateConstraint(OperatorType.BETWEEN,"01/01/2000", "01/01/2100", "dd/mm/yyyy");

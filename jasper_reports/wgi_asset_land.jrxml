@@ -195,9 +195,9 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 					<text><![CDATA[ EFD OHEA - Validated Wealthgroup - Land Assets ]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="30" y="50" width="249" height="16" forecolor="#FFFFFF" uuid="1768d8cc-3227-4dad-9989-6c9cbfc04be1"/>
+					<reportElement x="30" y="50" width="450" height="16" forecolor="#FFFFFF" uuid="1768d8cc-3227-4dad-9989-6c9cbfc04be1"/>
 					<textElement verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$P{normalisationMessage}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$P{normalisationMessage}+" "+$P{communityid}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>

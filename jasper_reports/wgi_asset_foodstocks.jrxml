@@ -12,7 +12,7 @@
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
 		<![CDATA[select * from efd.wginterview_assets
-where   resourcetype  in  ('Food Stocks', 'Food Purchase')
+where   resourcetype  = 'Food Stocks'
 and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 	</queryString>
 	<field name="Project" class="java.lang.String">
@@ -192,7 +192,7 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 					<textElement verticalAlignment="Middle">
 						<font size="20" isBold="true"/>
 					</textElement>
-					<text><![CDATA[ EFD OHEA - Validated Wealthgroup - Food Stock Assets ]]></text>
+					<text><![CDATA[ EFD OHEA - Validated Wealthgroup - Food Stock Assets ..]]></text>
 				</staticText>
 				<textField>
 					<reportElement x="30" y="50" width="249" height="16" forecolor="#FFFFFF" uuid="1768d8cc-3227-4dad-9989-6c9cbfc04be1"/>
@@ -210,11 +210,11 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="10" y="0" width="540" height="20" forecolor="#FFFFFF" uuid="6728a62e-62df-43d1-ad69-038ea4079ded"/>
+					<reportElement x="10" y="0" width="590" height="20" forecolor="#FFFFFF" uuid="6728a62e-62df-43d1-ad69-038ea4079ded"/>
 					<textElement verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{Project}+" "+$F{LZName}+" "+$F{District}+" "+$F{SubDistrict}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{Project}+" "+$F{LZName}+" "+$F{District}+" "+$F{SubDistrict}+" "+$F{WGAverageNumberInHH}]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>

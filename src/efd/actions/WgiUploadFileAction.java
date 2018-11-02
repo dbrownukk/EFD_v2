@@ -26,8 +26,11 @@ public class WgiUploadFileAction extends UploadFileAction {
 	}
 */
 
-public class WgiUploadFileAction extends ViewBaseAction implements INavigationAction, IProcessLoadedFileAction {
+//public class WgiUploadFileAction extends ViewBaseAction implements INavigationAction, IProcessLoadedFileAction {
+public class WgiUploadFileAction extends UploadFileAction implements IChainAction {
 
+
+	
 	@SuppressWarnings("rawtypes")
 	private List fileItems;
 
@@ -35,6 +38,9 @@ public class WgiUploadFileAction extends ViewBaseAction implements INavigationAc
 	private String newFileProperty;
 
 	public void execute() throws Exception {
+		
+		
+		/*
 		Iterator<?> it = getFileItems().iterator();
 		while (it.hasNext()) {
 			FileItem fi = (FileItem) it.next();
@@ -49,11 +55,23 @@ public class WgiUploadFileAction extends ViewBaseAction implements INavigationAc
 			}
 		}
 		closeDialog();
+		 */
+		super.execute();
+	
+		
+		
 		System.out.println("model = "+getView().getModelName());
 		if(getView().getModelName().equals("WealthGroupInterview"))
 			getView().setValue("status",efd.model.WealthGroupInterview.Status.Uploaded);
+		
+		
+		
+		
+		// Remove confusion of whether or not file upload is in database or not - no longer requires a Save
+		//XPersistence.commit();
+		
 	}
-
+/*
 	@SuppressWarnings("rawtypes")
 	public List getFileItems() {
 		return fileItems;
@@ -79,4 +97,16 @@ public class WgiUploadFileAction extends ViewBaseAction implements INavigationAc
 	public void setNewFileProperty(String newFileProperty) {
 		this.newFileProperty = newFileProperty;
 	}
+
+*/
+
+	@Override
+	public String getNextAction() throws Exception {
+		// TODO Auto-generated method stub
+		System.out.println("In Save of ichain for file upload" );
+		if(getView().getModelName().equals("WealthGroupInterview"))
+			return "TypicalNotResetOnSave.save";
+		return null;
+	}
+
 }

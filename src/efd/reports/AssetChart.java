@@ -41,7 +41,7 @@ public class AssetChart extends JasperConcatReportBaseAction {
 		System.out.println("in assetchart"); 
 		setFormat("pdf");
 		
-		String[] reports = new String[] {"wgi_asset.jrxml", "wgi_asset_foodstocks.jrxml" ,"wgi_asset_land.jrxml"}; 
+		String[] reports = new String[] {"wgi_asset.jrxml", "wgi_asset_foodstocks3.jrxml" ,"wgi_asset_land.jrxml"}; 
     	return reports; 
     	
     }
