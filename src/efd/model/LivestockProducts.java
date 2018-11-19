@@ -33,8 +33,15 @@ public class LivestockProducts extends Asset {
 	@Digits(integer = 10, fraction = 2)
 	private Double pricePerUnit;
 	
+	@Depends("unitsProduced,unitsSold,unitsOtherUse")
 	@Column(name = "UnitsConsumed")
-	private Double unitsConsumed;
+	public Double getUnitsConsumed(){
+		return(unitsProduced-unitsSold-unitsOtherUse);
+	};
+	
+	
+	//@Column(name = "UnitsConsumed")
+	//private Double unitsConsumed;
 
 	@Column(name = "UnitsOtherUse")
 	private Double unitsOtherUse;
@@ -93,12 +100,7 @@ public class LivestockProducts extends Asset {
 	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
-	public Double getUnitsConsumed() {
-		return unitsConsumed;
-	}
-	public void setUnitsConsumed(Double unitsConsumed) {
-		this.unitsConsumed = unitsConsumed;
-	}
+
 	
 	public Double getUnitsOtherUse() {
 		return unitsOtherUse;

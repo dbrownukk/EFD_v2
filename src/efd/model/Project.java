@@ -41,7 +41,10 @@ import org.openxava.tab.*;
 
 @Table(name = "Project")
 public class Project {
-	//@Version 	
+	
+
+	
+	
 	@Id
 	@Hidden
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
@@ -110,7 +113,12 @@ public class Project {
 	@Column(length = 32, name = "StageFile")
 	private String stageFile;
 	*/
-	
+	/*  dont forget setters,,,,,,,,
+	@Version
+	private Integer version;
+	*/
+
+
 
 
 

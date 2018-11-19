@@ -41,7 +41,7 @@ public class AssetChart extends JasperConcatReportBaseAction {
 		System.out.println("in assetchart"); 
 		setFormat("pdf");
 		
-		String[] reports = new String[] {"wgi_asset.jrxml", "wgi_asset_foodstocks3.jrxml" ,"wgi_asset_land.jrxml"}; 
+		String[] reports = new String[] {"wgi_asset2.jrxml", "wgi_asset_foodstocks3.jrxml" ,"wgi_asset_land.jrxml"}; 
     	return reports; 
     	
     }
@@ -56,7 +56,7 @@ public class AssetChart extends JasperConcatReportBaseAction {
 		
 		wealthGroupInterview = (WealthGroupInterview) MapFacade.findEntity("WealthGroupInterview", getView().getValues());
 		String communityid = wealthGroupInterview.getWealthgroup().getCommunity().getCommunityid();
-	
+		System.out.println("in assetchart communityid = "+communityid); 
 		
 		Map parameters = new HashMap();			
 		//String wgiid = getView().getValueString("wgiid");

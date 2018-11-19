@@ -31,8 +31,12 @@ public class Crop extends Asset {
 	@Digits(integer = 10, fraction = 2)
 	private Double pricePerUnit;
 	
+	
+	@Depends("unitsProduced,unitsSold,unitsOtherUse")
 	@Column(name = "UnitsConsumed")
-	private Double unitsConsumed;
+	public Double getUnitsConsumed(){
+		return(unitsProduced-unitsSold-unitsOtherUse);
+	};
 
 	@Column(name = "UnitsOtherUse", length = 255)
 	@DisplaySize(10)
@@ -88,12 +92,7 @@ public class Crop extends Asset {
 		this.pricePerUnit = pricePerUnit;
 	}
 
-	public Double getUnitsConsumed() {
-		return unitsConsumed;
-	}
-	public void setUnitsConsumed(Double unitsConsumed) {
-		this.unitsConsumed = unitsConsumed;
-	}
+
 
 	public Double getUnitsOtherUse() {
 		return unitsOtherUse;

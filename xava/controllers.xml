@@ -81,6 +81,9 @@
 		<action name="WealthgroupIncome" label="WealthgroupIncome"
 			mode="detail" icon="view-list" class="efd.reports.CashIncomeReport"
 			image="excel.gif" />
+					<action name="WealthgroupIncomeWithPurchases" label="WealthgroupIncomeWithPurchases"
+			mode="detail" icon="view-list" class="efd.reports.CashIncomeReportWithPurchases"
+			image="excel.gif" />
 	</controller>
 
 

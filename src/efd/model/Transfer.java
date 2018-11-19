@@ -63,8 +63,14 @@ public class Transfer extends Asset{
 	@Column(name = "OtherUse", length = 255)
 	private Double otherUse;
 	
+	
+	@Depends("unitsTransferred,unitsSold,otherUse")
 	@Column(name = "UnitsConsumed")
-	private Double unitsConsumed;
+	public Double getUnitsConsumed(){
+		return(unitsTransferred-unitsSold-otherUse);
+	};
+	//@Column(name = "UnitsConsumed")
+	//private Double unitsConsumed;
 	
 	@Column(name = "Market1", length = 50)
 	private String market1;
@@ -166,12 +172,7 @@ public class Transfer extends Asset{
 	public void setOtherUse(Double otherUse) {
 		this.otherUse = otherUse;
 	}
-	public Double getUnitsConsumed() {
-		return unitsConsumed;
-	}
-	public void setUnitsConsumed(Double unitsConsumed) {
-		this.unitsConsumed = unitsConsumed;
-	}
+
 	public String getMarket1() {
 		return market1;
 	}

@@ -135,7 +135,7 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 			<band height="310">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="Project">
-						<reportElement x="80" y="0" width="600" height="310" uuid="2e99cc1c-20ed-40b4-bd39-9b9411c1f0f3"/>
+						<reportElement x="80" y="0" width="600" height="310" uuid="b3eef156-730f-4242-97e6-89a4dc751d10"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend/>
@@ -144,12 +144,12 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 						<dataset resetType="Group" resetGroup="Project"/>
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
-							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
+							<categoryExpression><![CDATA[$P{normalise}?$F{WGNameEng}+" "+"Avg HH = "+$F{WGAverageNumberInHH}:$F{WGNameEng}]]></categoryExpression>
 							<valueExpression><![CDATA[$P{normalise}?$F{xx} /$F{WGAverageNumberInHH}:$F{xx}]]></valueExpression>
 							<labelExpression><![CDATA[$F{ResourceUnit}]]></labelExpression>
 						</categorySeries>
 					</categoryDataset>
-					<barPlot>
+					<barPlot isShowLabels="true">
 						<plot/>
 						<itemLabel/>
 						<categoryAxisFormat>
@@ -185,19 +185,19 @@ and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
 			<frame>
 				<reportElement mode="Opaque" x="0" y="0" width="791" height="66" backcolor="#009CCC" uuid="21e282f3-08cb-4fc6-a3ef-d59888e7be59"/>
 				<staticText>
-					<reportElement x="20" y="3" width="710" height="47" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
+					<reportElement x="0" y="3" width="784" height="47" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
 					<box topPadding="4" leftPadding="4" bottomPadding="4" rightPadding="4">
 						<pen lineWidth="0.0"/>
 					</box>
-					<textElement verticalAlignment="Middle">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="20" isBold="true"/>
 					</textElement>
 					<text><![CDATA[ EFD OHEA - Validated Wealthgroup - Land Assets ]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="30" y="50" width="450" height="16" forecolor="#FFFFFF" uuid="1768d8cc-3227-4dad-9989-6c9cbfc04be1"/>
-					<textElement verticalAlignment="Middle"/>
-					<textFieldExpression><![CDATA[$P{normalisationMessage}+" "+$P{communityid}]]></textFieldExpression>
+					<reportElement x="0" y="47" width="790" height="16" forecolor="#FFFFFF" uuid="1768d8cc-3227-4dad-9989-6c9cbfc04be1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$P{normalisationMessage}]]></textFieldExpression>
 				</textField>
 			</frame>
 			<frame>

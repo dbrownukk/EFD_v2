@@ -160,7 +160,7 @@ where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]
 			<band height="320">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="Project">
-						<reportElement x="80" y="0" width="600" height="320" uuid="a7b052a0-9856-4e35-911a-6f3e9543f52b"/>
+						<reportElement x="80" y="0" width="600" height="320" uuid="19bb69c9-b093-489d-ae4e-8fa6c45f8a6d"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend/>
@@ -169,12 +169,11 @@ where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]
 						<dataset resetType="Group" resetGroup="Project"/>
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
-							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
-							<valueExpression><![CDATA[$P{normalise}?$F{val4} /$F{WGAverageNumberInHH}:$F{val4}
-]]></valueExpression>
+							<categoryExpression><![CDATA[$P{normalise}?$F{WGNameEng}+" "+"Avg HH = "+$F{WGAverageNumberInHH}:$F{WGNameEng}]]></categoryExpression>
+							<valueExpression><![CDATA[$P{normalise}?$F{val4} /$F{WGAverageNumberInHH}:$F{val4}]]></valueExpression>
 						</categorySeries>
 					</categoryDataset>
-					<barPlot>
+					<barPlot isShowLabels="true">
 						<plot/>
 						<itemLabel/>
 						<categoryAxisFormat>
@@ -205,11 +204,11 @@ where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]
 			<frame>
 				<reportElement mode="Opaque" x="0" y="0" width="791" height="66" backcolor="#009CCC" uuid="21e282f3-08cb-4fc6-a3ef-d59888e7be59"/>
 				<staticText>
-					<reportElement x="0" y="0" width="740" height="66" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
+					<reportElement x="0" y="0" width="791" height="66" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
 					<box topPadding="4" leftPadding="4" bottomPadding="4" rightPadding="4">
 						<pen lineWidth="0.0"/>
 					</box>
-					<textElement verticalAlignment="Middle">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="20" isBold="true"/>
 					</textElement>
 					<text><![CDATA[ EFD OHEA - Wealthgroup - Cash Income.]]></text>
@@ -228,7 +227,7 @@ where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]
 			<frame>
 				<reportElement mode="Opaque" x="0" y="82" width="792" height="20" forecolor="#000000" backcolor="#009CCC" uuid="b935b773-b548-4459-b884-0b7b73943c0f"/>
 				<textField pattern="EEEEE dd MMMMM yyyy">
-					<reportElement x="550" y="0" width="144" height="20" forecolor="#FFFFFF" uuid="86bdcb85-d863-4d3b-9586-a94d756bb312"/>
+					<reportElement x="646" y="0" width="144" height="20" forecolor="#FFFFFF" uuid="86bdcb85-d863-4d3b-9586-a94d756bb312"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="12"/>
 					</textElement>

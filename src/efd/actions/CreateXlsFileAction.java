@@ -304,7 +304,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		workbook = (HSSFWorkbook) scenarioWB.createPOIWorkbook();
 
-		System.out.println("created workbook 1313");
+
 
 		// set number validation and format style
 

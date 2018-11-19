@@ -156,7 +156,7 @@ where efd.wginterview_nonfoodpurchased_details.`CommunityID`   =  $P{communityid
 			<band height="340">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="Project">
-						<reportElement x="80" y="20" width="600" height="320" uuid="9f6afe71-896b-4bcc-90b6-a7c0a64a1084"/>
+						<reportElement x="80" y="20" width="600" height="320" uuid="1d07c9a5-cb08-4dd1-b7a8-ab4a659a810f"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend/>
@@ -165,11 +165,11 @@ where efd.wginterview_nonfoodpurchased_details.`CommunityID`   =  $P{communityid
 						<dataset resetType="Group" resetGroup="Project"/>
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{ResourceType}+" "+$F{ResourceSubTypeName}]]></seriesExpression>
-							<categoryExpression><![CDATA[$F{WGNameEng}]]></categoryExpression>
+							<categoryExpression><![CDATA[$P{normalise}?$F{WGNameEng}+" "+"Avg HH = "+$F{WGAverageNumberInHH}:$F{WGNameEng}]]></categoryExpression>
 							<valueExpression><![CDATA[$P{normalise}?$F{UnitsPurchased}*$F{PricePerUnit} /$F{WGAverageNumberInHH}:$F{UnitsPurchased}*$F{PricePerUnit}]]></valueExpression>
 						</categorySeries>
 					</categoryDataset>
-					<barPlot>
+					<barPlot isShowLabels="true">
 						<plot/>
 						<itemLabel/>
 						<categoryAxisFormat>
@@ -200,11 +200,11 @@ where efd.wginterview_nonfoodpurchased_details.`CommunityID`   =  $P{communityid
 			<frame>
 				<reportElement mode="Opaque" x="0" y="0" width="791" height="66" backcolor="#009CCC" uuid="21e282f3-08cb-4fc6-a3ef-d59888e7be59"/>
 				<staticText>
-					<reportElement x="0" y="0" width="650" height="66" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
+					<reportElement x="0" y="0" width="791" height="66" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
 					<box topPadding="4" leftPadding="4" bottomPadding="4" rightPadding="4">
 						<pen lineWidth="0.0"/>
 					</box>
-					<textElement verticalAlignment="Middle">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="20" isBold="true"/>
 					</textElement>
 					<text><![CDATA[ EFD OHEA - Wealthgroup - Non-Food Expenditure]]></text>
