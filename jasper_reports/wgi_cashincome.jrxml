@@ -10,8 +10,8 @@
 	</parameter>
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
-		<![CDATA[select * from   efd.wginterview_cash_income_details 
-where  efd.wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]>
+		<![CDATA[select * from   wginterview_cash_income_details 
+where  wginterview_cash_income_details .`CommunityID`   =  $P{communityid}]]>
 	</queryString>
 	<field name="Project" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="Project"/>

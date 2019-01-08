@@ -79,10 +79,10 @@
 
 	<controller name="Reports">
 		<action name="WealthgroupIncome" label="WealthgroupIncome"
-			mode="detail" icon="view-list" class="efd.reports.CashIncomeReport"
+			mode="detail" icon="view-list" takes-long="true" class="efd.reports.CashIncomeReport"
 			image="excel.gif" />
 					<action name="WealthgroupIncomeWithPurchases" label="WealthgroupIncomeWithPurchases"
-			mode="detail" icon="view-list" class="efd.reports.CashIncomeReportWithPurchases"
+			mode="detail" icon="view-list" takes-long="true" class="efd.reports.CashIncomeReportWithPurchases"
 			image="excel.gif" />
 	</controller>
 
@@ -130,7 +130,7 @@
 	<controller name="Community">
 		<extends controller="EFD_v2" />
 		<action name="filteredSitesearch" hidden="true"
-			image="search.gif" class="efd.actions.FileteredSite" />
+			image="search.gif" class="efd.actions.FilteredSite" />
 	</controller>
 
 	<!-- <controller name="Sections"> <action name="change" hidden="true" class="efd.actions.AssetChangeSectionAction" 

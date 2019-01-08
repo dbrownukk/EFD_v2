@@ -10,6 +10,8 @@ import javax.persistence.*;
 
 /* Read XLS Community Interview  spreadsheet */
 import java.util.*;
+import java.util.Date;
+
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
@@ -164,18 +166,22 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		Connection con = null;
 
-		// what schema!
+		// what schema?
 
 		// System.out.println("XP schema = "+XPersistence.getDefaultSchema());
 		String schema = XPersistence.getDefaultSchema();
+		System.out.println("schema = "+schema);
 
 		try {
 			con = DataSourceConnectionProvider.getByComponent("WealthGroupInterview").getConnection();
 
 			// System.out.println("schema con = "+con.getSchema().toString());
-
-			PreparedStatement ps = con
-					.prepareStatement("select id,data from " + schema + ".OXFILES where ID = '" + spreadsheetId + "'");
+			PreparedStatement ps;
+			if(schema != null) {
+			 schema = schema+".";	
+			 ps = con.prepareStatement("select id,data from " + schema + "OXFILES where ID = '" + spreadsheetId + "'");
+			} else
+				ps = con.prepareStatement("select id,data from OXFILES where ID = '" + spreadsheetId + "'");
 			// System.out.println("prepped statment = " + ps.toString());
 			// System.out.println("prepped");
 			ResultSet rs = ps.executeQuery();
@@ -364,16 +370,10 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 			addError("Incomplete Spreadsheet data - Interview Date error ");
 			return;
 		}
-
+		System.out.println("date cell type = "+icell.getCellType());
 		if (icell.getCellType() == 0) { /* Numeric */
-			// System.out.println("in Numeric Date");
-			Double iDateD = icell.getNumericCellValue();
-			// Date iDate = (Date) DateUtil.getJavaDate(iDateD);
 
-			SimpleDateFormat formatter1 = new SimpleDateFormat("dd/MM/yyyy");
-
-			// System.out.println("in Numeric Date " + iDateD);
-			wgi.setWgInterviewDate(new java.sql.Date(iDateD.longValue()));
+			wgi.setWgInterviewDate(icell.getDateCellValue());
 
 		} else {
 			sdate = icell.getStringCellValue();
@@ -470,7 +470,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		/* get the details for this sheet */
 
-		for (k = ASSETLAND; k < NUMBERSHEETS; k++) { // Sheets ---- was <= DRB
+		for (k = ASSETLAND; k <= NUMBERSHEETS; k++) { // Sheets ---- was <= DRB
 
 			try {
 
@@ -513,8 +513,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						// if first column is blank then no more data in this sheet
 
 						if (cell[k][i][0].getCellType() == 3) {
-							// System.out.println("No more data in this sheet " + k + " " + i);
-							// numberRows[k] = i;
+							System.out.println("In read No more data in this sheet " + k + " " + i);
+							numberRows[k] = i;   // re included DRB 19/11/2018
 							i = 100;
 							j = 100;
 
@@ -527,7 +527,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							System.out.println("EMPTY String " + k + " " + i);
 							// record numrows in each sheet
 							numberRows[k] = i;
-							// System.out.println("numberrows = " + numberRows[k]);
+							System.out.println("in read numberrows = " + numberRows[k]);
 							i = 100;
 							break;
 						}
@@ -579,10 +579,11 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		}
 
 		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) { // Sheet
-
+			System.out.println("in switch i at beginning = "+i);
+			System.out.println("in switch no rows in this one =  "+numberRows[i]);
 			// breaksheet: for (j = 0; j < 35; j++) { // Row
 			breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
-
+				System.out.println("in switch i = "+i);
 				switch (i) {
 
 				case ASSETLAND:
@@ -804,6 +805,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 					}
 
 				case CROPS:
+					System.out.println("in CROPs");
 					try {
 						acrop = new Crop();
 						warnMessage = "";
@@ -1250,15 +1252,21 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 					}
 
 				case NONFOODPURCHASE:
+					//System.out.println("in NONFP");
 					try {
 						anfp = new NonFoodPurchase();
 						int l = 0;
 
+						
 						anfp.setItemPurchased(cell[i][j][l++].getStringCellValue());
+						
 						anfp.setUnit(cell[i][j][l++].getStringCellValue());
+						
 						anfp.setUnitsPurchased(getCellDouble(cell[i][j][l++]));
+						
 						anfp.setPricePerUnit(getCellDouble(cell[i][j][l++]));
-
+						
+						
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
 							System.out.println("done Non Food Purchase get =  " + rst.getResourcetypename());

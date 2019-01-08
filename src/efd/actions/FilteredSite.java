@@ -24,7 +24,7 @@ import efd.model.*;
  *	Will not allow you to ad the same site twice
 */
 
-public class FileteredSite extends ReferenceSearchAction {
+public class FilteredSite extends ReferenceSearchAction {
 
 	public void execute() throws Exception {
 
@@ -106,8 +106,9 @@ public class FileteredSite extends ReferenceSearchAction {
 
 		if (lzs.isEmpty() && com.isEmpty()) /* No existing Sites/LZS in this project */
 		{
-			// System.out.println("In setbasecondition 1");
-			getTab().setBaseCondition("${locationid} != '" + locid + "'");
+			//System.out.println("In setbasecondition 1");
+			addWarning("No Livelihood Zones or Sites for current Project");
+			getTab().setBaseCondition("${locationid} = '" + locid + "'");
 		} else if (com.isEmpty()) /* No previously used sites in this project - show all sites from this proj */
 		{
 			// System.out.println("In setbasecondition 2");

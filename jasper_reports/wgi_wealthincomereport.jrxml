@@ -81,8 +81,8 @@
 		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 		<parameter name="wealthgroupid2" class="java.lang.String"/>
 		<queryString language="SQL">
-			<![CDATA[select * from  efd.wginterview_cash_income_report
-where  efd.wginterview_cash_income_report.`WGID` =  $P{wealthgroupid2}]]>
+			<![CDATA[select * from  wginterview_cash_income_report
+where  wginterview_cash_income_report.`WGID` =  $P{wealthgroupid2}]]>
 		</queryString>
 		<field name="Project" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.label" value="Project"/>
@@ -281,8 +281,8 @@ where  efd.wginterview_cash_income_report.`WGID` =  $P{wealthgroupid2}]]>
 	</subDataset>
 	<parameter name="wealthgroupid" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[select * from  efd.wginterview_cash_income_report
-where  efd.wginterview_cash_income_report.`WGID`  =  $P{wealthgroupid}]]>
+		<![CDATA[select * from  wginterview_cash_income_report
+where  wginterview_cash_income_report.`WGID`  =  $P{wealthgroupid}]]>
 	</queryString>
 	<field name="Project" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="Project"/>

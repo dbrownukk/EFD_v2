@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="wgi_foodconsumed" pageWidth="1100" pageHeight="595" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="1060" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7b3fc1c9-a216-4b02-a291-7e7c64e00dac">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
@@ -12,8 +12,8 @@
 	<parameter name="normalise" class="java.lang.Boolean" isForPrompting="false"/>
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
-		<![CDATA[select * from  efd.wginterview_food_consumed_details 
-where   efd.wginterview_food_consumed_details.`CommunityID` 
+		<![CDATA[select * from  wginterview_food_consumed_details 
+where   wginterview_food_consumed_details.`CommunityID` 
   =  $P{communityid}]]>
 	</queryString>
 	<field name="Project" class="java.lang.String">
@@ -160,10 +160,10 @@ where   efd.wginterview_food_consumed_details.`CommunityID`
 	<group name="Project">
 		<groupExpression><![CDATA[$F{Project}]]></groupExpression>
 		<groupHeader>
-			<band height="430">
+			<band height="417">
 				<stackedBarChart>
 					<chart evaluationTime="Group" evaluationGroup="LZName">
-						<reportElement x="90" y="20" width="944" height="390" uuid="a24018df-2ca3-495f-962b-2336b960bb36"/>
+						<reportElement x="90" y="20" width="944" height="360" uuid="a24018df-2ca3-495f-962b-2336b960bb36"/>
 						<chartTitle/>
 						<chartSubtitle/>
 						<chartLegend position="Left"/>
@@ -243,12 +243,12 @@ where   efd.wginterview_food_consumed_details.`CommunityID`
 		</band>
 	</title>
 	<summary>
-		<band height="42" splitType="Stretch"/>
+		<band height="11" splitType="Stretch"/>
 	</summary>
 	<noData>
-		<band height="55">
+		<band height="30">
 			<staticText>
-				<reportElement x="150" y="0" width="430" height="55" uuid="edd08474-0728-4c7e-8b39-7f853e62c243"/>
+				<reportElement x="150" y="0" width="430" height="20" uuid="edd08474-0728-4c7e-8b39-7f853e62c243"/>
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>

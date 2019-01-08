@@ -36,6 +36,13 @@ public class LivelihoodZone  {
 	@Column(name = "LZID", length = 32, unique = true)
 	private String lzid;
 
+	@SearchKey
+	@Column(name = "LZName", length = 255)
+	@Required
+	private String lzname;
+	
+	
+	
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
 	@NoModify
@@ -52,9 +59,8 @@ public class LivelihoodZone  {
 	@DescriptionsList
 	private Country country;
 	
-	@Column(name = "LZName", length = 255)
-	@Required
-	private String lzname;
+
+
 
 	@Column(name = "LZZoneMap")
 	// private String lzzonemap;

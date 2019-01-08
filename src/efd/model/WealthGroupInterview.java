@@ -43,7 +43,7 @@ import efd.model.*;
 				+ "wealthgroup.community.site.locationdistrict, wealthgroup.community.site.subdistrict, wealthgroup.wgnameeng,status,wgInterviewNumber,"
 				+ "wgInterviewers,wgIntervieweesCount,wgFemaleIVees,"
 				+ "wgMaleIVees,wgAverageNumberInHH,wgYearType,wgInterviewDate")
-		// baseCondition="from Organization e, in (e.users) u where u.name = ?")
+		//baseCondition="from Organization e, in (e.users) u where u.name = ?")
 })
 
 @Entity

@@ -8,8 +8,8 @@
 	<parameter name="normalise" class="java.lang.Boolean"/>
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
-		<![CDATA[select * from  efd.wginterview_foodpurchased_details 
-where efd.wginterview_foodpurchased_details.`CommunityID`   =  $P{communityid}]]>
+		<![CDATA[select * from  wginterview_foodpurchased_details 
+where wginterview_foodpurchased_details.`CommunityID`   =  $P{communityid}]]>
 	</queryString>
 	<field name="Project" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="Project"/>
@@ -249,7 +249,7 @@ where efd.wginterview_foodpurchased_details.`CommunityID`   =  $P{communityid}]]
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[No Validated Wealthgroups for this Community]]></text>
+				<text><![CDATA[No data is available for food expenditure]]></text>
 			</staticText>
 		</band>
 	</noData>

@@ -56,8 +56,8 @@
 		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
 		<parameter name="projectid2" class="java.lang.String"/>
 		<queryString language="SQL">
-			<![CDATA[select * from efd.project_details
-where  efd.project_details.`ProjectID`  =  $P{projectid2}]]>
+			<![CDATA[select * from project_details
+where  project_details.`ProjectID`  =  $P{projectid2}]]>
 		</queryString>
 		<field name="ProjectID" class="java.lang.String">
 			<property name="com.jaspersoft.studio.field.label" value="ProjectID"/>
@@ -272,8 +272,8 @@ where  efd.project_details.`ProjectID`  =  $P{projectid2}]]>
 	</subDataset>
 	<parameter name="projectid" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[select * from  efd.project_details
-where  efd.project_details.`ProjectID`  =  $P{projectid}]]>
+		<![CDATA[select * from  project_details
+where  project_details.`ProjectID`  =  $P{projectid}]]>
 	</queryString>
 	<field name="ProjectID" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="ProjectID"/>

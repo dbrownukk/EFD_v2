@@ -11,9 +11,9 @@
 	</parameter>
 	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
 	<queryString language="SQL">
-		<![CDATA[select * from efd.wginterview_assets
+		<![CDATA[select * from wginterview_assets
 where   resourcetype in ('Livestock' ,'Other Tradeable Goods' ,'Trees' ,'Cash')
-and  efd.wginterview_assets.`CommunityID` =  $P{communityid}]]>
+and  wginterview_assets.`CommunityID` =  $P{communityid}]]>
 	</queryString>
 	<field name="Project" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.label" value="Project"/>

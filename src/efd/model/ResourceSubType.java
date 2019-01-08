@@ -67,14 +67,15 @@ public class ResourceSubType {
 	@DescriptionsList(descriptionProperties = "resourcetypename")
 	private ResourceType resourcetype;
 
-	//@Column(name = "ResourceTypeName", length = 255, unique = true)
+	
 	@Column(name = "ResourceTypeName", length = 255)
 	@Required
 	private String resourcetypename;
 
 	@ManyToOne
 
-	@DescriptionsList(descriptionProperties = "resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetypename",
+	condition="resourcesubtypesynonym is null")
 	private ResourceSubType resourcesubtypesynonym;
 
 	@Column(name = "ResourceSubTypeUnit", length = 20)
