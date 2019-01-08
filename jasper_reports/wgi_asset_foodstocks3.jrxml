@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="wgi_asset" pageWidth="842" pageHeight="900" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7b3fc1c9-a216-4b02-a291-7e7c64e00dac">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
+	<property name="ireport.jasperserver.url" value="http://idaps.walker.ac.uk:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="efd"/>
+	<parameter name="communityid" class="java.lang.String"/>
+	<parameter name="normalise" class="java.lang.Boolean"/>
+	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
+	<queryString language="SQL">
+		<![CDATA[select * from wealthgroupinterview_assetfoodstock,wealthgroupinterview,wealthgroup, community,project,site,resourcesubtype,resourcetype
+where wealthgroupinterview.wgiid = wealthgroupinterview_assetfoodstock.WealthGroupInterview_WGIID
+ and wealthgroup.WealthGroupID = wealthgroupinterview.WGID 
+ and wealthgroup.CommunityID = community.cid
+ and community.CProject=project.ProjectID
+ and community.CLocation=site.LocationID
+ and wealthgroupinterview_assetfoodstock.resourcesubtype = resourcesubtype.idresourcesubtype
+ and resourcesubtype.reourcetype=resourcetype.idresourcetype 
+ and community.cid = $P{communityid}]]>
+	</queryString>
+	<field name="WealthGroupInterview_WGIID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WealthGroupInterview_WGIID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_assetfoodstock"/>
+	</field>
+	<field name="FoodTypeEnteredName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="FoodTypeEnteredName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_assetfoodstock"/>
+	</field>
+	<field name="Quantity" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="Quantity"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_assetfoodstock"/>
+	</field>
+	<field name="ResourceSubType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceSubType"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_assetfoodstock"/>
+	</field>
+	<field name="Status" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="Status"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_assetfoodstock"/>
+	</field>
+	<field name="Unit" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Unit"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_assetfoodstock"/>
+	</field>
+	<field name="WGIID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGIID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="Notes" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Notes"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGISpreadsheet" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGISpreadsheet"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGIStatus" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGIStatus"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGAverageNumberInHH" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGAverageNumberInHH"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGFemaleIVees" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGFemaleIVees"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGInterviewDate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="WGInterviewDate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGInterviewNumber" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGInterviewNumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGIntervieweesCount" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGIntervieweesCount"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGInterviewers" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGInterviewers"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGMaleIVees" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGMaleIVees"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGYearType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGYearType"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WGID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="WealthGroupID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WealthGroupID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGHHSize" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WGHHSize"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGName_Eng" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGName_Eng"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGName_Local" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGName_Local"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGOrder" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGOrder"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGPercent" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGPercent"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGWives" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="WGWives"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="CommunityID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CommunityID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="CID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="CInterviewDate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="CInterviewDate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="CInterviewSequence" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="CInterviewSequence"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="CIVF" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="CIVF"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="CIVM" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="CIVM"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="CIVparticipants" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="CIVparticipants"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="Interviewers" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Interviewers"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="COLUMN_35" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Notes"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="CProject" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CProject"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="CLocation" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CLocation"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="community"/>
+	</field>
+	<field name="ProjectID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ProjectID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="project"/>
+	</field>
+	<field name="altExchangeRate" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="altExchangeRate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="project"/>
+	</field>
+	<field name="COLUMN_40" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="Notes"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="project"/>
+	</field>
+	<field name="PDate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="PDate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="project"/>
+	</field>
+	<field name="ProjectTitle" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ProjectTitle"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="project"/>
+	</field>
+	<field name="altcurrency_IDCountry" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="altcurrency_IDCountry"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="project"/>
+	</field>
+	<field name="LocationID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LocationID"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="GPSLocation" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="GPSLocation"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="LocationDistrict" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LocationDistrict"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="SubDistrict" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="SubDistrict"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="LZ" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="LZ"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="site"/>
+	</field>
+	<field name="IDResourceSubType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="IDResourceSubType"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcesubtype"/>
+	</field>
+	<field name="ResourceSubTypeKCal" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceSubTypeKCal"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcesubtype"/>
+	</field>
+	<field name="ResourceSubTypeUnit" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceSubTypeUnit"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcesubtype"/>
+	</field>
+	<field name="ResourceTypeName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceTypeName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcesubtype"/>
+	</field>
+	<field name="resourcesubtypesynonym_IDResourceSubType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="resourcesubtypesynonym_IDResourceSubType"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcesubtype"/>
+	</field>
+	<field name="ReourceType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ReourceType"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcesubtype"/>
+	</field>
+	<field name="IDResourceType" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="IDResourceType"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcetype"/>
+	</field>
+	<field name="COLUMN_56" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceTypeName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcetype"/>
+	</field>
+	<sortField name="ProjectID"/>
+	<sortField name="CID"/>
+	<sortField name="WGID"/>
+	<sortField name="WGOrder"/>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{WGName_Eng}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="134">
+			<property name="com.jaspersoft.studio.layout"/>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="791" height="66" backcolor="#009CCC" uuid="21e282f3-08cb-4fc6-a3ef-d59888e7be59"/>
+				<staticText>
+					<reportElement x="0" y="3" width="791" height="47" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
+					<box topPadding="4" leftPadding="4" bottomPadding="4" rightPadding="4">
+						<pen lineWidth="0.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="20" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ EFD OHEA - Validated Wealthgroup - Food Stock Assets ..]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="0" y="45" width="791" height="16" forecolor="#FFFFFF" uuid="1768d8cc-3227-4dad-9989-6c9cbfc04be1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$P{normalisationMessage}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="82" width="792" height="20" forecolor="#000000" backcolor="#009CCC" uuid="b935b773-b548-4459-b884-0b7b73943c0f"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="640" y="0" width="144" height="20" forecolor="#FFFFFF" uuid="86bdcb85-d863-4d3b-9586-a94d756bb312"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="0" y="0" width="570" height="20" forecolor="#FFFFFF" uuid="eff1d410-3485-428c-87a4-f44a18001c73"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ProjectTitle}+" "+$F{LocationDistrict}+" "+$F{SubDistrict}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<summary>
+		<band height="630">
+			<stackedBarChart>
+				<chart evaluationTime="Report">
+					<reportElement isPrintRepeatedValues="false" x="90" y="0" width="580" height="360" uuid="845d7031-2ba4-4f71-94e9-27370c14611d"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{COLUMN_56}+" "+$F{ResourceTypeName}]]></seriesExpression>
+						<categoryExpression><![CDATA[$P{normalise}?$F{WGName_Eng}+" "+"Avg HH = "+$F{WGAverageNumberInHH}:$F{WGName_Eng}]]></categoryExpression>
+						<valueExpression><![CDATA[$P{normalise}?$F{Quantity} /$F{WGAverageNumberInHH}:$F{Quantity}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot isShowLabels="true">
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</valueAxisFormat>
+				</barPlot>
+			</stackedBarChart>
+			<staticText>
+				<reportElement x="70" y="220" width="100" height="30" uuid="390614cb-7f23-48ec-b55f-ca2bc5df17c5"/>
+				<text><![CDATA[Kgs]]></text>
+			</staticText>
+		</band>
+	</summary>
+	<noData>
+		<band height="55">
+			<staticText>
+				<reportElement x="150" y="0" width="430" height="55" uuid="5b141625-c090-469a-be5c-5b2f1866f307"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No Validated Wealthgroups with Food Stocks for this Community]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>

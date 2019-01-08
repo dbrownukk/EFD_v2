@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="wgi_asset" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="NoDataSection" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7b3fc1c9-a216-4b02-a291-7e7c64e00dac">
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[d2VhbHRoZ3JvdXBpbnRlcnZpZXdfYXNzZXRmb29kc3RvY2sgLDI1NywyNywwNDU5MzVhYS0wOWM0
+LTQxY2YtODU1Mi02ZTA4NGZiYmU4ODA7YFJlc291cmNlU3ViVHlwZWAgLDQ5MiwzOSw3Mzg0MjIw
+MS02NmQ4LTRhOGYtYTZhMi1lMDE5NmJiM2EwMzY7d2VhbHRoZ3JvdXAgLDExMSwyNyxjYmMzMzVi
+ZS1jNWEzLTQyYTUtYmNiNC0xMjIwYzA2OGE2ODg7d2VhbHRoZ3JvdXBpbnRlcnZpZXcgLDY2Mywx
+NSwxODZmYjM5Yi05ZDhmLTQ4MjgtODUwZC05YWZiODg1NjExOTU7Y29tbXVuaXR5ICwxNSw2MCw2
+MjEyZjIyNy02ZjM0LTQ5MDQtYjBkNy03NjQ5YmE1N2EwNWE7
+]]>
+	</property>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
+	<property name="ireport.jasperserver.url" value="http://idaps.walker.ac.uk:8080/jasperserver/"/>
+	<property name="ireport.jasperserver.user" value="efd"/>
+	<parameter name="communityid" class="java.lang.String"/>
+	<parameter name="normalise" class="java.lang.Boolean" isForPrompting="false">
+		<defaultValueExpression><![CDATA[false]]></defaultValueExpression>
+	</parameter>
+	<parameter name="normalisationMessage" class="java.lang.String" isForPrompting="false"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT wealthgroup.`WGName_Eng`,
+	wealthgroupinterview.`WGAverageNumberInHH`,
+	wealthgroupinterview_assetfoodstock.`Quantity`,
+	`ResourceSubType`.`ResourceTypeName`
+FROM wealthgroup,
+	wealthgroupinterview_assetfoodstock,
+	`ResourceSubType`,
+	wealthgroupinterview,
+	community
+WHERE 
+	 wealthgroupinterview.`WGID` = wealthgroup.`WealthGroupID` 
+	 AND wealthgroupinterview_assetfoodstock.`WealthGroupInterview_WGIID` = wealthgroupinterview.`WGIID` 
+	 AND wealthgroupinterview_assetfoodstock.`ResourceSubType` = `ResourceSubType`.`IDResourceSubType` 
+	 AND wealthgroupinterview.`WGIStatus` = 4 
+	 AND wealthgroup.`CommunityID` = $P{communityid}]]>
+	</queryString>
+	<field name="WGName_Eng" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="WGName_Eng"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroup"/>
+	</field>
+	<field name="WGAverageNumberInHH" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.label" value="WGAverageNumberInHH"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview"/>
+	</field>
+	<field name="Quantity" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.label" value="Quantity"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="wealthgroupinterview_assetfoodstock"/>
+	</field>
+	<field name="ResourceTypeName" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ResourceTypeName"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="resourcesubtype"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="134" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout"/>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="791" height="66" backcolor="#009CCC" uuid="21e282f3-08cb-4fc6-a3ef-d59888e7be59"/>
+				<staticText>
+					<reportElement x="20" y="3" width="710" height="47" forecolor="#FFFFFF" uuid="3e4cd26a-1ed5-4a79-bd95-4689c1d25e7f"/>
+					<box topPadding="4" leftPadding="4" bottomPadding="4" rightPadding="4">
+						<pen lineWidth="0.0"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="20" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ EFD OHEA - Validated Wealthgroup - Food Stock Assets ..]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="82" width="792" height="20" forecolor="#000000" backcolor="#009CCC" uuid="b935b773-b548-4459-b884-0b7b73943c0f"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="640" y="0" width="144" height="20" forecolor="#FFFFFF" uuid="86bdcb85-d863-4d3b-9586-a94d756bb312"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<summary>
+		<band height="240" splitType="Stretch">
+			<barChart>
+				<chart evaluationTime="Report">
+					<reportElement x="160" y="0" width="510" height="240" uuid="6cbeb02c-c77c-4316-853b-c7e556d8ed12"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<incrementWhenExpression><![CDATA[$F{WGName_Eng}]]></incrementWhenExpression>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{ResourceTypeName}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{WGName_Eng}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{Quantity}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat labelColor="#000000" tickLabelColor="#000000" axisLineColor="#000000"/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+	<noData>
+		<band height="55">
+			<staticText>
+				<reportElement x="150" y="0" width="430" height="55" uuid="5b141625-c090-469a-be5c-5b2f1866f307"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No Validated Wealthgroups with Food Stocks for this Community]]></text>
+			</staticText>
+		</band>
+	</noData>
+</jasperReport>
