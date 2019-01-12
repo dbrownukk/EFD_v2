@@ -1,53 +1,91 @@
 package efd.model;
 
-import java.math.*;
+import com.openxava.naviox.model.*;
+
+import efd.validations.*;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+import org.openxava.util.*;
 
 @Entity
 
-@View(members="Resource Sub Type[resourcetype;resourcesubtypesynonym;resourcetypename;resourcesubtypeunit;resourcesubtypekcal]")
+@Views({ @View(members = "resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
+		@View(name = "SimpleSubtype", members = "resourcetypename") })
 
+@Tab(properties = "resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
+
+@Table(name = "ResourceSubType", uniqueConstraints = @UniqueConstraint(columnNames = { "ReourceType",
+		"ResourceTypeName" }))
 public class ResourceSubType {
 
+	@PrePersist
+	@PreUpdate
+
+	
+	
+	private void calcKcal() {
+		if (resourcesubtypesynonym != null) {
+			resourcesubtypekcal = 0;
+		}
+		//System.out.println("About to get Roles  = ");
+
+		String userName = Users.getCurrent();
+		User user = User.find(userName);
+
+		System.out.println("Roles done = ");
+
+		// if Role is efd_remote then this is standalone and user can create an RST but
+		// must be a synonym for some other RST
+		// This assumes XavaPro is used
+
+		System.out.println("Role = " + user.hasRole("efd_remote"));
+		System.out.println("Synonym = " + getResourcesubtypesynonym());
+
+		if (user.hasRole("efd_remote") && resourcesubtypesynonym == null) {
+			System.out.println("Need to stop update");
+			throw new javax.validation.ValidationException(
+					XavaResources.getString("Field Users must enter a SubType Synonym"));
+		}
+
+	}
+
 	@Id
-	@Hidden // The property is not shown to the user. It's an internal identifier
-	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
+	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "IDResourceSubType", length = 32, unique = true)
 	private String idresourcesubtype;
-	
-	@ManyToOne(fetch = FetchType.LAZY, 
-			optional = false)
+
+	@ManyToOne
 	@Required
 	@JoinColumn(name = "ReourceType")
-	@DescriptionsList(descriptionProperties="resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetypename")
 	private ResourceType resourcetype;
+
 	
-	@Column(name = "ResourceSubTypeSynonym")  // ?? Should be a string not Int ??
-	private String resourcesubtypesynonym;
-	
-	@Column(name = "ResourceTypeName", length=255)  // ?? Should be a string ??
+	@Column(name = "ResourceTypeName", length = 255)
 	@Required
 	private String resourcetypename;
-	
-	@Column(name = "ResourceSubTypeUnit")  // ?? Should be a string ??
-	private BigDecimal resourcesubtypeunit;
-	
-	@Column(name = "ResourceSubTypeKCal")  // ?? Should be a string ?
+
+	@ManyToOne
+
+	@DescriptionsList(descriptionProperties = "resourcetypename",
+	condition="resourcesubtypesynonym is null")
+	private ResourceSubType resourcesubtypesynonym;
+
+	@Column(name = "ResourceSubTypeUnit", length = 20)
+	@Required
+	private String resourcesubtypeunit;
+
+	@DefaultValueCalculator(IntegerCalculator.class)
+	@OnChange(value = OnChangeRSTkcal.class)
+	@Column(name = "ResourceSubTypeKCal")
 	private int resourcesubtypekcal;
-
-	public String getIdresourcesubtype() {
-		return idresourcesubtype;
-	}
-
-	public void setIdresourcesubtype(String idresourcesubtype) {
-		this.idresourcesubtype = idresourcesubtype;
-	}
 
 	public ResourceType getResourcetype() {
 		return resourcetype;
@@ -55,14 +93,6 @@ public class ResourceSubType {
 
 	public void setResourcetype(ResourceType resourcetype) {
 		this.resourcetype = resourcetype;
-	}
-
-	public String getResourcesubtypesynonym() {
-		return resourcesubtypesynonym;
-	}
-
-	public void setResourcesubtypesynonym(String resourcesubtypesynonym) {
-		this.resourcesubtypesynonym = resourcesubtypesynonym;
 	}
 
 	public String getResourcetypename() {
@@ -73,11 +103,19 @@ public class ResourceSubType {
 		this.resourcetypename = resourcetypename;
 	}
 
-	public BigDecimal getResourcesubtypeunit() {
+	public ResourceSubType getResourcesubtypesynonym() {
+		return resourcesubtypesynonym;
+	}
+
+	public void setResourcesubtypesynonym(ResourceSubType resourcesubtypesynonym) {
+		this.resourcesubtypesynonym = resourcesubtypesynonym;
+	}
+
+	public String getResourcesubtypeunit() {
 		return resourcesubtypeunit;
 	}
 
-	public void setResourcesubtypeunit(BigDecimal resourcesubtypeunit) {
+	public void setResourcesubtypeunit(String resourcesubtypeunit) {
 		this.resourcesubtypeunit = resourcesubtypeunit;
 	}
 
@@ -89,8 +127,12 @@ public class ResourceSubType {
 		this.resourcesubtypekcal = resourcesubtypekcal;
 	}
 
+	public String getIdresourcesubtype() {
+		return idresourcesubtype;
+	}
 
-	
-	
-	
+	public void setIdresourcesubtype(String idresourcesubtype) {
+		this.idresourcesubtype = idresourcesubtype;
+	}
+
 }

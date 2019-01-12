@@ -1,48 +1,87 @@
 package efd.model;
 
 import java.math.*;
-
 import javax.persistence.*;
-import javax.persistence.Entity;
-import org.hibernate.annotations.*;
+
+import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
+import javax.persistence.Entity;
+
 @Entity
-@View(members="wgresourcesubtype;wgresourceunit;wgresourceamount;resourcesubtype")
+
+
+
+@Views({ @View(members = "Characteristics_Resources[resourcesubtype;wgresourceunit]"),
+	@View(name = "DetailCR", members="Project")})
+
+@Tab(rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), 
+properties = "wealthgroup.community.projectlz.projecttitle,"
+		+ "wealthgroup.community.site.livelihoodZone.lzname,"
+		+ "wealthgroup.community.site.subdistrict,"
+		+ "wealthgroup.wgnameeng,"
+		+ "resourcesubtype.resourcetype.resourcetypename,"
+		+ "resourcesubtype.resourcetypename,"
+		+ "wgresourceunit" ,
+		defaultOrder="${wealthgroup.community.projectlz.projecttitle} desc"
+				+ ", ${wealthgroup.community.site.livelihoodZone.lzname} desc"
+				+ ", ${wealthgroup.community.site.subdistrict} desc"
+				+ ", ${wealthgroup.wgnameeng} desc"	
+		)
+
 public class WGCharacteristicsResource {
 
-	
 	@Id
-	@Hidden // The property is not shown to the user. It's an internal identifier
-	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier (1)
+	@Hidden // The property is not shown to the user. It's an internal
+			// identifier
+	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
+												// (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
-	@Column(name = "WGID", length = 32, unique = true)
-	private String wgid;
+	@Column(name = "IDWGResource", length = 32, unique = true)
+	private String idwgresource;
 	
-	@ManyToOne(fetch = FetchType.LAZY, // This is FK to Site == Location
-			optional = false)
-	//@ReferenceView("SimpleSite")
-	@JoinColumn(name = "IDWGResource")
+	// ----------------------------------------------------------------------------------------------//
+	
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "WGID")
 	@Required
+	@NoFrame
+	private WealthGroup wealthgroup;
+
+	// ----------------------------------------------------------------------------------------------//
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "WGResourceSubType")
+	@Required
+	@NoCreate
+	//@NoModify
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
 	private ResourceSubType resourcesubtype;
-	
-	@Column(name = "WGResourceSubType")     // think this should be FK not 
-	@Required
-	private Integer wgresourcesubtype;
-	
-	@Column(name = "WGResourceUnit",length = 255)    
+
+	// ----------------------------------------------------------------------------------------------//
+	@Column(name = "WGResourceUnit", length = 255)
 	private String wgresourceunit;
-	
+
+	// ----------------------------------------------------------------------------------------------//
 	@Stereotype("MONEY")
-	@Column(name = "WGResourceAmount")    
+	@Column(name = "WGResourceAmount")
 	private BigDecimal wgresourceamount;
 
-	public String getWgid() {
-		return wgid;
+	// ----------------------------------------------------------------------------------------------//
+	
+	public String getIdwgresource() {
+		return idwgresource;
 	}
 
-	public void setWgid(String wgid) {
-		this.wgid = wgid;
+	public void setIdwgresource(String idwgresource) {
+		this.idwgresource = idwgresource;
+	}
+
+	public WealthGroup getWealthgroup() {
+		return wealthgroup;
+	}
+
+	public void setWealthgroup(WealthGroup wealthgroup) {
+		this.wealthgroup = wealthgroup;
 	}
 
 	public ResourceSubType getResourcesubtype() {
@@ -51,14 +90,6 @@ public class WGCharacteristicsResource {
 
 	public void setResourcesubtype(ResourceSubType resourcesubtype) {
 		this.resourcesubtype = resourcesubtype;
-	}
-
-	public Integer getWgresourcesubtype() {
-		return wgresourcesubtype;
-	}
-
-	public void setWgresourcesubtype(Integer wgresourcesubtype) {
-		this.wgresourcesubtype = wgresourcesubtype;
 	}
 
 	public String getWgresourceunit() {
@@ -76,7 +107,5 @@ public class WGCharacteristicsResource {
 	public void setWgresourceamount(BigDecimal wgresourceamount) {
 		this.wgresourceamount = wgresourceamount;
 	}
-	
-	
-	
+
 }
