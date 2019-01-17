@@ -7,20 +7,15 @@
 
 	<object name="activesectionchar" class="java.lang.String"
 		value="Crops" scope="global" />
-	<object name="EFD_v2_sessionTab" class="java.lang.String"
+	<object name="OHEA_sessionTab" class="java.lang.String"
 		value="Employment" scope="global" />
 
 
-	<controller name="EFD_v2">
+	<controller name="EFD_HM">
 		<extends controller="TypicalNotResetOnSave" />
 	</controller>
-	<!-- <controller name="EFD_v2"> <extends controller="Typical" /> </controller> -->
+	
 
-
-	<!-- <controller name="Project"> <extends controller="Typical"/> <action 
-		name="save" mode="detail" class="org.openxava.actions.SaveAction" by-default="if-possible" 
-		image="save.gif" icon="content-save" keystroke="Control S"> <set property="resetAfter" 
-		value="false"/> </action> </controller> -->
 	<controller name="Spreadsheet">
 		<extends controller="TypicalRealExcel" />
 		<action name="Template Spreadsheet" mode="detail"
@@ -88,7 +83,7 @@
 
 
 	<controller name="ProjectReports">
-		<extends controller="EFD_v2" />
+		<extends controller="EFD_HM" />
 		<action name="ProjectExcel" label="ProjectExcel" icon="excel"
 			class="efd.reports.ProjectExcel" image="excel.gif" mode="detail" />
 	</controller>
@@ -112,7 +107,7 @@
 	
 
 	<controller name="LivelihoodZone">
-		<extends controller="EFD_v2" />
+		<extends controller="EFD_HM" />
 		<action name="filteredsearch" hidden="true" image="search.gif"
 			class="efd.actions.FilteredLZ" />
 		<action name="add" hidden="true" icon="table-row-plus-after"
@@ -120,7 +115,7 @@
 	</controller>
 
 
-	<!-- <extends controller="EFD_v2"/> <action name="new LZ" image="new.gif" 
+	<!-- <extends controller="EFD_HM"/> <action name="new LZ" image="new.gif" 
 		hidden="true" icon="library-plus" class="efd.actions.NewLZ"/> <action name="add 
 		LZ" hidden="true" icon="table-row-plus-after" class="efd.actions.AddLZ"/> 
 		<action name="filteredsearch" hidden="true" image="search.gif" class="efd.actions.FilteredLZ"/> 
@@ -128,7 +123,7 @@
 
 
 	<controller name="Community">
-		<extends controller="EFD_v2" />
+		<extends controller="EFD_HM" />
 		<action name="filteredSitesearch" hidden="true"
 			image="search.gif" class="efd.actions.FilteredSite" />
 	</controller>
