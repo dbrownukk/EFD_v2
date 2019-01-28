@@ -9,8 +9,6 @@ import java.util.*;
 import java.util.List;
 
 import org.apache.commons.beanutils.*;
-import org.apache.commons.io.*;
-import org.codehaus.groovy.control.io.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
