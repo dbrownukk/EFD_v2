@@ -32,7 +32,7 @@ public class HouseholdMember extends EFDIdentifiable{
 	private Sex gender;
 
 	public enum Sex {
-	Male, Female
+	Male, Female, Unknown
 	};
 	/*************************************************************************************************/	
 	@Required

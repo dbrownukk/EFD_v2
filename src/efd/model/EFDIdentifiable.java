@@ -8,7 +8,7 @@ import org.openxava.annotations.*;
 /**
  * Base class for defining entities with a UUID id. <p>
  * 
- * @author Javier Paniza
+ * and Versioning for multi user locking
  */
 
 @MappedSuperclass

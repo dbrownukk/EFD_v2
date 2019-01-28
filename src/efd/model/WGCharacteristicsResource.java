@@ -6,8 +6,6 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
-import javax.persistence.Entity;
-
 @Entity
 
 
@@ -42,12 +40,17 @@ public class WGCharacteristicsResource {
 	
 	// ----------------------------------------------------------------------------------------------//
 	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "WGID")
-	@Required
+	//@Required     Now either a WG or a Study
 	@NoFrame
 	private WealthGroup wealthgroup;
-
+	// ----------------------------------------------------------------------------------------------//
+	
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	//@Required
+	@NoFrame
+	private Study study;
 	// ----------------------------------------------------------------------------------------------//
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "WGResourceSubType")
@@ -67,6 +70,7 @@ public class WGCharacteristicsResource {
 	private BigDecimal wgresourceamount;
 
 	// ----------------------------------------------------------------------------------------------//
+
 	
 	public String getIdwgresource() {
 		return idwgresource;
@@ -106,6 +110,14 @@ public class WGCharacteristicsResource {
 
 	public void setWgresourceamount(BigDecimal wgresourceamount) {
 		this.wgresourceamount = wgresourceamount;
+	}
+
+	public Study getStudy() {
+		return study;
+	}
+
+	public void setStudy(Study study) {
+		this.study = study;
 	}
 
 }

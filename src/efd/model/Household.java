@@ -20,26 +20,18 @@ public class Household extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@Required
 	private int householdNumber;
-
 	/*************************************************************************************************/
-
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@NoFrame
-	// @JoinColumn(name = "studyid")
-	// @DescriptionsList(descriptionProperties = "site.locationdistrict",
-	// forViews="FromCommunity")
-	// @ReferenceViews({
-	// @ReferenceView(forViews="DEFAULT",value="FromWGCommunity")
-	// })
 	private Study study;
 	/*************************************************************************************************/
-
+	//@OneToMany(mappedBy = "household" , cascade=CascadeType.REMOVE)
+	@ElementCollection
+	@ListProperties("householdMemberName,headofHousehold, gender, age, yearOfBirth, absent, reasonForAbsence")
+	private Collection<HouseholdMember> householdMember;
+	/*************************************************************************************************/
 	@OneToMany(mappedBy = "household" , cascade=CascadeType.REMOVE)
-	// @RowAction("Spreadsheet.Template Spreadsheet")
-	// @CollectionView("FromCommunity")
-	// @ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
-	private List<HouseholdMember> householdMember;
-
+	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 	public String getHouseholdName() {
 		return householdName;
@@ -59,11 +51,17 @@ public class Household extends EFDIdentifiable {
 	public void setStudy(Study study) {
 		this.study = study;
 	}
-	public List<HouseholdMember> getHouseholdMember() {
+	public Collection<HouseholdMember> getHouseholdMember() {
 		return householdMember;
 	}
 	public void setHouseholdMember(List<HouseholdMember> householdMember) {
 		this.householdMember = householdMember;
+	}
+	public Collection<ConfigAnswer> getConfigAnswer() {
+		return configAnswer;
+	}
+	public void setConfigAnswer(Collection<ConfigAnswer> configAnswer) {
+		this.configAnswer = configAnswer;
 	}
 
 

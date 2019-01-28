@@ -31,7 +31,11 @@ import efd.model.Asset.*;
 import org.openxava.tab.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
-@View(members = "Study[#projectlz;studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate,notes];site;household")
+
+@Views({ @View(members = "Study[#projectlz;studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate,notes]"
+		+ ";site;Household{household};StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem}"
+		+ ";CharacteristicResource{characteristicsResource}"),
+		@View(name = "FromStdOfLiving", members = "studyName,referenceYear") })
 
 @Entity
 
@@ -76,9 +80,17 @@ public class Study extends EFDIdentifiable {
 	@JoinColumn(name = "CProject")
 	// @OnChange(OnChangeClearCommunity.class)
 	@ReferenceView("SimpleProject")
-	@NoCreate
-	@NoModify
+	// @NoCreate
+	// @NoModify
 	private Project projectlz;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@ListProperties("study.studyName,resourcesubtype.resourcetypename,amount,cost,level,gender,ageRangeLower,ageRangeUpper")
+	private Collection<StdOfLivingElement> stdOfLivingElement;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@ListProperties("study.studyName,resourcesubtype.resourcetypename,percentage,unitPrice")
+	private Collection<DefaultDietItem> defaultDietItem;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@SearchAction("Community.filteredSitesearch")
@@ -87,21 +99,13 @@ public class Study extends EFDIdentifiable {
 	@JoinColumn(name = "CLocation")
 	private Site site;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study") // ,cascade = CascadeType.ALL)
-//@RowAction("Spreadsheet.Template Spreadsheet")
-//@CollectionView("FromCommunity")
-//@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	private Collection<Household> household;
-
 	/*************************************************************************************************/
-
-	public Collection<Household> getHousehold() {
-		return household;
-	}
-
-	public void setHousehold(Collection<Household> household) {
-		this.household = household;
-	}
+	// @OneToMany(mappedBy = "study", cascade=CascadeType.REMOVE)
+	@ElementCollection
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit,wgresourceamount")
+	private Collection<WGCharacteristicsResource> characteristicsResource;
 
 	public String getStudyName() {
 		return studyName;
@@ -167,6 +171,22 @@ public class Study extends EFDIdentifiable {
 		this.projectlz = projectlz;
 	}
 
+	public Collection<StdOfLivingElement> getStdOfLivingElement() {
+		return stdOfLivingElement;
+	}
+
+	public void setStdOfLivingElement(Collection<StdOfLivingElement> stdOfLivingElement) {
+		this.stdOfLivingElement = stdOfLivingElement;
+	}
+
+	public Collection<DefaultDietItem> getDefaultDietItem() {
+		return defaultDietItem;
+	}
+
+	public void setDefaultDietItem(Collection<DefaultDietItem> defaultDietItem) {
+		this.defaultDietItem = defaultDietItem;
+	}
+
 	public Site getSite() {
 		return site;
 	}
@@ -174,6 +194,24 @@ public class Study extends EFDIdentifiable {
 	public void setSite(Site site) {
 		this.site = site;
 	}
+
+	public Collection<Household> getHousehold() {
+		return household;
+	}
+
+	public void setHousehold(Collection<Household> household) {
+		this.household = household;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResource() {
+		return characteristicsResource;
+	}
+
+	public void setCharacteristicsResource(Collection<WGCharacteristicsResource> characteristicsResource) {
+		this.characteristicsResource = characteristicsResource;
+	}
+
+	/*************************************************************************************************/
 
 	/*************************************************************************************************/
 
