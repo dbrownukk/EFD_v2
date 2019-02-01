@@ -1,40 +1,31 @@
 package efd.model;
 
 import java.math.*;
-import java.text.*;
 import java.util.*;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
-import org.apache.commons.lang.time.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
-import org.openxava.annotations.NewAction;
-import org.openxava.annotations.SearchAction;
-import org.openxava.annotations.Tab;
 import org.openxava.calculators.*;
-import org.openxava.validators.*;
-import org.openxava.actions.*;
-
-import org.openxava.jpa.*;
-import org.openxava.model.*;
-import org.openxava.util.*;
-import org.openxava.util.jxls.*;
-import org.openxava.web.servlets.*;
-
-import com.openxava.naviox.model.*;
-
-import efd.actions.*;
-import efd.model.Asset.*;
-
-import org.openxava.tab.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
 @Views({ @View(members = "Study[#projectlz;studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate,notes]"
 		+ ";site;Household{household};StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem}"
-		+ ";CharacteristicResource{characteristicsResource}"),
+		+ "Land{characteristicsResourceLand}" 
+		+ "Livestock{characteristicsResourceLivestock}" 
+		+ "Tradeable{characteristicsResourceTradeable}" 
+		+ "Foodstock{characteristicsResourceFoodstock}" 
+		+ "Tress{characteristicsResourceTree}" 
+		+ "Cash{characteristicsResourceCash}" 
+		+ "Crops{characteristicsResourceCrop}"
+		+ "LivestockSales{characteristicsResourceLivestockSales}"
+		+ "LivestockProducts{characteristicsResourceLivestockProducts}"
+		+ "Employment{characteristicsResourceEmployment}"
+		+ "Transfers{characteristicsResourceTransfers}"
+		+ "WildFoods{characteristicsResourceWildFoods}"
+	+ "ConfigQuestionUse{configQuestionUse}"),
 		@View(name = "FromStdOfLiving", members = "studyName,referenceYear") })
 
 @Entity
@@ -102,10 +93,104 @@ public class Study extends EFDIdentifiable {
 	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	private Collection<Household> household;
 	/*************************************************************************************************/
-	// @OneToMany(mappedBy = "study", cascade=CascadeType.REMOVE)
-	@ElementCollection
-	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit,wgresourceamount")
-	private Collection<WGCharacteristicsResource> characteristicsResource;
+	// Assets
+	/*************************************************************************************************/
+
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Land')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceLand;
+	/*************************************************************************************************/
+
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceLivestock;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Tradeable')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceTradeable;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Food Stocks')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceFoodstock;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Trees')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceTree;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Cash')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceCash;
+	/*************************************************************************************************/
+	// Non Assets
+	/*************************************************************************************************/
+
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	// @ElementCollection //- will not work with SearchListCondition
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Crops')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceCrop;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Sales')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockSales;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Products')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockProducts;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Employment')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceEmployment;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Transfers')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceTransfers;
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Wild Foods')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	private Collection<WGCharacteristicsResource> characteristicsResourceWildFoods;
+	/*************************************************************************************************/
+	
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	
+	
+	private Collection<ConfigQuestionUse> configQuestionUse;
+	/*************************************************************************************************/
+	
+	
 
 	public String getStudyName() {
 		return studyName;
@@ -203,16 +288,120 @@ public class Study extends EFDIdentifiable {
 		this.household = household;
 	}
 
-	public Collection<WGCharacteristicsResource> getCharacteristicsResource() {
-		return characteristicsResource;
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceCrop() {
+		return characteristicsResourceCrop;
 	}
 
-	public void setCharacteristicsResource(Collection<WGCharacteristicsResource> characteristicsResource) {
-		this.characteristicsResource = characteristicsResource;
+	public void setCharacteristicsResourceCrop(Collection<WGCharacteristicsResource> characteristicsResourceCrop) {
+		this.characteristicsResourceCrop = characteristicsResourceCrop;
 	}
 
-	/*************************************************************************************************/
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceTree() {
+		return characteristicsResourceTree;
+	}
 
+	public void setCharacteristicsResourceTree(Collection<WGCharacteristicsResource> characteristicsResourceTree) {
+		this.characteristicsResourceTree = characteristicsResourceTree;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceLand() {
+		return characteristicsResourceLand;
+	}
+
+	public void setCharacteristicsResourceLand(Collection<WGCharacteristicsResource> characteristicsResourceLand) {
+		this.characteristicsResourceLand = characteristicsResourceLand;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceLivestock() {
+		return characteristicsResourceLivestock;
+	}
+
+	public void setCharacteristicsResourceLivestock(
+			Collection<WGCharacteristicsResource> characteristicsResourceLivestock) {
+		this.characteristicsResourceLivestock = characteristicsResourceLivestock;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceTradeable() {
+		return characteristicsResourceTradeable;
+	}
+
+	public void setCharacteristicsResourceTradeable(
+			Collection<WGCharacteristicsResource> characteristicsResourceTradeable) {
+		this.characteristicsResourceTradeable = characteristicsResourceTradeable;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceFoodstock() {
+		return characteristicsResourceFoodstock;
+	}
+
+	public void setCharacteristicsResourceFoodstock(
+			Collection<WGCharacteristicsResource> characteristicsResourceFoodstock) {
+		this.characteristicsResourceFoodstock = characteristicsResourceFoodstock;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceCash() {
+		return characteristicsResourceCash;
+	}
+
+	public void setCharacteristicsResourceCash(Collection<WGCharacteristicsResource> characteristicsResourceCash) {
+		this.characteristicsResourceCash = characteristicsResourceCash;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceLivestockSales() {
+		return characteristicsResourceLivestockSales;
+	}
+
+	public void setCharacteristicsResourceLivestockSales(
+			Collection<WGCharacteristicsResource> characteristicsResourceLivestockSales) {
+		this.characteristicsResourceLivestockSales = characteristicsResourceLivestockSales;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceLivestockProducts() {
+		return characteristicsResourceLivestockProducts;
+	}
+
+	public void setCharacteristicsResourceLivestockProducts(
+			Collection<WGCharacteristicsResource> characteristicsResourceLivestockProducts) {
+		this.characteristicsResourceLivestockProducts = characteristicsResourceLivestockProducts;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceEmployment() {
+		return characteristicsResourceEmployment;
+	}
+
+	public void setCharacteristicsResourceEmployment(
+			Collection<WGCharacteristicsResource> characteristicsResourceEmployment) {
+		this.characteristicsResourceEmployment = characteristicsResourceEmployment;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceTransfers() {
+		return characteristicsResourceTransfers;
+	}
+
+	public void setCharacteristicsResourceTransfers(
+			Collection<WGCharacteristicsResource> characteristicsResourceTransfers) {
+		this.characteristicsResourceTransfers = characteristicsResourceTransfers;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceWildFoods() {
+		return characteristicsResourceWildFoods;
+	}
+
+	public void setCharacteristicsResourceWildFoods(
+			Collection<WGCharacteristicsResource> characteristicsResourceWildFoods) {
+		this.characteristicsResourceWildFoods = characteristicsResourceWildFoods;
+	}
+
+	public Collection<ConfigQuestionUse> getConfigQuestionUse() {
+		return configQuestionUse;
+	}
+
+	public void setConfigQuestionUse(Collection<ConfigQuestionUse> configQuestionUse) {
+		this.configQuestionUse = configQuestionUse;
+	}
+
+	
+	
 	/*************************************************************************************************/
 
 }

@@ -10,7 +10,7 @@ import org.openxava.annotations.*;
 
 
 @View(members = "DefaultDietItem[#resourcesubtype;percentage,unitPrice]")
-@Tab(properties="study.studyName,resourcesubtype.resourcetypename;percentage,unitPrice")
+@Tab(properties="resourcesubtype.resourcetypename;percentage,unitPrice")
 
 
 @Entity
@@ -20,7 +20,11 @@ public class DefaultDietItem extends EFDIdentifiable {
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
-	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename",
+			condition="e.resourcetype.resourcetypename in ('Crops','Wild Foods','Livestock Products','Food Purchase','Food Stocks')")
+	
+	
+	
 	private ResourceSubType resourcesubtype;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -1,10 +1,14 @@
 package efd.model;
 
 import java.math.*;
+
+import javax.inject.*;
 import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
+
+import efd.actions.*;
 
 @Entity
 
@@ -29,6 +33,7 @@ properties = "wealthgroup.community.projectlz.projecttitle,"
 
 public class WGCharacteristicsResource {
 
+
 	@Id
 	@Hidden // The property is not shown to the user. It's an internal
 			// identifier
@@ -52,12 +57,17 @@ public class WGCharacteristicsResource {
 	@NoFrame
 	private Study study;
 	// ----------------------------------------------------------------------------------------------//
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false,cascade = CascadeType.ALL)
 	@JoinColumn(name = "WGResourceSubType")
 	@Required
 	@NoCreate
 	//@NoModify
 	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
+	//condition="e.resourcetype.resourcetypename = 'Land'")
+	@OnChange(OnChangeResourceType.class)
+	//@EditAction("CharacteristicsResource.edit")
+	
+	
 	private ResourceSubType resourcesubtype;
 
 	// ----------------------------------------------------------------------------------------------//

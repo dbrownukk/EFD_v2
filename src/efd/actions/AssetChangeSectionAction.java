@@ -5,90 +5,67 @@ import org.openxava.controller.*;
 
 import efd.model.*;
 
+import static org.junit.Assert.assertThat;
+
 import javax.inject.*;
 
+public class AssetChangeSectionAction extends ChangeSectionAction {// implements IModuleContextAction {
 
 
-
-
-public class AssetChangeSectionAction extends ChangeSectionAction implements IModuleContextAction{
-//public class AssetChangeSectionAction extends OnChangePropertyBaseAction {
-//	public class AssetChangeSectionAction extends ViewBaseAction{
-
-	@Inject @Named("EFD_v2_sessionTab")
+	@Inject
 	private String sessionTab;
-
+	private ModuleContext context;
 	public void execute() throws Exception {
-	
-	   
-		int irst = 0;
-		ResourceType rt = null;
-		String rType[] = new String[9];
+
+		String rType[] = new String[20];
 		
-		rType[0] = "Livestock";
-		rType[1] = "Land";
-		rType[2] = "Crops";
-		rType[3] = "Livestock Products";
-		rType[4] = "Employment";
-		rType[5] = "Transfers";
-		rType[6] = "Wild foods";
-		rType[7] = "Tradeable";
-		rType[8] = "Food Stocks";
+		/* Numbering is the order on the screen tabs - do not change without editing Study View */
 		
+		rType[3] = "Land";
+		rType[4] = "Livestock";
+		rType[5] = "Tradeable";
+		rType[6] = "Food Stocks";
+		rType[7] = "Trees";
+		rType[8] = "Cash";
+		
+		rType[9] = "Crops";
+		rType[10] = "Livestock Sales";
+		rType[11] = "Livestock Products";
+		rType[12] = "Employment";
+		rType[13] = "Transfers";
+		rType[14] = "Wild Foods";
 	
+
+
+		//super.execute();
+
+		
+		
+		int iactiveSection = getActiveSection();
+		String sactiveSection = getViewObject();
+		
+		//System.out.println("activeSection =" + sactiveSection);		
+		
+		//if(sactiveSection.("3"))
+		//	System.out.println("sactivesession is null");
+		
+		//if(sactiveSection.isEmpty()) {      // Creats an exception!
+		//	System.out.println("dave view object empty aa =" + sactiveSection+" "+iactiveSection);	
+		//}
+			
+		
+		
+		System.out.println("dave view object bb =" + sactiveSection+" "+iactiveSection);		
+		
+		sessionTab = rType[iactiveSection];
+		
+		System.out.println("dave in change section  = " + iactiveSection+" "+sessionTab);
+		
 		
 		super.execute();
 		
-		
-		
-		//activeSectionchar = "FRED";
-		
-		//String asection = getRequest().getParameter("activeSectionchar");
-		//System.out.println("in change section asection = "+activeSectionchar);
-		
-		
-		
-		
-		
-		int iactiveSection = this.getActiveSection();
-		sessionTab = "FRED";
-		getRequest().setAttribute(sessionTab, "FREDDY");
-		
-		//getView().setValue("CurrentTab", "FRED");
-		
-		System.out.println("dave in change section"+iactiveSection);
-				
-		String envset = getEnvironment().getValue("EFD_v2_sessionTab");
-		System.out.println("session var"+envset);
-		
-		
-
-		
-		//getView().setDescriptionsListCondition("resourceSubType","resourcetype.resourcetypename = 'Crops'");
-	
-	/*
-	  rt = (ResourceType) XPersistence.getManager().createQuery("from ResourceType where ResourceTypeName = '"+rType[activeSection]+"'").getSingleResult();
-	  System.out.println("in condition for sub resource type");
-	  //String condition = "${resourcetype} = '"+rt.getIdresourcetype()+"'";
-	  String condition = "${resourcetype} = 'fred'";
-	  getView().setDescriptionsListCondition("resourceSubType", condition);    // we modify the condition of the combo 'state'
-	 
-	 getView not valid here
-	 
-	*/
 	}
-		
-		/*
-	    public void setActiveSectionchar(String activeSectionchar) {  
-	         this.activeSectionchar = activeSectionchar;
-	    }
-	 
-	    public String getActiveSectionchar() { 
-	         return activeSectionchar;
-	    }
-		
-		*/
-	
+
 
 
 }

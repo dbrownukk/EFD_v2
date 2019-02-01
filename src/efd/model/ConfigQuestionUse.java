@@ -8,8 +8,9 @@ import org.openxava.annotations.*;
 
 import efd.model.ConfigQuestion.*;
 
-@View(members = "study;configQuestion,level")
+@View(members = "study;configQuestion;configAnswer,level")
 
+//@Tab(properties="configQuestion.prompt,configAnswer.answer")
 
 @Entity
 

@@ -10,7 +10,7 @@ import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
 
 @View(members = "StandardOfLivingElement[#resourcesubtype;amount,cost;level,gender;ageRangeLower,ageRangeUpper]")
-@Tab(properties="study.studyName,resourcesubtype.resourcetypename;amount,cost,level,gender,ageRangeLower,ageRangeUpper")
+@Tab(properties="resourcesubtype.resourcetypename;amount,cost,level,gender,ageRangeLower,ageRangeUpper")
 
 
 @Entity
