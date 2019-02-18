@@ -64,7 +64,7 @@ public class Site {
 	@JoinColumn(name = "LZ")
 	private LivelihoodZone livelihoodZone;
 
-	@OneToMany(mappedBy = "site", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "site",cascade = CascadeType.REMOVE)
 	@ListProperties("cinterviewdate,cinterviewsequence,civf,civm")
 	private Collection<Community> community;
 

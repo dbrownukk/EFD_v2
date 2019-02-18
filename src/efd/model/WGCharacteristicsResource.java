@@ -57,14 +57,14 @@ public class WGCharacteristicsResource {
 	@NoFrame
 	private Study study;
 	// ----------------------------------------------------------------------------------------------//
-	@ManyToOne(fetch = FetchType.LAZY, optional = false,cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "WGResourceSubType")
 	@Required
 	@NoCreate
 	//@NoModify
 	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
 	//condition="e.resourcetype.resourcetypename = 'Land'")
-	@OnChange(OnChangeResourceType.class)
+	@OnChange(OnChangeResourceType.class)  // class is not used..
 	//@EditAction("CharacteristicsResource.edit")
 	
 	

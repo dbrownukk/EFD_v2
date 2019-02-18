@@ -59,14 +59,14 @@ public class Community {
 	
 
 
-	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "community")//, cascade = CascadeType.ALL)
 	@RowAction("Spreadsheet.Template Spreadsheet")
 	@CollectionView("FromCommunity")
 	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "community")//, cascade = CascadeType.ALL)
 	private Collection<CommunityYearNotes> communityyearnotes;
 	// ----------------------------------------------------------------------------------------------//
 
@@ -105,7 +105,7 @@ public class Community {
 	// ----------------------------------------------------------------------------------------------//
 	
 
-	@ManyToOne  //(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@SearchAction("Community.filteredSitesearch")
 	// need a new LZ create check @AddAction("LivelihoodZone.add LZ")
 	@NoFrame(forViews = "FromWGCommunity")

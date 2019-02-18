@@ -30,7 +30,7 @@ public class Household extends EFDIdentifiable {
 	@ListProperties("householdMemberName,headofHousehold, gender, age, yearOfBirth, absent, reasonForAbsence")
 	private Collection<HouseholdMember> householdMember;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "household" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "household")// , cascade=CascadeType.REMOVE)
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 	public String getHouseholdName() {

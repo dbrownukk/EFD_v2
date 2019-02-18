@@ -19,7 +19,10 @@ public class ReusableConfigTopic extends EFDIdentifiable {
 @Column(length = 45, unique = true)
 private String topic;
 /*************************************************************************************************/
-@OneToMany(mappedBy = "topic", cascade=CascadeType.REMOVE)
+//@EditAction("")
+//@CollectionView("FromTopic")
+@OneToMany(mappedBy = "topic")
+
 private Collection<ConfigQuestion> configQuestion;
 /*************************************************************************************************/
 

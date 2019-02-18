@@ -42,6 +42,15 @@ public class AddLZ extends GoAddElementsToCollectionAction {
 		if (lzs.size() > 0)
 			getTab().setBaseCondition("${lzid} not in (" + inlist + ")");
 	
+	
+	mustRefreshCollection();
+	getParentView().refresh();
+	
+	
 	}
+	
+	
+	
+	
 
 }

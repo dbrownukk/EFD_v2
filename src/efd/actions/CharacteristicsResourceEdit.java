@@ -17,6 +17,9 @@ public class CharacteristicsResourceEdit extends EditElementInCollectionAction {
 
     	super.execute();
     	
+    	
+    	
+    	
     	System.out.println("in charresource edit, sessiontab =  = " + sessionTab);
     	getCollectionElementView().setDescriptionsListCondition("resourcesubtype", "e.resourcetype.resourcetypename = '"+sessionTab+"'");
     	

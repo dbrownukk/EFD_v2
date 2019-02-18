@@ -28,7 +28,7 @@ public class HouseholdMember extends EFDIdentifiable{
 	};
 	/*************************************************************************************************/	
 	@Required
-	@Editor("ValidValuesRadioButton")
+	@Editor("ValidValuesVerticalRadioButton")
 	private Sex gender;
 
 	public enum Sex {

@@ -52,7 +52,7 @@ public class WealthGroup {
 	private Community community;
 	// ----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy = "wealthgroup", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "wealthgroup")
 	//@ElementCollection
 	//@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,resourcesubtype.resourcesubtypeunit")
 	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,wgresourceunit")
@@ -92,7 +92,7 @@ public class WealthGroup {
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy = "wealthgroup", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "wealthgroup")
 	private List<WealthGroupInterview> wealthGroupInterview;
 	
 

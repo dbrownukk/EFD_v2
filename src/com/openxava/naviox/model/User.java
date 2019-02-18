@@ -70,7 +70,14 @@ public class User implements java.io.Serializable {
 
 	
 	public static User find(String name) {
-		return XPersistence.getManager().find(User.class, name);
+		User user = XPersistence.getManager().find(User.class, name);
+		if (user != null) return user;
+		if (Configuration.getInstance().isUseEmailAsUserName()) {
+			if (name.contains("@")) {
+				return findByEmail(name);
+			}
+		}
+		return null;
 	}
 	
 	public static User findByEmail(String email) { 
@@ -172,6 +179,8 @@ public class User implements java.io.Serializable {
 	private String passwordRecoveringCode; 
 	
 	private Date passwordRecoveringDate; 
+	
+	private Date privacyPolicyAcceptanceDate; 
 	
 	@ManyToMany
 	@ReadOnly 
@@ -429,6 +438,18 @@ public class User implements java.io.Serializable {
 		if (!organizations.contains(organization)) return organizations.add(organization);
 		else return false;
 	}
+	
+	/** @since 6.0 */
+	public boolean addRole(String roleName) { 
+		if (roles == null) roles = new ArrayList<Role>();
+		Role role = Role.find(roleName);
+		if (role != null) {
+			addRole(role);
+			return true;
+		}
+		return false;
+	}
+
 	
 	public void addRole(Role role) { 
 		if (roles == null) roles = new ArrayList<Role>();
@@ -706,6 +727,14 @@ public class User implements java.io.Serializable {
 
 	public String getPasswordRecoveringCode() {
 		return passwordRecoveringCode;
+	}
+
+	public Date getPrivacyPolicyAcceptanceDate() {
+		return privacyPolicyAcceptanceDate;
+	}
+
+	public void setPrivacyPolicyAcceptanceDate(Date privacyPolicyAcceptanceDate) {
+		this.privacyPolicyAcceptanceDate = privacyPolicyAcceptanceDate;
 	}
 
 }

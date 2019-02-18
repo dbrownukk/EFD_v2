@@ -3,6 +3,8 @@ package efd.model;
 import java.math.*;
 import java.text.*;
 import java.util.*;
+
+import javax.inject.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
@@ -27,7 +29,6 @@ import com.openxava.naviox.model.*;
 import efd.actions.*;
 import efd.model.Asset.*;
 
-
 import org.openxava.tab.*;
 
 @Entity
@@ -42,8 +43,12 @@ import org.openxava.tab.*;
 // model is OHEA or OIHM
 @Tab(filter = ProjectModelFilter.class, properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", baseCondition = "${model} = ?")
 
+
 @Table(name = "Project")
+
+
 public class Project {
+
 
 	@PrePersist
 	@PreUpdate
@@ -54,10 +59,14 @@ public class Project {
 		String userName = Users.getCurrent();
 		User user = User.find(userName);
 
-		if (user.hasRole("oihm_user"))
+		if (user.hasRole("oihm_user")) {
 			this.model = "OIHM";
-		else if (user.hasRole("ohea_user"))
+	
+		} else if (user.hasRole("ohea_user")) {
 			this.model = "OHEA";
+	
+		}
+
 	}
 
 	@Id
@@ -100,8 +109,11 @@ public class Project {
 	// @NewAction(forViews="DEFAULT", value="LivelihoodZone.new LZ"), /* Check
 	// projectid is not empty */
 	// })
+	
+	
 	@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */
-	// @AddAction("LivelihoodZone.add")
+	
+	
 	@NewAction("ManyToMany.new")
 	@ManyToMany
 	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false), uniqueConstraints = @UniqueConstraint(columnNames = {
@@ -115,8 +127,18 @@ public class Project {
 	@Column(length = 32, name = "Notes")
 	private String notes;
 
-	@Version
-	private Integer version;
+	
+	/*
+	 * 
+	 * Versioning fails with ManyToMany - raising bug 
+	 * 
+	 * Removed all custom actions and views and fails
+	 * 
+	 * Create proj, save, add LZ and get error - another user has updated this record
+	 * 
+	 */
+	//@Version
+	//private Integer version;
 
 	@DefaultValueCalculator(StringCalculator.class)
 	private String donor;
@@ -145,9 +167,14 @@ public class Project {
 
 	/***********************************************************************************************/
 
+	
+	
+	
 	public String getProjectid() {
 		return projectid;
 	}
+
+
 
 	public String getModel() {
 		return model;
@@ -157,13 +184,7 @@ public class Project {
 		this.model = model;
 	}
 
-	public Integer getVersion() {
-		return version;
-	}
 
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
 
 	public String getDonor() {
 		return donor;

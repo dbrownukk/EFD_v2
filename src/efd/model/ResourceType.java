@@ -33,7 +33,7 @@ public class ResourceType {
 	private String resourcetypename;
 	//----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="resourcetype") //,cascade=CascadeType.REMOVE)
 	@ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
 	private Collection<ResourceSubType> resourcesubtype;
 	//----------------------------------------------------------------------------------------------//

@@ -11,31 +11,67 @@ import org.openxava.calculators.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
-@Views({ @View(members = "Study[#projectlz;studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate,notes]"
-		+ ";site;Household{household};StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem}"
+/*
+ * 
+ 
+@Views({ @View(members = "Study[#studyName,projectlz,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate,notes]"
+		+ ";site;StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem}"
 		+ "Land{characteristicsResourceLand}" 
 		+ "Livestock{characteristicsResourceLivestock}" 
 		+ "Tradeable{characteristicsResourceTradeable}" 
 		+ "Foodstock{characteristicsResourceFoodstock}" 
-		+ "Tress{characteristicsResourceTree}" 
+		+ "Trees{characteristicsResourceTree}" 
 		+ "Cash{characteristicsResourceCash}" 
 		+ "Crops{characteristicsResourceCrop}"
 		+ "LivestockSales{characteristicsResourceLivestockSales}"
 		+ "LivestockProducts{characteristicsResourceLivestockProducts}"
 		+ "Employment{characteristicsResourceEmployment}"
 		+ "Transfers{characteristicsResourceTransfers}"
-		+ "WildFoods{characteristicsResourceWildFoods}"
-	+ "ConfigQuestionUse{configQuestionUse}"),
-		@View(name = "FromStdOfLiving", members = "studyName,referenceYear") })
+		+ "WildFoods{characteristicsResourceWildFoods}"),
+	//+ "ConfigQuestionUse{configQuestionUse}"),
+		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
+		@View(name="FromQuestionUse", members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")		
+})
+*/
+
+
+@Views({ @View(members = "Study[#studyName,projectlz,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate,notes]"
+		+ ";StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem};Site{site}"
+		+ ";Assets/Resources{Land{characteristicsResourceLand}" 
+		+ "Livestock{characteristicsResourceLivestock}" 
+		+ "Tradeable{characteristicsResourceTradeable}" 
+		+ "Foodstock{characteristicsResourceFoodstock}" 
+		+ "Trees{characteristicsResourceTree}" 
+		+ "Cash{characteristicsResourceCash}" 
+		+ "Crops{characteristicsResourceCrop}"
+		+ "LivestockSales{characteristicsResourceLivestockSales}"
+		+ "LivestockProducts{characteristicsResourceLivestockProducts}"
+		+ "Employment{characteristicsResourceEmployment}"
+		+ "Transfers{characteristicsResourceTransfers}"
+		+ "WildFoods{characteristicsResourceWildFoods}}"),
+	//+ "ConfigQuestionUse{configQuestionUse}"),
+		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
+		@View(name="FromQuestionUse", members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")		
+})
 
 @Entity
 
-@Table(name = "Study")
+@Table(name = "Study",
+
+uniqueConstraints = {
+	@UniqueConstraint(name="studyrefyear",columnNames={"studyName","referenceYear"})
+}
+)
+
+
+
+
 
 public class Study extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	@Required
+	@Column(length = 45, unique = true)
 	private String studyName;
 	/*************************************************************************************************/
 	@Stereotype("DATE")
@@ -66,7 +102,7 @@ public class Study extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
-	@Required
+	//@Required  NOT required in OIHM a Study can just be part of a Project without LZ and Site, but may have an LZ and Site
 	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
 	@JoinColumn(name = "CProject")
 	// @OnChange(OnChangeClearCommunity.class)
@@ -83,7 +119,7 @@ public class Study extends EFDIdentifiable {
 	@ListProperties("study.studyName,resourcesubtype.resourcetypename,percentage,unitPrice")
 	private Collection<DefaultDietItem> defaultDietItem;
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@SearchAction("Community.filteredSitesearch")
 	@NoFrame(forViews = "FromWGCommunity")
 	@ReferenceView("SimpleSite")
@@ -97,6 +133,7 @@ public class Study extends EFDIdentifiable {
 	/*************************************************************************************************/
 
 	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	//@ElementCollection   // Not usable with EditAction
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Land')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -184,9 +221,7 @@ public class Study extends EFDIdentifiable {
 	private Collection<WGCharacteristicsResource> characteristicsResourceWildFoods;
 	/*************************************************************************************************/
 	
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
-	
-	
+	@OneToMany(mappedBy = "study")
 	private Collection<ConfigQuestionUse> configQuestionUse;
 	/*************************************************************************************************/
 	

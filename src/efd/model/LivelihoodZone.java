@@ -8,9 +8,9 @@ import org.openxava.annotations.*;
 
 
 
-@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap]"),
-		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
-		@View(name = "CreateLZ", members = "Livelihood Zone[lzname;country;lzzonemap]"),
+@Views({ @View(members="LivelihoodZone[lzname;country;lzzonemap]"),
+		@View(name = "UpdateLZ", members = "LivelihoodZone[lzname,country,project,site]"),
+		@View(name = "CreateLZ", members = "LivelihoodZone[lzname;country;lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname,country;lzzonemap"),
 		@View(name = "SimpleLZnomap", members = "lzname,country") 
 })
@@ -77,6 +77,23 @@ public class LivelihoodZone  {
 	@ManyToMany(mappedBy = "livelihoodZone")
 	// @ListProperties("projecttitle,pdate")
 	private Collection<Project> project;
+	
+	
+	@Version
+	private Integer version;
+	
+	
+	
+	
+	
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
 
 	public String getLzid() {
 		return lzid;

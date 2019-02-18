@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import org.openxava.annotations.*;
 
-@View(members = "configQuestionUse.study;household,householdMember,answer")
+@View(members = "answer")
 
 
 @Entity

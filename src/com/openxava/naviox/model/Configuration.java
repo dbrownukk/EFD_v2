@@ -55,6 +55,13 @@ public class Configuration implements java.io.Serializable {
 	@Column(name="sharedUsersBetweenOrgs", columnDefinition="varchar(1) default 'N' not null") 
 	private boolean sharedUsersBetweenOrganizations;
 	
+	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
+	@Column(columnDefinition="varchar(1) default 'N' not null")
+	private boolean useEmailAsUserName; 
+
+	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
+	@Column(columnDefinition="varchar(1) default 'N' not null")
+	private boolean privacyPolicyOnSignUp; 
 
 	@Hidden
 	public int getLockSessionMilliseconds() {  
@@ -178,6 +185,26 @@ public class Configuration implements java.io.Serializable {
 
 	public void setSharedUsersBetweenOrganizations(boolean sharedUsersBetweenOrganizations) {
 		this.sharedUsersBetweenOrganizations = sharedUsersBetweenOrganizations;
+	}
+
+
+	public boolean isUseEmailAsUserName() {
+		return useEmailAsUserName;
+	}
+
+
+	public void setUseEmailAsUserName(boolean useEmailAsUserName) {
+		this.useEmailAsUserName = useEmailAsUserName;
+	}
+
+
+	public boolean isPrivacyPolicyOnSignUp() {
+		return privacyPolicyOnSignUp;
+	}
+
+
+	public void setPrivacyPolicyOnSignUp(boolean privacyPolicyOnSignUp) {
+		this.privacyPolicyOnSignUp = privacyPolicyOnSignUp;
 	}
 
 }
