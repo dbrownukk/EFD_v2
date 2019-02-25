@@ -11,7 +11,7 @@ import efd.model.ConfigQuestion.*;
 @Views({ @View(members = "QuestionUse[study;level;configQuestion]")})
 //		@View(name = "FromConfigQuestion", members = "QuestionUse[#study,level]") })
 
-//@Tab(properties = "study.studyName,study.referenceYear,configQuestion.prompt")
+@Tab(properties = "study.studyName,study.referenceYear,configQuestion.prompt")
 
 @Entity
 
@@ -28,8 +28,8 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
 	private Study study;
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	//@NoFrame
+	@ManyToOne(optional = false)
+	//@ReferenceView("FromQuestionUse")
 	private ConfigQuestion configQuestion;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "configQuestionUse") // , cascade=CascadeType.REMOVE)

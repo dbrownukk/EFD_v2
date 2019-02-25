@@ -71,7 +71,7 @@ public class Study extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	@Required
-	@Column(length = 45, unique = true)
+	@Column(length = 45)
 	private String studyName;
 	/*************************************************************************************************/
 	@Stereotype("DATE")
@@ -118,13 +118,15 @@ public class Study extends EFDIdentifiable {
 	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@ListProperties("study.studyName,resourcesubtype.resourcetypename,percentage,unitPrice")
 	private Collection<DefaultDietItem> defaultDietItem;
+	
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)// cascade = CascadeType.REMOVE)
 	@SearchAction("Community.filteredSitesearch")
-	@NoFrame(forViews = "FromWGCommunity")
-	@ReferenceView("SimpleSite")
+	//@NoFrame(forViews = "FromWGCommunity")
+	@ReferenceView("FromStudy")
 	@JoinColumn(name = "CLocation")
 	private Site site;
+	
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	private Collection<Household> household;

@@ -2,6 +2,7 @@ package efd.actions;
 
 import java.util.List;
 
+import javax.inject.*;
 import javax.mail.*;
 import javax.persistence.*;
 
@@ -26,103 +27,125 @@ import efd.model.*;
 
 public class FilteredSite extends ReferenceSearchAction {
 
+	@Inject
+	private String efdModel;
+
 	public void execute() throws Exception {
 
-		System.out.println("current proj " + getView().getValue("projectlz.projectid"));
-		// System.out.println("current site "
-		// +getView().getValue("site.locationid"));
+		if (efdModel == "OHEA") {
 
-		// System.out.println("In Site Filter from Comm "+getView().getSearchKeyName());
+			System.out.println("current proj " + getView().getValue("projectlz.projectid"));
+			// System.out.println("current site "
+			// +getView().getValue("site.locationid"));
 
-		/* need to set project context */
-		if (getView().getValueString("projectlz.projectid").isEmpty()) {
-			throw new IllegalStateException(XavaResources.getString("Site lookup must be in context of a Project"));
+			// System.out.println("In Site Filter from Comm "+getView().getSearchKeyName());
+
+			/* need to set project context */
+			if (getView().getValueString("projectlz.projectid").isEmpty()) {
+				throw new IllegalStateException(XavaResources.getString("Site lookup must be in context of a Project"));
+			}
+
+			// String locid =
+			// getPreviousView().getValue("site.locationid").toString();
+			// String cprojectid =
+			// getPreviousView().getValue("projectlz.projectid").toString();
+			super.execute();
+			String locid = getPreviousView().getValueString("site.locationid");
+			String cprojectid = getPreviousView().getValueString("projectlz.projectid");
+
+			// System.out.println("locid = "+locid);
+			// System.out.println("cprojectid = "+cprojectid);
+			/*
+			 * select sites that are valid for current LZ in project LZ for this Project
+			 */
+
+			Query query = XPersistence.getManager()
+					.createQuery("select lz.lzid from LivelihoodZone lz join lz.project pr " + " where pr.projectid = '"
+							+ cprojectid + "'");
+			List<LivelihoodZone> lzs = query.getResultList();
+			String lzs1 = lzs.toString().replace("[]", " ");
+			// System.out.println("LZS = " + lzs + lzs.size() + lzs1);
+
+			String inlist = "";
+			for (int k = 0; k < lzs.size(); k++) {
+				System.out.println("in loop 1 " + lzs.get(k));
+				inlist += "'" + lzs.get(k) + "'";
+				if (k + 1 == lzs.size())
+					break;
+				inlist += ",";
+				System.out.println(k);
+
+			}
+
+			/* Need to remove sites already used in this project */
+			/* Select Clocation from Community where CProject = this projectid */
+
+			Query Cquery = XPersistence.getManager()
+					.createQuery("select c from Community c" + " where c.projectlz = '" + cprojectid + "'");
+			// System.out.println("done query");
+			List<Community> com = Cquery.getResultList();
+			// System.out.println("done list get");
+
+			String alist = "";
+
+			for (int j = 0; j < com.size(); j++) {
+				// System.out.println("in loop alist");
+
+				// System.out.println("in loop2");
+				// System.out.println("Comsiteid = "+com.get(j).getSite());
+				// System.out.println("ComProjid = "+com.get(j).getProjectlz());
+
+				// System.out.println("ComSite = "+com.get(j).getSite().toString());
+				// System.out.println("in loop 1"+com.get(j).getSite().getLocationid());
+				alist += "'" + com.get(j).getSite().getLocationid() + "'";
+				if (j + 1 == com.size())
+					break;
+				alist += ",";
+				// System.out.println(j);
+			}
+
+			// System.out.println("inlist ="+inlist);
+			// System.out.println("alist = "+alist);
+
+			// getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and
+			// ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
+			// + " where pr.projectid = '" + cprojectid + ")'");
+
+			if (lzs.isEmpty() && com.isEmpty()) /* No existing Sites/LZS in this project */
+			{
+				// System.out.println("In setbasecondition 1");
+				addWarning("No Livelihood Zones or Sites for current Project");
+				getTab().setBaseCondition("${locationid} = '" + locid + "'");
+			} else if (com.isEmpty()) /* No previously used sites in this project - show all sites from this proj */
+			{
+				// System.out.println("In setbasecondition 2");
+				getTab().setBaseCondition(
+						"${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")");
+				// getTab().setBaseCondition("${locationid} != '" + locid);
+			} else /* Show all relevant sites */
+			{
+				// System.out.println("In setbasecondition 3");
+				getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in ("
+						+ inlist + ")" + "and ${locationid} not in ( " + alist + ")");
+				// getTab().setBaseCondition("${locationid} != '" + locid);
+				System.out.println("In setbasecondition 4");
+			}
+
 		}
-
-		// String locid =
-		// getPreviousView().getValue("site.locationid").toString();
-		// String cprojectid =
-		// getPreviousView().getValue("projectlz.projectid").toString();
-		super.execute();
-		String locid = getPreviousView().getValueString("site.locationid");
-		String cprojectid = getPreviousView().getValueString("projectlz.projectid");
-
-		// System.out.println("locid = "+locid);
-		// System.out.println("cprojectid = "+cprojectid);
-		/*
-		 * select sites that are valid for current LZ in project LZ for this Project
-		 */
-
-		Query query = XPersistence.getManager().createQuery("select lz.lzid from LivelihoodZone lz join lz.project pr "
-				+ " where pr.projectid = '" + cprojectid + "'");
-		List<LivelihoodZone> lzs = query.getResultList();
-		String lzs1 = lzs.toString().replace("[]", " ");
-		// System.out.println("LZS = " + lzs + lzs.size() + lzs1);
-
-		String inlist = "";
-		for (int k = 0; k < lzs.size(); k++) {
-			System.out.println("in loop 1 " + lzs.get(k));
-			inlist += "'" + lzs.get(k) + "'";
-			if (k + 1 == lzs.size())
-				break;
-			inlist += ",";
-			System.out.println(k);
-
+		
+		
+		if (efdModel == "OIHM") {
+			System.out.println("in oihm site filteredsite");
+			String projectId = getView().getValue("projectlz.projectid").toString();
+			Project project = XPersistence.getManager().find(Project.class, projectId);
+			System.out.println("done project query");
+			System.out.println("project country = "+project.getAltCurrency().getIsocountrycode());
+			System.out.println("project country = "+project.getAltCurrency().getIdcountry());
+			
+			super.execute();
+			//getTab().setBaseCondition("${country.isocountrycode} != '"+project.getAltCurrency().getIsocountrycode().toString()+"'");
+		
+		
 		}
-
-		/* Need to remove sites already used in this project */
-		/* Select Clocation from Community where CProject = this projectid */
-
-		Query Cquery = XPersistence.getManager()
-				.createQuery("select c from Community c" + " where c.projectlz = '" + cprojectid + "'");
-		// System.out.println("done query");
-		List<Community> com = Cquery.getResultList();
-		// System.out.println("done list get");
-
-		String alist = "";
-
-		for (int j = 0; j < com.size(); j++) {
-			// System.out.println("in loop alist");
-
-			// System.out.println("in loop2");
-			// System.out.println("Comsiteid = "+com.get(j).getSite());
-			// System.out.println("ComProjid = "+com.get(j).getProjectlz());
-
-			// System.out.println("ComSite = "+com.get(j).getSite().toString());
-			// System.out.println("in loop 1"+com.get(j).getSite().getLocationid());
-			alist += "'" + com.get(j).getSite().getLocationid() + "'";
-			if (j + 1 == com.size())
-				break;
-			alist += ",";
-			// System.out.println(j);
-		}
-
-		// System.out.println("inlist ="+inlist);
-		// System.out.println("alist = "+alist);
-
-		// getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and
-		// ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
-		// + " where pr.projectid = '" + cprojectid + ")'");
-
-		if (lzs.isEmpty() && com.isEmpty()) /* No existing Sites/LZS in this project */
-		{
-			//System.out.println("In setbasecondition 1");
-			addWarning("No Livelihood Zones or Sites for current Project");
-			getTab().setBaseCondition("${locationid} = '" + locid + "'");
-		} else if (com.isEmpty()) /* No previously used sites in this project - show all sites from this proj */
-		{
-			// System.out.println("In setbasecondition 2");
-			getTab().setBaseCondition(
-					"${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist + ")");
-			// getTab().setBaseCondition("${locationid} != '" + locid);
-		} else /* Show all relevant sites */
-		{
-			// System.out.println("In setbasecondition 3");
-			getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${livelihoodZone.lzid} in (" + inlist
-					+ ")" + "and ${locationid} not in ( " + alist + ")");
-			// getTab().setBaseCondition("${locationid} != '" + locid);
-			System.out.println("In setbasecondition 4");
-		}
-
 	}
 }

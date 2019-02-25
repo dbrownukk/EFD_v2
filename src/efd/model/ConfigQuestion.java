@@ -13,11 +13,11 @@ import efd.model.HouseholdMember.*;
 import efd.validations.*;
 
 
-//@Views({@View(members = "prompt, answerType,hint,gender;level;ageRangeLower,ageRangeUpper,notes"),
-//		@View(name = "FromTopic", members="Question[#prompt, answerType,hint;gender,level,ageRangeLower,ageRangeUpper]")})
 
-@View(members="Question[topic,prompt,answerType,hint,gender;level,notes;Ranges[#ageRangeLower,ageRangeUpper;"
-		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]")
+@Views({@View(members="Question[#topic,prompt,hint,gender;level,answerType,notes,questionLOV;Ranges[#ageRangeLower,ageRangeUpper;"
+		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]")//,
+//	@View(name="FromQuestionUse",members="Question[topic,prompt,answerType,hint,level]")
+})
 
 @Tab(properties="prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper")
 
@@ -25,14 +25,20 @@ import efd.validations.*;
 
 public class ConfigQuestion extends EFDIdentifiable {
 
+	
+	
+	
 	@Required
 	@Column(length = 50, nullable = false)
 	private String prompt;
 	/*************************************************************************************************/
 
 	@Column(nullable = false)
+	@OnChange(value = OnChangeAnswerType.class)
 	private AnswerType answerType;
 
+	
+	
 	public enum AnswerType {
 		Text, Decimal, Integer, LOV, IntegerRange, DecimalRange
 	}
@@ -56,8 +62,7 @@ public class ConfigQuestion extends EFDIdentifiable {
 	/*************************************************************************************************/
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = false)
-	@Required
+			optional = true)
 	@NoFrame
 	@DescriptionsList(descriptionProperties = "topic")
 	private ReusableConfigTopic topic;
@@ -87,13 +92,30 @@ public class ConfigQuestion extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "configQuestion")
 	@ListProperties("study.studyName, level")
-	//@CollectionView("FromConfigQuestion")
 	private Collection<ConfigQuestionUse> configQuestionUse;
 	
 	/*************************************************************************************************/
+	@OneToMany(mappedBy = "configQuestion")
+	
+	//@ElementCollection
+	//@ListProperties("study.studyName, level")
 
+	private Collection<QuestionLOV> questionLOV;
+	/*************************************************************************************************/
+
+	
+	
+	
+	
+	
 	public String getPrompt() {
 		return prompt;
+	}
+	public Collection<QuestionLOV> getQuestionLOV() {
+		return questionLOV;
+	}
+	public void setQuestionLOV(Collection<QuestionLOV> questionLOV) {
+		this.questionLOV = questionLOV;
 	}
 	public void setPrompt(String prompt) {
 		this.prompt = prompt;
@@ -103,49 +125,6 @@ public class ConfigQuestion extends EFDIdentifiable {
 	}
 	public void setAnswerType(AnswerType answerType) {
 		this.answerType = answerType;
-	}
-	public String getHint() {
-		return hint;
-	}
-	public void setHint(String hint) {
-		this.hint = hint;
-	}
-	public ReusableConfigTopic getTopic() {
-		return topic;
-	}
-	public void setTopic(ReusableConfigTopic topic) {
-		this.topic = topic;
-	}
-	public Level getLevel() {
-		return level;
-	}
-	public void setLevel(Level level) {
-		this.level = level;
-	}
-
-	public Integer getAgeRangeLower() {
-		return ageRangeLower;
-	}
-	public void setAgeRangeLower(Integer ageRangeLower) {
-		this.ageRangeLower = ageRangeLower;
-	}
-	public Integer getAgeRangeUpper() {
-		return ageRangeUpper;
-	}
-	public void setAgeRangeUpper(Integer ageRangeUpper) {
-		this.ageRangeUpper = ageRangeUpper;
-	}
-	public Collection<ConfigQuestionUse> getConfigQuestionUse() {
-		return configQuestionUse;
-	}
-	public void setConfigQuestionUse(Collection<ConfigQuestionUse> configQuestionUse) {
-		this.configQuestionUse = configQuestionUse;
-	}
-	public SexQ getGender() {
-		return gender;
-	}
-	public void setGender(SexQ gender) {
-		this.gender = gender;
 	}
 	public Integer getIntRangeLower() {
 		return intRangeLower;
@@ -171,6 +150,52 @@ public class ConfigQuestion extends EFDIdentifiable {
 	public void setDecRangeUpper(Double decRangeUpper) {
 		this.decRangeUpper = decRangeUpper;
 	}
+	public String getHint() {
+		return hint;
+	}
+	public void setHint(String hint) {
+		this.hint = hint;
+	}
+	public ReusableConfigTopic getTopic() {
+		return topic;
+	}
+	public void setTopic(ReusableConfigTopic topic) {
+		this.topic = topic;
+	}
+	public Level getLevel() {
+		return level;
+	}
+	public void setLevel(Level level) {
+		this.level = level;
+	}
+	public SexQ getGender() {
+		return gender;
+	}
+	public void setGender(SexQ gender) {
+		this.gender = gender;
+	}
+	public Integer getAgeRangeLower() {
+		return ageRangeLower;
+	}
+	public void setAgeRangeLower(Integer ageRangeLower) {
+		this.ageRangeLower = ageRangeLower;
+	}
+	public Integer getAgeRangeUpper() {
+		return ageRangeUpper;
+	}
+	public void setAgeRangeUpper(Integer ageRangeUpper) {
+		this.ageRangeUpper = ageRangeUpper;
+	}
+	public Collection<ConfigQuestionUse> getConfigQuestionUse() {
+		return configQuestionUse;
+	}
+	public void setConfigQuestionUse(Collection<ConfigQuestionUse> configQuestionUse) {
+		this.configQuestionUse = configQuestionUse;
+	}
+	
+	/*************************************************************************************************/
+
+	
 
 	
 	/*************************************************************************************************/

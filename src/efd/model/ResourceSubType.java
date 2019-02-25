@@ -4,6 +4,8 @@ import com.openxava.naviox.model.*;
 
 import efd.validations.*;
 
+import java.util.*;
+
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -15,7 +17,8 @@ import org.openxava.util.*;
 
 @Entity
 
-@Views({ @View(members = "resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym"),
+@Views({ @View(members = "resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym,category"),
+	@View(name = "FromCategory", members = "resourcetype,resourcetypename,resourcesubtypeunit;resourcesubtypekcal,resourcesubtypesynonym"),
 		@View(name = "SimpleSubtype", members = "resourcetypename") })
 
 @Tab(properties = "resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
@@ -86,6 +89,22 @@ public class ResourceSubType {
 	@OnChange(value = OnChangeRSTkcal.class)
 	@Column(name = "ResourceSubTypeKCal")
 	private int resourcesubtypekcal;
+
+	@ManyToMany(mappedBy = "resourceSubType")
+	private Collection<Category> category;
+	
+	
+	
+	
+	
+	
+	public Collection<Category> getCategory() {
+		return category;
+	}
+
+	public void setCategory(Collection<Category> category) {
+		this.category = category;
+	}
 
 	public ResourceType getResourcetype() {
 		return resourcetype;

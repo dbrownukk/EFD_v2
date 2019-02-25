@@ -3,24 +3,36 @@
 <!DOCTYPE controllers SYSTEM "dtds/controllers.dtd">
 
 <controllers>
-
+	<env-var name="XAVA_SEARCH_ACTION"
+		value="CRUD.searchExecutingOnChange" />
 
 	<object name="activesectionchar" class="java.lang.String"
 		value="Crops" scope="global" />
-	<object name="EFD_v2_sessionTab" class="java.lang.String"
+	<object name="sessionTab" class="java.lang.String"
 		value="Employment" scope="global" />
+	<object name="efdModel" class="java.lang.String" value="OIHM"
+		scope="global" />
 
 
-	<controller name="EFD_v2">
+	<controller name="EFD_HM">
 		<extends controller="TypicalNotResetOnSave" />
+
 	</controller>
-	<!-- <controller name="EFD_v2"> <extends controller="Typical" /> </controller> -->
 
 
-	<!-- <controller name="Project"> <extends controller="Typical"/> <action 
-		name="save" mode="detail" class="org.openxava.actions.SaveAction" by-default="if-possible" 
-		image="save.gif" icon="content-save" keystroke="Control S"> <set property="resetAfter" 
-		value="false"/> </action> </controller> -->
+	<controller name="Study">
+		<extends controller="EFD_HM" />
+		<action name="Template Spreadsheet" mode="detail"
+			image="excel.gif" icon="file-excel"
+			class="efd.actions.CreateXlsFileActionOIHM" />
+		<action name="newSiteFromStudy" hidden="true" mode="detail"
+			class="efd.actions.NewSiteFromStudy">
+			<action name="init" on-init="true" hidden="true"
+				class="efd.actions.SetEfdOIHMModel" />
+
+		</action>
+	</controller>
+
 	<controller name="Spreadsheet">
 		<extends controller="TypicalRealExcel" />
 		<action name="Template Spreadsheet" mode="detail"
@@ -32,9 +44,8 @@
 		<action name="Parse Spreadsheet"
 			label="Parse Interview Spreadsheet 2" icon="file-excel" mode="detail"
 			in-each-row="false" class="efd.actions.ParseXLSFile2" />
-		<action name="Validate" label="Validate"
-			icon="marker-check" mode="detail" in-each-row="false"
-			class="efd.actions.ValidateWGI" />
+		<action name="Validate" label="Validate" icon="marker-check"
+			mode="detail" in-each-row="false" class="efd.actions.ValidateWGI" />
 	</controller>
 
 	<controller name="ChartList">
@@ -43,8 +54,8 @@
 
 	<controller name="Charts">
 		<action name="Assets" label="Asset Chart" mode="detail"
-			icon="view-list" class="efd.reports.AssetChart">
-		</action>
+			icon="view-list" class="efd.reports.AssetChart" />
+
 		<action name="Assets(Normalised)"
 			label="Asset Chart (Normalised)" mode="detail" icon="view-list"
 			class="efd.reports.AssetChartNormalised" />
@@ -79,48 +90,59 @@
 
 	<controller name="Reports">
 		<action name="WealthgroupIncome" label="WealthgroupIncome"
-			mode="detail" icon="view-list" takes-long="true" class="efd.reports.CashIncomeReport"
-			image="excel.gif" />
-					<action name="WealthgroupIncomeWithPurchases" label="WealthgroupIncomeWithPurchases"
-			mode="detail" icon="view-list" takes-long="true" class="efd.reports.CashIncomeReportWithPurchases"
+			mode="detail" icon="view-list" takes-long="true"
+			class="efd.reports.CashIncomeReport" image="excel.gif" />
+		<action name="WealthgroupIncomeWithPurchases"
+			label="WealthgroupIncomeWithPurchases" mode="detail" icon="view-list"
+			takes-long="true" class="efd.reports.CashIncomeReportWithPurchases"
 			image="excel.gif" />
 	</controller>
 
 
 	<controller name="ProjectReports">
-		<extends controller="EFD_v2" />
+		<extends controller="EFD_HM" />
 		<action name="ProjectExcel" label="ProjectExcel" icon="excel"
 			class="efd.reports.ProjectExcel" image="excel.gif" mode="detail" />
 	</controller>
 
 	<controller name="RemoteDatabaseDump">
-		<action name="DatabaseExport" label="DatabaseExport" icon="database"
-			class="efd.actions.RemoteMysqlDump"  />
+		<action name="DatabaseExport" label="DatabaseExport"
+			icon="database" class="efd.actions.RemoteMysqlDump" />
 	</controller>
-	
+
 	<controller name="LoadRemoteToStage">
-		<action name="LoadRemoteToStage" label="DatabaseStageImport" icon="database" confirm="true"
-			class="efd.actions.LoadRemoteToStage"   />
+		<action name="LoadRemoteToStage" label="DatabaseStageImport"
+			icon="database" confirm="true" class="efd.actions.LoadRemoteToStage" />
 	</controller>
-	
-	
+
+
 	<controller name="MergeProject">
-		<action name="MergeProject" label="MergeProject" icon="database" mode="detail"
-			class="efd.actions.MergeProject"   />
+		<action name="MergeProject" label="MergeProject"
+			icon="database" mode="detail" class="efd.actions.MergeProject" />
 	</controller>
-	
-	
+
+
 
 	<controller name="LivelihoodZone">
-		<extends controller="EFD_v2" />
+		<extends controller="EFD_HM" />
 		<action name="filteredsearch" hidden="true" image="search.gif"
 			class="efd.actions.FilteredLZ" />
 		<action name="add" hidden="true" icon="table-row-plus-after"
-			class="efd.actions.AddLZ" />
+			class="efd.actions.AddLZ">
+			<!-- <set property="resetAfter" value="false"/> -->
+		</action>
 	</controller>
 
 
-	<!-- <extends controller="EFD_v2"/> <action name="new LZ" image="new.gif" 
+
+
+	<controller name="CharacteristicsResource">
+		<action name="edit" hidden="false" icon="pencil"
+			class="efd.actions.CharacteristicsResourceEdit" />
+	</controller>
+
+
+	<!-- <extends controller="EFD_HM"/> <action name="new LZ" image="new.gif" 
 		hidden="true" icon="library-plus" class="efd.actions.NewLZ"/> <action name="add 
 		LZ" hidden="true" icon="table-row-plus-after" class="efd.actions.AddLZ"/> 
 		<action name="filteredsearch" hidden="true" image="search.gif" class="efd.actions.FilteredLZ"/> 
@@ -128,15 +150,23 @@
 
 
 	<controller name="Community">
-		<extends controller="EFD_v2" />
+		<extends controller="EFD_HM" />
 		<action name="filteredSitesearch" hidden="true"
 			image="search.gif" class="efd.actions.FilteredSite" />
+		<action name="init" on-init="true" hidden="true"
+			class="efd.actions.SetEfdOHEAModel" />
+
+
 	</controller>
 
-	<!-- <controller name="Sections"> <action name="change" hidden="true" class="efd.actions.AssetChangeSectionAction" 
-		keystroke="Control 1..9" /> </controller> <controller name="Sections"> <action 
-		name="change" hidden="true" class="efd.actions.ResourceSubTypeFilter" keystroke="Control 
-		1..9" /> </controller> -->
+
+
+	<controller name="Sections">
+		<action name="change" hidden="true"
+			class="efd.actions.AssetChangeSectionAction" keystroke="Control 1..9" />
+	</controller>
+	<!-- <controller name="Sections"> <action name="change" hidden="true" class="efd.actions.ResourceSubTypeFilter" 
+		keystroke="Control 1..9" /> </controller> -->
 
 
 
@@ -154,35 +184,58 @@
 
 
 	<controller name="UploadFile">
-		<action name="uploadFile" 
-			class="efd.actions.WgiUploadFileAction"  />
+		<action name="uploadFile"
+			class="efd.actions.WgiUploadFileAction" />
 		<action name="cancel" class="org.openxava.actions.CancelAction" />
 	</controller>
 
-	<controller name="AttachedFiles"> 
-		<action name="add" class="org.openxava.actions.AddFileToFilesetAction" 
-			icon="attachment" image="attach.gif" takes_long="true"/>
-		<action name="remove" class="org.openxava.actions.RemoveFileFromFilesetAction" 
-			icon="delete" image="delete.gif" confirm="true" />	
+	<controller name="AttachedFiles">
+		<action name="add"
+			class="org.openxava.actions.AddFileToFilesetAction" icon="attachment"
+			image="attach.gif" takes_long="true" />
+		<action name="remove"
+			class="org.openxava.actions.RemoveFileFromFilesetAction"
+			icon="delete" image="delete.gif" confirm="true" />
 	</controller>
 
 
 	<controller name="SetReadOnly">
 		<action name="readOnly" class="efd.actions.SetWGIReadOnly"
-			hidden="true" mode="detail" >
-		</action>
+			hidden="true" mode="detail" />
+
 	</controller>
 
 	<controller name="SetEditable">
 		<action name="SetEditable" class="efd.actions.SetWGIEditable"
-			hidden="true" mode="detail" icon="pencil">
-		</action>
+			hidden="true" mode="detail" icon="pencil" />
+
 	</controller>
-		<controller name="ShowButton">
+	<controller name="ShowButton">
 		<action name="ShowButton" class="efd.actions.ShowWGIEditButton"
-			hidden="true" mode="detail" >
+			hidden="true" mode="detail" />
+
+	</controller>
+
+	<controller name="ConfigQuestionUse">
+		<extends controller="EFD_HM" />
+
+		<action name="afterquery" after-each-request="true" hidden="true"
+			mode="detail" class="efd.validations.InitQuestionUseAnswerType">
 		</action>
 	</controller>
+
+
+
+	<controller name="ConfigQuestion">
+		<extends controller="EFD_HM" />
+		<!-- <action name="afterquery" after-each-request="true" hidden="true" 
+			mode="detail" class="efd.validations.InitQuestionAnswerType"> </action> -->
+
+
+	</controller>
+
+
+
 
 
 

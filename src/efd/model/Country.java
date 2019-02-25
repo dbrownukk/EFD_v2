@@ -1,5 +1,7 @@
 package efd.model;
 
+import java.util.*;
+
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
@@ -49,6 +51,11 @@ public class Country {
 	@Column(name="Currency",length=3, nullable=false)
 	@Required
 	private String currency;
+	
+	
+	@OneToMany(mappedBy="country")
+	private Collection<Site> site;
+	
 	
 	@Column(name="CurrencySymbol",length=1)
 	private String currencySymbol;
