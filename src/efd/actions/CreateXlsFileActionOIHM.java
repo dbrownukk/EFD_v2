@@ -1,5 +1,7 @@
 package efd.actions;
 
+import java.math.*;
+
 /* Write XLS template for OIHM Study */
 
 import java.util.*;
@@ -37,6 +39,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	int numwidth = 15;
 	int numRows = 30;
 	List chrs = null;
+	int validationRowCount = 100;
 	String rt;
 	String resub;
 	String rtunit;
@@ -47,6 +50,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 	private int row;
 	private String forwardURI = null;
+
+	// Sheet sheet = null;
 
 	public void execute() throws Exception {
 
@@ -288,7 +293,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		/* Interview Validations */
 
 		addDateValidation(workbook, sheet, interviewSheet, 7, 7, 2, 2, datestyle);
-		addDateValidation(workbook, sheet, interviewSheet, 3, 3, 6, 6, datestyle);
+		addDateValidation(workbook, sheet, interviewSheet, 5, 5, 4, 4, datestyle);
 
 		/* HH Validations */
 
@@ -300,33 +305,86 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		for (i = 0; i < configQuestionUseHHC.size(); i++) {
 			System.out.println(
 					"hh question data type = " + configQuestionUseHHC.get(i).getConfigQuestion().getAnswerType());
+
 			answerType = configQuestionUseHHC.get(i).getConfigQuestion().getAnswerType();
 
 			if (answerType.equals(ConfigQuestion.AnswerType.Integer)) {
-				addNumberValidation(workbook, sheet, hhcSheet, i + 2, i + 2, 2, 10, style);
+				addIntegerValidation(workbook, sheet, hhcSheet, i + 2, i + 2, 2, 2, style);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.Decimal)) {
+				addNumberValidation(workbook, sheet, hhcSheet, i + 2, i + 2, 2, 2, style);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.IntegerRange)) {
+				Integer intRangeLower = configQuestionUseHHC.get(i).getConfigQuestion().getIntRangeLower();
+				Integer intRangeUpper = configQuestionUseHHC.get(i).getConfigQuestion().getIntRangeUpper();
+				addIntegerRangeValidation(workbook, sheet, hhcSheet, i + 2, i + 2, 2, 2, style, intRangeLower,
+						intRangeUpper);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.DecimalRange)) {
+				Double decRangeLower = configQuestionUseHHC.get(i).getConfigQuestion().getDecRangeLower();
+				Double decRangeUpper = configQuestionUseHHC.get(i).getConfigQuestion().getDecRangeUpper();
+				addDecimalRangeValidation(workbook, sheet, hhcSheet, i + 2, i + 2, 2, 2, style, decRangeLower,
+						decRangeUpper);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.LOV)) {
+				System.out.println("about to do  LOV question build = ");
+				String questionId = configQuestionUseHHC.get(i).getConfigQuestion().getId();
+				System.out.println("about to do LOV questionID = " + questionId);
+				addQuestionLOVValidation(workbook, sheet, hhcSheet, i + 2, i + 2, 2, 2, style, questionId);
+				System.out.println("done LOV question build = ");
 			}
+
 		}
 		/*
 		 * HH Member Validations
 		 * 
 		 * Note that addLov is firstRow, numrows not firstRow LastRow....
 		 */
-		
-		int numMembers = 20;
-		 
-		hhmSheet.setDefaultColumnWidth(40);
-		addLOV(sheet, hhmSheet, 4, 5, 1, numMembers, "Sex");
-		
-		// Age and Year of Birth Integers
-		addNumberValidation(workbook, sheet, hhmSheet, 5, 6, 1, numMembers, style);
-		// Head of Household
-		addLOV(sheet, hhmSheet, 7, 8, 1, numMembers, "YesNo");
-		
-		// Period away in Months
-		addNumberValidation(workbook, sheet, hhmSheet, 8, 9, 1, numMembers, style);
-		
-		
 
+		int numMembers = 20;
+
+		//hhmSheet.setDefaultColumnWidth(40);
+		addLOV(sheet, hhmSheet, 4, 5, 2, numMembers, "Sex");
+
+		// Age and Year of Birth Integers
+		addNumberValidation(workbook, sheet, hhmSheet, 5, 6, 2, numMembers, style);
+		// Head of Household
+		addLOV(sheet, hhmSheet, 7, 8, 2, numMembers, "YesNo");
+
+		// Period away in Months
+		addNumberValidation(workbook, sheet, hhmSheet, 8, 9, 2, numMembers, style);
+
+		// Answer Validation
+		int qStartRow=9;
+		for (i = 0; i < configQuestionUseHHM.size(); i++) {
+			System.out.println(
+					"hhm question data type = " + configQuestionUseHHM.get(i).getConfigQuestion().getAnswerType());
+
+			answerType = configQuestionUseHHM.get(i).getConfigQuestion().getAnswerType();
+
+			if (answerType.equals(ConfigQuestion.AnswerType.Integer)) {
+				addIntegerValidation(workbook, sheet, hhmSheet, i + qStartRow, i + qStartRow, 2, numMembers+2, style);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.Decimal)) {
+				addNumberValidation(workbook, sheet, hhmSheet, i + qStartRow, i + qStartRow, 2, numMembers+2, style);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.IntegerRange)) {
+				Integer intRangeLower = configQuestionUseHHM.get(i).getConfigQuestion().getIntRangeLower();
+				Integer intRangeUpper = configQuestionUseHHM.get(i).getConfigQuestion().getIntRangeUpper();
+				addIntegerRangeValidation(workbook, sheet, hhmSheet, i + qStartRow, i + qStartRow, 2, numMembers+2, style, intRangeLower,
+						intRangeUpper);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.DecimalRange)) {
+				Double decRangeLower = configQuestionUseHHM.get(i).getConfigQuestion().getDecRangeLower();
+				Double decRangeUpper = configQuestionUseHHM.get(i).getConfigQuestion().getDecRangeUpper();
+				addDecimalRangeValidation(workbook, sheet, hhmSheet, i + qStartRow, i + qStartRow, 2, numMembers+2, style, decRangeLower,
+						decRangeUpper);
+			} else if (answerType.equals(ConfigQuestion.AnswerType.LOV)) {
+				System.out.println("about to do HHM LOV question build = ");
+				String questionId = configQuestionUseHHM.get(i).getConfigQuestion().getId();
+				System.out.println("about to do HHM LOV questionID = " + questionId);
+				addQuestionLOVValidation(workbook, sheet, hhmSheet, i + qStartRow, i + qStartRow, 2, numMembers+2, style, questionId);
+				System.out.println("done HHM LOV question build = ");
+			}
+
+		}
+		
+		
+		
+		
 		/* Asset Land Type */
 
 		addLOV(sheet, landSheet, 3, numRows - 1, 1, 1, "Land");
@@ -335,6 +393,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		addNumberValidation(workbook, sheet, landSheet, 3, numRows, 3, 3, style);
 
+	
 		/* Assets - Livestock Type */
 
 		addLOV(sheet, lsSheet, 3, numRows - 1, 1, 1, "Livestock");
@@ -455,6 +514,60 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	/**************************************************************************************************************************************************/
 	/* Validations */
 	/**************************************************************************************************************************************************/
+	private void addIntegerRangeValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
+			int firstCol, int lastCol, CellStyle style, Integer intRangeLower, Integer intRangeUpper) {
+
+		CellRangeAddressList addressList = null;
+
+		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
+
+		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
+
+		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
+				DVConstraint.ValidationType.INTEGER, DVConstraint.OperatorType.BETWEEN, intRangeLower.toString(),
+				intRangeUpper.toString());
+
+		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+		validation.createErrorBox("", "Enter an Integer between " + intRangeLower + " and " + intRangeUpper);
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(true);
+		iSheet.addValidationData(validation);
+
+		/*
+		 * the above sets the validation but need to set the cell format to be Number
+		 */
+
+	}
+
+	/**************************************************************************************************************************************************/
+	private void addDecimalRangeValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
+			int firstCol, int lastCol, CellStyle style, Double decRangeLower, Double decRangeUpper) {
+
+		CellRangeAddressList addressList = null;
+
+		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
+
+		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
+
+		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
+				DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, decRangeLower.toString(),
+				decRangeUpper.toString());
+
+		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+		validation.createErrorBox("", "Enter a Decimal between " + decRangeLower + " and " + decRangeUpper);
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(true);
+		iSheet.addValidationData(validation);
+
+		/*
+		 * the above sets the validation but need to set the cell format to be Number
+		 */
+
+	}
+
+	/**************************************************************************************************************************************************/
 
 	private void addNumberValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
 			int firstCol, int lastCol, CellStyle style) {
@@ -515,6 +628,98 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	}
 
 	/**************************************************************************************************************************************************/
+	/*
+	 * Create list of values on validation Page Get question Create LOV Add
+	 * validation to the question answer
+	 */
+
+	private void addQuestionLOVValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
+			int firstCol, int lastCol, CellStyle style, String questionID) {
+
+		Cell cell = null;
+		Name name = null;
+		CellRangeAddressList addressList = null;
+		int questionCount = 0;
+		
+		
+		
+		Row questionRow = vsheet.createRow(validationRowCount);
+		
+
+		System.out.println("in configQuestion LOV. QID = " + questionID);
+
+		List<QuestionLOV> questionLOVs = XPersistence.getManager()
+				.createQuery("from QuestionLOV where configQuestion_ID  = '" + questionID + "')").getResultList();
+		// Get LOV Values for Question and add to Validations sheet
+		for (int k = 0; k < questionLOVs.size(); k++) {
+			cell = questionRow.createCell(questionCount);
+			cell.setCellValue(questionLOVs.get(k).getLovValue());
+			questionCount++;
+			System.out.println("configQuestion LOV = " + questionCount + " " + cell.getStringCellValue());
+		}
+
+		// Name the Range
+
+		String questioncol = getCharForNumber(questionCount); // Convert for drop list creation
+		name = vsheet.getWorkbook().createName();
+		validationRowCount++;
+		
+		System.out.println("validation range in LOV = "+"!$A$" + validationRowCount + ":$" + questioncol + "$" + validationRowCount);
+		name.setRefersToFormula(
+				"Validations" + "!$A$" + validationRowCount + ":$" + questioncol + "$" + validationRowCount);
+		
+		System.out.println("Name info = "+name.getNameName()+" "+name.getRefersToFormula()+" "+name.getSheetIndex()+" "+name.getSheetName());
+		
+		
+		String rangeName = "q" + questionID.toString();
+		name.setNameName(rangeName);
+		
+
+		// add validation to the question answer
+
+		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
+		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
+		DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint(rangeName);
+		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(false); // Allows for other values - combo style
+		iSheet.addValidationData(validation);
+
+		validationRowCount++;
+		
+	}
+
+	/**************************************************************************************************************************************************/
+	private void addIntegerValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
+			int firstCol, int lastCol, CellStyle style) {
+
+		Row row = null;
+		Cell cell = null;
+
+		CellRangeAddressList addressList = null;
+		int i = 0;
+
+		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
+
+		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
+
+		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
+				DVConstraint.ValidationType.INTEGER, DVConstraint.OperatorType.BETWEEN, "0", "1000000");
+
+		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+		validation.createErrorBox("", "Enter an Integer only");
+		validation.setEmptyCellAllowed(true);
+		validation.setShowErrorBox(true);
+		iSheet.addValidationData(validation);
+
+		/*
+		 * the above sets the validation but need to set the cell format to be Number
+		 */
+
+	}
+
+	/**************************************************************************************************************************************************/
 
 	private void addDateValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
 			int firstCol, int lastCol, CellStyle style) {
@@ -542,6 +747,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	 * 
 	 */
 	{
+
+		// System.out.println("in LOV "+firstRow+" "+lastRow+" "+firstCol+" "+lastCol+"
+		// "+rType);
+
 		CellRangeAddressList addressList = null;
 		for (int l = 3; l < lastRow; l++) {
 			// System.out.println("LOV = "+rType);
@@ -606,7 +815,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		/* for HH */
 		Row sexRow = dataSheet.createRow(sexRowNum);
 		Row yesNoRow = dataSheet.createRow(yesNoRowNum);
-		
 
 		System.out.println("Section 1");
 
@@ -845,7 +1053,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		/* Yes or No */
 
-		
 		List<ReferenceCode> referenceCodeYesNo = XPersistence.getManager()
 				.createQuery("from ReferenceCode where ReferenceType = 'YesNo')").getResultList();
 		for (int k = 0; k < referenceCodeYesNo.size(); k++) {
@@ -864,8 +1071,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		name.setRefersToFormula("Validations" + "!$A$" + yesNoRowNum + ":$" + yesNocol + "$" + yesNoRowNum);
 
 		name.setNameName("YesNo");
-		
-		
+
 		/* Transfer Style */
 
 		List<ReferenceCode> referenceTStyle = XPersistence.getManager()
@@ -942,44 +1148,38 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	}
 
 	/**************************************************************************************************************************************************/
-	/* Validation for HH cels */
-	/**************************************************************************************************************************************************/
-	private void buildValidationsHH(Sheet sheet1) {
-	}
-
-	/**************************************************************************************************************************************************/
 	/* Print Each Sheet */
 	/**************************************************************************************************************************************************/
 	private void printInterview(JxlsSheet sheet, Project project, Study study, Site site) {
 
 		int j = 2;
 		System.out.println("in printInterview");
-		sheet.setColumnWidths(2, 40, width, width, width, width, numwidth); /* set col widths */
+		sheet.setColumnWidths(2, 40, width, width, width, width, width); /* set col widths */
 
 		sheet.setValue(2, 2, "IHM Household Interview - Interview Summary", boldRStyle);
 
-		sheet.setValue(2, 4, "Study Name: ", textStyle);
-		sheet.setValue(3, 4, study.getStudyName(), borderStyle);
+		sheet.setValue(2, 4, "Project Name: ", textStyle); // Study or Project??
+		sheet.setValue(3, 4, project.getProjecttitle(), borderStyle);
 
-		sheet.setValue(2, 6, "Household Number: ", textStyle);
-		sheet.setValue(3, 6, "", borderStyle);
+		// sheet.setValue(2, 6, "Household Number: ", textStyle);
+		// sheet.setValue(3, 6, "", borderStyle);
 
-		sheet.setValue(2, 8, "Interview Date: ", textStyle);
-		sheet.setValue(3, 8, "", borderStyle);
+		sheet.setValue(4, 6, "Interview Date: ", textStyle);
+		sheet.setValue(5, 6, "", borderStyle);
 
 		sheet.setValue(4, 4, "Site: ", textStyle);
 		System.out.println("in printInterview 1");
 
 		if (site != null)
-			sheet.setValue(5, 4, site.getLocationdistrict(), borderStyle);
+			sheet.setValue(5, 4, study.getSite().getLocationdistrict(), borderStyle);
 		else
 			sheet.setValue(5, 4, "", borderStyle);
 
-		sheet.setValue(4, 6, "Household Name: ", textStyle);
-		sheet.setValue(5, 6, "", borderStyle);
+		sheet.setValue(2, 6, "Household Name: ", textStyle);
+		sheet.setValue(3, 6, "", borderStyle);
 
-		sheet.setValue(4, 8, "Interviewers:", textStyle);
-		sheet.setValue(5, 8, "", borderStyle);
+		sheet.setValue(6, 6, "Interviewers:", textStyle);
+		sheet.setValue(7, 6, "", borderStyle);
 
 		System.out.println("in printInterview 2");
 
@@ -987,8 +1187,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		sheet.setValue(7, 4, study.getStartDate(), dateStyle);
 
-		sheet.setValue(6, 8, "Type of Year: ", textStyle);
-		sheet.setValue(7, 8, "", borderStyle);
+		// sheet.setValue(6, 8, "Type of Year: ", textStyle);
+		// sheet.setValue(7, 8, "", borderStyle);
 
 	}
 
@@ -1014,7 +1214,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(2, i + 3, configQuestionUseHHC.get(i).getConfigQuestion().getPrompt(), textStyle);
 			System.out.println(
 					"hh question data type = " + configQuestionUseHHC.get(i).getConfigQuestion().getAnswerType());
-
+			AnswerType answerType = configQuestionUseHHC.get(i).getConfigQuestion().getAnswerType();
+			// SetAnswerTypeValidation(sheet, 3,i+3,answerType) ; //col,row,type
 		}
 
 	}
@@ -1023,23 +1224,32 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	private void printHHMembers(JxlsSheet sheet) {
 
 		int i = 0;
+		int k = 0;
 
+		sheet.setColumnWidths(2, width, width, width, width, width, width,width, width, width, width,
+				width, width, width, width, width, width,width, width, width, width, width, width);
+		
 		sheet.setValue(2, 2, "Household Members", boldRStyle);
-		System.out.println("in print hhmembers done colwidth ");
+		for (i=3;i<=22;i++)
+		{
+			k = i - 2;
+			sheet.setValue(i, 3, "Member  "+k, boldRStyle);
+		}
+			
 
-		sheet.setColumnWidths(50, width, width, width, width, width, width);
-		sheet.setValue(1, 4, "Person Name/ID", boldRStyle);
-		sheet.setValue(1, 5, "Sex", boldRStyle);
-		sheet.setValue(1, 6, "Age", boldRStyle);
-		sheet.setValue(1, 7, "Year of Birth", boldRStyle);
-		sheet.setValue(1, 8, "Head of Household", boldRStyle);
-		sheet.setValue(1, 9, "Period Away in Months", boldRStyle);
+		
+		sheet.setValue(2, 4, "Person Name/ID", boldRStyle);
+		sheet.setValue(2, 5, "Sex", boldRStyle);
+		sheet.setValue(2, 6, "Age", boldRStyle);
+		sheet.setValue(2, 7, "Year of Birth", boldRStyle);
+		sheet.setValue(2, 8, "Head of Household", boldRStyle);
+		sheet.setValue(2, 9, "Period Away in Months", boldRStyle);
 
 		/*
 		 * need to get Config Questions and Answers for this Study ID where the usage
 		 * (ConfigQuestionUse) is at the Household Member level (2)
 		 */
-		sheet.setColumnWidths(50, width, width, width, width, width, width);
+		
 		configQuestionUseHHM = XPersistence.getManager()
 				.createQuery("from ConfigQuestionUse where study_ID = :studyid and level = '2'")
 				.setParameter("studyid", studyID).getResultList();
@@ -1050,7 +1260,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		for (i = 0; i < configQuestionUseHHM.size(); i++) {
 			System.out.println("hhm questions  =  " + configQuestionUseHHM.get(i).getConfigQuestion().getPrompt());
-			sheet.setValue(1, i + 10, configQuestionUseHHM.get(i).getConfigQuestion().getPrompt(), textStyle);
+			sheet.setValue(2, i + 10, configQuestionUseHHM.get(i).getConfigQuestion().getPrompt(), textStyle);
 		}
 
 		return;

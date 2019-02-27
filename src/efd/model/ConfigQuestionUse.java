@@ -11,7 +11,7 @@ import efd.model.ConfigQuestion.*;
 @Views({ @View(members = "QuestionUse[study;level;configQuestion]")})
 //		@View(name = "FromConfigQuestion", members = "QuestionUse[#study,level]") })
 
-@Tab(properties = "study.studyName,study.referenceYear,configQuestion.prompt")
+@Tab(properties = "study.studyName,study.referenceYear,configQuestion.level,configQuestion.prompt,configQuestion.answerType")
 
 @Entity
 
@@ -24,7 +24,7 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
 	@NoCreate
-	@NoModify
+	//@NoModify
 	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
 	private Study study;
 	/*************************************************************************************************/

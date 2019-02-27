@@ -1,5 +1,6 @@
 package efd.model;
 
+import java.math.*;
 import java.util.*;
 
 import javax.persistence.*;
@@ -7,9 +8,13 @@ import javax.validation.constraints.*;
 
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
+import org.openxava.util.*;
+
+import efd.model.ConfigQuestion.*;
 
 
 @View(members = "DefaultDietItem[#resourcesubtype;percentage,unitPrice]")
+
 @Tab(properties="resourcesubtype.resourcetypename;percentage,unitPrice")
 
 
@@ -17,6 +22,29 @@ import org.openxava.annotations.*;
 
 @Table(name = "DefaultDietItem")
 public class DefaultDietItem extends EFDIdentifiable {
+	
+	
+	/*
+	@PrePersist
+	@PreUpdate
+	private void validate() throws Exception{
+
+		if(1==1)
+		{
+			System.out.println("sum percentage = "+totalPercent);
+			throw new IllegalStateException(
+					
+							
+					XavaResources.getString(  
+							"hhm_needs_gender"));
+							
+					}
+					
+			
+		}
+	
+	*/
+	
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
@@ -44,6 +72,21 @@ public class DefaultDietItem extends EFDIdentifiable {
 	@Digits(integer = 10, fraction = 2)
 	private Double unitPrice;
 	/*************************************************************************************************/
+	
+	@Transient
+	//@Depends("percentage")
+	//@Calculation("sum(study.percentage)")
+	//@ReadOnly
+	private Integer totalPercent;
+	
+	
+
+	public Integer getTotalPercent() {
+		return totalPercent;
+	}
+	public void setTotalPercent(Integer totalPercent) {
+		this.totalPercent = totalPercent;
+	}
 	public ResourceSubType getResourcesubtype() {
 		return resourcesubtype;
 	}

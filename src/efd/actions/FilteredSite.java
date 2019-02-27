@@ -136,11 +136,18 @@ public class FilteredSite extends ReferenceSearchAction {
 		
 		if (efdModel == "OIHM") {
 			System.out.println("in oihm site filteredsite");
+			
 			String projectId = getView().getValue("projectlz.projectid").toString();
+			try {
 			Project project = XPersistence.getManager().find(Project.class, projectId);
+			}catch (Exception ex) {
+
+				// failed to find a project as there is no country - carry on with no COuntry 
+		   
+			}
+			
+			
 			System.out.println("done project query");
-			System.out.println("project country = "+project.getAltCurrency().getIsocountrycode());
-			System.out.println("project country = "+project.getAltCurrency().getIdcountry());
 			
 			super.execute();
 			//getTab().setBaseCondition("${country.isocountrycode} != '"+project.getAltCurrency().getIsocountrycode().toString()+"'");

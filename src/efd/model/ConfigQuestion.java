@@ -19,7 +19,7 @@ import efd.validations.*;
 //	@View(name="FromQuestionUse",members="Question[topic,prompt,answerType,hint,level]")
 })
 
-@Tab(properties="prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper")
+//@Tab(properties="topic,prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper")
 
 @Entity
 

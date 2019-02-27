@@ -8,6 +8,10 @@ import org.openxava.annotations.*;
 import org.openxava.model.*;
 
 @View(members = "Category[#categoryName,study,resourceSubType]")
+@Tab(properties = "categoryName, study.studyName")
+
+
+
 
 @Entity
 
@@ -22,6 +26,9 @@ public class Category extends Identifiable {
 	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
 	@NoFrame
 	private Study study;
+	
+	
+	
 	/*************************************************************************************************/
 	@ManyToMany
 	//@NewAction("")

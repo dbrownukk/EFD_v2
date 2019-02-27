@@ -4,7 +4,11 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.hibernate.validator.constraints.*;
+import org.omg.CORBA.DynAnyPackage.*;
 import org.openxava.annotations.*;
+import org.openxava.util.*;
+
+import com.openxava.naviox.model.*;
 
 import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
@@ -22,6 +26,32 @@ import efd.model.HouseholdMember.*;
 
 public class StdOfLivingElement extends EFDIdentifiable{
 
+	
+	@PrePersist
+	@PreUpdate
+	private void validate() throws Exception{
+
+		if((level == Level.HouseholdMember) && gender == null)
+		{
+			System.out.println("HHM in validate HHM with no gender");
+			throw new IllegalStateException(
+					
+							
+					XavaResources.getString(  
+							"hhm_needs_gender"));
+							
+					}
+					
+			
+		}
+
+	
+	
+	
+	
+	
+	
+	
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	//@NoFrame
@@ -32,7 +62,10 @@ public class StdOfLivingElement extends EFDIdentifiable{
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
-	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename",
+	condition="${resourcetype.resourcetypename} = 'Non Food Purchase'")
+	
+	
 	private ResourceSubType resourcesubtype;
 	/*************************************************************************************************/
 	@Required
@@ -49,9 +82,18 @@ public class StdOfLivingElement extends EFDIdentifiable{
 	@Required
 	private Level level;
 	/*************************************************************************************************/
-	@Required
+	
 	@Editor("ValidValuesRadioButton")
-	private Sex gender;
+	private Gender gender;
+	
+	public enum Gender {
+		Male, Female, Both
+	}
+	
+	
+	
+	
+	
 	/*************************************************************************************************/
 	@Range(min=1,max=120)
 	private Integer ageRangeLower;
@@ -89,12 +131,7 @@ public class StdOfLivingElement extends EFDIdentifiable{
 	public void setLevel(Level level) {
 		this.level = level;
 	}
-	public Sex getGender() {
-		return gender;
-	}
-	public void setGender(Sex gender) {
-		this.gender = gender;
-	}
+
 	public Integer getAgeRangeLower() {
 		return ageRangeLower;
 	}
@@ -106,6 +143,12 @@ public class StdOfLivingElement extends EFDIdentifiable{
 	}
 	public void setAgeRangeUpper(Integer ageRangeUpper) {
 		this.ageRangeUpper = ageRangeUpper;
+	}
+	public Gender getGender() {
+		return gender;
+	}
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 	
