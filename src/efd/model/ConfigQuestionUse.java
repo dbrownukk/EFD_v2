@@ -5,10 +5,12 @@ import java.util.*;
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
+import org.openxava.util.*;
 
 import efd.model.ConfigQuestion.*;
+import efd.validations.*;
 
-@Views({ @View(members = "QuestionUse[study;level;configQuestion]")})
+@Views({ @View(members = "QuestionUse[study;configQuestion]")})
 //		@View(name = "FromConfigQuestion", members = "QuestionUse[#study,level]") })
 
 @Tab(properties = "study.studyName,study.referenceYear,configQuestion.level,configQuestion.prompt,configQuestion.answerType")
@@ -20,6 +22,28 @@ import efd.model.ConfigQuestion.*;
 
 
 public class ConfigQuestionUse extends EFDIdentifiable {
+	
+	/* Fails in Copy Study  - need to discuss use of Level in Study and Question Usages
+	@PrePersist
+	@PreUpdate
+	private void validate() throws Exception {
+		try {
+			System.out.println("in configQuestionUse update");
+			
+			setLevel(getConfigQuestion().getLevel());
+
+			
+
+		} catch (Exception ex) {
+			System.out.println("in jpa exception in configQuestion " + ex);
+			return;
+
+		}
+
+	}
+	*/
+	
+	
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
@@ -39,6 +63,8 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	@Column(nullable = false)
 	@Required
 	@Editor("ValidValuesRadioButton")
+	//@ReadOnly
+	@OnChange(value = OnChangeQuestionUseLevel.class)
 	private Level level;
 
 	/*************************************************************************************************/

@@ -7,6 +7,7 @@ import javax.validation.constraints.*;
 
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
+import org.openxava.util.*;
 
 import efd.model.Asset.*;
 import efd.model.HouseholdMember.*;
@@ -19,14 +20,14 @@ import efd.validations.*;
 //	@View(name="FromQuestionUse",members="Question[topic,prompt,answerType,hint,level]")
 })
 
-//@Tab(properties="topic,prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper")
+//@Tab(properties="topic,prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper",defaultOrder="${label} desc") 
 
 @Entity
 
 public class ConfigQuestion extends EFDIdentifiable {
 
-	
-	
+
+
 	
 	@Required
 	@Column(length = 50, nullable = false)
@@ -69,6 +70,7 @@ public class ConfigQuestion extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@Column(nullable = false)
 	@Required
+	@OnChange(value = OnChangeQuestionLevel.class)
 	//	@Editor("ValidValuesVerticalRadioButton")
 	private Level level;
 

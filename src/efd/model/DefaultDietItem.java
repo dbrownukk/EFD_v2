@@ -8,51 +8,38 @@ import javax.validation.constraints.*;
 
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 import org.openxava.util.*;
 
 import efd.model.ConfigQuestion.*;
 
+@View(members = "DefaultDietItem[resourcesubtype;percentage,unitPrice]")
 
-@View(members = "DefaultDietItem[#resourcesubtype;percentage,unitPrice]")
-
-@Tab(properties="resourcesubtype.resourcetypename;percentage,unitPrice")
-
+@Tab(properties = "resourcesubtype.resourcetypename;percentage,unitPrice")
 
 @Entity
 
 @Table(name = "DefaultDietItem")
 public class DefaultDietItem extends EFDIdentifiable {
-	
-	
-	/*
-	@PrePersist
-	@PreUpdate
-	private void validate() throws Exception{
 
-		if(1==1)
-		{
-			System.out.println("sum percentage = "+totalPercent);
+	
+	//@PrePersist
+	@PreUpdate
+	private void validate() throws Exception {
+		System.out.println("tot = " + study.getTotalDietPercentage());
+		if (study.getTotalDietPercentage() > 100) {
 			throw new IllegalStateException(
-					
-							
-					XavaResources.getString(  
-							"hhm_needs_gender"));
-							
-					}
-					
-			
+
+					XavaResources.getString("diet_greater_100"));
+
 		}
-	
-	*/
-	
+
+	}
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
-	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename",
-			condition="e.resourcetype.resourcetypename in ('Crops','Wild Foods','Livestock Products','Food Purchase','Food Stocks')")
-	
-	
-	
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename", condition = "e.resourcetype.resourcetypename in ('Crops','Wild Foods','Livestock Products','Food Purchase','Food Stocks')")
+
 	private ResourceSubType resourcesubtype;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -61,32 +48,20 @@ public class DefaultDietItem extends EFDIdentifiable {
 	@ReferenceView("FromStdOfLiving")
 	private Study study;
 	/*************************************************************************************************/
-	@Column(nullable=false)
+	@Column(nullable = false)
 	@Required
-	@Range(min=0,max=100)
+	@Range(min = 0, max = 100)
+	@DefaultValueCalculator(value = ZeroIntegerCalculator.class)
 	private Integer percentage;
 	/*************************************************************************************************/
-	@Stereotype("Money")
-	@Column(nullable=false)
+	//@Stereotype("Money")
+	@Column(nullable = false)
 	@Required
+	@DefaultValueCalculator(value = ZeroBigDecimalCalculator.class)
 	@Digits(integer = 10, fraction = 2)
-	private Double unitPrice;
-	/*************************************************************************************************/
-	
-	@Transient
-	//@Depends("percentage")
-	//@Calculation("sum(study.percentage)")
-	//@ReadOnly
-	private Integer totalPercent;
+	private BigDecimal unitPrice;
 	
 	
-
-	public Integer getTotalPercent() {
-		return totalPercent;
-	}
-	public void setTotalPercent(Integer totalPercent) {
-		this.totalPercent = totalPercent;
-	}
 	public ResourceSubType getResourcesubtype() {
 		return resourcesubtype;
 	}
@@ -105,13 +80,18 @@ public class DefaultDietItem extends EFDIdentifiable {
 	public void setPercentage(Integer percentage) {
 		this.percentage = percentage;
 	}
-	public Double getUnitPrice() {
+	public BigDecimal getUnitPrice() {
 		return unitPrice;
 	}
-	public void setUnitPrice(Double unitPrice) {
+	public void setUnitPrice(BigDecimal unitPrice) {
 		this.unitPrice = unitPrice;
 	}
 
+	/*************************************************************************************************/
+	
+	
+	
+	
 	
 	
 }

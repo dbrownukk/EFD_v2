@@ -11,13 +11,5 @@ public class CurrentTabCalculator implements ICalculator {
 		return null;
 	}
 	
-//	System.out.println("in tab calc 1");
-	
-	//public Object calculate() throws Exception {
-	//	System.out.println("in tab calc");
-	//	return "fred";
-	//}
-	
-	
 
 }

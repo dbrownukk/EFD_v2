@@ -43,12 +43,15 @@ public class CopyTopic extends ViewBaseAction {
 				configQuestionUse.setStudy(study);
 				configQuestionUse.setLevel(configQuestion.getLevel());
 				
+				configQuestionUse.setId(null);
+				
 				// exception is not caught - needs investigating
 				
 				try
 				{
 				XPersistence.getManager().persist(configQuestionUse);
-				
+				getView().refreshCollections();
+				getView().refresh();
 				}
 				catch(RollbackException e) {
 					addMessage("caught XPersistence ex "+e);
@@ -62,6 +65,8 @@ public class CopyTopic extends ViewBaseAction {
 			//addMessage("Failed to Add Topic questions to this Study " + ex);
 			//closeDialog();
 		}
+		getView().refreshCollections();
+		getView().refresh();
 		closeDialog();
 
 	}

@@ -61,7 +61,7 @@ public class Site {
 	private String gpslocation;
 
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = true)
+			optional = true, cascade = CascadeType.REMOVE)
 	// @SearchAction(notForViews="DEFAULT", value="LivelihoodZone.filteredsearch")
 	@SearchAction(value = "LivelihoodZone.filteredsearch")
 

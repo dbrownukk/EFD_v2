@@ -121,7 +121,10 @@ public class Project {
 	@ListProperties("lzname,country.description,country.currency,lzzonemap")
 	@CollectionView("SimpleLZ")
 	private Collection<LivelihoodZone> livelihoodZone;
+	/***********************************************************************************************/
 
+	
+	
 	/***********************************************************************************************/
 	@Stereotype("FILES")
 	@Column(length = 32, name = "Notes")

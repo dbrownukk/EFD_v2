@@ -53,7 +53,6 @@ public class WGCharacteristicsResource {
 	// ----------------------------------------------------------------------------------------------//
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	//@Required
 	@NoFrame
 	private Study study;
 	// ----------------------------------------------------------------------------------------------//

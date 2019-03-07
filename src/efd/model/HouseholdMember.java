@@ -20,7 +20,7 @@ public class HouseholdMember extends EFDIdentifiable{
 	/*************************************************************************************************/	
 
 	@Required
-	@Editor("ValidValuesRadioButton")
+	//@Editor("ValidValuesVerticalRadioButton")
 	private YN headofHousehold;
 
 	public enum YN {
@@ -28,7 +28,7 @@ public class HouseholdMember extends EFDIdentifiable{
 	};
 	/*************************************************************************************************/	
 	@Required
-	@Editor("ValidValuesVerticalRadioButton")
+	//@Editor("ValidValuesVerticalRadioButton")
 	private Sex gender;
 
 	public enum Sex {
@@ -43,7 +43,7 @@ public class HouseholdMember extends EFDIdentifiable{
 	@Range(min=1900,max=2050)
 	private int yearOfBirth;
 	/*************************************************************************************************/	
-	@Editor("ValidValuesRadioButton")
+	//@Editor("ValidValuesVerticalRadioButton")
 	private YN absent;
 	/*************************************************************************************************/	
 	@Column(length=45)

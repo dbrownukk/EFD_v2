@@ -8,23 +8,33 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
+import org.openxava.util.*;
+
+import efd.actions.*;
+import efd.model.ConfigQuestion.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
-
-
-@Views({ @View(members = "Study[#studyName,projectlz,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate,notes]"
+@Views({ @View(members = "Study[studyName,projectlz,referenceYear;startDate,endDate, description;altCurrency,altExchangeRate,notes]"
+		+ ";warningMessage,"
 		+ ";Site{site};StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem};"
-		+ ";CharacteristicAssets/Resources{Land{characteristicsResourceLand}" + "Livestock{characteristicsResourceLivestock}"
-		+ "Tradeable{characteristicsResourceTradeable}" + "Foodstock{characteristicsResourceFoodstock}"
-		+ "Trees{characteristicsResourceTree}" + "Cash{characteristicsResourceCash}"
-		+ "Crops{characteristicsResourceCrop}" + "LivestockSales{characteristicsResourceLivestockSales}"
+		+ ";CharacteristicAssets/Resources{Land{characteristicsResourceLand}"
+		+ "Livestock{characteristicsResourceLivestock}" + "Tradeable{characteristicsResourceTradeable}"
+		+ "Foodstock{characteristicsResourceFoodstock}" + "Trees{characteristicsResourceTree}"
+		+ "Cash{characteristicsResourceCash}" + "Crops{characteristicsResourceCrop}"
+		+ "LivestockSales{characteristicsResourceLivestockSales}"
 		+ "LivestockProducts{characteristicsResourceLivestockProducts}"
 		+ "Employment{characteristicsResourceEmployment}" + "Transfers{characteristicsResourceTransfers}"
 		+ "WildFoods{characteristicsResourceWildFoods}},Questions{configQuestionUse}"),
 		// + "ConfigQuestionUse{configQuestionUse}"),
 		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
+		@View(name = "StudyInterview", members = "studyName,referenceYear,spreadsheets"),
 		@View(name = "FromQuestionUse", members = "Study[#studyName,topic,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]") })
+
+
+//@Tabs({
+//@Tab(name="StudyInterview", properties = "studyName,referenceYear, household.householdName")
+//})
 
 @Entity
 
@@ -34,6 +44,26 @@ import org.openxava.calculators.*;
 				@UniqueConstraint(name = "studyrefyear", columnNames = { "studyName", "referenceYear" }) })
 
 public class Study extends EFDIdentifiable {
+
+	@PrePersist
+	@PreUpdate
+	private void validate() throws Exception {
+		try {
+			System.out.println("tot = " + getTotalDietPercentage());
+			if (getTotalDietPercentage() > 100) {
+				throw new IllegalStateException(
+
+						XavaResources.getString("diet_greater_100"));
+
+			}
+
+		} catch (Exception ex) {
+			System.out.println("in jpa exception in study " + ex);
+			return;
+
+		}
+
+	}
 
 	/*************************************************************************************************/
 	@Required
@@ -78,12 +108,12 @@ public class Study extends EFDIdentifiable {
 	// @NoModify
 	private Project projectlz;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
-	@ListProperties("study.studyName,resourcesubtype.resourcetypename,amount,cost,level,gender,ageRangeLower,ageRangeUpper")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,amount,cost,level,gender,ageRangeLower,ageRangeUpper")
 	private Collection<StdOfLivingElement> stdOfLivingElement;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
-	@ListProperties("study.studyName,resourcesubtype.resourcetypename,percentage+,unitPrice")
+	@OneToMany(mappedBy = "study",  cascade=CascadeType.REMOVE)
+	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,percentage+,unitPrice")
 	private Collection<DefaultDietItem> defaultDietItem;
 
 	/*************************************************************************************************/
@@ -95,13 +125,13 @@ public class Study extends EFDIdentifiable {
 	private Site site;
 
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	private Collection<Household> household;
 	/*************************************************************************************************/
 	// Assets
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	// @ElementCollection // Not usable with EditAction
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Land')"
 			+ "AND ${this.id} = ${study.id}")
@@ -110,34 +140,38 @@ public class Study extends EFDIdentifiable {
 	private Collection<WGCharacteristicsResource> characteristicsResourceLand;
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestock;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
-	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Tradeable')"
+	@OneToMany(mappedBy = "study")
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Other Tradeable Goods')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTradeable;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
-	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Food Stocks')"
-			+ "AND ${this.id} = ${study.id}")
+	@OneToMany(mappedBy = "study")
+	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename in ('Crops','Wild Foods','Livestock Products') ${this.id} = ${study.id}")
+	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Food Stocks')"  
+	//		+ "AND ${this.id} = ${study.id}")
+	@EditAction("CharacteristicsResource.edit")
+	
+	
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceFoodstock;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Trees')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTree;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Cash')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -147,7 +181,7 @@ public class Study extends EFDIdentifiable {
 	// Non Assets
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	// @ElementCollection //- will not work with SearchListCondition
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Crops')"
 			+ "AND ${this.id} = ${study.id}")
@@ -155,34 +189,34 @@ public class Study extends EFDIdentifiable {
 	@EditAction("CharacteristicsResource.edit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceCrop;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
-	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Sales')"
+	@OneToMany(mappedBy = "study")
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockSales;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Products')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockProducts;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Employment')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceEmployment;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Transfers')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTransfers;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Wild Foods')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -190,56 +224,65 @@ public class Study extends EFDIdentifiable {
 	private Collection<WGCharacteristicsResource> characteristicsResourceWildFoods;
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" ) //, cascade=CascadeType.REMOVE)
+	@XOrderBy("level desc")
+	
 	
 	@ListProperties("configQuestion.prompt,configQuestion.hint,configQuestion.gender,"
 			+ "configQuestion.level,configQuestion.answerType,configQuestion.ageRangeLower,configQuestion.ageRangeUpper")
-	
+
 	private Collection<ConfigQuestionUse> configQuestionUse;
+
 	/*************************************************************************************************/
 	/*
 	 * Copy from a Topic a list of Questions to use - fails if Quesions already
 	 * exist
 	 */
-	//@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	//@NoModify
-	//@NoCreate
-	//@DescriptionsList(descriptionProperties = "topic")
-	//private ReusableConfigTopic reusableConfigTopic;
-	
+	// @ManyToOne(fetch = FetchType.LAZY, optional = true)
+	// @NoModify
+	// @NoCreate
+	// @DescriptionsList(descriptionProperties = "topic")
+	// private ReusableConfigTopic reusableConfigTopic;
+
+	public Integer totalDietPercentage() {
+		Integer result = new Integer("0");
+		for (DefaultDietItem detail : getDefaultDietItem())
+			result = result + detail.getPercentage();
+
+		return result;
+	}
+
+	/*************************************************************************************************/
+	/*
+	 * get default diet % running total
+	 */
+	// @Transient
+	// @DefaultValueCalculator(ZeroIntegerCalculator.class)
+	// @DisplaySize(15)
+	// @Max(value=100)
+	public Integer getTotalDietPercentage() {
+		Integer result = new Integer("0");
+		for (DefaultDietItem defaultDietItem : getDefaultDietItem()) { // We iterate through all details
+			result = result + defaultDietItem.getPercentage(); // Adding up the amount
+		}
+		return result;
+	}
+
+	@Depends("totalDietPercentage")
+	@Stereotype("LABEL") // @Stereotype("HTML_TEXT")
 	@Transient
-	private Integer totalDietPercentage;
-	
+	@ReadOnly
+	public String getWarningMessage() {
+		if (getTotalDietPercentage() != 100) {
+			return "<font color=" + "red" + ">Total Diet Items Percent is not equal to 100</font>";
+		}
+		return null;
+	}
+
+
 
 	/*************************************************************************************************/
 
-
-	
-	
-	public Integer getTotalDietPercentage() {
-		Integer result = new Integer("0");
-	    for (DefaultDietItem defaultDietItem: getDefaultDietItem()) { // We iterate through all details
-	        result = result + defaultDietItem.getPercentage(); // Adding up the amount
-	    }
-	    System.out.println("result = "+result);
-	    return result;
-	}
-	
-	
-	
-	
-	
-
-	public void setTotalDietPercentage(Integer totalDietPercentage) {
-		this.totalDietPercentage = totalDietPercentage;
-	}	
-	
-	
-	
-	
-	
-	
-	
 	public String getStudyName() {
 		return studyName;
 	}
@@ -450,6 +493,11 @@ public class Study extends EFDIdentifiable {
 		this.configQuestionUse = configQuestionUse;
 	}
 
+
+
+	
+	
+	
 	/*************************************************************************************************/
 
 }

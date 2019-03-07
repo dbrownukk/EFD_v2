@@ -21,7 +21,7 @@ public class CopyStudy extends ViewBaseAction {
 		Object studyId = getPreviousView().getValue("id");
 
 		// get topic questions and study
-
+		String message = null;
 		Study study = XPersistence.getManager().find(Study.class, studyId);
 		System.out.println("study after query = " + study.getStudyName());
 		System.out.println("NEW study  = " + getView().getValueString("studyName"));
@@ -32,29 +32,45 @@ public class CopyStudy extends ViewBaseAction {
 		try {
 			Study newStudy = new Study();
 
-			System.out.println("about to copy bean");
-			// newStudy = (Study) BeanUtils.cloneBean(study); clone and copy properties fail
-			// due to multiple refs to charactericsresources
-			System.out.println("done  copy bean");
 			newStudy.setStudyName(newStudyName);
 			newStudy.setProjectlz(study.getProjectlz());
+			message = "Done ProjectLZ";
 			newStudy.setReferenceYear(study.getReferenceYear());
 			newStudy.setStartDate(study.getStartDate());
 			newStudy.setEndDate(study.getEndDate());
-
+			message = "Done End Date";
 			newStudy.setNotes(study.getNotes());
 			newStudy.setAltCurrency(study.getAltCurrency());
 			newStudy.setAltExchangeRate(study.getAltExchangeRate());
-
+			message = "Done AltExchangeRate ";
 			newStudy.setDescription(study.getDescription());
+			message = "Done Description ";
+			newStudy.setId(null);
+			newStudy.setVersion(null);
 
-			// newStudy.setId(null);
 			newStudy.setSite(study.getSite());
 
-			System.out.println("new site = " + newStudy.getSite().getLocationdistrict());
+			message = "Done Site ";
+
+			/*
+			 * System.out.println("new site = " + newStudy.getSite().getLocationdistrict());
+			 * 
+			 * System.out.println("new study notes  = "+newStudy.getNotes());
+			 * System.out.println("new study  exrate = "+newStudy.getAltExchangeRate());
+			 * System.out.println("new study desc = "+newStudy.getDescription());
+			 * System.out.println("new study edate = "+newStudy.getEndDate());
+			 * System.out.println("new study refyear = "+newStudy.getReferenceYear());
+			 * System.out.println("new study sdate = "+newStudy.getStartDate());
+			 * System.out.println("new study name = "+newStudy.getStudyName());
+			 * System.out.println("new study altcurr = "+newStudy.getAltCurrency());
+			 * System.out.println("new study proj = "+newStudy.getProjectlz());
+			 * System.out.println("new study site  = "+newStudy.getSite());
+			 */
+
+			message = "Done print of New Study ";
 
 			XPersistence.getManager().persist(newStudy);
-
+			message = " Done persist New Study";
 			System.out.println("new study id = " + newStudy.getId());
 			System.out.println("old study id = " + study.getId());
 			String oldStudyId = study.getId().toString();
@@ -83,14 +99,100 @@ public class CopyStudy extends ViewBaseAction {
 				XPersistence.getManager().persist(newCharResource);
 			}
 
+			// Standard of Living
+
+			// get current standard of livings for orig study
+
+			List<StdOfLivingElement> stdels = XPersistence.getManager()
+					.createQuery("from StdOfLivingElement where study_ID = '" + oldStudyId + "'").getResultList();
+
+			StdOfLivingElement stdel = null;
+			System.out.println("standard of livings = " + stdels.size());
+			for (int i = 0; i < stdels.size(); i++) {
+				stdel = new StdOfLivingElement();
+
+				BeanUtils.copyProperties(stdel, stdels.get(i));
+				System.out.println("done bean copy" + stdel.getResourcesubtype().getResourcetypename());
+				stdel.setId(null);
+				stdel.setStudy(newStudy);
+				stdel.setVersion(null);
+				XPersistence.getManager().persist(stdel);
+			}
+			
+			// Default Diet
+
+			// get current Default Diet for orig study
+
+			List<DefaultDietItem> ddiets = XPersistence.getManager()
+					.createQuery("from DefaultDietItem where study_ID = '" + oldStudyId + "'").getResultList();
+
+			DefaultDietItem ddiet = null;
+
+			System.out.println("number of ddiets items = " + ddiets.size());
+			for (int i = 0; i < ddiets.size(); i++) {
+				ddiet = new DefaultDietItem();
+
+				// BeanUtils.copyProperties(ddiet, ddiets.get(i)); // FAILS
+
+				ddiet.setNotes(ddiets.get(i).getNotes());
+				ddiet.setPercentage(ddiets.get(i).getPercentage());
+				ddiet.setResourcesubtype(ddiets.get(i).getResourcesubtype());
+				ddiet.setStudy(newStudy);
+				ddiet.setUnitPrice(ddiets.get(i).getUnitPrice());
+
+				System.out.println("done SET in ddiet " + ddiet.getResourcesubtype().getResourcetypename());
+				//ddiet.setId(null);
+
+				//ddiet.setVersion(null);
+				System.out.println("about to persist ddiet");
+				
+				
+				XPersistence.getManager().persist(ddiet);
+				
+
+				System.out.println("persisted ddiet");
+
+			}
+			
+			// Config Questions
+
+			// get current Questions for orig study
+
+			List<ConfigQuestionUse> questions = XPersistence.getManager()
+					.createQuery("from ConfigQuestionUse where study_ID = '" + oldStudyId + "'").getResultList();
+
+			ConfigQuestionUse question = null;
+
+			for (int i = 0; i < questions.size(); i++) {
+				question = new ConfigQuestionUse();
+
+				// BeanUtils.copyProperties(question, questions.get(i)); BEAN will not work with
+				// sub collections
+				question.setConfigQuestion(questions.get(i).getConfigQuestion());
+				question.setConfigAnswer(null);
+				question.setLevel(questions.get(i).getLevel());
+				question.setNotes(questions.get(i).getNotes());
+				question.setVersion(null);
+				question.setId(null);
+				question.setStudy(newStudy);
+				//System.out.println("about to persist question use "+question.getLevel()+" "+question.getConfigQuestion().getId()+" "+question.getStudy().getId());
+				XPersistence.getManager().persist(question);
+				System.out.println("persisted question use");
+			}
+			
+			
 		} catch (Exception ex) {
 
 			// failed to add topic questions to study due to duplicates or other failure
-			addMessage("Failed to create Study " + ex);
 			closeDialog();
-		}
-		closeDialog();
+			addError("Failed to create Study " + ex + " " + message);
+			return;
 
+		}
+		XPersistence.commit();
+		closeDialog();
+		addMessage("Successfully created new Study " + newStudyName);
+		return;
 	}
 
 }

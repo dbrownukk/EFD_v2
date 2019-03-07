@@ -10,6 +10,8 @@ import org.openxava.model.*;
 
 @Entity
 
+@Table(name = "questionlov",uniqueConstraints = {@UniqueConstraint(name = "questionlov", columnNames = { "configQuestion_ID", "lovValue"}) })
+
 public class QuestionLOV extends Identifiable {
 
 	@Required
