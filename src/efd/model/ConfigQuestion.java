@@ -15,7 +15,7 @@ import efd.validations.*;
 
 
 
-@Views({@View(members="Question[#topic,prompt,hint,gender;level,answerType,notes,questionLOV;Ranges[#ageRangeLower,ageRangeUpper;"
+@Views({@View(members="Question[#topic,prompt,hint;level,answerType,gender,notes,questionLOV;Ranges[#ageRangeLower,ageRangeUpper;"
 		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]")//,
 //	@View(name="FromQuestionUse",members="Question[topic,prompt,answerType,hint,level]")
 })

@@ -295,10 +295,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		Sheet wildfSheet = workbook.getSheetAt(14);
 		Sheet inputsSheet = workbook.getSheetAt(15);
 
-		
-		
-		
-		
 		System.out.println("isheet = " + isheet);
 
 		/* Interview Validations */
@@ -545,36 +541,32 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			int lastCol, CellStyle style) {
 
 		Cell cell = null;
-		int k=0;
+		int k = 0;
 		int j = 0;
-		
-	
+
 		System.out.println("add formula");
 		if (iSheet.getSheetName() == "Inputs") // Add % in cols G + I + K and put in L
 		{
 			// Create conditional format rule for this sheet
 			// Is RED until value = 100%
-			
-			
+
 			HSSFSheet mysheet = workbook.getSheet("inputs");
-			
+
 			HSSFSheetConditionalFormatting my_cond_format_layer = mysheet.getSheetConditionalFormatting();
-			HSSFConditionalFormattingRule rule = my_cond_format_layer.createConditionalFormattingRule(ComparisonOperator.NOT_EQUAL, "100",null);
-			
-			 HSSFPatternFormatting patternFmt = rule.createPatternFormatting();
-			 patternFmt.setFillBackgroundColor(RED);
-		
-			 CellRangeAddress[] addresses = {CellRangeAddress.valueOf("L4:L29")};
-			 
-			 
-			 my_cond_format_layer.addConditionalFormatting(addresses,rule);
-			
-			
-			
-			for ( k = 3; k < 29; k++) {
-				System.out.println("add formula pre ="+k);
-				j = k+1;
-				iSheet.getRow(k).createCell(11).setCellFormula("G"+j+"+I"+j+"+K"+j);
+			HSSFConditionalFormattingRule rule = my_cond_format_layer
+					.createConditionalFormattingRule(ComparisonOperator.NOT_EQUAL, "100", null);
+
+			HSSFPatternFormatting patternFmt = rule.createPatternFormatting();
+			patternFmt.setFillBackgroundColor(RED);
+
+			CellRangeAddress[] addresses = { CellRangeAddress.valueOf("L4:L29") };
+
+			my_cond_format_layer.addConditionalFormatting(addresses, rule);
+
+			for (k = 3; k < 29; k++) {
+				System.out.println("add formula pre =" + k);
+				j = k + 1;
+				iSheet.getRow(k).createCell(11).setCellFormula("G" + j + "+I" + j + "+K" + j);
 			}
 		}
 
@@ -1260,8 +1252,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		sheet.setValue(2, 2, "IHM Household Interview - Interview Summary", boldRStyle);
 
-		sheet.setValue(2, 4, "Project Name: ", textStyle); // Study or Project??
-		sheet.setValue(3, 4, project.getProjecttitle(), borderStyle);
+		sheet.setValue(2, 4, "Study Name: ", textStyle); // Study or Project??
+		sheet.setValue(3, 4, study.getStudyName() + " " + study.getReferenceYear(), borderStyle);
 
 		// sheet.setValue(2, 6, "Household Number: ", textStyle);
 		// sheet.setValue(3, 6, "", borderStyle);
@@ -1350,16 +1342,23 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		 */
 
 		configQuestionUseHHM = XPersistence.getManager()
-				.createQuery("from ConfigQuestionUse where study_ID = :studyid and level = '2'")
-				.setParameter("studyid", studyID).getResultList();
+				.createQuery("from ConfigQuestionUse where study_ID = :studyid ").setParameter("studyid", studyID)
+				.getResultList();
 
 		System.out.println("hhm questions count =  " + configQuestionUseHHM.size());
 		if (configQuestionUseHHM.isEmpty())
 			return;
-
+		k=10; // first row for configQuestions
 		for (i = 0; i < configQuestionUseHHM.size(); i++) {
 			System.out.println("hhm questions  =  " + configQuestionUseHHM.get(i).getConfigQuestion().getPrompt());
-			sheet.setValue(2, i + 10, configQuestionUseHHM.get(i).getConfigQuestion().getPrompt(), textStyle);
+			
+			System.out.println("hhm questions  =  " + configQuestionUseHHM.get(i).getConfigQuestion().getLevel());
+			
+			if (configQuestionUseHHM.get(i).getConfigQuestion().getLevel() == Level.HouseholdMember) {
+				sheet.setValue(2, k, configQuestionUseHHM.get(i).getConfigQuestion().getPrompt(), textStyle);
+				k++;
+			}
+
 		}
 
 		return;
@@ -1576,6 +1575,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			/* Get Resource Sub Type */
 			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
 					.find(WGCharacteristicsResource.class, chrs.get(k));
+			
+			System.out.println("food stocks get "+wgcharacteristicsresource.getResourcesubtype().getResourcetype().getResourcetypename());
+			
+			
 			/* Get Resource Type */
 			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
 					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());

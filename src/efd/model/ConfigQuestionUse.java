@@ -10,7 +10,7 @@ import org.openxava.util.*;
 import efd.model.ConfigQuestion.*;
 import efd.validations.*;
 
-@Views({ @View(members = "QuestionUse[study;configQuestion]")})
+@Views({ @View(members = "QuestionUse[study,configQuestion]")})
 //		@View(name = "FromConfigQuestion", members = "QuestionUse[#study,level]") })
 
 @Tab(properties = "study.studyName,study.referenceYear,configQuestion.level,configQuestion.prompt,configQuestion.answerType")
@@ -48,22 +48,27 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
 	@NoCreate
-	//@NoModify
-	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
+	
+	@ReferenceView("FromStdOfLiving")
+	//@DescriptionsList(descriptionProperties = "studyName")
+	@NoModify
+	@NoFrame
+	@NoSearch
+	@ReadOnly
 	private Study study;
 	/*************************************************************************************************/
 	@ManyToOne(optional = false)
 	//@ReferenceView("FromQuestionUse")
 	private ConfigQuestion configQuestion;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "configQuestionUse") // , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "configQuestionUse",cascade=CascadeType.REMOVE)
 	//@ListProperties("answer")
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 	@Column(nullable = false)
-	@Required
-	@Editor("ValidValuesRadioButton")
-	//@ReadOnly
+	//@Required
+	//@Editor("ValidValuesRadioButton")
+	@DisplaySize(30)
 	@OnChange(value = OnChangeQuestionUseLevel.class)
 	private Level level;
 

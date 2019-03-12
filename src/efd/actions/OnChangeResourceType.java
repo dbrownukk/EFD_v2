@@ -3,6 +3,9 @@ package efd.actions;
 import javax.inject.*;
 
 import org.openxava.actions.*;
+import org.openxava.jpa.*;
+
+import efd.model.*;
 
 public class OnChangeResourceType extends OnChangePropertyBaseAction {
 
@@ -30,6 +33,19 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 
 		else if (efdModel.equals("OHEA"))
 			getView().setDescriptionsListCondition("resourcesubtype", "e.resourcetype.resourcetypename like '%'");
+
+		String newRST = getNewValue().toString();
+
+		System.out.println("rst on change = " + newRST + " " + getView().getAllValues().toString());
+		System.out.println("rst in change id = " + getView().getValue("resourcesubtype.idresourcesubtype"));
+
+		String rst = getView().getValue("resourcesubtype.idresourcesubtype").toString();
+
+		ResourceSubType resourceSubType = XPersistence.getManager().find(ResourceSubType.class, rst);
+		System.out.println("rst unit = " + resourceSubType.getResourcesubtypeunit());
+
+		System.out.println("set unit");
+		getView().setValue("wgresourceunit", resourceSubType.getResourcesubtypeunit());
 
 	}
 

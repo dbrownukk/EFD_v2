@@ -6,6 +6,7 @@ import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.util.*;
@@ -79,6 +80,8 @@ public class Study extends EFDIdentifiable {
 	private java.util.Date endDate;
 	/*************************************************************************************************/
 	@Required
+	@Range(min=1960,max=2050)
+	
 	private Integer referenceYear;
 	/*************************************************************************************************/
 	@Column(length = 45)
@@ -137,6 +140,9 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@NewAction("CharacteristicsResource.new")
+	@AddAction("")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLand;
 	/*************************************************************************************************/
 
@@ -144,22 +150,31 @@ public class Study extends EFDIdentifiable {
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@NewAction("CharacteristicsResource.new")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestock;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Other Tradeable Goods')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@NewAction("CharacteristicsResource.new")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTradeable;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
 	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename in ('Crops','Wild Foods','Livestock Products') ${this.id} = ${study.id}")
 	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Food Stocks')"  
 	//		+ "AND ${this.id} = ${study.id}")
+	@Condition("${type} = 'Food Stocks' AND ${this.id} = ${study.id}")
 	@EditAction("CharacteristicsResource.edit")
-	
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceFoodstock;
@@ -169,6 +184,9 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTree;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
@@ -176,6 +194,9 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceCash;
 	/*************************************************************************************************/
 	// Non Assets
@@ -187,6 +208,9 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceCrop;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
@@ -194,12 +218,18 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockSales;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Products')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockProducts;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
@@ -207,6 +237,9 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceEmployment;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
@@ -214,6 +247,9 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTransfers;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
@@ -221,13 +257,16 @@ public class Study extends EFDIdentifiable {
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceWildFoods;
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study" ) //, cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study" ,cascade=CascadeType.REMOVE)
 	@XOrderBy("level desc")
-	
-	
+	@NewAction("ConfigQuestionUse.new")
+	@EditAction("ConfigQuestionUse.edit")
 	@ListProperties("configQuestion.prompt,configQuestion.hint,configQuestion.gender,"
 			+ "configQuestion.level,configQuestion.answerType,configQuestion.ageRangeLower,configQuestion.ageRangeUpper")
 

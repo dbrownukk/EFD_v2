@@ -17,6 +17,9 @@ import efd.model.ConfigQuestion.*;
  * @author Javier Paniza
  */
 
+
+
+
 public class ConfigQuestionUpdateAction extends UpdateAction  {
 	
 	@Inject
@@ -27,7 +30,7 @@ public class ConfigQuestionUpdateAction extends UpdateAction  {
 	private String questionid;
 	
 	public void execute() throws Exception {	
-		
+		/*
 		String level = getView().getValue("level").toString();
 		
 		//System.out.println("study id in update "+getView().getValueString("study.id"));
@@ -45,7 +48,9 @@ public class ConfigQuestionUpdateAction extends UpdateAction  {
 
 			XPersistence.getManager().persist(configQuestionUse);
 		}
+		getView().refresh();
 		
+		*/
 		super.execute();
 		
 	}

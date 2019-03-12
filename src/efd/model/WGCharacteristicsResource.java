@@ -14,7 +14,7 @@ import efd.actions.*;
 
 
 
-@Views({ @View(members = "Characteristics_Resources[resourcesubtype;wgresourceunit]"),
+@Views({ @View(members = "Characteristics_Resources[resourcesubtype;wgresourceunit,type]"),
 	@View(name = "DetailCR", members="Project")})
 
 @Tab(rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), 
@@ -79,8 +79,23 @@ public class WGCharacteristicsResource {
 	private BigDecimal wgresourceamount;
 
 	// ----------------------------------------------------------------------------------------------//
+	// which sessiontab used in?
+	@Hidden
+	private String type;
+	
+	// ----------------------------------------------------------------------------------------------//
 
 	
+	
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public String getIdwgresource() {
 		return idwgresource;
 	}

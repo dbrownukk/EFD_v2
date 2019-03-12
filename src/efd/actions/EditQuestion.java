@@ -6,7 +6,7 @@ public class EditQuestion extends ReferenceBaseAction  {
 
 	public void execute() throws Exception {
 
-		
+		System.out.println("in edit Question");
 		super.execute();
 	}
 

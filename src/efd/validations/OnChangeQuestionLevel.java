@@ -34,6 +34,7 @@ public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 		System.out.println("aaa question id = " + questionid);
 		System.out.println("ccc configuseid id  = " + configuseid);
 
+		/*   March 2019 - no longer using configQuestionUse Level 
 		if (!configuseid.isEmpty()) {
 			System.out.println("in configuseid SET  = " + configuseid);
 			ConfigQuestionUse configQuestionUse = XPersistence.getManager().find(ConfigQuestionUse.class, configuseid);
@@ -47,6 +48,7 @@ public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 
 			XPersistence.getManager().persist(configQuestionUse);
 		}
+		*/
 
 		System.out.println("New changed level  to = " + getNewValue().toString());
 		System.out.println("level = " + getView().getValueString("level"));

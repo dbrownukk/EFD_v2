@@ -4,41 +4,77 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import org.apache.poi.util.*;
 import org.openxava.annotations.*;
+import org.openxava.jpa.*;
+import org.openxava.util.*;
 
 import efd.model.WealthGroupInterview.*;
+import efd.validations.*;
 
-@View(members = "Household[householdName,householdNumber;spreadsheet,status, notes];HouseholdMember{householdMember},"
-		+ "Assets{Land{assetLand};LiveStock{assetLiveStock};Tradeable{assetTradeable}"
-		+ ";FoodStock{assetFoodStock}" + ";Trees{assetTree};Cash{assetCash}};Crops{crop}"
+@View(members = "Household[#study,householdName,householdNumber;interviewers, interviewDate,notes;spreadsheet,status];configAnswer;HouseholdMember{householdMember},"
+		+ "Assets{Land{assetLand};LiveStock{assetLiveStock};Tradeable{assetTradeable}" + ";FoodStock{assetFoodStock}"
+		+ ";Trees{assetTree};Cash{assetCash}};Crops{crop}"
 		+ ";LiveStockSales{livestockSales};LiveStockProducts{livestockProducts};Employment{employment}"
-		+ ";Transfer{transfer};WildFood{wildFood}")
-
+		+ ";Transfer{transfer};WildFood{wildFood};Inputs{inputs}")
 
 @Tab(properties = "study.studyName,study.referenceYear, householdName, status")
 
+@Table(name = "Household", uniqueConstraints = {
+		@UniqueConstraint(name = "unique_household_number", columnNames = { "study_id", "householdNumber" }),
+		@UniqueConstraint(name = "unique_household_name", columnNames = { "study_id", "householdName" }) })
+
 @Entity
 
-@Table(name = "Household")
 public class Household extends EFDIdentifiable {
+
+	@PrePersist
+
+	private void validate() throws Exception {
+		System.out.println("calc next household number = ");
+		Integer lastNumber = null;
+		String studyid = getStudy().getId();
+		System.out.println("calc next household number, studyid =  = " + studyid);
+		try {
+			Query query = XPersistence.getManager()
+					.createQuery("select max(householdNumber) from Household where study_id = :studyid");
+			query.setParameter("studyid", studyid);
+			lastNumber = (Integer) query.getSingleResult();
+		} catch (Exception ex) {
+			System.out.println("exception = "+ex.toString());
+			if (lastNumber == null)
+				setHouseholdNumber(1);
+			return;
+		}
+		if (lastNumber > 0)
+			setHouseholdNumber(lastNumber + 1);
+		return;
+
+	}
 
 	@Required
 	@Column(length = 45)
+	@SearchKey 
 	private String householdName;
 	/*************************************************************************************************/
-	@Required
+	// @Required
 	private int householdNumber;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@NoFrame
+	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
 	private Study study;
 	/*************************************************************************************************/
-	// @OneToMany(mappedBy = "household" , cascade=CascadeType.REMOVE)
-	@ElementCollection
+	@OneToMany(mappedBy = "household" , cascade=CascadeType.REMOVE)
+	//@ElementCollection
 	@ListProperties("householdMemberName,headofHousehold, gender, age, yearOfBirth, absent, reasonForAbsence")
 	private Collection<HouseholdMember> householdMember;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "household") // , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "household", cascade=CascadeType.REMOVE)
+	//@ElementCollection
+	@NoCreate
+	@AddAction("")
+	@ListProperties("answer")
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 	@Stereotype("FILE")
@@ -46,6 +82,16 @@ public class Household extends EFDIdentifiable {
 	private String spreadsheet;
 
 	/*************************************************************************************************/
+	@Stereotype("DATE")
+	@Column(name = "InterviewDate")
+	private java.util.Date interviewDate;
+	/*************************************************************************************************/
+	@Column(name = "Interviewers", length=45)
+	private String interviewers;
+	/*************************************************************************************************/
+
+	
+	
 	/* Collections of resource elements */
 
 	@ElementCollection
@@ -53,12 +99,6 @@ public class Household extends EFDIdentifiable {
 	// https://sourceforge.net/p/openxava/discussion/419690/thread/b6535530de/
 
 	@ListProperties("status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
-
-	// @ListsProperties({
-	// @ListProperties(forViews="ReadOnly",
-	// value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit"),
-	// @ListProperties(forViews="DEFAULT",value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
-	// })
 	private Collection<AssetLiveStock> assetLiveStock;
 
 	@ElementCollection
@@ -111,14 +151,15 @@ public class Household extends EFDIdentifiable {
 	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,pricePerUnit,unitsConsumed,otherUse"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<WildFood> wildFood;
-	
+
+	@ElementCollection
+	@ListProperties("status,resourceSubType.resourcetypename, itemPurchased, unit, unitsPurchased, pricePerUnit,resource1UsedFor,percentResource1,resource2UsedFor,percentResource2,resource3UsedFor,percentResource3" )
+	private Collection<Inputs> inputs;
 	
 	
 	@DisplaySize(25)
 	private Status status;
 
-
-	
 	public Status getStatus() {
 		return status;
 	}
@@ -140,6 +181,7 @@ public class Household extends EFDIdentifiable {
 	}
 
 	public void setHouseholdNumber(int householdNumber) {
+
 		this.householdNumber = householdNumber;
 	}
 
@@ -158,6 +200,8 @@ public class Household extends EFDIdentifiable {
 	public void setHouseholdMember(List<HouseholdMember> householdMember) {
 		this.householdMember = householdMember;
 	}
+
+
 
 	public Collection<ConfigAnswer> getConfigAnswer() {
 		return configAnswer;
@@ -275,7 +319,30 @@ public class Household extends EFDIdentifiable {
 		this.wildFood = wildFood;
 	}
 
-	
+	public Collection<Inputs> getInputs() {
+		return inputs;
+	}
+
+	public void setInputs(Collection<Inputs> inputs) {
+		this.inputs = inputs;
+	}
+
+	public java.util.Date getInterviewDate() {
+		return interviewDate;
+	}
+
+	public void setInterviewDate(java.util.Date interviewDate) {
+		this.interviewDate = interviewDate;
+	}
+
+	public String getInterviewers() {
+		return interviewers;
+	}
+
+	public void setInterviewers(String interviewers) {
+		this.interviewers = interviewers;
+	}
+
 	
 	
 	

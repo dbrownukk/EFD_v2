@@ -22,7 +22,7 @@ public class ConfigAnswer extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
 	private Study study;
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)  //,cascade=CascadeType.REMOVE)
 	@NoCreate
 	@NoModify
 	@DescriptionsList(descriptionProperties = "householdName")
@@ -32,7 +32,7 @@ public class ConfigAnswer extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "householdMemberName")
 	private HouseholdMember householdMember;
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true,cascade=CascadeType.REMOVE)
 	private ConfigQuestionUse configQuestionUse;
 	/*************************************************************************************************/
 	@Column(length=45,nullable=false)
