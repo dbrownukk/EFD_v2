@@ -65,7 +65,7 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	//@ListProperties("answer")
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
-	@Column(nullable = false)
+	@Column(nullable = true)
 	//@Required
 	//@Editor("ValidValuesRadioButton")
 	@DisplaySize(30)

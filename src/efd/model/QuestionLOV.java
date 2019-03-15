@@ -5,20 +5,44 @@ package efd.model;
 
 import javax.persistence.*;
 
+
+
 import org.openxava.annotations.*;
 import org.openxava.model.*;
 
+
+@Views({ @View(members = "lovValue")})
+
+
+
 @Entity
 
-@Table(name = "questionlov",uniqueConstraints = {@UniqueConstraint(name = "questionlov", columnNames = { "configQuestion_ID", "lovValue"}) })
+@Table(name = "questionlov")//,      uniqueConstraints = @UniqueConstraint(name = "questionlov",    columnNames = { "configQuestion_ID", "lovValue"}))
+
+
+
 
 public class QuestionLOV extends Identifiable {
 
 	@Required
 	private String lovValue;
 
+
+	
 	@ManyToOne
-	private ConfigQuestion configQuestion;
+	private QuestionLOVType questionLOVType;
+	
+	
+	
+	
+
+	public QuestionLOVType getQuestionLOVType() {
+		return questionLOVType;
+	}
+
+	public void setQuestionLOVType(QuestionLOVType questionLOVType) {
+		this.questionLOVType = questionLOVType;
+	}
 
 	public String getLovValue() {
 		return lovValue;
@@ -28,13 +52,7 @@ public class QuestionLOV extends Identifiable {
 		this.lovValue = lovValue;
 	}
 
-	public ConfigQuestion getConfigQuestion() {
-		return configQuestion;
-	}
 
-	public void setConfigQuestion(ConfigQuestion configQuestion) {
-		this.configQuestion = configQuestion;
-	}
 
 
 

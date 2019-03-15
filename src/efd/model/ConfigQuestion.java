@@ -15,7 +15,7 @@ import efd.validations.*;
 
 
 
-@Views({@View(members="Question[#topic,prompt,hint;level,answerType,gender,notes,questionLOV;Ranges[#ageRangeLower,ageRangeUpper;"
+@Views({@View(members="Question[#topic,prompt,hint;level,answerType,gender,notes;questionLOVType;Ranges[#ageRangeLower,ageRangeUpper;"
 		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]")//,
 //	@View(name="FromQuestionUse",members="Question[topic,prompt,answerType,hint,level]")
 })
@@ -97,28 +97,36 @@ public class ConfigQuestion extends EFDIdentifiable {
 	private Collection<ConfigQuestionUse> configQuestionUse;
 	
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "configQuestion")
+	//@OneToMany(mappedBy = "configQuestion")
 	
 	//@ElementCollection
 	//@ListProperties("study.studyName, level")
 
-	private Collection<QuestionLOV> questionLOV;
+	//private Collection<QuestionLOV> questionLOV;
 	/*************************************************************************************************/
 
+	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
+			optional = true)
+	@NoFrame
+	@DescriptionsList(descriptionProperties = "lovType")
+	private QuestionLOVType questionLOVType;
 	
 	
 	
 	
 	
+	public QuestionLOVType getQuestionLOVType() {
+		return questionLOVType;
+	}
+
+	public void setQuestionLOVType(QuestionLOVType questionLOVType) {
+		this.questionLOVType = questionLOVType;
+	}
+
 	public String getPrompt() {
 		return prompt;
 	}
-	public Collection<QuestionLOV> getQuestionLOV() {
-		return questionLOV;
-	}
-	public void setQuestionLOV(Collection<QuestionLOV> questionLOV) {
-		this.questionLOV = questionLOV;
-	}
+
 	public void setPrompt(String prompt) {
 		this.prompt = prompt;
 	}

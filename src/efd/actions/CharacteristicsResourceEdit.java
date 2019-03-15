@@ -99,8 +99,10 @@ public class CharacteristicsResourceEdit extends EditElementInCollectionAction {
 			System.out.println("its a food stock");
 			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 					"e.resourcetype.resourcetypename in ('Crops','Wild Foods','Livestock Products')");
-		} else {
-
+		} else if (sessionTab == "Livestock Sales") {
+				getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
+						"e.resourcetype.resourcetypename = 'Livestock'");
+		}else{
 			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 					"e.resourcetype.resourcetypename = '" + sessionTab + "'");
 		}

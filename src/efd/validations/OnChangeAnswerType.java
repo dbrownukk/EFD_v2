@@ -42,7 +42,7 @@ public class OnChangeAnswerType extends OnChangePropertyBaseAction {
 			getView().setHidden("intRangeUpper", false);
 			getView().setHidden("decRangeLower", true);
 			getView().setHidden("decRangeUpper", true);
-			getView().setHidden("questionLOV", true);
+			getView().setHidden("questionLOVType", true);
 
 		}
 
@@ -52,13 +52,13 @@ public class OnChangeAnswerType extends OnChangePropertyBaseAction {
 			getView().setHidden("decRangeUpper", false);
 			getView().setHidden("intRangeLower", true);
 			getView().setHidden("intRangeUpper", true);
-			getView().setHidden("questionLOV", true);
+			getView().setHidden("questionLOVType", true);
 
 		}
 
 		else if (getNewValue().equals(efd.model.ConfigQuestion.AnswerType.LOV)) {
 			System.out.println("30303");
-			getView().setHidden("questionLOV", false);
+			getView().setHidden("questionLOVType", false);
 			getView().setHidden("decRangeLower", true);
 			getView().setHidden("decRangeUpper", true);
 			getView().setHidden("intRangeLower", true);
@@ -74,7 +74,7 @@ public class OnChangeAnswerType extends OnChangePropertyBaseAction {
 			getView().setHidden("decRangeUpper", true);
 			getView().setHidden("intRangeLower", true);
 			getView().setHidden("intRangeUpper", true);
-			getView().setHidden("questionLOV", true);
+			getView().setHidden("questionLOVType", true);
 
 		}
 

@@ -10,6 +10,7 @@ import org.openxava.view.*;
 import efd.model.*;
 
 public class CharacteristicsResourceNew extends CreateNewElementInCollectionAction implements INavigationAction {
+
 	@Inject
 	private String sessionTab;
 
@@ -69,19 +70,31 @@ public class CharacteristicsResourceNew extends CreateNewElementInCollectionActi
 		else if(getMetaCollection().getName().equals("characteristicsResourceWildFoods"))
 			iactiveSection=11;
 
+		System.out.println("sessiontab in new wgr 1 = "+sessionTab);
+		
 		sessionTab = rType[iactiveSection];
 
 		
+		System.out.println("sessiontab in new wgr 2 = "+sessionTab);
+		
+		
 		if (sessionTab == "Food Stocks") { /// Special as it uses 3 RTs
-			
+			System.out.println("its a food stock");
 			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 					"e.resourcetype.resourcetypename in ('Crops','Wild Foods','Livestock Products')");
-		} else {
-
+		} else if (sessionTab == "Livestock Sales") {
+				getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
+						"e.resourcetype.resourcetypename = 'Livestock'");
+		}else{
 			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 					"e.resourcetype.resourcetypename = '" + sessionTab + "'");
 		}
 		
+		System.out.println("rst condition now = "+getCollectionElementView().getDescriptionsListCondition("resourcesubtype"));
+		
+		
+		
+		//super.execute();
 		
 		getCollectionElementView().setHidden("type", true);
 		

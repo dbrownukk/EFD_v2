@@ -229,6 +229,7 @@ public class Study extends EFDIdentifiable {
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@AddAction("")
 	@NewAction("CharacteristicsResource.new")
+	@EditAction("CharacteristicsResource.edit")
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockProducts;
 	/*************************************************************************************************/

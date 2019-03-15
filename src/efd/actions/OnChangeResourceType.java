@@ -18,13 +18,20 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 
 		System.out.println("In OnChangeRT 1 efdModel = " + efdModel);
 		if (efdModel.equals("OIHM")) {
-
+			System.out.println("rstonchange sessionTab = " + sessionTab);
 			if (sessionTab == "Food Stocks") { /// Special as it uses 3 RTs
-
+				System.out.println("rstonchange foodstocks = ");
 				getView().setDescriptionsListCondition("resourcesubtype",
 						"e.resourcetype.resourcetypename in ('Crops','Wild Foods','Livestock Products')");
-			} else {
+			}
 
+			else if (sessionTab == "Livestock Sales") {
+				getView().setDescriptionsListCondition("resourcesubtype",
+						"e.resourcetype.resourcetypename = 'Livestock'");
+			}
+
+			else {
+				System.out.println("rstonchange not foodstocks = ");
 				getView().setDescriptionsListCondition("resourcesubtype",
 						"e.resourcetype.resourcetypename = '" + sessionTab + "'");
 			}
@@ -34,18 +41,25 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 		else if (efdModel.equals("OHEA"))
 			getView().setDescriptionsListCondition("resourcesubtype", "e.resourcetype.resourcetypename like '%'");
 
-		String newRST = getNewValue().toString();
+		System.out.println("done oihm ohea if = ");
 
-		System.out.println("rst on change = " + newRST + " " + getView().getAllValues().toString());
-		System.out.println("rst in change id = " + getView().getValue("resourcesubtype.idresourcesubtype"));
+		try {
+			String newRST = getNewValue().toString();
 
-		String rst = getView().getValue("resourcesubtype.idresourcesubtype").toString();
+			System.out.println("rst on change = " + newRST + " " + getView().getAllValues().toString());
+			System.out.println("rst in change id = " + getView().getValue("resourcesubtype.idresourcesubtype"));
 
-		ResourceSubType resourceSubType = XPersistence.getManager().find(ResourceSubType.class, rst);
-		System.out.println("rst unit = " + resourceSubType.getResourcesubtypeunit());
+			String rst = getView().getValue("resourcesubtype.idresourcesubtype").toString();
 
-		System.out.println("set unit");
-		getView().setValue("wgresourceunit", resourceSubType.getResourcesubtypeunit());
+			ResourceSubType resourceSubType = XPersistence.getManager().find(ResourceSubType.class, rst);
+			System.out.println("rst unit = " + resourceSubType.getResourcesubtypeunit());
+
+			System.out.println("set unit");
+			getView().setValue("wgresourceunit", resourceSubType.getResourcesubtypeunit());
+
+		} catch (Exception ex) {
+			System.out.println("catch - this is a new asset, thus onchange not needed to fire and no new value");
+		}
 
 	}
 

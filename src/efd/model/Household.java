@@ -67,14 +67,14 @@ public class Household extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "household" , cascade=CascadeType.REMOVE)
 	//@ElementCollection
-	@ListProperties("householdMemberName,headofHousehold, gender, age, yearOfBirth, absent, reasonForAbsence")
+	//@ListProperties("householdMemberName,headofHousehold, gender, age, yearOfBirth, absent, reasonForAbsence")
 	private Collection<HouseholdMember> householdMember;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "household", cascade=CascadeType.REMOVE)
 	//@ElementCollection
 	@NoCreate
 	@AddAction("")
-	@ListProperties("answer")
+	@ListProperties("configQuestionUse.configQuestion.prompt,answer")
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 	@Stereotype("FILE")

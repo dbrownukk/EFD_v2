@@ -25,12 +25,14 @@ import org.openxava.util.jxls.*;
 import org.openxava.web.editors.*;
 import efd.model.*;
 import efd.model.ConfigQuestion.*;
+import efd.model.HouseholdMember.*;
 import efd.model.WealthGroupInterview.*;
 
 import org.apache.commons.lang3.text.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Row.*;
 import org.apache.poi.util.*;
+import org.directwebremoting.hibernate.*;
 
 public class ParseHHSpreadsheet extends CollectionBaseAction
 		implements IForwardAction, JxlsConstants, IFilePersistor, IJDBCAction {
@@ -301,6 +303,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		getHHDetails(wb, hhi);
 
+		getHHMDetails(wb, hhi);
+
 		// getWorkSheetDetail(wb, hhi); // Get cells from ss
 
 		// setResource(); // populate resource intersection tables
@@ -308,6 +312,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		// getView().findObject(); // refresh views and collection tab count
 
 		// hhi.setStatus(Status.FullyParsed);
+
+		getView().refresh();
+		getView().refreshCollections();
+		getView().refreshDescriptionsLists();
 		addMessage("Spreadsheet Parsed");
 
 	}
@@ -384,19 +392,31 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		 * Check if correct Project
 		 */
 
-		String projecttitle = hhi.getStudy().getProjectlz().getProjecttitle();
-		System.out.println("hhi projecttitle = " + projecttitle);
+		String studyName = hhi.getStudy().getStudyName() + " " + hhi.getStudy().getReferenceYear();
+		em("hhi studyName = " + studyName);
 
 		icell = sheet.getRow(3).getCell(2, Row.CREATE_NULL_AS_BLANK);
 
 		System.out.println("first get = " + icell.getStringCellValue());
 
-		if (!icell.getStringCellValue().equals(projecttitle)) // Not for this project
+		if (!icell.getStringCellValue().equals(studyName)) // Not for this project
 		{
-			addError("Spreadsheet is not for current Study Project. Spreadsheet Project = " + icell.getStringCellValue()
-					+ ", Study Project = " + projecttitle);
+			addError("Spreadsheet is not for current Study . Spreadsheet Study Name + Reference Year = "
+					+ icell.getStringCellValue() + ", Study Project = " + studyName);
 			return;
 		}
+
+		// icell = sheet.getRow(5).getCell(2,
+		// Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+
+		String hhName = sheet.getRow(5).getCell(2, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+		Date hhIDate = sheet.getRow(5).getCell(4, Row.CREATE_NULL_AS_BLANK).getDateCellValue();
+		String hhInterviewers = sheet.getRow(5).getCell(6, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+
+		hhi.setHouseholdName(hhName);
+		hhi.setInterviewDate(hhIDate);
+		hhi.setInterviewers(hhInterviewers);
+
 		em(" end getInterviewDetails ");
 		// hhi.setStatus(Status.PartParsed);
 	}
@@ -409,6 +429,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 	private void getHHDetails(Workbook wb, Household hhi) {
 		em(" start getHHDetails ");
+		Integer k = 0;
 		Cell qcell = null;
 		Cell acell = null;
 		Double answerDouble = null;
@@ -421,107 +442,93 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			return; // no HH Questions
 
 		/*
+		 * Only want Household questions
+		 */
+		Iterator<ConfigQuestionUse> iterator = hhi.getStudy().getConfigQuestionUse().iterator();
+		while (iterator.hasNext()) {
+			System.out.println("in iterator 1");
+			ConfigQuestionUse nextq = iterator.next();
+			if (nextq.getConfigQuestion().getLevel().toString() == "Household") {
+				k++;
+			}
+		}
+		qsize = k;
+
+		em("No of HH questions = " + qsize);
+
+		/*
 		 * get spreadsheet HH Q and A
 		 */
-
-		class QandA {
-			private String question;
-			private String answer;
-
-			public String getQuestion() {
-				return question;
-			}
-
-			public void setQuestion(String question) {
-				this.question = question;
-			}
-
-			public String getAnswer() {
-				return answer;
-			}
-
-			public void setAnswer(String answer) {
-				this.answer = answer;
-			}
-
-		}
 
 		ArrayList<QandA> qand = new ArrayList<QandA>();
 
 		QandA qa = null;
 
-		System.out.println("done QandA setup " + qsize);
-
 		for (int i = 0; i < qsize; i++) {
 			System.out.println("in loop 1");
 			try {
 				qcell = sheet.getRow(2 + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
+
 			} catch (Exception ex) {
 				break;
 			}
-			System.out.println("in loop 2 qcell = ");
+
 			if (qcell.getStringCellValue().isEmpty())
 				break; // no more questions - but should be caught by number of questions
 
 			// What celltype is answer?
 
 			qa = new QandA();
-			em("about to get cell");
+
 			acell = sheet.getRow(2 + i).getCell(2, Row.CREATE_NULL_AS_BLANK);
-			em("done  get cell");
 
 			if (acell.getCellType() == Cell.CELL_TYPE_STRING) {
-				em("in compare 1");
+
 				qa.setAnswer(acell.getStringCellValue());
-				em("in compare 2");
+
 			} else if (acell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-				{
-					em("in compare 3");
-					answerDouble = acell.getNumericCellValue();
-					em("in compare 4 " + Double.toString(answerDouble));
-					answerString = Double.toString(answerDouble);
-					em("in compare 5 " + answerString);
-					qa.setAnswer(answerString.toString());
-					em("in compare 6 ");
-				}
 
-				qa.setQuestion(qcell.getStringCellValue());
-				System.out.println("in loop 3");
-				if (qa.getAnswer().isEmpty()) {
-					qa.setAnswer("-");
-				}
-				System.out.println("in loop 4" + qa.question + " " + qa.answer);
+				answerDouble = acell.getNumericCellValue();
 
-				qand.add(qa);
-				System.out.println("in loop 5");
-				System.out.println("qand " + qand.get(i).question);
+				answerString = Double.toString(answerDouble);
+
+				qa.setAnswer(answerString.toString());
 
 			}
+
+			qa.setQuestion(qcell.getStringCellValue());
+			System.out.println("in loop 3");
+			if (qa.getAnswer().isEmpty()) {
+				qa.setAnswer("-");
+			}
+
+			qand.add(qa);
+
 		}
+
 		/*
 		 * Number of HH Questions in this study
 		 */
 
-		Iterator<ConfigQuestionUse> iterator = hhi.getStudy().getConfigQuestionUse().iterator();
+		iterator = hhi.getStudy().getConfigQuestionUse().iterator();
 		while (iterator.hasNext()) {
+
 			System.out.println("in iterator");
 			ConfigQuestionUse nextq = iterator.next();
 			if (nextq.getConfigQuestion().getLevel().toString() == "Household") {
-				System.out.println(nextq.getConfigQuestion().getPrompt().toString());
+				em("prompt = " + nextq.getConfigQuestion().getPrompt().toString());
 				// Find answer for this question
-				for (int k = 0; k < qand.size(); k++) {
+				for (k = 0; k < qand.size(); k++) {
 					if (qand.get(k).getQuestion().equals(nextq.getConfigQuestion().getPrompt())) {
-						System.out.println("match found");
 
 						qanswer = new ConfigAnswer();
 						qanswer.setConfigQuestionUse(nextq);
-						em("qanswer 1" + qanswer.getConfigQuestionUse().getId());
+
 						qanswer.setAnswer(qand.get(k).getAnswer());
-						em("qanswer 2" + qanswer.getAnswer());
+
 						qanswer.setHousehold(hhi);
-						em("qanswer 3" + qanswer.getHousehold().getId());
+
 						qanswer.setStudy(nextq.getStudy());
-						em("qanswer 1" + qanswer.getStudy().getId());
 
 						qanswer.setStudy(hhi.getStudy());
 
@@ -541,6 +548,186 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	}
 
 	/**************************************************************************************************************************************************************************************************/
+	private void getHHMDetails(Workbook wb, Household hhi) {
+		em(" start getHHMDetails ");
+		Integer k = 0;
+		Cell qcell = null;
+		Cell acell = null;
+		Double answerDouble = null;
+		String answerString = null;
+		String gender = null;
+		String head = null;
+		HouseholdMember hhm = null;
+
+		Sheet sheet = wb.getSheetAt(HOUSEHOLDMEMBERS);
+		/*
+		 * get standard HHM details Note that members go across spreadsheet
+		 * 
+		 */
+
+		// get first Member
+
+		for (int hhmcol = 2; hhmcol < 22; hhmcol++) {
+
+			hhm = new HouseholdMember();
+
+			hhm.setHousehold(hhi);
+
+			hhm.setHouseholdMemberName(sheet.getRow(3).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue());
+			if (hhm.getHouseholdMemberName() == "") {
+				em("no more members");
+				hhmcol = 23;
+				break;
+			}
+
+			gender = sheet.getRow(4).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+			if (gender.equals("Male")) {
+				hhm.setGender(Sex.Male);
+			} else if (gender.equals("Female")) {
+				hhm.setGender(Sex.Female);
+			} else {
+				hhm.setGender(Sex.Unknown);
+			}
+
+			hhm.setAge((int) (sheet.getRow(5).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+			hhm.setYearOfBirth((int) (sheet.getRow(6).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+
+			head = sheet.getRow(7).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+			if (head.equals("Yes")) {
+				hhm.setHeadofHousehold(YN.Yes);
+			} else if (head.equals("No")) {
+				hhm.setHeadofHousehold(YN.No);
+			}
+
+			hhm.setMonthsAway((int) (sheet.getRow(5).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+			if (hhm.getMonthsAway() == 0) {
+				hhm.setAbsent(YN.Yes);
+			} else
+				hhm.setAbsent(YN.No);
+
+			XPersistence.getManager().persist(hhm);
+
+			/*
+			 * Needs some refactoring to combine HH and HHM QandA
+			 * 
+			 */
+
+			int qsize = hhi.getStudy().getConfigQuestionUse().size(); // Number of questions in this study for HH
+
+			if (qsize == 0)
+				return; // no HH Questions
+
+			/*
+			 * Only want HouseholdMember questions
+			 */
+			Iterator<ConfigQuestionUse> iterator = hhi.getStudy().getConfigQuestionUse().iterator();
+			while (iterator.hasNext()) {
+				System.out.println("in iterator 1");
+				ConfigQuestionUse nextq = iterator.next();
+				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember) {
+					k++;
+				}
+			}
+			qsize = k;
+
+			em("No of HHM questions = " + qsize);
+
+			/*
+			 * get spreadsheet HH Q and A
+			 */
+
+			ArrayList<QandA> qand = new ArrayList<QandA>();
+
+			QandA qa = null;
+
+			for (int i = 0; i < qsize; i++) {
+				System.out.println("in loop 1");
+				try {
+					qcell = sheet.getRow(9 + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
+
+				} catch (Exception ex) {
+					break;
+				}
+
+				if (qcell.getStringCellValue().isEmpty())
+					break; // no more questions - but should be caught by number of questions
+
+				// What celltype is answer?
+
+				qa = new QandA();
+
+				acell = sheet.getRow(9 + i).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK);
+
+				if (acell.getCellType() == Cell.CELL_TYPE_STRING) {
+
+					qa.setAnswer(acell.getStringCellValue());
+
+				} else if (acell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+
+					answerDouble = acell.getNumericCellValue();
+
+					answerString = Double.toString(answerDouble);
+
+					qa.setAnswer(answerString.toString());
+
+				}
+
+				qa.setQuestion(qcell.getStringCellValue());
+				System.out.println("in loop 3");
+				if (qa.getAnswer().isEmpty()) {
+					qa.setAnswer("-");
+				}
+
+				qand.add(qa);
+
+			}
+
+			em("no of qanda size = " + qand.size());
+
+			/*
+			 * Number of HH Questions in this study
+			 */
+
+			iterator = hhi.getStudy().getConfigQuestionUse().iterator();
+			while (iterator.hasNext()) {
+
+				System.out.println("in iterator");
+				ConfigQuestionUse nextq = iterator.next();
+				em("hhm level = " + nextq.getConfigQuestion().getLevel().toString());
+				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember)
+					em("prompt = " + nextq.getConfigQuestion().getPrompt().toString());
+				// Find answer for this question
+				for (k = 0; k < qand.size(); k++) {
+					if (qand.get(k).getQuestion().equals(nextq.getConfigQuestion().getPrompt())) {
+
+						qanswer = new ConfigAnswer();
+						qanswer.setConfigQuestionUse(nextq);
+
+						qanswer.setAnswer(qand.get(k).getAnswer());
+
+						// qanswer.setHousehold(hhi);
+
+						// qanswer.setStudy(nextq.getStudy());
+
+						qanswer.setStudy(hhi.getStudy());
+
+						qanswer.setHouseholdMember(hhm);
+
+						XPersistence.getManager().persist(qanswer);
+
+					}
+
+				}
+
+			}
+		}
+		getView().refresh();
+		em("end getHHMDetails");
+
+	}
+
+	/**************************************************************************************************************************************************************************************************/
+
 	public void getWorkSheetDetail(Workbook wb, Household hhi) {
 
 		/* Load spreadsheet into multi dimensional Cell [sheet] [row] [col] */
@@ -1543,6 +1730,28 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			// You can throw any runtime exception here
 			// System.out.println("caught in check cell");
 			return false;
+		}
+
+	}
+
+	class QandA {
+		private String question;
+		private String answer;
+
+		public String getQuestion() {
+			return question;
+		}
+
+		public void setQuestion(String question) {
+			this.question = question;
+		}
+
+		public String getAnswer() {
+			return answer;
+		}
+
+		public void setAnswer(String answer) {
+			this.answer = answer;
 		}
 
 	}

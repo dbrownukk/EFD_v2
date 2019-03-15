@@ -32,7 +32,7 @@ public class ConfigAnswer extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "householdMemberName")
 	private HouseholdMember householdMember;
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, optional = true,cascade=CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	private ConfigQuestionUse configQuestionUse;
 	/*************************************************************************************************/
 	@Column(length=45,nullable=false)
