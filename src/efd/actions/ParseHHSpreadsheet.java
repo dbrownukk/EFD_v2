@@ -45,7 +45,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 	private IConnectionProvider provider;
 
-	public static final int NUMBERSHEETS = 15;
+	public static final int NUMBERSHEETS = 15; // Number of sheets after HH Members
 	public static final int HOUSEHOLD = 1;
 	public static final int HOUSEHOLDMEMBERS = 2;
 
@@ -61,6 +61,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	public static final int EMPLOYMENT = 12;
 	public static final int TRANSFER = 13;
 	public static final int WILDFOOD = 14;
+
 	public static final int INPUTS = 15;
 	// public static final int FOODPURCHASE = 15;
 	// public static final int NONFOODPURCHASE = 14;
@@ -85,11 +86,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	/* Cells to hold all spreadsheet values */
 	/* Sheet / Row / Col */
 
-	Cell cell[][][] = new Cell[15][60][60];
+	Cell cell[][][] = new Cell[20][60][60];
 
 	/* Class variable definition */
 
-	WealthGroupInterview wgi;
 	ResourceSubType rst = null;
 	AssetLiveStock als = null;
 	AssetLand al = null;
@@ -107,7 +107,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	Inputs inputs = null;
 	ConfigAnswer qanswer = null;
 
-	int numberRows[] = new int[15]; // Sheet / Rows
+	int numberRows[] = new int[16]; // Sheet / Rows
 
 	Crop acrop = null;
 
@@ -259,7 +259,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			}
 		}
 
-		/* delete previous assets for this wgi */
+		/* delete previous assets for this hh */
 		/* delete previous assets */
 
 		hhi.getAssetLand().removeAll(hhi.getAssetLand());
@@ -305,13 +305,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		getHHMDetails(wb, hhi);
 
-		// getWorkSheetDetail(wb, hhi); // Get cells from ss
+		getWorkSheetDetail(wb, hhi); // Get cells from ss
 
-		// setResource(); // populate resource intersection tables
+		setResource(hhi); // populate resource intersection tables
 
-		// getView().findObject(); // refresh views and collection tab count
+		getView().findObject(); // refresh views and collection tab count
 
-		// hhi.setStatus(Status.FullyParsed);
+		hhi.setStatus(Status.FullyParsed);
 
 		getView().refresh();
 		getView().refreshCollections();
@@ -535,7 +535,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						XPersistence.getManager().persist(qanswer);
 						// hhi.getConfigAnswer().add(qanswer);
 
-						getView().refresh();
+					
 
 					}
 
@@ -721,7 +721,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			}
 		}
-		getView().refresh();
+	
 		em("end getHHMDetails");
 
 	}
@@ -743,15 +743,16 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		for (k = ASSETLAND; k <= NUMBERSHEETS; k++) { // Sheets ---- was <= DRB
 
 			try {
-
+				
 				sheet = wb.getSheetAt(k);
-
+				
 				for (i = 0; i < 40; i++) { // ROWS
-
-					for (j = 0; j < ws.get(k - 1).numcols; j++) {
-
+					
+					for (j = 0; j < ws.get(k - 3).numcols; j++) {
+				
 						// new check for null row
 						irow = sheet.getRow(i + 3);
+					
 						if (irow == null) {
 							System.out.println("No more data in this sheet " + k + " " + i);
 							numberRows[k] = i;
@@ -761,8 +762,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							break;
 
 						}
+						
 						cell[k][i][j] = sheet.getRow(i + 3).getCell((j + 1), Row.CREATE_NULL_AS_BLANK);
-
+						
 						/*
 						 * Used for testing if (k == EMPLOYMENT) {
 						 * 
@@ -810,13 +812,14 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			}
 		}
 
-		// System.out.println("done worksheet detail ");
+		System.out.println("done worksheet detail ");
 
 	}
 
 	/**************************************************************************************************************************************************************************************************/
-	private void setResource() {
+	private void setResource(Household hhi) {
 
+		em("in getresource");
 		ResourceType[] rtype = new ResourceType[15];
 
 		/* Get list of currencies for validation of Cash Asset */
@@ -840,20 +843,23 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		 */
 
 		/* set validation rtypes array */
+	
 		for (i = ASSETLAND; i <= INPUTS; i++) {
-
-			rtype[i] = (ResourceType) XPersistence.getManager()
-					.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 1).resourceType + "'")
-					.getSingleResult();
-
+			
+			try {
+				rtype[i] = (ResourceType) XPersistence.getManager()
+						.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 3).resourceType + "'")
+						.getSingleResult();
+			} catch (Exception ex) {
+				em("did not find rst for " + ws.get(i - 3).resourceType);
+			}
 		}
-
+		
 		for (i = ASSETLAND; i <= INPUTS; i++) { // Sheet
-			System.out.println("in switch i at beginning = " + i);
-			System.out.println("in switch no rows in this one =  " + numberRows[i]);
+			em("in loop ASSETLAND TO INPUTS =  "+i);
 			// breaksheet: for (j = 0; j < 35; j++) { // Row
 			breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
-				System.out.println("in switch i = " + i);
+				em("inp loop assets 777 ");
 				switch (i) {
 
 				case ASSETLAND:
@@ -866,12 +872,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done al get = " + rst.getResourcetypename());
+							System.out.println("done al get = " + rst.getResourcetypename());
 
 							al.setResourceSubType(rst);
 							al.setStatus(efd.model.Asset.Status.Valid);
 
 							/* Is Unit Entered Valid for this resource */
+							em("done al get 11 ");
 							if (!checkSubTypeEntered(al.getUnit(), rst))
 								al.setStatus(efd.model.Asset.Status.Invalid);
 
@@ -879,8 +886,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							al.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
-						wgi.getAssetLand().add(al);
-						getView().refreshCollections();
+						hhi.getAssetLand().add(al);
+
+						em("done al get 33 ");
+					
 						k = 100;
 
 						break;
@@ -888,7 +897,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					}
 
 					catch (Exception ex) {
-						addMessage("Problem parsing Land Asset worksheet");
+						addMessage("Problem parsing Land Asset worksheet " + ex);
 						k = 100;
 						break breaksheet;
 					}
@@ -915,8 +924,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							als.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getAssetLiveStock().add(als);
-						getView().refreshCollections();
+						hhi.getAssetLiveStock().add(als);
+						//getView().refreshCollections();
 						k = 100;
 						break;
 
@@ -949,8 +958,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							atrade.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getAssetTradeable().add(atrade);
-						getView().refreshCollections();
+						hhi.getAssetTradeable().add(atrade);
+						//getView().refreshCollections();
 						k = 100;
 						break;
 
@@ -975,20 +984,43 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						afood.setQuantity(getCellDouble(cell[i][j][2]));
 
-						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
-								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done afood get = " + rst.getResourcetypename());
+						// Food Stocks come from Crops, Wild Foods, Food Purchases or Livestock Products
+						// - there is not a Food Stock type in RST
+
+						// Current Food Stock from Spreadsheet
+						// is this a valid resource type?
+
+						ResourceSubType rstcrops = null;
+						ResourceSubType rstwildfoods = null;
+						ResourceSubType rstfoodpurchase = null;
+
+						if (((rstcrops = checkSubType(cell[i][j][0].getStringCellValue(),
+								rtype[9].getIdresourcetype().toString())) != null)
+								|| ((rstwildfoods = checkSubType(cell[i][j][0].getStringCellValue(),
+										rtype[14].getIdresourcetype().toString())) != null)
+								|| ((rstfoodpurchase = checkSubType(cell[i][j][0].getStringCellValue(),
+										rtype[11].getIdresourcetype().toString())) != null))
+
+						{
+							// which rst?
+							if (rstcrops != null)
+								rst = rstcrops;
+							else if (rstwildfoods != null)
+								rst = rstwildfoods;
+							else if (rstfoodpurchase != null)
+								rst = rstfoodpurchase;
 
 							afood.setResourceSubType(rst);
 							afood.setStatus(efd.model.Asset.Status.Valid);
-							if (!checkSubTypeEntered(afood.getUnit(), rst))
-								afood.setStatus(efd.model.Asset.Status.Invalid);
+
+							// if (!checkSubTypeEntered(afood.getUnit(), rst))
+							// afood.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
 							afood.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getAssetFoodStock().add(afood);
-						getView().refreshCollections();
+						hhi.getAssetFoodStock().add(afood);
+						//getView().refreshCollections();
 						k = 100;
 						break;
 
@@ -1021,8 +1053,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							atree.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getAssetTree().add(atree);
-						getView().refreshCollections();
+						hhi.getAssetTree().add(atree);
+						//getView().refreshCollections();
 						k = 100;
 						break;
 
@@ -1061,7 +1093,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							}
 
 						}
-						wgi.getAssetCash().add(acash);
+						hhi.getAssetCash().add(acash);
 						getView().refreshCollections();
 						k = 100;
 						break;
@@ -1116,8 +1148,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							acrop.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getCrop().add(acrop);
-						getView().refreshCollections();
+						hhi.getCrop().add(acrop);
+					//	getView().refreshCollections();
 
 						k = 100;
 						break;
@@ -1166,7 +1198,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							alss.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getLivestockSales().add(alss);
+						hhi.getLivestockSales().add(alss);
 						getView().refreshCollections();
 						k = 100;
 						break;
@@ -1217,8 +1249,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							alsp.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getLivestockProducts().add(alsp);
-						getView().refreshCollections();
+						hhi.getLivestockProducts().add(alsp);
+					//	getView().refreshCollections();
 						k = 100;
 						break;
 
@@ -1284,8 +1316,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						}
 
 						System.out.println("in emp  33");
-						wgi.getEmployment().add(aemp);
-						getView().refreshCollections();
+						hhi.getEmployment().add(aemp);
+						//getView().refreshCollections();
 						k = 100;
 						break;
 
@@ -1302,7 +1334,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						at = new Transfer();
 						int l = 0;
 
-						// System.out.println("Official text = "+cell[i][j][l].getStringCellValue());
+						System.out.println("Official text = " + cell[i][j][l].getStringCellValue());
 
 						if (cell[i][j][l++].getStringCellValue().equals("Official"))
 							at.setIsOfficial(true);
@@ -1400,8 +1432,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							}
 						}
-						wgi.getTransfer().add(at);
-						getView().refreshCollections();
+						hhi.getTransfer().add(at);
+					//	getView().refreshCollections();
 						k = 100;
 
 						break;
@@ -1448,7 +1480,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							awf.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						wgi.getWildFood().add(awf);
+						hhi.getWildFood().add(awf);
 						getView().refreshCollections();
 						k = 100;
 						break;
@@ -1461,11 +1493,92 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						break breaksheet;
 					}
 
+				case INPUTS:
+					
+					em("in INPUTS");
+					try {
+					
+						Inputs ins = new Inputs();
+						int l = 0;
+
+						ins.setItemPurchased(cell[i][j][l++].getStringCellValue());
+
+						ins.setUnit(cell[i][j][l++].getStringCellValue());
+
+						ins.setUnitsPurchased(getCellDouble(cell[i][j][l++]));
+						ins.setPricePerUnit(getCellDouble(cell[i][j][l++]));
+
+						ins.setResource1UsedFor(cell[i][j][l++].getStringCellValue());
+						ins.setPercentResource1(getCellDouble(cell[i][j][l++]));
+						ins.setResource2UsedFor(cell[i][j][l++].getStringCellValue());
+						ins.setPercentResource2(getCellDouble(cell[i][j][l++]));
+						ins.setResource3UsedFor(cell[i][j][l++].getStringCellValue());
+						ins.setPercentResource3(getCellDouble(cell[i][j][l++]));
+
+						// Check if Resource 1/2/3 Used for are Valid
+
+						if (checkInputsResource(ins.getResource1UsedFor(), ins.getResource2UsedFor(),
+								ins.getResource3UsedFor()))
+
+						{
+
+							ins.setStatus(efd.model.Asset.Status.Valid);
+						}
+
+						else {
+							ins.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						em("in INPUTS  44");
+						hhi.getInputs().add(ins);
+					//	getView().refreshCollections();
+						k = 100;
+						break;
+
+					}
+
+					catch (Exception ex) {
+						addMessage("Problem parsing Inputs worksheet ");
+						k = 100;
+						break breaksheet;
+					}
+
 				} // end switch
 
 			}
 		}
 		System.out.println("done set resource");
+	}
+
+	private Boolean checkInputsResource(String resource1UsedFor, String resource2UsedFor, String resource3UsedFor) {
+
+		ArrayList<String> inputStrings = new ArrayList(); // Prob want a sorted list..
+
+		List<ResourceSubType> resourceSubTypes = XPersistence.getManager().createQuery("from ResourceSubType")
+				.getResultList();
+		List<ResourceType> resourceTypes = XPersistence.getManager().createQuery("from ResourceType").getResultList();
+		List<Category> categories = XPersistence.getManager().createQuery("from Category").getResultList();
+
+		// Get codes for Currency and add to Validations sheet
+		for (int k = 0; k < resourceSubTypes.size(); k++) {
+			inputStrings.add(resourceSubTypes.get(k).getResourcetypename().toString());
+		}
+		for (int k = 0; k < resourceTypes.size(); k++) {
+			inputStrings.add(resourceTypes.get(k).getResourcetypename().toString());
+
+		}
+		for (int k = 0; k < categories.size(); k++) {
+			inputStrings.add(categories.get(k).getCategoryName().toString());
+		}
+		// Collections.sort(inputStrings);
+
+		if (inputStrings.contains(resource1UsedFor))
+			return (true);
+		else if (inputStrings.contains(resource2UsedFor))
+			return (true);
+		else if (inputStrings.contains(resource3UsedFor))
+			return (true);
+		else
+			return (false);
 	}
 
 	/**************************************************************************************************************************************************************************************************/
@@ -1517,6 +1630,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			String var2 = stripS(var1);
 			String var3 = addS(var1);
 
+			// em("checksubtype rst = " + resourceType);
+
 			// System.out.println("var 1 = " + var1);
 			// System.out.println("var 2 = " + var2);
 			// System.out.println("var 3 = " + var3);
@@ -1527,7 +1642,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							+ "'" + ") ")
 					.setMaxResults(1).getSingleResult();
 
-			// System.out.println("rsty = " + rsty.getResourcetypename());
+			System.out.println("rsty = " + rsty.getResourcetypename());
 
 			/*
 			 * check RST synonym

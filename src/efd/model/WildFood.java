@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 /*
 @Views({
@@ -28,14 +29,17 @@ public class WildFood extends Asset{
 	@Column(name = "UnitsProduced", length = 6)
 	@NotNull
 	@Min(value = 0)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold", length = 6)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 	
 	
 	@Column(name = "PricePerUnit",precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 
 	@Depends("unitsProduced,unitsSold,otherUse")
@@ -49,28 +53,33 @@ public class WildFood extends Asset{
 	//private Double unitsConsumed;
 	
 	@Column(name = "OtherUse", length = 255)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double otherUse;
 
 	@Column(name = "Market1", length = 50)
 	private String market1;
 	@Column(name = "PercentTradeMarket1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentTradeMarket1;
 	
 	@Column(name = "Market2", length = 50)
 	private String market2;
 	@Column(name = "PercentTradeMarket2", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentTradeMarket2;
 	
 	@Column(name = "Market3", length = 50)
 	private String market3;
 	@Column(name = "PercentTradeMarket3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentTradeMarket3;
 	
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
+	@Required
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Wild Food%'")
 	private ResourceSubType resourceSubType;
 	

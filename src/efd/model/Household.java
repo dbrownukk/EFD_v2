@@ -32,22 +32,30 @@ public class Household extends EFDIdentifiable {
 
 	private void validate() throws Exception {
 		System.out.println("calc next household number = ");
-		Integer lastNumber = null;
+		int lastNumber = 0;
 		String studyid = getStudy().getId();
 		System.out.println("calc next household number, studyid =  = " + studyid);
 		try {
-			Query query = XPersistence.getManager()
-					.createQuery("select max(householdNumber) from Household where study_id = :studyid");
-			query.setParameter("studyid", studyid);
-			lastNumber = (Integer) query.getSingleResult();
+			TypedQuery<Integer> ilast = XPersistence.getManager()
+					.createQuery("select max(householdNumber) from Household where study_id = :studyid", Integer.class);
+			ilast.setParameter("studyid", studyid);
+			
+			System.out.println("post XP select");
+			lastNumber = ilast.getSingleResult();
+			
+			System.out.println("post XP select lastnumber = "+lastNumber);
+			//lastNumber = query.getSingleResult();
+		
 		} catch (Exception ex) {
 			System.out.println("exception = "+ex.toString());
-			if (lastNumber == null)
+			if (lastNumber == 0)
 				setHouseholdNumber(1);
 			return;
 		}
 		if (lastNumber > 0)
 			setHouseholdNumber(lastNumber + 1);
+		else
+			setHouseholdNumber(1);
 		return;
 
 	}
@@ -158,6 +166,7 @@ public class Household extends EFDIdentifiable {
 	
 	
 	@DisplaySize(25)
+	@OnChange(value = OnChangeSetHHStatus.class)
 	private Status status;
 
 	public Status getStatus() {

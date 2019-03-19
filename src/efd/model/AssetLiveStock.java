@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 
 
@@ -29,13 +30,16 @@ public class AssetLiveStock extends Asset{
 	@Column(name = "NumberOwnedAtStart", nullable=false )
 	//@Required
 	@NotNull
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double numberOwnedAtStart;
 
 	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 	
 	@ManyToOne
+	@Required
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Livestock'")
 	private ResourceSubType resourceSubType;

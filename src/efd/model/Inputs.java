@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 @Embeddable
 
@@ -17,31 +18,37 @@ public class Inputs extends Asset {
 	private String itemPurchased;
 	
 	@Column(name = "UnitsPurchased", length = 6)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsPurchased;
 
 	@Column(name = "PricePerUnit", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 
 	@Column(name = "Resource1UsedFor", length = 50)
 	private String resource1UsedFor;
 	@Column(name = "PercentResource1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentResource1;
 
 	@Column(name = "Resource2UsedFor", length = 50)
 	private String resource2UsedFor;
 	@Column(name = "PercentResource2", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentResource2;
 	
 	@Column(name = "Resource3UsedFor", length = 50)
 	private String resource3UsedFor;
 	@Column(name = "PercentResource3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentResource3;
 	
 	@ManyToOne
+
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename} like '%Wild Food%'")
 	private ResourceSubType resourceSubType;

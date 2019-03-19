@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 import efd.model.Asset.Status;
 import efd.model.WealthGroupInterview.*;
@@ -24,9 +25,11 @@ public class AssetFoodStock extends Asset {
 	
 
 	@Column(name = "Quantity" )
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double quantity;
 	
 	@ManyToOne
+	@Required
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Stocks','Crops','Wild Foods','Food Purchase','Livestock Products')")
 	

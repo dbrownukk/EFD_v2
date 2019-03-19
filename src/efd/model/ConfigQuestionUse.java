@@ -5,52 +5,61 @@ import java.util.*;
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
+import org.openxava.jpa.*;
 import org.openxava.util.*;
 
 import efd.model.ConfigQuestion.*;
 import efd.validations.*;
 
-@Views({ @View(members = "QuestionUse[study,configQuestion]")})
+@Views({ @View(members = "QuestionUse[study,configQuestion]") })
 //		@View(name = "FromConfigQuestion", members = "QuestionUse[#study,level]") })
 
-@Tab(properties = "study.studyName,study.referenceYear,configQuestion.level,configQuestion.prompt,configQuestion.answerType")
+@Tab(properties = "study.studyName,study.referenceYear,configQuestion.level,configQuestion.prompt,configQuestion.answerType", defaultOrder = "${configQuestion.level} asc")
 
 @Entity
 
-@Table(name = "ConfigQuestionUse",uniqueConstraints = @UniqueConstraint(name="configUseQuestion",columnNames = { "study_ID","configQuestion_ID"}))
-
-
+@Table(name = "ConfigQuestionUse", uniqueConstraints = @UniqueConstraint(name = "configUseQuestion", columnNames = {
+		"study_ID", "configQuestion_ID" }))
 
 public class ConfigQuestionUse extends EFDIdentifiable {
-	
-	/* Fails in Copy Study  - need to discuss use of Level in Study and Question Usages
-	@PrePersist
-	@PreUpdate
-	private void validate() throws Exception {
-		try {
-			System.out.println("in configQuestionUse update");
-			
-			setLevel(getConfigQuestion().getLevel());
 
-			
+	/*
+	 * If config Question Level is Study then create a dummy answer Update answer
+	 * create is handled in configQuestion
+	 */
+
+	@PostPersist
+
+	private void createAnswer() throws Exception {
+		try {
+			System.out.println("in configQuestionUse postPersist");
+
+			System.out.println("postpersist level =  " + getConfigQuestion().getLevel());
+
+			if (getConfigQuestion().getLevel().equals(Level.Study)) {
+				XPersistence.getManager();
+				System.out.println("its a Study in post persist");
+				ConfigAnswer answer = new ConfigAnswer();
+				answer.setAnswer("-");
+				answer.setStudy(getStudy());
+				XPersistence.commit();
+
+			}
 
 		} catch (Exception ex) {
-			System.out.println("in jpa exception in configQuestion " + ex);
+			System.out.println("in jpa exception in configQuestionuse postpersist " + ex);
 			return;
 
 		}
 
 	}
-	*/
-	
-	
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
 	@NoCreate
-	
+
 	@ReferenceView("FromStdOfLiving")
-	//@DescriptionsList(descriptionProperties = "studyName")
+	// @DescriptionsList(descriptionProperties = "studyName")
 	@NoModify
 	@NoFrame
 	@NoSearch
@@ -58,16 +67,16 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	private Study study;
 	/*************************************************************************************************/
 	@ManyToOne(optional = false)
-	//@ReferenceView("FromQuestionUse")
+	// @ReferenceView("FromQuestionUse")
 	private ConfigQuestion configQuestion;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "configQuestionUse",cascade=CascadeType.REMOVE)
-	//@ListProperties("answer")
+	@OneToMany(mappedBy = "configQuestionUse", cascade = CascadeType.REMOVE)
+	// @ListProperties("answer")
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 	@Column(nullable = true)
-	//@Required
-	//@Editor("ValidValuesRadioButton")
+	// @Required
+	// @Editor("ValidValuesRadioButton")
 	@DisplaySize(30)
 	@OnChange(value = OnChangeQuestionUseLevel.class)
 	private Level level;

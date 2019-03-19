@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 @Embeddable
 
@@ -20,11 +21,13 @@ public class AssetCash extends Asset{
 	private String currencyEnteredName;
 	
 	@Column(name = "Amount" ,precision=10, scale=2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Digits(integer=10,fraction=2)
 	private Double amount;
 	
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
+	@Required
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Cash'")
 	private ResourceSubType resourceSubType;
 

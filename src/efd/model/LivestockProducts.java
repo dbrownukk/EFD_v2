@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 @Embeddable
 
@@ -24,13 +25,16 @@ public class LivestockProducts extends Asset {
 
 	
 	@Column(name = "UnitsProduced", nullable = false)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold")
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 
 	@Column(name = "PricePerUnit", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 	
 	@Depends("unitsProduced,unitsSold,unitsOtherUse")
@@ -43,28 +47,37 @@ public class LivestockProducts extends Asset {
 	//@Column(name = "UnitsConsumed")
 	//private Double unitsConsumed;
 
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "UnitsOtherUse")
 	private Double unitsOtherUse;
 
 	@Column(name = "Market1", length = 50)
 	private String market1;
+	
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "PercentTradeMarket1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private Double percentTradeMarket1;
 	
 	@Column(name = "Market2", length = 50)
 	private String market2;
+	
 	@Column(name = "PercentTradeMarket2", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentTradeMarket2;
+	
 	
 	@Column(name = "Market3", length = 50)
 	private String market3;
+	
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "PercentTradeMarket3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private Double percentTradeMarket3;
 	
 	@ManyToOne
+	@Required
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like 'Livestock Products'")
 	private ResourceSubType resourceSubType;

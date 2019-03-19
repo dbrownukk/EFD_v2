@@ -5,6 +5,7 @@ import javax.persistence.*;
 import org.openxava.annotations.*;
 
 import efd.actions.*;
+import efd.validations.*;
 
 
 
@@ -15,6 +16,7 @@ public class Asset {
 
 
 	@Column(name = "Status", nullable = false)
+//	@OnChange(OnChangeAssetStatus.class)
 	private Status status;
 
 	public enum Status {

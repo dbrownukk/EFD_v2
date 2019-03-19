@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 import efd.actions.*;
 
@@ -76,6 +77,7 @@ public class WGCharacteristicsResource {
 	// ----------------------------------------------------------------------------------------------//
 	@Stereotype("MONEY")
 	@Column(name = "WGResourceAmount")
+	@DefaultValueCalculator(value = ZeroBigDecimalCalculator.class)
 	private BigDecimal wgresourceamount;
 
 	// ----------------------------------------------------------------------------------------------//

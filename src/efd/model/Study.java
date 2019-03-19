@@ -26,7 +26,7 @@ import efd.model.ConfigQuestion.*;
 		+ "LivestockSales{characteristicsResourceLivestockSales}"
 		+ "LivestockProducts{characteristicsResourceLivestockProducts}"
 		+ "Employment{characteristicsResourceEmployment}" + "Transfers{characteristicsResourceTransfers}"
-		+ "WildFoods{characteristicsResourceWildFoods}},Questions{configQuestionUse}"),
+		+ "WildFoods{characteristicsResourceWildFoods}},Questions{configQuestionUse},StudyQuestionAnswers{configAnswer}"),
 		// + "ConfigQuestionUse{configQuestionUse}"),
 		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
 		@View(name = "StudyInterview", members = "studyName,referenceYear,spreadsheets"),
@@ -265,7 +265,7 @@ public class Study extends EFDIdentifiable {
 	/*************************************************************************************************/
 
 	@OneToMany(mappedBy = "study" ,cascade=CascadeType.REMOVE)
-	@XOrderBy("level desc")
+	@XOrderBy("configQuestion.level asc")
 	@NewAction("ConfigQuestionUse.new")
 	@EditAction("ConfigQuestionUse.edit")
 	@ListProperties("configQuestion.prompt,configQuestion.hint,configQuestion.gender,"
@@ -320,14 +320,34 @@ public class Study extends EFDIdentifiable {
 	}
 
 
-
+	/*************************************************************************************************/
+	@OneToMany(mappedBy = "study", cascade=CascadeType.REMOVE)
+	//@NoCreate
+	//@AddAction("")
+	@ListProperties("configQuestionUse.configQuestion.prompt,answer")
+	@Condition("${configQuestionUse.configQuestion.level} = 'Study'")
+	@EditOnly
+	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 
+	
+	
+	
+	
+	
 	public String getStudyName() {
 		return studyName;
 	}
 
 
+
+	public Collection<ConfigAnswer> getConfigAnswer() {
+		return configAnswer;
+	}
+
+	public void setConfigAnswer(Collection<ConfigAnswer> configAnswer) {
+		this.configAnswer = configAnswer;
+	}
 
 	public void setStudyName(String studyName) {
 		this.studyName = studyName;

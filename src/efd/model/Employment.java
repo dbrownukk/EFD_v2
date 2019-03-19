@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 @Embeddable
 
@@ -23,17 +24,21 @@ public class Employment extends Asset {
 	private String employmentName;
 
 	@Column(name = "PeopleCount", nullable = false)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double peopleCount;
 
 	@Column(name = "UnitsWorked")
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsWorked;
 	
 	@Column(name = "CashPaymentAmount", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double cashPaymentAmount;
 	
 	@ManyToOne
 	@JoinColumn(name = "FoodResourceSubType")
+
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops','Livestock Products')")
 	private ResourceSubType foodResourceSubType;
 
@@ -48,23 +53,29 @@ public class Employment extends Asset {
 	
 	@Column(name = "WorkLocation1", length = 50)
 	private String workLocation1;
+	
 	@Column(name = "PercentWorkLocation1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentWorkLocation1;
 	
 	@Column(name = "WorkLocation2", length = 50)
 	private String workLocation2;
 	@Column(name = "PercentWorkLocation2", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentWorkLocation2;
 	
 	@Column(name = "WorkLocation3", length = 50)
 	private String workLocation3;
 	@Column(name = "PercentWorkLocation3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentWorkLocation3;
 	
+	
 	@ManyToOne
+	@Required
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Employment%'")
 	private ResourceSubType resourceSubType;

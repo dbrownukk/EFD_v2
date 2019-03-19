@@ -39,47 +39,47 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 		Double dtest;
 		Boolean messaging = false;
 
-		String wgiid = getView().getValueString("wgiid");
+		String hhid = getView().getValueString("id");
 
-		WealthGroupInterview wgi = XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
-		if (wgi.getSpreadsheet().isEmpty()) {
+		Household hhi = XPersistence.getManager().find(Household.class, hhid);
+		if (hhi.getSpreadsheet().isEmpty()) {
 			addError("Upload completed Interview Spreadsheet before validating");
 			return;
-		} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Generated)) {
+		} else if (hhi.getStatus().equals(WealthGroupInterview.Status.Generated)) {
 			addError("Cannot Validate Interview Spreadsheet - Upload and Parse Spreadsheet first ");
 			return;
-		} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Uploaded)) {
+		} else if (hhi.getStatus().equals(WealthGroupInterview.Status.Uploaded)) {
 			addError("Cannot Validate Interview Spreadsheet - Parse Spreadsheet first");
 			return;
-		} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Validated)) {
+		} else if (hhi.getStatus().equals(WealthGroupInterview.Status.Validated)) {
 			addError("Cannot Validate Interview Spreadsheet Data - Already Validated");
 			return;
 		}
 
-		System.out.println("DONE wgi ");
+		System.out.println("DONE hhi ");
 		/*************************************************************************************************/
 		/*
 		 * VALIDATE EACH Resource Asset type
 		 */
-		List<AssetLand> al = (List<AssetLand>) wgi.getAssetLand();
-		List<AssetLiveStock> als = (List<AssetLiveStock>) wgi.getAssetLiveStock();
-		List<AssetTradeable> at = (List<AssetTradeable>) wgi.getAssetTradeable();
-		List<AssetFoodStock> afs = (List<AssetFoodStock>) wgi.getAssetFoodStock();
-		List<AssetTree> atree = (List<AssetTree>) wgi.getAssetTree();
-		List<AssetCash> ac = (List<AssetCash>) wgi.getAssetCash();
-		List<Crop> crop = (List<Crop>) wgi.getCrop();
-		List<LivestockSales> lss = (List<LivestockSales>) wgi.getLivestockSales();
-		List<LivestockProducts> lsp = (List<LivestockProducts>) wgi.getLivestockProducts();
-		List<Employment> emp = (List<Employment>) wgi.getEmployment();
-		List<Transfer> tran = (List<Transfer>) wgi.getTransfer();
-		List<WildFood> wf = (List<WildFood>) wgi.getWildFood();
-		List<FoodPurchase> fp = (List<FoodPurchase>) wgi.getFoodPurchase();
-		List<NonFoodPurchase> nfp = (List<NonFoodPurchase>) wgi.getNonFoodPurchase();
+		List<AssetLand> al = (List<AssetLand>) hhi.getAssetLand();
+		List<AssetLiveStock> als = (List<AssetLiveStock>) hhi.getAssetLiveStock();
+		List<AssetTradeable> at = (List<AssetTradeable>) hhi.getAssetTradeable();
+		List<AssetFoodStock> afs = (List<AssetFoodStock>) hhi.getAssetFoodStock();
+		List<AssetTree> atree = (List<AssetTree>) hhi.getAssetTree();
+		List<AssetCash> ac = (List<AssetCash>) hhi.getAssetCash();
+		List<Crop> crop = (List<Crop>) hhi.getCrop();
+		List<LivestockSales> lss = (List<LivestockSales>) hhi.getLivestockSales();
+		List<LivestockProducts> lsp = (List<LivestockProducts>) hhi.getLivestockProducts();
+		List<Employment> emp = (List<Employment>) hhi.getEmployment();
+		List<Transfer> tran = (List<Transfer>) hhi.getTransfer();
+		List<WildFood> wf = (List<WildFood>) hhi.getWildFood();
+		List<Inputs> ins = (List<Inputs>) hhi.getInputs();
+		
 
 		System.out.println("DONE LISTS ");
 		
 		for (i = 0; i < al.size(); i++) {
-			if (!al.get(i).getStatus().equals(efd.model.Asset.Status.Valid)) {
+			if (!al.get(i).getStatus().equals(Status.Valid)) {
 				
 				addMessage("Land Assets still Invalid or Unchecked");
 				isinvalid = true;
@@ -176,29 +176,22 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 		}
 		//System.out.println("DONE WF ");
-		for (i = 0; i < fp.size(); i++) {
-			if (!fp.get(i).getStatus().toString().equals("Valid")) {
-				addMessage("Food Purchase still Invalid or Unchecked ");
+		for (i = 0; i < ins.size(); i++) {
+			if (!ins.get(i).getStatus().toString().equals("Valid")) {
+				addMessage("Inputs still Invalid or Unchecked ");
 				isinvalid = true;
 				break;
 			}
 		}
-		//System.out.println("DONE FP ");
-		for (i = 0; i < nfp.size(); i++) {
-			if (!nfp.get(i).getStatus().toString().equals("Valid")) {
-				addMessage("Non Food Purchase still Invalid or Unchecked ");
-				isinvalid = true;
-				break;
-			}
-		}
+
 		//System.out.println("DONE NFP ");
 		if (isinvalid)
 			addMessage("Validation Complete with Invalid Assets");
 		else 
 		{
-			wgi.setStatus(WealthGroupInterview.Status.Validated);	
+			hhi.setStatus(WealthGroupInterview.Status.Validated);	
 			getView().setEditable(false);
-			addActions("SetEditable.SetEditable");
+			addActions("SetEditable.SetEditableHH");
 			getView().refresh();
 			addMessage("Validation Complete");
 		}

@@ -14,7 +14,7 @@ import com.gargoylesoftware.htmlunit.*;
 public class ProjectTest extends ModuleTestBase{
 
 	public ProjectTest(String nameTest) {
-		super(nameTest, "EFD_v2", "Project");
+		super(nameTest, "EFD_HM", "Project");
 		
 	}
 	
@@ -22,7 +22,7 @@ public class ProjectTest extends ModuleTestBase{
 		
 		Date date = new Date();
 		
-		login("admin", "admin2018");
+		login("ohea", "ohea2019");
 		System.out.println("done login");
 		//Create
 		waitAJAX();

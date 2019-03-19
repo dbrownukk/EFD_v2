@@ -20,7 +20,7 @@ import efd.validations.*;
 //	@View(name="FromQuestionUse",members="Question[topic,prompt,answerType,hint,level]")
 })
 
-//@Tab(properties="topic,prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper",defaultOrder="${label} desc") 
+@Tab(properties="topic.topic, prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper",defaultOrder="${topic} desc") 
 
 @Entity
 
@@ -35,6 +35,7 @@ public class ConfigQuestion extends EFDIdentifiable {
 	/*************************************************************************************************/
 
 	@Column(nullable = false)
+	@Required
 	@OnChange(value = OnChangeAnswerType.class)
 	private AnswerType answerType;
 

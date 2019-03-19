@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 import efd.model.Asset.*;
 
@@ -31,13 +32,16 @@ public class Transfer extends Asset{
 	
 	
 	@Column(name = "PeopleReceiving")
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double peopleReceiving;
 	
 	@Column(name = "TimesReceived")
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double timesReceived;
 	
 	@Column(name = "CashTransferAmount" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double cashTransferAmount;
 	
 	

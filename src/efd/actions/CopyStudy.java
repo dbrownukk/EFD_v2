@@ -87,11 +87,21 @@ public class CopyStudy extends ViewBaseAction {
 
 			for (int i = 0; i < charResources.size(); i++) {
 				newCharResource = new WGCharacteristicsResource();
-				newCharResource.setResourcesubtype(charResources.get(i).getResourcesubtype());
-
+				System.out.println("rst to copy = "+charResources.get(i).getResourcesubtype());
+				
+				// edge case FoodStocks - check if type = foodstock 
+				// Food Stocks is not an RST 
+				
+				
+				
+				newCharResource = (WGCharacteristicsResource) BeanUtils.cloneBean(charResources.get(i));
+				
+				//newCharResource.setResourcesubtype(charResources.get(i).getResourcesubtype());
+				
+				//newCharResource.setWgresourceunit(charResources.get(i).getWgresourceunit());
+				
 				newCharResource.setStudy(newStudy);
-				newCharResource.setWgresourceunit(charResources.get(i).getWgresourceunit());
-
+				
 				System.out.println(
 						"new char res = " + newCharResource.getResourcesubtype().getIdresourcesubtype() + " " + i);
 
@@ -113,8 +123,9 @@ public class CopyStudy extends ViewBaseAction {
 
 				BeanUtils.copyProperties(stdel, stdels.get(i));
 				System.out.println("done bean copy" + stdel.getResourcesubtype().getResourcetypename());
+				
 				stdel.setId(null);
-				stdel.setStudy(newStudy);
+				stdel.setStudy(newStudy);  
 				stdel.setVersion(null);
 				XPersistence.getManager().persist(stdel);
 			}
