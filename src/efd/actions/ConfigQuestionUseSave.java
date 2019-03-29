@@ -1,36 +1,60 @@
 package efd.actions;
 
+import java.rmi.*;
+import java.util.*;
+
+import javax.ejb.*;
+import javax.persistence.*;
+import javax.swing.event.*;
+
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
+import org.openxava.tab.impl.*;
 
 import efd.model.*;
+import efd.model.ConfigQuestion.*;
 
-/* Ensure Level of ConfigQuestionUse is same as Config Question Level */
+/* 
+ * Create dummy answer on creation of question usage at Question Study level
+ * 
+ */
 
-public class ConfigQuestionUseSave extends SaveAction {
+public class ConfigQuestionUseSave extends SaveElementInCollectionAction {
 
-	
 	public void execute() throws Exception {
-		//setResetAfter(false);
-		super.execute();
-		XPersistence.commit();
-		System.out.println("in configQuestionUse Save"+getView().getAllValues());
-		
+		// setResetAfter(false);
 
-		
+		if (getCollectionElementView().getValue("configQuestion.level").equals(Level.Study)) {
 
-		if (getView().getValue("level") == "Study") {
+			String studyid = getView().getValueString("id");
+			String cqid = getCollectionElementView().getValueString("configQuestion.id");
 
-			Object cquid = getView().getValue("configQuestionUse.id").toString();
+			System.out.println("in Study if 2");
 
-			System.out.println("cquid = " + cquid);
+			super.execute();
 
-		
-			
-		}
-		return;
+			ConfigQuestionUse cqu = (ConfigQuestionUse) XPersistence.getManager().createQuery(
+					"select c from ConfigQuestionUse c where c.configQuestion.id = :cqid and c.study.id = :studyid",
+					ConfigQuestionUse.class).setParameter("cqid", cqid).setParameter("studyid", studyid)
+					.getSingleResult();
+
+			System.out.println("cqu = " + cqu.getId());
+
+			System.out.println("ids = " + studyid + " a " + cqid + " b");
+
+			if (cqu.getConfigAnswer().isEmpty()) {
+				ConfigAnswer answer = new ConfigAnswer();
+				answer.setAnswer(null);
+				answer.setConfigQuestionUse(cqu);
+				answer.setStudy(cqu.getStudy());
+				XPersistence.getManager().persist(answer);
+			}
+		} else
+			super.execute();
+
+		getView().findObject();
+		// super.executeAction("CRUD.refresh");
+
 	}
-
-
 
 }

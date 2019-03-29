@@ -32,7 +32,7 @@ public class NonFoodPurchase extends Asset{
 	private Double pricePerUnit;
 
 	@ManyToOne
-	@Required
+	
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in ('Non Food Purchase','Other Tradeable Goods')")
 	private ResourceSubType resourceSubType;

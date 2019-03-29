@@ -99,16 +99,17 @@ public class Study extends EFDIdentifiable {
 	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 	private BigDecimal altExchangeRate;
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = false)
+	@ManyToOne //(fetch = FetchType.LAZY, // The reference is loaded on demand
+			// optional = false)
 	// @Required NOT required in OIHM a Study can just be part of a Project without
 	// LZ and Site, but may have an LZ and Site
-	@DescriptionsList(descriptionProperties = "projecttitle,pdate")
+	@DescriptionsList(descriptionProperties = "projecttitle,pdate") //,  showReferenceView=true)
 	@JoinColumn(name = "CProject")
 	// @OnChange(OnChangeClearCommunity.class)
+	
 	@ReferenceView("SimpleProject")
-	// @NoCreate
-	// @NoModify
+	//@NoCreate
+	//@NoModify
 	private Project projectlz;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
@@ -268,6 +269,7 @@ public class Study extends EFDIdentifiable {
 	@XOrderBy("configQuestion.level asc")
 	@NewAction("ConfigQuestionUse.new")
 	@EditAction("ConfigQuestionUse.edit")
+	@SaveAction("ConfigQuestionUse.save")
 	@ListProperties("configQuestion.prompt,configQuestion.hint,configQuestion.gender,"
 			+ "configQuestion.level,configQuestion.answerType,configQuestion.ageRangeLower,configQuestion.ageRangeUpper")
 
@@ -278,11 +280,7 @@ public class Study extends EFDIdentifiable {
 	 * Copy from a Topic a list of Questions to use - fails if Quesions already
 	 * exist
 	 */
-	// @ManyToOne(fetch = FetchType.LAZY, optional = true)
-	// @NoModify
-	// @NoCreate
-	// @DescriptionsList(descriptionProperties = "topic")
-	// private ReusableConfigTopic reusableConfigTopic;
+
 
 	public Integer totalDietPercentage() {
 		Integer result = new Integer("0");
@@ -296,10 +294,7 @@ public class Study extends EFDIdentifiable {
 	/*
 	 * get default diet % running total
 	 */
-	// @Transient
-	// @DefaultValueCalculator(ZeroIntegerCalculator.class)
-	// @DisplaySize(15)
-	// @Max(value=100)
+
 	public Integer getTotalDietPercentage() {
 		Integer result = new Integer("0");
 		for (DefaultDietItem defaultDietItem : getDefaultDietItem()) { // We iterate through all details
@@ -324,8 +319,11 @@ public class Study extends EFDIdentifiable {
 	@OneToMany(mappedBy = "study", cascade=CascadeType.REMOVE)
 	//@NoCreate
 	//@AddAction("")
-	@ListProperties("configQuestionUse.configQuestion.prompt,answer")
-	@Condition("${configQuestionUse.configQuestion.level} = 'Study'")
+	@EditAction("ConfigAnswer.edit")
+	@ListProperties("configQuestionUse.configQuestion.prompt,configQuestionUse.configQuestion.answerType,displayAnswer")
+	@Condition("${configQuestionUse.configQuestion.level} = 'Study' AND ${study.id} =${this.id}")   // Note use of JPA syntax not sql
+	
+	@SaveAction("ConfigAnswer.save")
 	@EditOnly
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/

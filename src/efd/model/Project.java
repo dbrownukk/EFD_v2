@@ -81,6 +81,7 @@ public class Project {
 	@Column(name = "ProjectTitle", length = 255, unique = true)
 	// @OnChange(value = LoadRemoteToOrg.class)
 	@Required
+	@SearchKey
 	private String projecttitle;
 
 	/***********************************************************************************************/

@@ -31,7 +31,7 @@ public class AssetLand extends Asset{
 	
 	
 	@ManyToOne(fetch=FetchType.LAZY)
-	@Required
+	
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Land'")
 

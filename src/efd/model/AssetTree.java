@@ -33,7 +33,7 @@ public class AssetTree extends Asset{
 	
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
-	@Required
+
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Trees%'")
 	private ResourceSubType resourceSubType;
 

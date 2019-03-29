@@ -55,10 +55,16 @@ public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 		System.out.println("config q level = " + getView().getAllValues().toString());
 
 		if (getNewValue().equals(ConfigQuestion.Level.HouseholdMember)) {
-			System.out.println("show HH gender and ages");
+			System.out.println("show HH gender and ages b");
 			getView().setHidden("gender", false);
 			getView().setHidden("ageRangeLower", false);
 			getView().setHidden("ageRangeUpper", false);
+			
+			getPreviousView().getSubview("configQuestion").setHidden("gender", false);
+			getPreviousView().getSubview("configQuestion").setHidden("ageRangeLower", false);
+			getPreviousView().getSubview("configQuestion").setHidden("ageRangeUpper", false);
+			
+			
 
 		}
 
@@ -67,6 +73,13 @@ public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 			getView().setHidden("gender", true);
 			getView().setHidden("ageRangeLower", true);
 			getView().setHidden("ageRangeUpper", true);
+			
+	
+			getPreviousView().getSubview("configQuestion").setHidden("gender", true);
+			getPreviousView().getSubview("configQuestion").setHidden("ageRangeLower", true);
+			getPreviousView().getSubview("configQuestion").setHidden("ageRangeUpper", true);
+			
+			
 
 		}
 

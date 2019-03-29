@@ -47,27 +47,27 @@ public class ConfigQuestionModifyFromReferenceAction extends SearchByViewKeyActi
 			// get integer range
 
 			{
-				System.out.println("10101");
+				System.out.println("10101c");
 				getView().setHidden("intRangeLower", false);
 				getView().setHidden("intRangeUpper", false);
 				getView().setHidden("decRangeLower", true);
 				getView().setHidden("decRangeUpper", true);
-				getView().setHidden("questionLOV", true);
+				getView().setHidden("questionLOVType", true);
 
 			}
 
 			else if (answerType.equals(efd.model.ConfigQuestion.AnswerType.DecimalRange)) {
-				System.out.println("20202");
+				System.out.println("20202c");
 				getView().setHidden("decRangeLower", false);
 				getView().setHidden("decRangeUpper", false);
 				getView().setHidden("intRangeLower", true);
 				getView().setHidden("intRangeUpper", true);
-				getView().setHidden("questionLOV", true);
+				getView().setHidden("questionLOVType", true);
 
 			}
 
 			else if (answerType.equals(efd.model.ConfigQuestion.AnswerType.LOV)) {
-				System.out.println("30303");
+				System.out.println("30303c");
 				getView().setHidden("questionLOV", false);
 				getView().setHidden("decRangeLower", true);
 				getView().setHidden("decRangeUpper", true);
@@ -79,12 +79,12 @@ public class ConfigQuestionModifyFromReferenceAction extends SearchByViewKeyActi
 			else if (answerType.equals(efd.model.ConfigQuestion.AnswerType.Decimal)
 					|| answerType.equals(efd.model.ConfigQuestion.AnswerType.Integer)
 					|| answerType.equals(efd.model.ConfigQuestion.AnswerType.Text)) {
-				System.out.println("40404");
+				System.out.println("40404c");
 				getView().setHidden("decRangeLower", true);
 				getView().setHidden("decRangeUpper", true);
 				getView().setHidden("intRangeLower", true);
 				getView().setHidden("intRangeUpper", true);
-				getView().setHidden("questionLOV", true);
+				getView().setHidden("questionLOVType", true);
 
 			}
 		
@@ -98,7 +98,7 @@ public class ConfigQuestionModifyFromReferenceAction extends SearchByViewKeyActi
 		}
 
 		else {
-			System.out.println("hide HH gender and ages");
+			System.out.println("hide HH gender and ages c");
 			getView().setHidden("gender", true);
 			getView().setHidden("ageRangeLower", true);
 			getView().setHidden("ageRangeUpper", true);

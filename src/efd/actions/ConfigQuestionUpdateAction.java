@@ -28,39 +28,44 @@ public class ConfigQuestionUpdateAction extends UpdateAction {
 
 	public void execute() throws Exception {
 
-
-		
 		System.out.println("in update action configQuestion ");
 		if (getView().getValue("level").equals(Level.Study)) {
-			
-			
-			
-			String thisquestionid =  getView().getValueString("id");
-		
-			String thisstudyid = getPreviousView().getValueString("study.id");
-			
-			String thisconfigquestionuseid = getPreviousView().getValueString("id");
-	
-			
-			System.out.println("id 1 = "+thisquestionid);
-			System.out.println("id 2 = "+thisstudyid);
-			System.out.println("id 3 = "+thisconfigquestionuseid);
-			
-			ConfigQuestionUse configQuestionUse = (ConfigQuestionUse) XPersistence.getManager().find(ConfigQuestionUse.class, thisconfigquestionuseid); 
-			
-			if(configQuestionUse.getConfigAnswer().isEmpty())
-			{
-				ConfigAnswer answer = new ConfigAnswer();
-				answer.setAnswer("-");
-				answer.setConfigQuestionUse(configQuestionUse);
-				answer.setStudy(configQuestionUse.getStudy());
-				XPersistence.getManager().persist(answer);
 
-				
+			String thisquestionid = getView().getValueString("id");
+
+			String thisstudyid = getPreviousView().getValueString("study.id");
+
+			String thisconfigquestionuseid = getPreviousView().getValueString("id");
+
+			System.out.println("id 1 = " + thisquestionid);
+			System.out.println("id 2 = " + thisstudyid);
+			System.out.println("id 3 = " + thisconfigquestionuseid);
+
+			try {
+				ConfigQuestionUse configQuestionUse = (ConfigQuestionUse) XPersistence.getManager()
+						.find(ConfigQuestionUse.class, thisconfigquestionuseid);
+
+				if (configQuestionUse.getConfigAnswer().isEmpty()) {
+					ConfigAnswer answer = new ConfigAnswer();
+					System.out.println("in cq update 111");
+					answer.setAnswer("-");
+					System.out.println("in cq update 222");
+					answer.setConfigQuestionUse(configQuestionUse);
+					System.out.println("in cq update 333");
+					answer.setStudy(configQuestionUse.getStudy());
+					System.out.println("in cq update 444");
+					XPersistence.getManager().persist(answer);
+					System.out.println("in cq update 555");
+
+				}
+
+			} catch (Exception ex) {
+				// No CQU yet
 			}
+
 		}
 
-		super.execute();
+	super.execute();
 
 	}
 

@@ -69,7 +69,7 @@ public class Crop extends Asset {
 	private Double percentTradeMarket3;
 	
 	@ManyToOne
-	@Required
+
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Crops'")
 	private ResourceSubType resourceSubType;

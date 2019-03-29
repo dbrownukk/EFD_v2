@@ -53,6 +53,7 @@ public class OnChangeAnswerType extends OnChangePropertyBaseAction {
 			getView().setHidden("intRangeLower", true);
 			getView().setHidden("intRangeUpper", true);
 			getView().setHidden("questionLOVType", true);
+			
 
 		}
 

@@ -23,7 +23,7 @@ public class EditQuestionUse extends EditElementInCollectionAction  {
 		
 		
 		
-		
+		System.out.println("sub = "+getCollectionElementView().getSubview("configQuestion").getAllValues());
 		
 		
 		
@@ -34,19 +34,18 @@ public class EditQuestionUse extends EditElementInCollectionAction  {
 		
 		if (getCollectionElementView().getValue("configQuestion.level").equals(ConfigQuestion.Level.HouseholdMember)) {
 			System.out.println("edit quse show HH gender and ages");
-			getCollectionElementView().setHidden("configQuestion.gender", false);
-			getCollectionElementView().setHidden("configQuestion.ageRangeLower", false);
-			getCollectionElementView().setHidden("configQuestion.ageRangeUpper", false);
-
+			getCollectionElementView().getSubview("configQuestion").setHidden("gender", false);
+			getCollectionElementView().getSubview("configQuestion").setHidden("ageRangeLower", false);
+			getCollectionElementView().getSubview("configQuestion").setHidden("ageRangeUpper", false);
 		}
 
 		else {
-			System.out.println("edit quse hide HH gender and ages "+getCollectionElementView().getBaseModelName()+" "+getCollectionElementView().getValueString("configQuestion.level"));
-			getView().setHidden("configQuestion.gender", true);
-			getCollectionElementView().setHidden("configQuestion.gender", true);
-			getCollectionElementView().setHidden("ageRangeLower", true);
-			getCollectionElementView().setHidden("ageRangeUpper", true);
-
+			System.out.println("edit quse hide HH gender and ages a "+getCollectionElementView().getBaseModelName()+" "+getCollectionElementView().getValueString("configQuestion.level"));
+			
+			getCollectionElementView().getSubview("configQuestion").setHidden("gender", true);
+			getCollectionElementView().getSubview("configQuestion").setHidden("ageRangeLower", true);
+			getCollectionElementView().getSubview("configQuestion").setHidden("ageRangeUpper", true);
+		
 		}
 		
 		System.out.println("commented out level - now do answertype");
@@ -58,31 +57,35 @@ public class EditQuestionUse extends EditElementInCollectionAction  {
 
 			{
 				System.out.println("a10101");
-				getCollectionElementView().setHidden("configQuestion.intRangeLower", false);
-				getCollectionElementView().setHidden("configQuestion.intRangeUpper", false);
-				getCollectionElementView().setHidden("configQuestion.decRangeLower", true);
-				getCollectionElementView().setHidden("configQuestion.decRangeUpper", true);
-				getCollectionElementView().setHidden("configQuestion.questionLOV", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeLower", false);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeUpper", false);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeLower", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeUpper", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("questionLOVType", true);
 
 			}
 
 			else if (answerType.equals(efd.model.ConfigQuestion.AnswerType.DecimalRange)) {
 				System.out.println("a20202");
-				getCollectionElementView().setHidden("configQuestion.decRangeLower", false);
-				getCollectionElementView().setHidden("configQuestion.decRangeUpper", false);
-				getCollectionElementView().setHidden("configQuestion.intRangeLower", true);
-				getCollectionElementView().setHidden("configQuestion.intRangeUpper", true);
-				getCollectionElementView().setHidden("configQuestion.questionLOV", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeLower", false);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeUpper", false);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeLower", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeUpper", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("questionLOVType", true);
+				
+			
+				
+				
 
 			}
 
 			else if (answerType.equals(efd.model.ConfigQuestion.AnswerType.LOV)) {
 				System.out.println("a30303");
-				getCollectionElementView().setHidden("configQuestion.questionLOV", false);
-				getCollectionElementView().setHidden("configQuestion.decRangeLower", true);
-				getCollectionElementView().setHidden("configQuestion.decRangeUpper", true);
-				getCollectionElementView().setHidden("configQuestion.intRangeLower", true);
-				getCollectionElementView().setHidden("configQuestion.intRangeUpper", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("questionLOV", false);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeLower", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeUpper", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeLower", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeUpper", true);
 
 			}
 
@@ -90,11 +93,11 @@ public class EditQuestionUse extends EditElementInCollectionAction  {
 					|| answerType.equals(efd.model.ConfigQuestion.AnswerType.Integer)
 					|| answerType.equals(efd.model.ConfigQuestion.AnswerType.Text)) {
 				System.out.println("a40404");
-				getCollectionElementView().setHidden("decRangeLower", true);
-				getCollectionElementView().setHidden("configQuestion.decRangeUpper", true);
-				getCollectionElementView().setHidden("configQuestion.intRangeLower", true);
-				getCollectionElementView().setHidden("configQuestion.intRangeUpper", true);
-				getCollectionElementView().setHidden("configQuestion.questionLOV", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeLower", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("decRangeUpper", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeLower", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("intRangeUpper", true);
+				getCollectionElementView().getSubview("configQuestion").setHidden("questionLOVType", true);
 
 			}
 		

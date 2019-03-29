@@ -786,7 +786,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						for (icurr = 0; icurr < currency.size(); icurr++) {
 							if (currency.get(icurr).getCurrency().equals(cell[i][j][0].getStringCellValue())) {
-								rst = checkSubType("Cash", rtype[i].getIdresourcetype().toString());
+								rst = checkSubType(cell[i][j][0].getStringCellValue(), rtype[i].getIdresourcetype().toString());
 								acash.setStatus(efd.model.Asset.Status.Valid);
 								acash.setResourceSubType(rst);
 								break;

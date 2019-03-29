@@ -75,7 +75,7 @@ public class Employment extends Asset {
 	
 	
 	@ManyToOne
-	@Required
+
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Employment%'")
 	private ResourceSubType resourceSubType;

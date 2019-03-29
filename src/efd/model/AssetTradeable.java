@@ -37,7 +37,7 @@ public class AssetTradeable extends Asset{
 	private Double pricePerUnit;
 	
 	@ManyToOne
-	@Required
+
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Tradeable%'")
 	private ResourceSubType resourceSubType;

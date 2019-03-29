@@ -487,7 +487,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addNumberValidation(workbook, sheet, foodPurchaseSheet, 3, numRows, 3, 3, style);
 		addNumberValidation(workbook, sheet, foodPurchaseSheet, 3, numRows, 4, 4, style);
 
-		/* Food Purchases */
+		/*  Non Food Purchases */
 
 		addLOV(sheet, nonFoodPurchaseSheet, 3, numRows - 1, 1, 1, "NonFoodPurchase");
 		addLOV(sheet, nonFoodPurchaseSheet, 3, numRows - 1, 2, 2, "Unit");

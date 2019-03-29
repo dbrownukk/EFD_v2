@@ -50,7 +50,7 @@ public class Inputs extends Asset {
 	@ManyToOne
 
 	@JoinColumn(name = "ResourceSubType")
-	@DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename} like '%Wild Food%'")
+	@DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename} in  ('Non Food Purchase','Other Tradeable Goods')")
 	private ResourceSubType resourceSubType;
 
 

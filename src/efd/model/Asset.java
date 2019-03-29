@@ -16,7 +16,7 @@ public class Asset {
 
 
 	@Column(name = "Status", nullable = false)
-//	@OnChange(OnChangeAssetStatus.class)
+	@OnChange(OnChangeAssetStatus.class)
 	private Status status;
 
 	public enum Status {

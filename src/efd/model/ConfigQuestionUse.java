@@ -28,7 +28,8 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	 * create is handled in configQuestion
 	 */
 
-	@PostPersist
+	/*
+	@PrePersist
 
 	private void createAnswer() throws Exception {
 		try {
@@ -37,7 +38,7 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 			System.out.println("postpersist level =  " + getConfigQuestion().getLevel());
 
 			if (getConfigQuestion().getLevel().equals(Level.Study)) {
-				XPersistence.getManager();
+				//XPersistence.getManager();
 				System.out.println("its a Study in post persist");
 				ConfigAnswer answer = new ConfigAnswer();
 				answer.setAnswer("-");
@@ -53,6 +54,7 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 		}
 
 	}
+	*/
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
@@ -67,7 +69,7 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	private Study study;
 	/*************************************************************************************************/
 	@ManyToOne(optional = false)
-	// @ReferenceView("FromQuestionUse")
+	//@SearchListCondition("${configQuestion.id} != ${id}")
 	private ConfigQuestion configQuestion;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "configQuestionUse", cascade = CascadeType.REMOVE)

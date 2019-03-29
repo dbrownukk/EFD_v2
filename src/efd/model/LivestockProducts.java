@@ -77,7 +77,7 @@ public class LivestockProducts extends Asset {
 	private Double percentTradeMarket3;
 	
 	@ManyToOne
-	@Required
+	
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like 'Livestock Products'")
 	private ResourceSubType resourceSubType;

@@ -27,7 +27,7 @@ public class AssetCash extends Asset{
 	
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
-	@Required
+	
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Cash'")
 	private ResourceSubType resourceSubType;
 
