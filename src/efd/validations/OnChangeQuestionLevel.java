@@ -20,35 +20,36 @@ public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 	@Inject
 	private String questionid;
 
+	
+	
 	public void execute() throws Exception {
 
-		String level;
+		String level = null;
 
 		if (getNewValue() == null) {
+			
+			// New - set defaults
+			
 			System.out.println("questionlevel onchange = null" + getNewValue());
-			return;
+			setNewValue(Level.Study);
+			getView().setValue("level",Level.Study);
+			getView().setValue("answerType", AnswerType.Text);
+			
+			getView().setHidden("questionLOVType", false);
+			getView().setHidden("intRangeLower", false);
+			getView().setHidden("intRangeUpper", false);
+			getView().setHidden("decRangeLower", false);
+			getView().setHidden("decRangeUpper", false);
+			
+			
+			
 		}
 
-		level = getView().getValue("level").toString();
+		System.out.println("about to get level " +getView().getAllValues() );
+		
 
-		System.out.println("aaa question id = " + questionid);
-		System.out.println("ccc configuseid id  = " + configuseid);
+		System.out.println("level in onchange question level = "+level);
 
-		/*   March 2019 - no longer using configQuestionUse Level 
-		if (!configuseid.isEmpty()) {
-			System.out.println("in configuseid SET  = " + configuseid);
-			ConfigQuestionUse configQuestionUse = XPersistence.getManager().find(ConfigQuestionUse.class, configuseid);
-
-			if (level.equals("Household"))
-				configQuestionUse.setLevel(Level.Household); // set configQuestionUse Level to be same as Question level
-			else if (level.equals("Household Member"))
-				configQuestionUse.setLevel(Level.HouseholdMember);
-			else if (level.equals("Study"))
-				configQuestionUse.setLevel(Level.Study);
-
-			XPersistence.getManager().persist(configQuestionUse);
-		}
-		*/
 
 		System.out.println("New changed level  to = " + getNewValue().toString());
 		System.out.println("level = " + getView().getValueString("level"));
@@ -60,9 +61,9 @@ public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 			getView().setHidden("ageRangeLower", false);
 			getView().setHidden("ageRangeUpper", false);
 			
-			getPreviousView().getSubview("configQuestion").setHidden("gender", false);
-			getPreviousView().getSubview("configQuestion").setHidden("ageRangeLower", false);
-			getPreviousView().getSubview("configQuestion").setHidden("ageRangeUpper", false);
+			//getPreviousView().getSubview("configQuestion").setHidden("gender", false);
+			//getPreviousView().getSubview("configQuestion").setHidden("ageRangeLower", false);
+			//getPreviousView().getSubview("configQuestion").setHidden("ageRangeUpper", false);
 			
 			
 
@@ -75,9 +76,9 @@ public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 			getView().setHidden("ageRangeUpper", true);
 			
 	
-			getPreviousView().getSubview("configQuestion").setHidden("gender", true);
-			getPreviousView().getSubview("configQuestion").setHidden("ageRangeLower", true);
-			getPreviousView().getSubview("configQuestion").setHidden("ageRangeUpper", true);
+			//getPreviousView().getSubview("configQuestion").setHidden("gender", true);
+			//getPreviousView().getSubview("configQuestion").setHidden("ageRangeLower", true);
+			//getPreviousView().getSubview("configQuestion").setHidden("ageRangeUpper", true);
 			
 			
 

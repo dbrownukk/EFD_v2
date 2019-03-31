@@ -6,15 +6,17 @@ import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.*;
 import org.omg.CORBA.DynAnyPackage.*;
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 import org.openxava.util.*;
 
 import com.openxava.naviox.model.*;
 
 import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
+import efd.validations.*;
 
 @View(members = "StandardOfLivingElement[#resourcesubtype;amount,cost;level,gender;ageRangeLower,ageRangeUpper]")
-@Tab(properties = "resourcetype.resourcetypename,resourcesubtype.resourcetypename;amount,cost,level,gender,ageRangeLower,ageRangeUpper")
+@Tab(properties = "resourcetype.resourcetypename,resourcesubtype.resourcetypename;amount,cost,level")
 
 @Entity
 
@@ -58,10 +60,12 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	@Column(precision = 10, scale = 3, nullable = false)
 	@Required
 	@Digits(integer = 10, fraction = 3)
+	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 	private Double cost;
 	/*************************************************************************************************/
 	@Column(nullable = false)
 	@Required
+	@OnChange(value = OnChangeSOLLevel.class)
 	private Level level;
 	/*************************************************************************************************/
 
@@ -73,10 +77,15 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	}
 
 	/*************************************************************************************************/
-	//@Range(min = 1, max = 120)
+	@Range(min = 0, max = 120)
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer ageRangeLower;
 	/*************************************************************************************************/
-	//@Range(min = 1, max = 120)
+	@Range(min = 1, max = 120)
+	@DefaultValueCalculator(
+			 value=org.openxava.calculators.BigDecimalCalculator.class,
+			 properties={ @PropertyValue(name="value", value="120") }
+			)
 	private Integer ageRangeUpper;
 
 	/*************************************************************************************************/

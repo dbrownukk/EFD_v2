@@ -15,8 +15,9 @@ import efd.model.HouseholdMember.*;
 import efd.validations.*;
 
 @Views({ @View(members = "Question[#topic,prompt,hint;level,answerType,gender,notes;questionLOVType;Ranges[#ageRangeLower,ageRangeUpper;"
-		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]")// ,
-//	@View(name="FromQuestionUse",members="Question[topic,prompt,answerType,hint,level]")
+		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]") ,
+@View(name="FromTopic",members = "Question[#prompt,hint;level,answerType,gender,notes;questionLOVType;Ranges[#ageRangeLower,ageRangeUpper;"
+		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]")
 })
 
 @Tab(properties = "topic.topic, prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper", defaultOrder = "${topic} desc")
@@ -125,8 +126,13 @@ public class ConfigQuestion extends EFDIdentifiable {
 	@Required
 	@OnChange(value = OnChangeQuestionLevel.class)
 	// @Editor("ValidValuesVerticalRadioButton")
+	//@DefaultValueCalculator(value=EnumCalculator.class,
+	//		properties={@PropertyValue(name="enumType", value="efd.model.ConfigQuestion.Level"),
+	//				@PropertyValue(name="value", value = "Study")
+	//				})
 	private Level level;
 
+	
 	public enum Level {
 		Study, Household, HouseholdMember
 	}
@@ -147,7 +153,11 @@ public class ConfigQuestion extends EFDIdentifiable {
 	private Integer ageRangeLower;
 	/*************************************************************************************************/
 	@Range(min = 0, max = 120)
-	@DefaultValueCalculator(ZeroIntegerCalculator.class)
+	//@DefaultValueCalculator(ZeroIntegerCalculator.class)
+	@DefaultValueCalculator(
+			 value=org.openxava.calculators.BigDecimalCalculator.class,
+			 properties={ @PropertyValue(name="value", value="120") }
+			)
 	private Integer ageRangeUpper;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "configQuestion")

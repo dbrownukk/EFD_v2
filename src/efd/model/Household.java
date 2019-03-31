@@ -60,7 +60,7 @@ public class Household extends EFDIdentifiable {
 
 	}
 
-	@Required
+	
 	@Column(length = 45)
 	@SearchKey 
 	private String householdName;

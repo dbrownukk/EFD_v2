@@ -13,11 +13,18 @@ import org.openxava.jpa.*;
 import org.openxava.util.*;
 import org.openxava.view.*;
 import efd.model.*;
+import efd.model.ConfigQuestion.*;
 
 public class CopyStudy extends ViewBaseAction {
 
 	public void execute() throws Exception {
 
+		System.out.println("in copy study ");
+
+		
+		
+		
+		
 		Object studyId = getPreviousView().getValue("id");
 
 		// get topic questions and study
@@ -26,6 +33,8 @@ public class CopyStudy extends ViewBaseAction {
 		System.out.println("study after query = " + study.getStudyName());
 		System.out.println("NEW study  = " + getView().getValueString("studyName"));
 		String newStudyName = getView().getValueString("studyName");
+		
+		
 
 		// Add configQuestionUse for each Question to this Study
 
@@ -52,20 +61,7 @@ public class CopyStudy extends ViewBaseAction {
 
 			message = "Done Site ";
 
-			/*
-			 * System.out.println("new site = " + newStudy.getSite().getLocationdistrict());
-			 * 
-			 * System.out.println("new study notes  = "+newStudy.getNotes());
-			 * System.out.println("new study  exrate = "+newStudy.getAltExchangeRate());
-			 * System.out.println("new study desc = "+newStudy.getDescription());
-			 * System.out.println("new study edate = "+newStudy.getEndDate());
-			 * System.out.println("new study refyear = "+newStudy.getReferenceYear());
-			 * System.out.println("new study sdate = "+newStudy.getStartDate());
-			 * System.out.println("new study name = "+newStudy.getStudyName());
-			 * System.out.println("new study altcurr = "+newStudy.getAltCurrency());
-			 * System.out.println("new study proj = "+newStudy.getProjectlz());
-			 * System.out.println("new study site  = "+newStudy.getSite());
-			 */
+
 
 			message = "Done print of New Study ";
 
@@ -188,7 +184,24 @@ public class CopyStudy extends ViewBaseAction {
 				question.setStudy(newStudy);
 				//System.out.println("about to persist question use "+question.getLevel()+" "+question.getConfigQuestion().getId()+" "+question.getStudy().getId());
 				XPersistence.getManager().persist(question);
-				System.out.println("persisted question use");
+				System.out.println("persisted question use" );
+				
+				if(question.getConfigQuestion().getLevel().equals(Level.Study))
+						{
+					System.out.println("in copy answer 1");
+						ConfigAnswer answer = new ConfigAnswer();
+						answer.setStudy(newStudy);
+						answer.setAnswerType(question.getConfigQuestion().getAnswerType());
+						System.out.println("in copy answer 2");
+						answer.setConfigQuestionUse(question);
+						answer.setId(null);
+						answer.setVersion(null);
+						System.out.println("in copy answer 3");
+						XPersistence.getManager().persist(answer);
+						System.out.println("in copy answer 4");
+					
+						}
+				
 			}
 			
 			

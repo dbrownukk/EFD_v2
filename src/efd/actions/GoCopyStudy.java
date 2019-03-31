@@ -1,5 +1,5 @@
 
-/* In Project module override standard add LZ to remove LZs already associated with Project */
+/* IOX Dialog to enter new name of Study  */
 
 package efd.actions;
 
@@ -19,6 +19,7 @@ public class GoCopyStudy extends ViewBaseAction {
 
 		// get Topic List
 		
+		
 		System.out.println("in dialog call");
 		showDialog();
 		getView().setTitle("Enter New Study Name");
@@ -27,6 +28,7 @@ public class GoCopyStudy extends ViewBaseAction {
 
 		setControllers("CopyStudy", "Dialog");
 
+		
 	}
 
 }

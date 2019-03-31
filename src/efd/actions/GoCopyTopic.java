@@ -31,11 +31,11 @@ public class GoCopyTopic extends ViewBaseAction {
 		
 		System.out.println("in dialog call");
 		showDialog();
-		getView().setTitle("Enter Topic to copy from - will fail if Questions already \n exist for this Study");
+		getView().setTitle("Enter Topic to copy from");
 		
 		getView().setModelName("TopicList");
 		
-		setControllers("CopyTopic", "Dialog"); 
+		setControllers("CopyinTopicQuestions", "Dialog"); 
 	
 	
 	}

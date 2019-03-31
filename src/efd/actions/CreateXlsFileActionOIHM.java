@@ -1421,7 +1421,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		sheet.setValue(2, 7, "Year of Birth", boldRStyle);
 		sheet.setValue(2, 8, "Head of Household", boldRStyle);
 		sheet.setValue(2, 9, "Absent", boldRStyle);
-		sheet.setValue(2, 10, "Reason for Absense", boldRStyle);
+		sheet.setValue(2, 10, "Reason for Absence", boldRStyle);
 		sheet.setValue(2, 11, "Period Away in Months", boldRStyle);
 
 		/*

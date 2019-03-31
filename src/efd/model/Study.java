@@ -113,7 +113,8 @@ public class Study extends EFDIdentifiable {
 	private Project projectlz;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
-	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,amount,cost,level,gender,ageRangeLower,ageRangeUpper")
+	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,amount,cost,level")
+	@EditAction("StdOfLivingElement.edit")
 	private Collection<StdOfLivingElement> stdOfLivingElement;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study",  cascade=CascadeType.REMOVE)

@@ -20,7 +20,7 @@ public class ReusableConfigTopic extends EFDIdentifiable {
 private String topic;
 /*************************************************************************************************/
 //@EditAction("")
-//@CollectionView("FromTopic")
+@CollectionView("FromTopic")
 @OneToMany(mappedBy = "topic")
 
 private Collection<ConfigQuestion> configQuestion;
