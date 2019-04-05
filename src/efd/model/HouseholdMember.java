@@ -9,23 +9,27 @@ import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 
+import efd.validations.*;
+
 @View(members = "Household_Members[householdMemberName;householdMemberNumber;age,yearOfBirth;gender;headofHousehold;absent,monthsAway;reasonForAbsence];configAnswer")
 
 @Entity
 
 @Table(name = "HouseholdMember")
 public class HouseholdMember extends EFDIdentifiable {
-
+/*
 	@PrePersist
 	
 
 	private void AddHHMNumber() throws Exception {
 
 		int nextNumberInHH = getHousehold().getHouseholdMember().size() + 1;
+		
+		System.out.println("hhm prepersist num = "+nextNumberInHH);
 
 		householdMemberNumber="HHM" + nextNumberInHH;
 	}
-
+*/
 	// @Required
 	@Column(length = 45)
 	private String householdMemberName;
@@ -40,7 +44,7 @@ public class HouseholdMember extends EFDIdentifiable {
 	/*************************************************************************************************/
 
 	@Required
-	// @Editor("ValidValuesVerticalRadioButton")
+	@Editor("ValidValuesVerticalRadioButton")
 	private YN headofHousehold;
 
 	public enum YN {
@@ -59,22 +63,19 @@ public class HouseholdMember extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@Required
 	@Range(min = 1, max = 120)
+	@OnChange(OnChangeAge.class)
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer age;
 	/*************************************************************************************************/
-	//@Required
+	@Required
+	@ReadOnly
 	@Depends("age")
-	//@Range(min = 1900, max = 2050)
+	@Range(min = 1900, max = 2050)
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
-	public Integer getYearOfBirth() {
-		System.out.println("depends id = "+getHousehold().getId()+" "+age );
-		//Integer ref = getHousehold().getStudy().getReferenceYear();
-		System.out.println("depends on age "+getHousehold().getStudy().getReferenceYear() );
-		
-		return(getHousehold().getStudy().getReferenceYear()-getAge());
-	}
+	private Integer yearOfBirth;    //() {
+
 	/*************************************************************************************************/
-	// @Editor("ValidValuesVerticalRadioButton")
+	@Editor("ValidValuesVerticalRadioButton")
 	private YN absent;
 	/*************************************************************************************************/
 	@Column(length = 45)
@@ -180,6 +181,16 @@ public class HouseholdMember extends EFDIdentifiable {
 	public void setHouseholdMemberNumber(String householdMemberNumber) {
 		this.householdMemberNumber = householdMemberNumber;
 	}
+
+	public Integer getYearOfBirth() {
+		return yearOfBirth;
+	}
+
+	public void setYearOfBirth(Integer yearOfBirth) {
+		this.yearOfBirth = yearOfBirth;
+	}
+
+
 
 
 	

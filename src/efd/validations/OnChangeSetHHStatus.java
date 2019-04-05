@@ -27,10 +27,12 @@ import efd.model.WealthGroupInterview.*;
 public class OnChangeSetHHStatus extends OnChangePropertyBaseAction {
 	public void execute() throws Exception {
 
+		System.out.println("in onchangeHHstatus 1");
 		
-		
-		if (getView().getValueString("id") == "") // do not fire for New HH
+		if (getView().getValue("id") == null) // do not fire for New HH
 			return;
+		
+		System.out.println("in onchangeHHstatus 2");
 
 		Object currentRecord = getView().getValue("id");
 

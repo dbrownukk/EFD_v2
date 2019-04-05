@@ -106,7 +106,7 @@ public class Study extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "projecttitle,pdate") //,  showReferenceView=true)
 	@JoinColumn(name = "CProject")
 	// @OnChange(OnChangeClearCommunity.class)
-	
+	@Required
 	@ReferenceView("SimpleProject")
 	//@NoCreate
 	//@NoModify

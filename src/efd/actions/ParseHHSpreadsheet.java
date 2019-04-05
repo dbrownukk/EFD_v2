@@ -580,13 +580,16 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			try {
 				hhm.setHouseholdMemberName(
 						sheet.getRow(3).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue());
-				if (hhm.getHouseholdMemberName() == "") {
+				
+				gender = sheet.getRow(4).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+				
+				if (gender == "") {
 					em("no more members");
 					hhmcol = 23;
 					break;
 				}
 
-				gender = sheet.getRow(4).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+			
 				if (gender.equals("Male")) {
 					hhm.setGender(Sex.Male);
 				} else if (gender.equals("Female")) {
@@ -598,7 +601,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				hhm.setAge((int) (sheet.getRow(5).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
 
 				// calculated
-				/*
+				
 				hhm.setYearOfBirth(
 						(int) (sheet.getRow(6).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
 
@@ -608,9 +611,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					int thisYear=hhm.getHousehold().getStudy().getReferenceYear();
 					
 					
-					hhm.setYearOfBirth(thisyear - hhm.getAge());
+					hhm.setYearOfBirth(thisYear - hhm.getAge());
 				}
-				 */
+				 
 
 				head = sheet.getRow(7).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (head.equals("Yes")) {
@@ -651,6 +654,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				hhm.setHouseholdMemberNumber("HHM" + hhmNumber);
 
 				XPersistence.getManager().persist(hhm);
+				
 
 			} catch (Exception ex) {
 				addError("Parse Failed - Wrong template for Household Members " + ex);
