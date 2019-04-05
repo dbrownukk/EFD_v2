@@ -81,7 +81,7 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer ageRangeLower;
 	/*************************************************************************************************/
-	@Range(min = 1, max = 120)
+	@Range(min = 0, max = 120)
 	@DefaultValueCalculator(
 			 value=org.openxava.calculators.BigDecimalCalculator.class,
 			 properties={ @PropertyValue(name="value", value="120") }

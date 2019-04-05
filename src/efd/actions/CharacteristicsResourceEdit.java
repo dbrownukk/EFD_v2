@@ -39,27 +39,10 @@ public class CharacteristicsResourceEdit extends EditElementInCollectionAction {
 		rType[9] = "Employment";
 		rType[10] = "Transfers";
 		rType[11] = "Wild Foods";
-
-		
-	//	getView().recalculateProperties();
-	//	getView().refresh();
-	//	getView().refreshCollections();
-	
-		
+		rType[12] = "Inputs";
 
 
-		
-		
-		
-		System.out.println("meta = "+getMetaCollection().getName());
-		System.out.println("meta L = "+getMetaCollection().getLabel());
-		
-		//System.out.println("in char edit active section 33 = " + getCollectionElementView().getSections().size());
-		//System.out.println("in char edit active section 34 = " + getView().getActiveSection());
-		
-		//System.out.println("in char edit active section 35 = " + getCollectionElementView().getActiveSection());
-		//int iactiveSection = getCollectionElementView().getActiveSection();
-		
+
 		
 		if(getMetaCollection().getName().equals("characteristicsResourceLand"))
 			iactiveSection=0;
@@ -85,6 +68,8 @@ public class CharacteristicsResourceEdit extends EditElementInCollectionAction {
 			iactiveSection=10;
 		else if(getMetaCollection().getName().equals("characteristicsResourceWildFoods"))
 			iactiveSection=11;
+		else if(getMetaCollection().getName().equals("characteristicsResourceInputs"))
+			iactiveSection=12;
 
 
 		
@@ -102,6 +87,9 @@ public class CharacteristicsResourceEdit extends EditElementInCollectionAction {
 		} else if (sessionTab == "Livestock Sales") {
 				getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 						"e.resourcetype.resourcetypename = 'Livestock'");
+		} else if (sessionTab == "Inputs") {
+			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
+					"e.resourcetype.resourcetypename = 'Non Food Purchase'");
 		}else{
 			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 					"e.resourcetype.resourcetypename = '" + sessionTab + "'");

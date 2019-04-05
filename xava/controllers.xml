@@ -1,0 +1,391 @@
+<?xml version = "1.0" encoding = "ISO-8859-1"?>
+
+<!DOCTYPE controllers SYSTEM "dtds/controllers.dtd">
+
+<controllers>
+	<!-- <env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange" 
+		/> -->
+	<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchByViewKey" />
+	<object name="activesectionchar" class="java.lang.String"
+		value="Crops" scope="global" />
+	<object name="sessionTab" class="java.lang.String"
+		value="Employment" scope="global" />
+	<object name="questionlevel" class="java.lang.String"
+		value="Study" scope="global" />
+	<object name="studyid" class="java.lang.String" scope="global" />
+	<object name="configuseid" class="java.lang.String"
+		scope="global" />
+	<object name="questionid" class="java.lang.String"
+		scope="global" />
+	<object name="efdModel" class="java.lang.String" value="OIHM"
+		scope="global" />
+
+
+	<controller name="EFD_HM">
+		<extends controller="TypicalNotResetOnSave" />
+
+	</controller>
+
+	<controller name="GoCopyStudy">
+		<action name="copyStudy" class="efd.actions.GoCopyStudy"
+			mode="detail" icon="view-list" />
+	</controller>
+
+	<controller name="CopyStudy">
+		<action name="copy" class="efd.actions.CopyStudy" />
+	</controller>
+
+
+
+	<controller name="GoCopyinTopicQuestions">
+		<action name="CopyinTopicQuestions" mode="detail"
+			icon="view-list" class="efd.actions.GoCopyTopic" />
+	</controller>
+
+	<controller name="CopyinTopicQuestions">
+		<action name="copy" mode="detail" icon="view-list"
+			class="efd.actions.CopyTopic" />
+	</controller>
+
+
+
+	<controller name="Study">
+
+		<action name="Template Spreadsheet" mode="detail"
+			image="excel.gif" icon="file-excel" takes-long="true"
+			class="efd.actions.CreateXlsFileActionOIHM" />
+
+		<!-- <action name="CopyinTopicQuestions" mode="detail" icon="view-list" 
+			class="efd.actions.GoCopyTopic" /> <action name="CopyStudy" mode="detail" 
+			icon="view-list" class="efd.actions.GoCopyStudy" /> -->
+
+		<action name="newSiteFromStudy" hidden="true" mode="detail"
+			class="efd.actions.NewSiteFromStudy">
+			<action name="init" on-init="true" hidden="true"
+				class="efd.actions.SetEfdOIHMModel" />
+
+		</action>
+	</controller>
+
+	<controller name="Spreadsheet">
+		<extends controller="TypicalRealExcel" />
+		<action name="Template Spreadsheet" mode="detail"
+			in-each-row="false" class="efd.actions.CreateXlsFileAction" />
+	</controller>
+
+
+
+	<controller name="ParseSpreadsheet">
+		<extends controller="TypicalNotResetOnSave" />
+		<action name="Parse Spreadsheet"
+			label="Parse Interview Spreadsheet 2" icon="file-excel" mode="detail"
+			in-each-row="false" class="efd.actions.ParseXLSFile2" />
+		<action name="Validate" label="Validate" icon="marker-check"
+			mode="detail" in-each-row="false" class="efd.actions.ValidateWGI" />
+	</controller>
+	<!-- <controller name="ParseHHSpreadsheet"> <extends controller="EFD_HM" 
+		/> <action name="Parse Spreadsheet" label="Parse Interview Spreadsheet" icon="file-excel" 
+		takes-long="true" mode="detail" in-each-row="false" class="efd.actions.ParseHHSpreadsheet" 
+		/> <action name="Validate" label="Validate" icon="marker-check" mode="detail" 
+		in-each-row="false" class="efd.actions.ValidateHH" /> </controller> -->
+
+
+	<controller name="ChartList">
+		<subcontroller controller="Charts" icon="menu" />
+	</controller>
+
+	<controller name="Charts">
+		<action name="Assets" label="Asset Chart" mode="detail"
+			icon="view-list" class="efd.reports.AssetChart" />
+
+		<action name="Assets(Normalised)"
+			label="Asset Chart (Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.AssetChartNormalised" />
+		<action name="Food Expenditure" label="Food Expenditure"
+			mode="detail" icon="view-list"
+			class="efd.reports.FoodExpenditureChart" />
+		<action name="Food Expenditure(Normalised)"
+			label="Food Expenditure(Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.FoodExpenditureChartNormalised" />
+		<action name="Non-Food Expenditure"
+			label="Non-Food Expenditure" mode="detail" icon="view-list"
+			class="efd.reports.NonFoodExpenditureChart" />
+		<action name="Non-Food Expenditure(Normalised)"
+			label="Non-Food Expenditure(Normalised)" mode="detail"
+			icon="view-list"
+			class="efd.reports.NonFoodExpenditureChartNormalised" />
+		<action name="Food Consumed" label="Food Consumed"
+			mode="detail" icon="view-list" class="efd.reports.FoodConsumedChart" />
+		<action name="Food Consumed(Normalised)"
+			label="Food Consumed(Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.FoodConsumedChartNormalised" />
+		<action name="Cash Income" label="Cash Income" mode="detail"
+			icon="view-list" class="efd.reports.CashIncomeChart" />
+		<action name="Cash Income(Normalised)"
+			label="Cash Income(Normalised)" mode="detail" icon="view-list"
+			class="efd.reports.CashIncomeChartNormalised" />
+	</controller>
+
+	<controller name="ReportList">
+		<subcontroller controller="Reports" icon="menu" />
+	</controller>
+
+	<controller name="Reports">
+		<action name="WealthgroupIncome" label="WealthgroupIncome"
+			mode="detail" icon="view-list" takes-long="true"
+			class="efd.reports.CashIncomeReport" image="excel.gif" />
+		<action name="WealthgroupIncomeWithPurchases"
+			label="WealthgroupIncomeWithPurchases" mode="detail" icon="view-list"
+			takes-long="true" class="efd.reports.CashIncomeReportWithPurchases"
+			image="excel.gif" />
+	</controller>
+
+
+	<controller name="ProjectReports">
+		<extends controller="EFD_HM" />
+		<action name="ProjectExcel" label="ProjectExcel" icon="excel"
+			class="efd.reports.ProjectExcel" image="excel.gif" mode="detail" />
+	</controller>
+
+	<controller name="RemoteDatabaseDump">
+		<action name="DatabaseExport" label="DatabaseExport"
+			icon="database" class="efd.actions.RemoteMysqlDump" />
+	</controller>
+
+	<controller name="LoadRemoteToStage">
+		<action name="LoadRemoteToStage" label="DatabaseStageImport"
+			icon="database" confirm="true" class="efd.actions.LoadRemoteToStage" />
+	</controller>
+
+
+	<controller name="MergeProject">
+		<action name="MergeProject" label="MergeProject"
+			icon="database" mode="detail" class="efd.actions.MergeProject" />
+	</controller>
+
+
+	<controller name="Household">
+		<extends controller="EFD_HM" />
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchByViewKey" />
+		<action name="Parse Spreadsheet"
+			label="Parse Interview Spreadsheet" icon="file-excel"
+			takes-long="true" mode="detail" in-each-row="false"
+			class="efd.actions.ParseHHSpreadsheet" />
+		<action name="Validate" label="Validate" icon="marker-check"
+			mode="detail" in-each-row="false" class="efd.actions.ValidateHH" />
+
+	</controller>
+
+
+	<controller name="LivelihoodZone">
+		<extends controller="EFD_HM" />
+		<action name="filteredsearch" hidden="true" image="search.gif"
+			class="efd.actions.FilteredLZ" />
+		<action name="add" hidden="true" icon="table-row-plus-after"
+			class="efd.actions.AddLZ">
+			<!-- <set property="resetAfter" value="false"/> -->
+		</action>
+	</controller>
+
+
+
+
+	<controller name="CharacteristicsResource">
+		<action name="edit" hidden="false" icon="pencil"
+			class="efd.actions.CharacteristicsResourceEdit" />
+		<action name="new" hidden="false" icon="table-row-plus-after"
+			class="efd.actions.CharacteristicsResourceNew" />
+		<action name="save" mode="detail" by-default="if-possible"
+			class="efd.actions.CharacteristicsResourceSave" image="save.gif"
+			icon="content-save" keystroke="Control S">
+		</action>
+
+
+	</controller>
+
+
+	<controller name="StdOfLivingElement">
+		<extends controller="EFD_HM" />
+		<action name="edit" hidden="false" icon="pencil"
+			class="efd.actions.EditStdOfLivingElement">
+		</action>
+
+
+	</controller>
+
+
+
+
+
+
+	<!-- <extends controller="EFD_HM"/> <action name="new LZ" image="new.gif" 
+		hidden="true" icon="library-plus" class="efd.actions.NewLZ"/> <action name="add 
+		LZ" hidden="true" icon="table-row-plus-after" class="efd.actions.AddLZ"/> 
+		<action name="filteredsearch" hidden="true" image="search.gif" class="efd.actions.FilteredLZ"/> 
+		</controller> -->
+
+
+	<controller name="Community">
+		<extends controller="EFD_HM" />
+		<action name="filteredSitesearch" hidden="true"
+			image="search.gif" class="efd.actions.FilteredSite" />
+		<action name="init" on-init="true" hidden="true"
+			class="efd.actions.SetEfdOHEAModel" />
+
+
+	</controller>
+
+
+
+	<controller name="Sections">
+		<action name="change" hidden="true"
+			class="efd.actions.AssetChangeSectionAction" keystroke="Control 1..9" />
+	</controller>
+	<!-- <controller name="Sections"> <action name="change" hidden="true" class="efd.actions.ResourceSubTypeFilter" 
+		keystroke="Control 1..9" /> </controller> -->
+
+
+
+	<controller name="CollectionCopyPaste">
+
+		<action name="cut" icon="content-cut" image="cut.gif"
+			in-each-row="true" hidden="true"
+			class="org.openxava.actions.CutElementsFromCollectionAction" />
+
+		<action name="paste" icon="content-paste" image="paste.gif"
+			hidden="true"
+			class="org.openxava.actions.PasteElementsIntoCollectionAction" />
+
+	</controller>
+
+
+	<controller name="UploadFile">
+		<action name="uploadFile"
+			class="efd.actions.WgiUploadFileAction" />
+		<action name="cancel" class="org.openxava.actions.CancelAction" />
+	</controller>
+
+	<controller name="AttachedFiles">
+		<action name="add"
+			class="org.openxava.actions.AddFileToFilesetAction" icon="attachment"
+			image="attach.gif" takes_long="true" />
+		<action name="remove"
+			class="org.openxava.actions.RemoveFileFromFilesetAction"
+			icon="delete" image="delete.gif" confirm="true" />
+	</controller>
+
+
+	<controller name="SetReadOnly">
+		<action name="readOnly" class="efd.actions.SetWGIReadOnly"
+			hidden="true" mode="detail" />
+
+	</controller>
+
+	<controller name="SetEditable">
+		<action name="SetEditable" class="efd.actions.SetWGIEditable"
+			hidden="true" mode="detail" icon="pencil" />
+		<action name="SetEditableHH" class="efd.actions.SetHHEditable"
+			hidden="true" mode="detail" icon="pencil" />
+	</controller>
+
+
+
+
+	<controller name="ShowButton">
+		<action name="ShowButton" class="efd.actions.ShowWGIEditButton"
+			hidden="true" mode="detail" />
+
+	</controller>
+
+	<controller name="ConfigQuestionUse">
+		<extends controller="EFD_HM" />
+
+		<action name="edit" image="edit.gif" icon="pencil"
+			class="efd.actions.EditQuestionUse" />
+
+		<action name="new" image="new.gif" icon="plus"
+			class="efd.actions.NewQuestionUse" />
+
+
+		<action name="afterquery" after-each-request="true"
+			hidden="true" mode="detail"
+			class="efd.validations.InitQuestionUseAnswerType">
+		</action>
+
+		<action name="save" mode="detail" by-default="if-possible"
+			class="efd.actions.ConfigQuestionUseSave" image="save.gif"
+			icon="content-save" keystroke="Control S">
+
+		</action>
+
+	</controller>
+
+
+	<controller name="ConfigAnswer">
+		<extends controller="EFD_HM" />
+
+		<action name="edit" image="edit.gif" icon="pencil"
+			class="efd.actions.EditConfigAnswer">
+		</action>
+
+
+		<action name="save" mode="detail" by-default="if-possible"
+			class="efd.actions.ConfigAnswerSave" image="save.gif"
+			icon="content-save" keystroke="Control S">
+		</action>
+
+
+	</controller>
+
+
+
+
+
+	<controller name="ConfigQuestion">
+		<extends controller="EFD_HM" />
+
+		<action name="new" icon="plus" class="efd.actions.EditQuestion" />
+
+		<!-- <action name="afterquery" after-each-request="true" hidden="true" 
+			mode="detail" class="efd.validations.InitQuestionAnswerType"> -->
+	</controller>
+
+
+
+	<controller name="Print">
+
+		<action name="generatePdf" mode="list"
+			class="org.openxava.actions.GenerateReportAction" image="pdf.gif"
+			icon="file-pdf" keystroke="Control Alt P">
+			<set property="type" value="pdf" />
+		</action>
+
+		<!-- // do not want gen excel <action name="generateExcel" mode="list" 
+			class="org.openxava.actions.GenerateReportAction" image="excel.gif" icon="file-excel" 
+			keystroke="Control Alt X"> <set property="type" value="csv"/> </action> -->
+	</controller>
+
+
+
+	<controller name="ConfigQuestionModification">
+		<extends controller="Modification" />
+
+		<!-- The action 'search' is execute automatically -->
+		<action name="search" hidden="true"
+			class="efd.actions.ConfigQuestionModifyFromReferenceAction"
+			keystroke="F2" />
+		<action name="update" by-default="almost-always"
+			class="efd.actions.ConfigQuestionUpdateAction" />
+		<action name="cancel" class="org.openxava.actions.CancelAction" />
+
+	</controller>
+
+
+	<!-- <controller name="ConfigQuestionUseCreation"> <action name="new" hidden="true" 
+		class="org.openxava.actions.NewAction" keystroke="F2" /> <action name="saveNew" 
+		by-default="almost-always" class="efd.actions.ConfigQuestionUseSave"> <set 
+		property="resetAfter" value="false" /> </action> <action name="cancel" class="org.openxava.actions.CancelAction" 
+		/> </controller> -->
+
+</controllers>

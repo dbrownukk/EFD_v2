@@ -52,6 +52,7 @@ public class AssetChangeSectionAction extends ChangeSectionAction implements IMo
 			rType[9] = "Employment";
 			rType[10] = "Transfers";
 			rType[11] = "Wild Foods";
+			rType[12] = "Inputs";
 
 			
 			

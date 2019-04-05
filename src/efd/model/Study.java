@@ -26,7 +26,7 @@ import efd.model.ConfigQuestion.*;
 		+ "LivestockSales{characteristicsResourceLivestockSales}"
 		+ "LivestockProducts{characteristicsResourceLivestockProducts}"
 		+ "Employment{characteristicsResourceEmployment}" + "Transfers{characteristicsResourceTransfers}"
-		+ "WildFoods{characteristicsResourceWildFoods}},Questions{configQuestionUse},StudyQuestionAnswers{configAnswer}"),
+		+ "WildFoods{characteristicsResourceWildFoods},Inputs{characteristicsResourceInputs}},Questions{configQuestionUse},StudyQuestionAnswers{configAnswer}"),
 		// + "ConfigQuestionUse{configQuestionUse}"),
 		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
 		@View(name = "StudyInterview", members = "studyName,referenceYear,spreadsheets"),
@@ -200,6 +200,8 @@ public class Study extends EFDIdentifiable {
 	@NewAction("CharacteristicsResource.new")
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceCash;
+
+	
 	/*************************************************************************************************/
 	// Non Assets
 	/*************************************************************************************************/
@@ -264,6 +266,18 @@ public class Study extends EFDIdentifiable {
 	@NewAction("CharacteristicsResource.new")
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceWildFoods;
+	
+	/*************************************************************************************************/
+
+	@OneToMany(mappedBy = "study")
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Non Food Purchase')"
+			+ "AND ${this.id} = ${study.id}")
+	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
+	@EditAction("CharacteristicsResource.edit")
+	@AddAction("")
+	@NewAction("CharacteristicsResource.new")
+	@SaveAction("CharacteristicsResource.save")
+	private Collection<WGCharacteristicsResource> characteristicsResourceInputs;
 	/*************************************************************************************************/
 
 	@OneToMany(mappedBy = "study" ,cascade=CascadeType.REMOVE)
@@ -329,6 +343,15 @@ public class Study extends EFDIdentifiable {
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 
+	@OneToMany(mappedBy="study")
+	private Collection <ReportSpecUse> reportSpecUse;
+	
+	
+	/*************************************************************************************************/
+
+	
+	
+	
 	
 	
 	
@@ -339,6 +362,16 @@ public class Study extends EFDIdentifiable {
 	}
 
 
+
+
+
+	public Collection<ReportSpecUse> getReportSpecUse() {
+		return reportSpecUse;
+	}
+
+	public void setReportSpecUse(Collection<ReportSpecUse> reportSpecUse) {
+		this.reportSpecUse = reportSpecUse;
+	}
 
 	public Collection<ConfigAnswer> getConfigAnswer() {
 		return configAnswer;
@@ -550,6 +583,14 @@ public class Study extends EFDIdentifiable {
 
 	public void setConfigQuestionUse(Collection<ConfigQuestionUse> configQuestionUse) {
 		this.configQuestionUse = configQuestionUse;
+	}
+
+	public Collection<WGCharacteristicsResource> getCharacteristicsResourceInputs() {
+		return characteristicsResourceInputs;
+	}
+
+	public void setCharacteristicsResourceInputs(Collection<WGCharacteristicsResource> characteristicsResourceInputs) {
+		this.characteristicsResourceInputs = characteristicsResourceInputs;
 	}
 
 

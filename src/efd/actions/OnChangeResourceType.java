@@ -29,6 +29,10 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 				getView().setDescriptionsListCondition("resourcesubtype",
 						"e.resourcetype.resourcetypename = 'Livestock'");
 			}
+			else if (sessionTab == "Inputs") {
+				getView().setDescriptionsListCondition("resourcesubtype",
+						"e.resourcetype.resourcetypename = 'Non Food Purchase'");
+			}
 
 			else {
 				System.out.println("rstonchange not foodstocks = ");

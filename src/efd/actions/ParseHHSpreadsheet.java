@@ -9,6 +9,7 @@ package efd.actions;
 import java.io.*;
 import java.sql.*;
 import java.text.*;
+import java.time.*;
 
 import javax.inject.*;
 import javax.persistence.*;
@@ -149,7 +150,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		ws.add(new Wsheet(TRANSFER, "Transfers", 19, 0));
 		ws.add(new Wsheet(WILDFOOD, "Wild Foods", 13, 0)); // 11
 		ws.add(new Wsheet(INPUTS, "Inputs", 10, 0));
-		ws.add(new Wsheet(NONFOODPURCHASE, "Non Food Purchase", 4, 0));
+
+		ws.add(new Wsheet(NONFOODPURCHASE, "Non Food Purchase", 4, 0)); // used for INPUTS
 
 		/*
 		 * ws.add(new Wsheet(2, 3, 1, "Livestock Type")); ws.add(new Wsheet(2, 3, 2,
@@ -280,20 +282,17 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		// hhi.getConfigAnswer().removeAll(hhi.getConfigAnswer());
 
 		String hhid = hhi.getId();
-		Connection con2 = provider.getConnection();
-		try {
 
-			PreparedStatement ps = con2
-					.prepareStatement("DELETE FROM HouseholdMember where householdid = '" + hhid + "'");
-			ps.executeUpdate();
-			ps = con2.prepareStatement("DELETE FROM ConfigAnswer where household_id = '" + hhid + "'");
-			ps.executeUpdate();
-			ps.close();
-		} finally {
-			con.close();
+		HouseholdMember hm = null;
+		for (HouseholdMember householdMember : hhi.getHouseholdMember()) {
+			hm = XPersistence.getManager().find(HouseholdMember.class, householdMember.getId());
+			XPersistence.getManager().remove(hm);
+
 		}
 
 		getView().findObject();
+
+		System.out.println("hhm tot now =" + hhi.getHouseholdMember().size());
 
 		// hhi.getFoodPurchase().removeAll(hhi.getFoodPurchase());
 		// hhi.getNonFoodPurchase().removeAll(hhi.getNonFoodPurchase());
@@ -414,7 +413,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		Date hhIDate = sheet.getRow(5).getCell(4, Row.CREATE_NULL_AS_BLANK).getDateCellValue();
 		String hhInterviewers = sheet.getRow(5).getCell(6, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 
-		hhi.setHouseholdName(hhName);
+		if (hhName.isEmpty())
+			hhi.setHouseholdName(null);
+		else
+			hhi.setHouseholdName(hhName);
+
 		hhi.setInterviewDate(hhIDate);
 		hhi.setInterviewers(hhInterviewers);
 
@@ -514,7 +517,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		iterator = hhi.getStudy().getConfigQuestionUse().iterator();
 		while (iterator.hasNext()) {
 
-			System.out.println("in iterator");
 			ConfigQuestionUse nextq = iterator.next();
 			if (nextq.getConfigQuestion().getLevel().toString() == "Household") {
 				em("prompt = " + nextq.getConfigQuestion().getPrompt().toString());
@@ -594,8 +596,21 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				}
 
 				hhm.setAge((int) (sheet.getRow(5).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+
+				// calculated
+				/*
 				hhm.setYearOfBirth(
 						(int) (sheet.getRow(6).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+
+				if (hhm.getYearOfBirth() == 0) {
+					// calc year
+				
+					int thisYear=hhm.getHousehold().getStudy().getReferenceYear();
+					
+					
+					hhm.setYearOfBirth(thisyear - hhm.getAge());
+				}
+				 */
 
 				head = sheet.getRow(7).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (head.equals("Yes")) {
@@ -613,8 +628,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				absent = sheet.getRow(8).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (absent.equals("Yes")) {
+					System.out.println("absent Y = " + absent);
 					hhm.setAbsent(YN.Yes);
 				} else if (absent.equals("No")) {
+					System.out.println("absent N = " + absent);
 					hhm.setAbsent(YN.No);
 				}
 
@@ -626,9 +643,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				hhm.setMonthsAway(
 						(int) (sheet.getRow(10).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
 				if (hhm.getMonthsAway() == 0) {
-					hhm.setAbsent(YN.Yes);
-				} else
 					hhm.setAbsent(YN.No);
+				} else
+					hhm.setAbsent(YN.Yes);
+
+				int hhmNumber = hhmcol - 1;
+				hhm.setHouseholdMemberNumber("HHM" + hhmNumber);
 
 				XPersistence.getManager().persist(hhm);
 
@@ -652,7 +672,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			 */
 			Iterator<ConfigQuestionUse> iterator = hhi.getStudy().getConfigQuestionUse().iterator();
 			while (iterator.hasNext()) {
-				System.out.println("in iterator 1");
+
 				ConfigQuestionUse nextq = iterator.next();
 				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember) {
 					k++;
@@ -671,7 +691,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			QandA qa = null;
 
 			for (int i = 0; i < qsize; i++) {
-				System.out.println("in loop 1");
+
 				try {
 					qcell = sheet.getRow(9 + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
 
@@ -703,8 +723,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				}
 
 				qa.setQuestion(qcell.getStringCellValue());
-				System.out.println("in loop 3");
-				if (qa.getAnswer().isEmpty()) {
+
+				if (qa.getAnswer() == null) {
+					em("getanswer is empty");
 					qa.setAnswer("-");
 				}
 
@@ -721,7 +742,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			iterator = hhi.getStudy().getConfigQuestionUse().iterator();
 			while (iterator.hasNext()) {
 
-				System.out.println("in iterator");
 				ConfigQuestionUse nextq = iterator.next();
 				em("hhm level = " + nextq.getConfigQuestion().getLevel().toString());
 				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember)
@@ -837,7 +857,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				}
 			} catch (Exception ex) {
 				System.out.println("in catch for get cell i j k =  " + ex + i + j + k);
-				addError("Error in number of columns in Sheet = " + k + " " + i + j + k);
+				addError("Error in number of columns in Sheet = " + k + " " + i + " " + j + " " + k);
 
 			}
 		}
@@ -850,7 +870,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	private void setResource(Household hhi) {
 
 		em("in getresource");
-		ResourceType[] rtype = new ResourceType[15];
+		ResourceType[] rtype = new ResourceType[50];
 
 		/* Get list of currencies for validation of Cash Asset */
 		List<Country> currency = XPersistence.getManager().createQuery("from Country").getResultList();
@@ -874,19 +894,35 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		/* set validation rtypes array */
 
-		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) {
+		List<ResourceType> rst3 = (List<ResourceType>) XPersistence.getManager().createQuery("from ResourceType")
+				.getResultList();
 
+		for (ResourceType type : rst3) {
+			System.out.println("rst3 = " + type.getResourcetypename());
+		}
+
+		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) {
+			// System.out.println("in rt setup loop " + ASSETLAND + " " + INPUTS + " " + i +
+			// " "
+			// + ws.get(i - 3).resourceType.toString());
 			try {
-				rtype[i] = (ResourceType) XPersistence.getManager()
-						.createQuery("from ResourceType where ResourceTypeName = '" + ws.get(i - 3).resourceType + "'")
+				String qry = "from ResourceType where ResourceTypeName = '" + ws.get(i - 3).resourceType.toString()
+						+ "'";
+				System.out.println("qry = " + qry);
+				rtype[i] = (ResourceType) XPersistence.getManager().createQuery(
+						"from ResourceType where ResourceTypeName = '" + ws.get(i - 3).resourceType.toString() + "'")
 						.getSingleResult();
+				System.out.println("in get RT = " + rtype[i].getResourcetypename() + " " + i);
+
 			} catch (Exception ex) {
-				em("did not find rst for " + ws.get(i - 3).resourceType);
+				em("Exception in rst query " + ws.get(i - 3).resourceType + " " + ex);
+				if (i == 16)
+					return;
 			}
 		}
 
 		for (i = ASSETLAND; i <= INPUTS; i++) { // Sheet
-			em("in loop ASSETLAND TO INPUTS =  " + i);
+			// em("in loop ASSETLAND TO INPUTS = " + i);
 			// breaksheet: for (j = 0; j < 35; j++) { // Row
 			breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
 				em("inp loop assets 777 " + numberRows[i] + " " + j);
@@ -1530,6 +1566,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				case INPUTS:
 
+					ResourceSubType rst1 = null;
+					ResourceSubType rst2 = null;
+
 					em("in INPUTS i = " + i);
 					try {
 
@@ -1554,41 +1593,32 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Check Input resource - Non Food Product or Other Tradeable Goods
 
-				
-
 						if (!ins.getItemPurchased().isEmpty()) {
 
-							
-
-							try {
-								if ((rst = checkSubType(cell[i][j][0].getStringCellValue(),
-										rtype[ASSETTRADEABLE].getIdresourcetype().toString())) != null) {
-									
-									assetOK1 = true;
-								}
-							} catch (Exception ex) {
-								System.out.println("1 NOT OK ");
+							if ((rst1 = checkSubType(cell[i][j][0].getStringCellValue(),
+									rtype[ASSETTRADEABLE].getIdresourcetype().toString())) != null) {
+								System.out.println("tradeable  found ");
+								assetOK1 = true;
+								rst = rst1;
+							} else {
+								System.out.println("back in inputs rst not found ");
 							}
-							try {
-								if ((rst = checkSubType(cell[i][j][0].getStringCellValue(),
-										rtype[NONFOODPURCHASE].getIdresourcetype().toString())) != null) {
-									System.out.println("2 OK " + cell[i][j][0].getStringCellValue());
-									assetOK2 = true;
-								}
-							} catch (Exception ex) {
-								System.out.println("2 Not OK");
 
+							if ((rst2 = checkSubType(cell[i][j][0].getStringCellValue(),
+									rtype[NONFOODPURCHASE].getIdresourcetype().toString())) != null) {
+
+								assetOK2 = true;
+								rst = rst2;
 							}
 
 							if (assetOK1 || assetOK2)
 
 							{
-								
 
 								// check Unit entered
 
 								ins.setResourceSubType(rst);
-								
+
 								ins.setStatus(efd.model.Asset.Status.Valid);
 
 								// Check if Resource 1/2/3 Used for are Valid
@@ -1597,37 +1627,39 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 										ins.getResource3UsedFor()))
 
 								{
-									
+
 									ins.setStatus(efd.model.Asset.Status.Valid);
+
 								}
 
 								else {
-									
+
 									ins.setStatus(efd.model.Asset.Status.Invalid);
 								}
 
 								if (!checkSubTypeEntered(ins.getUnit(), rst)) {
 									ins.setStatus(efd.model.Asset.Status.Invalid);
+
 								}
 
 							} else {
-								
+
 								ins.setStatus(efd.model.Asset.Status.Invalid);
 
 							}
 
 						}
 
-						em("done INPUTS ");
+						em("done INPUTS " + ins.getItemPurchased());
 						hhi.getInputs().add(ins);
-						
+
 						// k = 100; // Possibility of next row being valid
 						break;
 
 					}
 
 					catch (Exception ex) {
-						addMessage("Problem parsing Inputs worksheet ");
+						addMessage("Problem parsing Inputs worksheet " + ex);
 						k = 100;
 						break breaksheet;
 					}
@@ -1687,6 +1719,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		// Change to use .isEmpty
 
+		System.out.println("in checkSubTypeEntered " + unitEntered + " " + rst.getResourcesubtypeunit());
 		if (unitEntered.isEmpty() || unitEntered.equals(null)) {
 			// empty thus invalid
 			return false;
@@ -1740,7 +1773,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			return (rsty);
 		} catch (Exception ex) {
-			System.out.println("Exception:rst not found");
+			System.out.println("Exception:rst not found rsty = " + rsty + " " + ex);
 
 			return (rsty);
 		}

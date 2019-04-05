@@ -37,6 +37,7 @@ public class CharacteristicsResourceNew extends CreateNewElementInCollectionActi
 		rType[9] = "Employment";
 		rType[10] = "Transfers";
 		rType[11] = "Wild Foods";
+		rType[12] = "Inputs";
 
 
 		
@@ -69,6 +70,8 @@ public class CharacteristicsResourceNew extends CreateNewElementInCollectionActi
 			iactiveSection=10;
 		else if(getMetaCollection().getName().equals("characteristicsResourceWildFoods"))
 			iactiveSection=11;
+		else if(getMetaCollection().getName().equals("characteristicsResourceInputs"))
+			iactiveSection=12;
 
 		System.out.println("sessiontab in new wgr 1 = "+sessionTab);
 		
@@ -85,6 +88,9 @@ public class CharacteristicsResourceNew extends CreateNewElementInCollectionActi
 		} else if (sessionTab == "Livestock Sales") {
 				getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 						"e.resourcetype.resourcetypename = 'Livestock'");
+		} else if (sessionTab == "Inputs") {
+			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
+					"e.resourcetype.resourcetypename = 'Non Food Purchase'");
 		}else{
 			getCollectionElementView().setDescriptionsListCondition("resourcesubtype",
 					"e.resourcetype.resourcetypename = '" + sessionTab + "'");

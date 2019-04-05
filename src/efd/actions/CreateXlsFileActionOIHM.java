@@ -144,9 +144,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
 					.find(WGCharacteristicsResource.class, chrs.get(k));
 
-			System.out.println("chrs get1 " + wgcharacteristicsresource.getType());
-			System.out.println("chrs get2 " + wgcharacteristicsresource.getResourcesubtype());
-			System.out.println("chrs get3 " + wgcharacteristicsresource.getIdwgresource());
+			
 
 			/* Get Resource Type */
 			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
@@ -377,11 +375,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			System.out.println(
 					"hhm question data type = " + configQuestionUseHHM.get(i).getConfigQuestion().getAnswerType());
 
-			System.out.println(
-					"HHM Validation build for question " + configQuestionUseHHC.get(i).getConfigQuestion().getPrompt());
-			System.out.println(
-					"HHM Validation build for question " + configQuestionUseHHC.get(i).getConfigQuestion().getId());
-
+			
 			answerType = configQuestionUseHHM.get(i).getConfigQuestion().getAnswerType();
 			level = configQuestionUseHHM.get(i).getConfigQuestion().getLevel();
 
@@ -2227,7 +2221,41 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 			row = 4;
 			int wfrow = 5;
-			// No existing rows so dot need to get them //
+			
+
+			// get resource sub type //
+			for (int k = 0; k < chrs.size(); k++) {
+				/* Get Resource Sub Type */
+				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+						.find(WGCharacteristicsResource.class, chrs.get(k));
+				
+				
+				/* Get Resource Type */
+				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+
+				//rt = rst.getResourcetypename();   // Inputs is of type Inputs in WGcharres but a NonFoodPurchase 
+				rt = wgcharacteristicsresource.getType().toString();
+				
+				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+				rtunit = wgcharacteristicsresource.getWgresourceunit();
+				if (rtunit.isEmpty())
+					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+				System.out.println("inputs rt =  "+rt );
+				if (rt.equals("Inputs")) {
+					System.out.println("get inputs for out put = "+resub+" "+rtunit);
+					sheet.setValue(2, row, resub, borderStyle);
+					sheet.setValue(3, row, rtunit, borderStyle);
+					row++;
+				}
+
+			}
+			
+			
+			
+			
+			
+			
 
 		}
 
