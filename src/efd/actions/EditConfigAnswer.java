@@ -13,7 +13,12 @@ public class EditConfigAnswer extends EditElementInCollectionAction {
 
 	public void execute() throws Exception {
 
+		System.out.println("in edit configAnswer");
+		
 		super.execute();
+		
+		System.out.println("in edit configAnswer done execute");
+		
 		getCollectionElementView().setHidden("answer", true);
 		getCollectionElementView().setHidden("textAnswer", true);
 		getCollectionElementView().setHidden("integerAnswer", true);
@@ -61,7 +66,7 @@ public class EditConfigAnswer extends EditElementInCollectionAction {
 			BigDecimal decanswer = null;
 			getCollectionElementView().setHidden("decimalAnswer", false);
 
-			if (answer.equals("-")) {
+			if (answer == null) {
 
 				decanswer = new BigDecimal(0.0);
 			} else {
@@ -85,15 +90,17 @@ public class EditConfigAnswer extends EditElementInCollectionAction {
 			getCollectionElementView().setDescriptionsListCondition("lovAnswer", condition);
 			System.out.println("condition = "+condition);
 			
-			
+			/*
 			if (answer != null) {
-				System.out.println("3333");
-				QuestionLOV qlov = XPersistence.getManager().find(QuestionLOV.class, answer.substring(4, 36));
+				System.out.println("3333 answer = "+questionLOVType);
+				//QuestionLOV qlov = XPersistence.getManager().find(QuestionLOV.class, answer.substring(4, 36));
+				QuestionLOV qlov = XPersistence.getManager().find(QuestionLOV.class, questionLOVType);
+				
 				System.out.println("lov in edit = " + qlov.toString());
 				
 				
 				
-			//	getCollectionElementView().setValue("lovAnswer", qlov.);
+				getCollectionElementView().setValue("lovAnswer", qlov);
 				System.out.println("lov in edit done set ");
 			}
 			else
@@ -102,7 +109,7 @@ public class EditConfigAnswer extends EditElementInCollectionAction {
 				getCollectionElementView().setValue("lovAnswer", null);
 				System.out.println("5555");
 			}
-
+*/
 			break;
 
 		case "IntegerRange":

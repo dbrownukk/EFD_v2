@@ -502,9 +502,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			qa.setQuestion(qcell.getStringCellValue());
 			System.out.println("in loop 3");
-			if (qa.getAnswer().isEmpty()) {
-				qa.setAnswer("-");
-			}
+			//if (qa.getAnswer().isEmpty()) {    // answer is nullable so not needed
+			//	qa.setAnswer("-");
+			//}
 			System.out.println("qanda = " + i + " " + qa.question + " " + qa.answer);
 			qand.add(qa);
 

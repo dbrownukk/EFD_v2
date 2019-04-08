@@ -97,7 +97,9 @@ public class Household extends EFDIdentifiable {
 	// @ElementCollection
 	@NoCreate
 	@AddAction("")
-	@ListProperties("configQuestionUse.configQuestion.prompt,answer")
+	//@ListProperties("configQuestionUse.configQuestion.prompt,answer")
+	@EditAction("ConfigAnswer.edit")
+	@ListProperties("configQuestionUse.configQuestion.prompt,configQuestionUse.configQuestion.answerType,displayAnswer")
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 	@Stereotype("FILE")
