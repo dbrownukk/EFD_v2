@@ -7,6 +7,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.model.*;
 
@@ -25,6 +26,7 @@ public class QuestionLOVType extends Identifiable {
 	private String lovType;
 
 	@OneToMany 
+	@NotEmpty
 	private Collection<QuestionLOV> questionLOV;
 
 	public String getLovType() {

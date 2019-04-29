@@ -20,6 +20,14 @@ public class CopyTopic extends ViewBaseAction {
 		String topicId = getView().getValueString("reusableConfigTopic.id");
 		Object studyId = getPreviousView().getValue("id");
 
+		if (studyId == null) {
+			addError("Save Study before copying in Topic Questions");
+			closeDialog();
+			return;
+		}
+
+		System.out.println("in copy topic" + topicId + " " + studyId);
+
 		// get topic questions and study
 		List<ConfigQuestion> topicConfigQuestions = XPersistence.getManager()
 				.createQuery("from ConfigQuestion where topic_ID = '" + topicId + "'").getResultList();
@@ -34,9 +42,11 @@ public class CopyTopic extends ViewBaseAction {
 		List<ConfigQuestionUse> currentQuestions = (List<ConfigQuestionUse>) study.getConfigQuestionUse();
 
 		Iterator<ConfigQuestion> topicQuestioniterator = topicConfigQuestions.iterator();
-
-		while (topicQuestioniterator.hasNext()) {
+		System.out.println("in copy topic 22");
+		while (topicQuestioniterator.hasNext() && currentQuestions.size() > 0) {
+			System.out.println("in copy topic 221 size = " + currentQuestions.size());
 			for (int j = 0; j < currentQuestions.size(); j++) {
+				System.out.println("in copy topic 223 " + j);
 				if (topicQuestioniterator.next().getId() == currentQuestions.get(j).getConfigQuestion().getId()) {
 					System.out.println("found an existing question");
 					topicQuestioniterator.remove();
@@ -89,10 +99,11 @@ public class CopyTopic extends ViewBaseAction {
 			// closeDialog();
 		}
 
+		closeDialog();
 		getView().findObject();
 		getView().refreshCollections();
 		getView().refresh();
-		closeDialog();
+
 		addMessage("Copied Topic Questions into this Study");
 
 	}
