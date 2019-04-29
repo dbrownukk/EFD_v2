@@ -55,7 +55,6 @@ public class OnChangeSetHHStatus extends OnChangePropertyBaseAction {
 			getView().setValue("status", hh.getStatus());
 		}
 		
-		
 	
 		
 		/*

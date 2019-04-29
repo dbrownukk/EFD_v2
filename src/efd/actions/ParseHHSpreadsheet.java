@@ -30,7 +30,6 @@ import efd.model.HouseholdMember.*;
 import efd.model.WealthGroupInterview.*;
 
 import org.apache.commons.lang3.text.*;
-import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Row.*;
 import org.apache.poi.util.*;
@@ -208,7 +207,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			return;
 		}
 		em("done get hhi");
-		/* Otherwise. delete assets from this Household */
+		/* Otherwise. delete assets from this wealthgroupinterview */
 
 		System.out.println("in xls parse 2 ");
 
@@ -290,16 +289,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			XPersistence.getManager().remove(hm);
 
 		}
-		em("deleted hhm");
-
-		em("size of ca q = " + hhi.getConfigAnswer().size());
-		ConfigAnswer ca = null;
-		for (ConfigAnswer configAnswer : hhi.getConfigAnswer()) {
-			ca = XPersistence.getManager().find(ConfigAnswer.class, configAnswer.getId());
-			em("current answer = " + ca.getConfigQuestionUse().getConfigQuestion().getPrompt());
-			XPersistence.getManager().remove(ca);
-		}
-		em("deleted canswers");
 
 		getView().findObject();
 
@@ -332,8 +321,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	}
 
 	private void em(String em) {
-		//System.out.println(em);
-		return;
+		System.out.println(em);
 
 	}
 
@@ -514,9 +502,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			qa.setQuestion(qcell.getStringCellValue());
 			System.out.println("in loop 3");
-			// if (qa.getAnswer().isEmpty()) { // answer is nullable so not needed
-			// qa.setAnswer("-");
-			// }
+			//if (qa.getAnswer().isEmpty()) {    // answer is nullable so not needed
+			//	qa.setAnswer("-");
+			//}
 			System.out.println("qanda = " + i + " " + qa.question + " " + qa.answer);
 			qand.add(qa);
 
@@ -543,11 +531,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						qanswer.setHousehold(hhi);
 
-						// qanswer.setStudy(nextq.getStudy());
+						qanswer.setStudy(nextq.getStudy());
 
 						qanswer.setStudy(hhi.getStudy());
-
-						em("adding HH answer " + qand.get(k).getAnswer());
 
 						XPersistence.getManager().persist(qanswer);
 						// hhi.getConfigAnswer().add(qanswer);
@@ -574,7 +560,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String head = null;
 		String absent = null;
 		String absentReason = null;
-		int firstRow = 11;
 
 		HouseholdMember hhm = null;
 
@@ -586,9 +571,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		// get first Member
 
-		FormulaEvaluator objFormulaEvaluator = new HSSFFormulaEvaluator((HSSFWorkbook) wb);
-		DataFormatter objDefaultFormat = new DataFormatter();
-
 		for (int hhmcol = 2; hhmcol < 22; hhmcol++) {
 
 			hhm = new HouseholdMember();
@@ -596,36 +578,18 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			hhm.setHousehold(hhi);
 
 			try {
-				em("hh members try");
-
-				/*
-				 * Name / ID could be text or numeric
-				 * 
-				 * FormulaEvaluator objFormulaEvaluator = new
-				 * HSSFFormulaEvaluator((HSSFWorkbook) wb); DataFormatter objDefaultFormat = new
-				 * DataFormatter();
-				 * 
-				 * is the way to get number into a string from excel via POI
-				 * 
-				 */
-
-				// em("HHM ID cell type = "+sheet.getRow(3).getCell(hhmcol).getCellType());
-
 				hhm.setHouseholdMemberName(
-						objDefaultFormat.formatCellValue(sheet.getRow(3).getCell(hhmcol), objFormulaEvaluator));
-
-				// hhm.setHouseholdMemberName(
-				// sheet.getRow(3).getCell(hhmcol).toString());
-				em("hhm  18 ");
+						sheet.getRow(3).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue());
+				
 				gender = sheet.getRow(4).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
-				em("hhm 19 ");
+				
 				if (gender == "") {
 					em("no more members");
 					hhmcol = 23;
 					break;
 				}
 
-				em("hhm 20 ");
+			
 				if (gender.equals("Male")) {
 					hhm.setGender(Sex.Male);
 				} else if (gender.equals("Female")) {
@@ -637,19 +601,20 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				hhm.setAge((int) (sheet.getRow(5).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
 
 				// calculated
-
+				
 				hhm.setYearOfBirth(
 						(int) (sheet.getRow(6).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
 
 				if (hhm.getYearOfBirth() == 0) {
 					// calc year
-
-					int thisYear = hhm.getHousehold().getStudy().getReferenceYear();
-
+				
+					int thisYear=hhm.getHousehold().getStudy().getReferenceYear();
+					
+					
 					hhm.setYearOfBirth(thisYear - hhm.getAge());
 				}
+				 
 
-				em("hh 23 ");
 				head = sheet.getRow(7).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (head.equals("Yes")) {
 					hhm.setHeadofHousehold(YN.Yes);
@@ -689,6 +654,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				hhm.setHouseholdMemberNumber("HHM" + hhmNumber);
 
 				XPersistence.getManager().persist(hhm);
+				
 
 			} catch (Exception ex) {
 				addError("Parse Failed - Wrong template for Household Members " + ex);
@@ -731,7 +697,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			for (int i = 0; i < qsize; i++) {
 
 				try {
-					qcell = sheet.getRow(firstRow + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
+					qcell = sheet.getRow(9 + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
 
 				} catch (Exception ex) {
 					break;
@@ -744,9 +710,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				qa = new QandA();
 
-				/* 11 is first row of extra questions */
-				
-				acell = sheet.getRow(firstRow + i).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK);
+				acell = sheet.getRow(9 + i).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK);
 
 				if (acell.getCellType() == Cell.CELL_TYPE_STRING) {
 
@@ -768,7 +732,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					em("getanswer is empty");
 					qa.setAnswer("-");
 				}
-				em("save in array  qand = "+qa.getQuestion()+" "+qa.getAnswer());
+
 				qand.add(qa);
 
 			}
@@ -784,40 +748,31 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				ConfigQuestionUse nextq = iterator.next();
 				em("hhm level = " + nextq.getConfigQuestion().getLevel().toString());
-				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember) {
+				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember)
 					em("prompt = " + nextq.getConfigQuestion().getPrompt().toString());
-					// Find answer for this question
-					for (k = 0; k < qand.size(); k++) {
+				// Find answer for this question
+				for (k = 0; k < qand.size(); k++) {
+					if (qand.get(k).getQuestion().equals(nextq.getConfigQuestion().getPrompt())) {
 
-						em("qand = " + qand.get(k).getQuestion());
-						em("cq = " + nextq.getConfigQuestion().getPrompt());
+						qanswer = new ConfigAnswer();
+						qanswer.setConfigQuestionUse(nextq);
 
-						if (qand.get(k).getQuestion().equals(nextq.getConfigQuestion().getPrompt())) {
-							
-							
-							em("qand a MATCH" );
-				
-							
+						qanswer.setAnswer(qand.get(k).getAnswer());
 
-							qanswer = new ConfigAnswer();
-							qanswer.setConfigQuestionUse(nextq);
+						qanswer.setHousehold(hhi);
 
-							qanswer.setAnswer(qand.get(k).getAnswer());
+						// qanswer.setStudy(nextq.getStudy());
 
-							// qanswer.setHousehold(hhi);
-							// not needed - it will appear in HH answer list
+						// qanswer.setStudy(hhi.getStudy());
 
-							// qanswer.setStudy(hhi.getStudy());
+						qanswer.setHouseholdMember(hhm);
 
-							qanswer.setHouseholdMember(hhm);
-
-							XPersistence.getManager().persist(qanswer);
-
-						}
+						XPersistence.getManager().persist(qanswer);
 
 					}
 
 				}
+
 			}
 		}
 		em("end getHHMDetails");

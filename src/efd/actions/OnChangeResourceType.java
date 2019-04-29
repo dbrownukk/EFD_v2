@@ -31,7 +31,7 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 			}
 			else if (sessionTab == "Inputs") {
 				getView().setDescriptionsListCondition("resourcesubtype",
-						"e.resourcetype.resourcetypename in ( 'Non Food Purchase','Other Tradeable Goods')");
+						"e.resourcetype.resourcetypename = 'Non Food Purchase'");
 			}
 
 			else {

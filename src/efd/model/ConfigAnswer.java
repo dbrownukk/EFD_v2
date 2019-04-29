@@ -66,14 +66,12 @@ public class ConfigAnswer extends EFDIdentifiable {
 			return answer;
 		else if (answerType2.equals(AnswerType.LOV) && answer != null) {
 			System.out.println("in lov answr = "+answer);
-			
-			
-			//QuestionLOV qlov = XPersistence.getManager().find(QuestionLOV.class, answer.substring(4, 36)); // remove (id
+			QuestionLOV qlov = XPersistence.getManager().find(QuestionLOV.class, answer.substring(4, 36)); // remove (id
 																											// = }
-			//System.out.println("lov = " + qlov.getLovValue());
+			System.out.println("lov = " + qlov.getLovValue());
 
-			//return (qlov.getLovValue());
-			return(answer);
+			return (qlov.getLovValue());
+			//return(answer);
 		}
 
 		else if (answerType2.equals(AnswerType.IntegerRange))

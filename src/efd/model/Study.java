@@ -270,11 +270,8 @@ public class Study extends EFDIdentifiable {
 	/*************************************************************************************************/
 
 	@OneToMany(mappedBy = "study")
-	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Non Food Purchase')"
-	//		+ "AND ${this.id} = ${study.id}")
-	
-	@Condition("${type} = 'Inputs' AND ${this.id} = ${study.id}")
-	
+	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Non Food Purchase')"
+			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	@AddAction("")
@@ -295,7 +292,7 @@ public class Study extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	/*
-	 * Copy from a Topic a list of Questions to use - fails if Questions already
+	 * Copy from a Topic a list of Questions to use - fails if Quesions already
 	 * exist
 	 */
 

@@ -25,7 +25,6 @@ public class ReportSpecUse extends Identifiable {
 	
 	
 	@ManyToOne
-	@ReferenceView("FromStdOfLiving")   // study name and ref year
 	private Study study;
 
 	@OneToMany(mappedBy="reportSpecUse")

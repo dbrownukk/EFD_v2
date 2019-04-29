@@ -15,7 +15,7 @@ import efd.model.ConfigQuestion.*;
 import efd.model.WealthGroupInterview.*;
 import efd.validations.*;
 
-@Views({ @View(members = "specName,quantile,reportSpecUse,report, Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType}"),
+@Views({ @View(members = "specName,quantile,rType,report, Include{resourceType,category,resourceSubType}"),
 		@View(name = "rst", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "rt", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "cat", members = "specName,quantile,rType,report,resourceSubType") })
@@ -36,7 +36,15 @@ public class CustomReportSpec extends Identifiable {
 		NoGrouping, Tercile, Quartile, Quintile
 	}
 
+	@Required
+	@Column(nullable = false)
+	//@OnChange(OnChangeRType.class)
 
+	private RType rType;
+
+	public enum RType {
+		ResourceSubType, ResourceType, Category
+	}
 
 	@ManyToMany
 	@JoinTable(name = "ReportInclusion")
@@ -56,12 +64,6 @@ public class CustomReportSpec extends Identifiable {
 	@NewAction("")
 	@JoinTable(name = "ReportSpecResourceInclusion")
 	private Collection<Category> category;
-	
-	@OneToMany(mappedBy="customReportSpec")
-	@ListProperties("study.studyName,study.referenceYear")
-	private Collection<ReportSpecUse> reportSpecUse;
-	
-	
 
 	public Collection<Report> getReport() {
 		return report;
@@ -111,14 +113,12 @@ public class CustomReportSpec extends Identifiable {
 		this.specName = specName;
 	}
 
-	public Collection<ReportSpecUse> getReportSpecUse() {
-		return reportSpecUse;
+	public RType getrType() {
+		return rType;
 	}
 
-	public void setReportSpecUse(Collection<ReportSpecUse> reportSpecUse) {
-		this.reportSpecUse = reportSpecUse;
+	public void setrType(RType rType) {
+		this.rType = rType;
 	}
-
-
 
 }
