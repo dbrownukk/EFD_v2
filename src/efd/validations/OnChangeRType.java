@@ -21,16 +21,16 @@ public class OnChangeRType extends OnChangePropertyBaseAction {
 		if(newRType == null)   // its a new record
 			return;
 		System.out.println("in rst new type 2");
-		if (newRType.equals(RType.ResourceType))
+	//	if (newRType.equals(RType.ResourceType))
 
-			getView().setViewName("rt");
+	//		getView().setViewName("rt");
 
-		else if (newRType.equals(RType.ResourceSubType))
+	//	else if (newRType.equals(RType.ResourceSubType))
 
-			getView().setViewName("rst");
+	//		getView().setViewName("rst");
 
-		else
-			getView().setViewName("cat");
+	//	else
+	//		getView().setViewName("cat");
 		
 		
 		

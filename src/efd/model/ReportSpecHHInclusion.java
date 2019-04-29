@@ -22,6 +22,7 @@ public class ReportSpecHHInclusion extends Identifiable {
 	
 	@ManyToOne
 	@Required
+	//@NewAction("")
 	private Household household;
 
 
