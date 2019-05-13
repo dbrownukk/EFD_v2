@@ -149,8 +149,9 @@ public class Study extends EFDIdentifiable {
 	/*************************************************************************************************/
 
 	@OneToMany(mappedBy = "study")
-	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
-			+ "AND ${this.id} = ${study.id}")
+	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
+	//		+ "AND ${this.id} = ${study.id}")
+	@Condition("${type} = 'Livestock' AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@NewAction("CharacteristicsResource.new")
 	@EditAction("CharacteristicsResource.edit")
@@ -218,8 +219,9 @@ public class Study extends EFDIdentifiable {
 	private Collection<WGCharacteristicsResource> characteristicsResourceCrop;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study")
-	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
-			+ "AND ${this.id} = ${study.id}")
+	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Sales')"
+	//		+ "AND ${this.id} = ${study.id}")
+	@Condition("${type} = 'Livestock Sales' AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	@AddAction("")

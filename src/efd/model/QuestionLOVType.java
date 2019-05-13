@@ -6,6 +6,7 @@ package efd.model;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
@@ -26,7 +27,8 @@ public class QuestionLOVType extends Identifiable {
 	private String lovType;
 
 	@OneToMany 
-	@NotEmpty
+	//@NotEmpty   - does not work well with collections
+	@Size(min=1)
 	private Collection<QuestionLOV> questionLOV;
 
 	public String getLovType() {
@@ -44,6 +46,8 @@ public class QuestionLOVType extends Identifiable {
 	public void setQuestionLOV(Collection<QuestionLOV> questionLOV) {
 		this.questionLOV = questionLOV;
 	}
+
+
 
 
 	

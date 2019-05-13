@@ -93,11 +93,21 @@ public class ResourceSubType {
 	@ManyToMany(mappedBy = "resourceSubType")
 	private Collection<Category> category;
 	
+	@ManyToMany
+	@NewAction("")
+	private Collection<CustomReportSpec> customReportSpecs;
 	
 	
 	
 	
-	
+	public Collection<CustomReportSpec> getCustomReportSpecs() {
+		return customReportSpecs;
+	}
+
+	public void setCustomReportSpecs(Collection<CustomReportSpec> customReportSpecs) {
+		this.customReportSpecs = customReportSpecs;
+	}
+
 	public Collection<Category> getCategory() {
 		return category;
 	}

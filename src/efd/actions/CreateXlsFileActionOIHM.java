@@ -1858,9 +1858,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(3, 3, "Unit", boldTopStyle);
 			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
 			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(8, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
-			sheet.setValue(8, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(6, 3, "Units Other Use", boldTopStyle);
 			sheet.setValue(9, 3, "Market 1", boldTopStyle);
 			sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(11, 3, "Market 2", boldTopStyle);
@@ -1987,9 +1987,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(4, 3, "Unit", boldTopStyle);
 			sheet.setValue(5, 3, "Units Produced", boldTopStyle);
 			sheet.setValue(6, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(7, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(9, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(8, 3, "Units Consumed", boldTopStyle);
-			sheet.setValue(9, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(7, 3, "Units Other Use", boldTopStyle);
 			sheet.setValue(10, 3, "Market 1", boldTopStyle);
 			sheet.setValue(11, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(12, 3, "Market 2", boldTopStyle);
@@ -2192,9 +2192,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(3, 3, "Unit", boldTopStyle);
 			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
 			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(8, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
-			sheet.setValue(8, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(6, 3, "Units Other Use", boldTopStyle);
 			sheet.setValue(9, 3, "Market 1", boldTopStyle);
 			sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(11, 3, "Market 2", boldTopStyle);

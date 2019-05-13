@@ -145,7 +145,7 @@ public class Household extends EFDIdentifiable {
 	private Collection<AssetCash> assetCash;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType.resourcetypename,cropType,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status, resourceSubType.resourcetypename,cropType,unit,unitsProduced, unitsSold,unitsOtherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Crop> crop;
 
@@ -155,7 +155,7 @@ public class Household extends EFDIdentifiable {
 	private Collection<LivestockSales> livestockSales;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType.resourcetypename, livestockType,livestockProduct,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status,resourceSubType.resourcetypename, livestockType,livestockProduct,unit,unitsProduced, unitsSold,unitsOtherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<LivestockProducts> livestockProducts;
 
@@ -171,7 +171,7 @@ public class Household extends EFDIdentifiable {
 	private Collection<Transfer> transfer;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,pricePerUnit,unitsConsumed,otherUse"
+	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,otherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<WildFood> wildFood;
 

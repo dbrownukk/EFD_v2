@@ -3,65 +3,91 @@ package efd.model;
 import java.util.*;
 
 import javax.persistence.*;
+//import javax.validation.constraints.*;
 
-import org.apache.poi.util.*;
 import org.openxava.annotations.*;
-import org.openxava.calculators.*;
-import org.openxava.jpa.*;
 import org.openxava.model.*;
-import org.openxava.util.*;
 
-import efd.model.ConfigQuestion.*;
-import efd.model.WealthGroupInterview.*;
-import efd.validations.*;
-
-@Views({ @View(members = "specName,quantile,reportSpecUse,report, Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType}"),
+@Views({ @View(members = "specName,totalQuantilePercentage,warningMessage,quantile,reportSpecUse,report, Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType}"),
 		@View(name = "rst", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "rt", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "cat", members = "specName,quantile,rType,report,resourceSubType") })
 
 @Entity
 
+/* check that only one of Cat/RT/RST is used */
+//@EntityValidator(value = SingleResourceValidation.class, properties = { @PropertyValue(name = "category"),
+//		@PropertyValue(name = "resourceType"), @PropertyValue(name = "resourceSubType") }) 
+
 public class CustomReportSpec extends Identifiable {
 
 	@Column(length = 45)
+	@Required
 	private String specName;
 
-	@Required
-	@Column(nullable = false)
-
-	private Quantile quantile;
-
-	public enum Quantile {
-		NoGrouping, Tercile, Quartile, Quintile
-	}
-
-
+	@OneToMany(mappedBy = "customReportSpec")
+	private Collection<Quantile> quantile;
 
 	@ManyToMany
 	@JoinTable(name = "ReportInclusion")
+	@NewAction("ManyToMany.new")
 	private Collection<Report> report;
 
 	@ManyToMany
 	@NewAction("")
-	@JoinTable(name = "ReportSpecResourceInclusion")
 	private Collection<ResourceType> resourceType;
 
 	@ManyToMany
 	@NewAction("")
-	@JoinTable(name = "ReportSpecResourceInclusion")
+	@ListProperties("resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
 	private Collection<ResourceSubType> resourceSubType;
 
 	@ManyToMany
 	@NewAction("")
-	@JoinTable(name = "ReportSpecResourceInclusion")
 	private Collection<Category> category;
-	
-	@OneToMany(mappedBy="customReportSpec")
+
+	@OneToMany(mappedBy = "customReportSpec")
 	@ListProperties("study.studyName,study.referenceYear")
 	private Collection<ReportSpecUse> reportSpecUse;
+
+	// ----------------------------------------------------------------------------------------------//
+	// Is quantile total above or not equal to 100%
+	// ----------------------------------------------------------------------------------------------//
+
+	@Transient
+	@ReadOnly
+	@Column(length = 3)
+
+
+	public int getTotalQuantilePercentage() {
+		int result = 0;
+
+		for (Quantile quantile : getQuantile()) {
+			result += quantile.getPercentage();
+		}
+		return result;
+	}
+
 	
+	@Depends("totalQuantilePercentage")
+	@Stereotype("LABEL")
+	@Transient
+	@ReadOnly
+	public String getWarningMessage() {
+		if (getTotalQuantilePercentage() > 100) {
+
+			return "<font color=" + "red" + ">Total Quantile Percent is greater than 100</font>";
+
+		} else if (getTotalQuantilePercentage() < 100) {
+
+			return "<font color=" + "orange" + ">Total Quantile Percent is less than 100</font>";
+		} else if (getTotalQuantilePercentage() == 100) {
+			return "<font color=" + "green" + ">Total Quantile Percent is 100</font>";
+		}
+		return null;
+	}
 	
+
 
 	public Collection<Report> getReport() {
 		return report;
@@ -92,15 +118,8 @@ public class CustomReportSpec extends Identifiable {
 	}
 
 	public void setCategory(Collection<Category> category) {
+
 		this.category = category;
-	}
-
-	public Quantile getQuantile() {
-		return quantile;
-	}
-
-	public void setQuantile(Quantile quantile) {
-		this.quantile = quantile;
 	}
 
 	public String getSpecName() {
@@ -119,6 +138,12 @@ public class CustomReportSpec extends Identifiable {
 		this.reportSpecUse = reportSpecUse;
 	}
 
+	public Collection<Quantile> getQuantile() {
+		return quantile;
+	}
 
+	public void setQuantile(Collection<Quantile> quantile) {
+		this.quantile = quantile;
+	}
 
 }

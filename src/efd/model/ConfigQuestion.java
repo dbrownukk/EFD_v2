@@ -173,8 +173,7 @@ public class ConfigQuestion extends EFDIdentifiable {
 	// private Collection<QuestionLOV> questionLOV;
 	/*************************************************************************************************/
 
-	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = true)
+	@ManyToOne
 	@NoFrame
 	@DescriptionsList(descriptionProperties = "lovType")
 	private QuestionLOVType questionLOVType;

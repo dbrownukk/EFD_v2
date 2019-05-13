@@ -38,6 +38,11 @@ public class ResourceType {
 	private Collection<ResourceSubType> resourcesubtype;
 	//----------------------------------------------------------------------------------------------//
 
+	@ManyToMany
+	@NewAction("")
+	private Collection<CustomReportSpec> customReportSpecs;
+	
+	
 	public String getIdresourcetype() {
 		return idresourcetype;
 	}
@@ -60,6 +65,14 @@ public class ResourceType {
 
 	public void setResourcesubtype(Collection<ResourceSubType> resourcesubtype) {
 		this.resourcesubtype = resourcesubtype;
+	}
+
+	public Collection<CustomReportSpec> getCustomReportSpecs() {
+		return customReportSpecs;
+	}
+
+	public void setCustomReportSpecs(Collection<CustomReportSpec> customReportSpecs) {
+		this.customReportSpecs = customReportSpecs;
 	}
 	
 }

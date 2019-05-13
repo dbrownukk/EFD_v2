@@ -11,8 +11,8 @@ import org.openxava.util.*;
 import efd.model.ConfigQuestion.*;
 import efd.validations.*;
 
-@Views({ @View(members = "QuestionUse[study,configQuestion]") })
-//		@View(name = "FromConfigQuestion", members = "QuestionUse[#study,level]") })
+@Views({ @View(members = "QuestionUse[study,configQuestion]"),
+		@View(name = "fromRSU", members = "configQuestion,configAnswer") })
 
 @Tab(properties = "study.studyName,study.referenceYear,configQuestion.level,configQuestion.prompt,configQuestion.answerType", defaultOrder = "${configQuestion.level} asc")
 
@@ -70,6 +70,16 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@ManyToOne(optional = false)
 	//@SearchListCondition("${configQuestion.id} != ${id}")
+	
+	// TODO
+	// TODO
+	
+	@DescriptionsList(
+			 descriptionProperties="prompt", // 3
+			 forViews="fromRSU" // 4
+			 //condition="${family.number} = ?" // 5
+			 //order="${description} desc" // 6
+			 )
 	private ConfigQuestion configQuestion;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "configQuestionUse", cascade = CascadeType.REMOVE)

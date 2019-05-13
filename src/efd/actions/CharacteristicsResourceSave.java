@@ -15,6 +15,8 @@ public class CharacteristicsResourceSave extends SaveElementInCollectionAction {
 
 		// set the resource type in characteristic resources for use in spreadsheet create
 		
+		
+		
 		getCollectionElementView().setValue("type", sessionTab);
 		
 		super.execute();

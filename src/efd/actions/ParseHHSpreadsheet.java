@@ -31,6 +31,7 @@ import efd.model.WealthGroupInterview.*;
 
 import org.apache.commons.lang3.text.*;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.format.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Row.*;
 import org.apache.poi.util.*;
@@ -309,7 +310,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		// hhi.getNonFoodPurchase().removeAll(hhi.getNonFoodPurchase());
 
 		/* Get the WS details */
-		getInterviewDetails(wb, hhi);
+		if (!getInterviewDetails(wb, hhi)) {
+			addError("Failed to parse spreadsheet");
+			return;
+		}
 
 		getHHDetails(wb, hhi);
 
@@ -392,9 +396,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	 * get Interview details
 	 */
 
-	private void getInterviewDetails(Workbook wb, Household hhi) {
+	private Boolean getInterviewDetails(Workbook wb, Household hhi) {
 
 		Cell icell = null;
+		Date hhIDate = null;
 
 		em(" start getInterviewDetails ");
 
@@ -409,32 +414,62 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		icell = sheet.getRow(3).getCell(2, Row.CREATE_NULL_AS_BLANK);
 
-		System.out.println("first get = " + icell.getStringCellValue());
+		em("first get = " + icell.getStringCellValue());
 
 		if (!icell.getStringCellValue().equals(studyName)) // Not for this project
 		{
 			addWarning("Spreadsheet is not for current Study . Spreadsheet Study Name + Reference Year = "
 					+ icell.getStringCellValue() + ", Study Project = " + studyName);
-			return;
+			return false;
 		}
 
 		// icell = sheet.getRow(5).getCell(2,
 		// Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 
+		
+		
+		
+		em("11");
 		String hhName = sheet.getRow(5).getCell(2, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
-		Date hhIDate = sheet.getRow(5).getCell(4, Row.CREATE_NULL_AS_BLANK).getDateCellValue();
+		
+		
+		
+		
+		
+		em("22 ct = "+sheet.getRow(5).getCell(4).getCellType());
+		
+		
+		icell = sheet.getRow(5).getCell(4);
+		em("get icell type = "+icell.getCellType());
+		if(icell.getCellType() == 0) // Date
+		{
+			em("set i date 22");
+			hhIDate =sheet.getRow(5).getCell(4,  Row.RETURN_NULL_AND_BLANK ).getDateCellValue();
+			em("set i date 44");
+		}
+		else
+		{
+			addError("Interview Date is empty and required");
+			return(false);
+		}
+		
+		
+		
+		em("33");
 		String hhInterviewers = sheet.getRow(5).getCell(6, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
-
+		em("44");
 		if (hhName.isEmpty())
 			hhi.setHouseholdName(null);
 		else
 			hhi.setHouseholdName(hhName);
-
+		em("55");
 		hhi.setInterviewDate(hhIDate);
+		em("66");
 		hhi.setInterviewers(hhInterviewers);
 
 		em(" end getInterviewDetails ");
-		// hhi.setStatus(Status.PartParsed);
+		return(true);
+		
 	}
 
 	/**************************************************************************************************************************************************************************************************/
@@ -745,7 +780,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				qa = new QandA();
 
 				/* 11 is first row of extra questions */
-				
+
 				acell = sheet.getRow(firstRow + i).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK);
 
 				if (acell.getCellType() == Cell.CELL_TYPE_STRING) {
@@ -768,7 +803,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					em("getanswer is empty");
 					qa.setAnswer("-");
 				}
-				em("save in array  qand = "+qa.getQuestion()+" "+qa.getAnswer());
+				em("save in array  qand = " + qa.getQuestion() + " " + qa.getAnswer());
 				qand.add(qa);
 
 			}
@@ -793,11 +828,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						em("cq = " + nextq.getConfigQuestion().getPrompt());
 
 						if (qand.get(k).getQuestion().equals(nextq.getConfigQuestion().getPrompt())) {
-							
-							
-							em("qand a MATCH" );
-				
-							
+
+							em("qand a MATCH");
 
 							qanswer = new ConfigAnswer();
 							qanswer.setConfigQuestionUse(nextq);
@@ -1234,9 +1266,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						acrop.setUnitsProduced(getCellDouble(cell[i][j][2]));
 						acrop.setUnitsSold(getCellDouble(cell[i][j][3]));
-						acrop.setPricePerUnit(getCellDouble(cell[i][j][4]));
+						acrop.setPricePerUnit(getCellDouble(cell[i][j][6]));
 						// acrop.setUnitsConsumed(getCellDouble(cell[i][j][5]));
-						acrop.setUnitsOtherUse(getCellDouble(cell[i][j][6]));
+						acrop.setUnitsOtherUse(getCellDouble(cell[i][j][4]));
 
 						warnMessage = "Market 1";
 						acrop.setMarket1(cell[i][j][7].getStringCellValue());
@@ -1342,9 +1374,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						alsp.setUnitsProduced(getCellDouble(cell[i][j][3]));
 						alsp.setUnitsSold(getCellDouble(cell[i][j][4]));
-						alsp.setPricePerUnit(getCellDouble(cell[i][j][5]));
+						alsp.setPricePerUnit(getCellDouble(cell[i][j][7]));
 						// alsp.setUnitsConsumed(getCellDouble(cell[i][j][6]));
-						alsp.setUnitsOtherUse(getCellDouble(cell[i][j][7]));
+						alsp.setUnitsOtherUse(getCellDouble(cell[i][j][5]));
 
 						alsp.setMarket1(cell[i][j][8].getStringCellValue());
 						alsp.setPercentTradeMarket1(getCellDouble(cell[i][j][9]));
@@ -1576,10 +1608,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						awf.setUnitsProduced(getCellDouble(cell[i][j][l++]));
 						awf.setUnitsSold(getCellDouble(cell[i][j][l++]));
-						awf.setPricePerUnit(getCellDouble(cell[i][j][l++]));
+						awf.setOtherUse(getCellDouble(cell[i][j][l++]));
 						// awf.setUnitsConsumed(getCellDouble(cell[i][j][l++]));
 						l++;
-						awf.setOtherUse(getCellDouble(cell[i][j][l++]));
+						awf.setPricePerUnit(getCellDouble(cell[i][j][l++]));
 
 						awf.setMarket1(cell[i][j][l++].getStringCellValue());
 						awf.setPercentTradeMarket1(getCellDouble(cell[i][j][l++]));

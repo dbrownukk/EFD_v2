@@ -2,6 +2,7 @@ package efd.actions;
 
 import javax.inject.*;
 
+import org.hibernate.loader.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
@@ -26,8 +27,21 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 			}
 
 			else if (sessionTab == "Livestock Sales") {
-				getView().setDescriptionsListCondition("resourcesubtype",
-						"e.resourcetype.resourcetypename = 'Livestock'");
+				
+				//System.out.println("in onchange prev view all vals =  = "+getPreviousView().getBaseModelName());
+				//String studyid = getPreviousView().getValueString("id");
+				//System.out.println("in onchange study = "+studyid);
+				//Study study = XPersistence.getManager().find(Study.class, studyid);
+
+				//CharacteristicsResourceNew characteristicsResourceNew = new CharacteristicsResourceNew();
+
+				//String condition = characteristicsResourceNew.setLSSCondition(study);
+				//getView().setDescriptionsListCondition("resourcesubtype", condition);
+				
+				
+			
+			//	getView().setDescriptionsListCondition("resourcesubtype",
+			//			"e.resourcetype.resourcetypename = 'Livestock'");
 			}
 			else if (sessionTab == "Inputs") {
 				getView().setDescriptionsListCondition("resourcesubtype",

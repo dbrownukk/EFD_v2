@@ -32,6 +32,13 @@ properties = "wealthgroup.community.projectlz.projecttitle,"
 				+ ", ${wealthgroup.wgnameeng} desc"	
 		)
 
+
+@Table(name = "wgcharacteristicsresource",
+
+uniqueConstraints = {
+		@UniqueConstraint(name = "studyrst", columnNames = { "study_id", "WGResourceSubType","type" }) })
+
+
 public class WGCharacteristicsResource {
 
 
@@ -61,7 +68,7 @@ public class WGCharacteristicsResource {
 	@JoinColumn(name = "WGResourceSubType")
 	@Required
 	@NoCreate
-	//@NoModify
+	@NoModify
 	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
 	//condition="e.resourcetype.resourcetypename = 'Land'")
 	@OnChange(OnChangeResourceType.class)  // class is not used..
