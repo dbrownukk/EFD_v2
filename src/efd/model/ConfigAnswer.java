@@ -1,18 +1,16 @@
 package efd.model;
 
 import java.math.*;
-import java.util.*;
 
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
-import org.openxava.jpa.*;
 
-import efd.actions.*;
 import efd.model.ConfigQuestion.*;
 
-@View(members = "answer,textAnswer,integerAnswer,lovAnswer,decimalAnswer,intRangeAnswer,decRangeAnswer,answerType")
+//@View(members = "answer,textAnswer,integerAnswer,lovAnswer,decimalAnswer,intRangeAnswer,decRangeAnswer,answerType")
+@View(members = "answer,textAnswer,integerAnswer,decimalAnswer,intRangeAnswer,decRangeAnswer,answerType")
 
 @Entity
 
@@ -43,6 +41,11 @@ public class ConfigAnswer extends EFDIdentifiable {
 	private String answer;
 
 	/*************************************************************************************************/
+	@ManyToOne(fetch = FetchType.LAZY)
+	private CustomReportSpec customReportSpec;
+	/*************************************************************************************************/
+
+	
 	/*
 	 * Transients to enter answer based on answer type for question
 	 * 
@@ -52,10 +55,7 @@ public class ConfigAnswer extends EFDIdentifiable {
 	@Transient
 	@Depends("answerType")
 	public String getDisplayAnswer() {
-		
-		
-		
-		
+
 		AnswerType answerType2 = getConfigQuestionUse().getConfigQuestion().getAnswerType();
 
 		if (answerType2.equals(AnswerType.Text)) {
@@ -107,8 +107,7 @@ public class ConfigAnswer extends EFDIdentifiable {
 	@Transient
 	@NoCreate
 	@NoModify
-	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = true)
+	@ManyToOne
 	@DescriptionsList(descriptionProperties = "lovValue")
 	private QuestionLOV lovAnswer;
 
@@ -121,7 +120,6 @@ public class ConfigAnswer extends EFDIdentifiable {
 	@Hidden
 	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 	private BigDecimal decRangeAnswer;
-
 	public Study getStudy() {
 		return study;
 	}
@@ -160,6 +158,14 @@ public class ConfigAnswer extends EFDIdentifiable {
 
 	public void setAnswer(String answer) {
 		this.answer = answer;
+	}
+
+	public CustomReportSpec getCustomReportSpec() {
+		return customReportSpec;
+	}
+
+	public void setCustomReportSpec(CustomReportSpec customReportSpec) {
+		this.customReportSpec = customReportSpec;
 	}
 
 	public AnswerType getAnswerType() {
@@ -218,4 +224,5 @@ public class ConfigAnswer extends EFDIdentifiable {
 		this.decRangeAnswer = decRangeAnswer;
 	}
 
+	
 }

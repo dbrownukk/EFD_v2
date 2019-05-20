@@ -12,96 +12,68 @@ import efd.actions.*;
 import efd.validations.*;
 
 
+@View(members = "study,customReportSpec, household")
 @Entity
 
+@Table(name = "ReportSpecUse",
+uniqueConstraints = {
+		@UniqueConstraint(name = "report_spec_use_study", columnNames = { "customReportSpec_id","study_ID "}) })
 
-//@View(members = "study,customReportSpec,Household")
+//@Tab(properties="study.studyName, household.householdName,household.householdNumber")
 
 public class ReportSpecUse extends Identifiable {
-	
-	
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@DescriptionsList(descriptionProperties = "specName")
-	private CustomReportSpec customReportSpec;
-	
-	
 
 	
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ReadOnly
+	@DescriptionsList(descriptionProperties = "specName")
+	private CustomReportSpec customReportSpec;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@NoFrame
+	@Required
 	@NoCreate
 	@NoModify
 	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
-	@ReferenceView("FromStdOfLiving")   // study name and ref year
+	@ReferenceView("FromStdOfLiving") // study name and ref year
 	private Study study;
 
-	@ManyToMany
-	@Required
+	@ManyToMany(cascade=CascadeType.ALL)
 	@NewAction("")
-	@JoinTable(name = "reportSpecHHInclusion")
-	private Collection<Household> Household;
-	
-
-	@ManyToOne
-	@Required
-	
-
-	
+	@DetailAction("")
 	@NoModify
-	//@DescriptionsList(descriptionProperties = "configQuestion.prompt,configAnswer")
-	@ReferenceView("fromRSU")
-	private ConfigQuestionUse configQuestionUse;
+	@JoinTable(name = "ExplicitReportHHInclusion")
+	@EditAction("")
+	@AddAction("ReportSpecUse.add")
+	@ListProperties("householdNumber,interviewers,interviewDate,status")
+	private Collection<Household> household;
 
-
-	public CustomReportSpec getCustomReportSpec() {
-		return customReportSpec;
-	}
-
-
-	public void setCustomReportSpec(CustomReportSpec customReportSpec) {
-		this.customReportSpec = customReportSpec;
-	}
 
 
 	public Study getStudy() {
 		return study;
 	}
 
-
 	public void setStudy(Study study) {
 		this.study = study;
 	}
 
-
 	public Collection<Household> getHousehold() {
-		return Household;
+		return household;
 	}
-
 
 	public void setHousehold(Collection<Household> household) {
-		Household = household;
+		this.household = household;
+	}
+
+	public CustomReportSpec getCustomReportSpec() {
+		return customReportSpec;
+	}
+
+	public void setCustomReportSpec(CustomReportSpec customReportSpec) {
+		this.customReportSpec = customReportSpec;
 	}
 
 
-	public ConfigQuestionUse getConfigQuestionUse() {
-		return configQuestionUse;
-	}
 
-
-	public void setConfigQuestionUse(ConfigQuestionUse configQuestionUse) {
-		this.configQuestionUse = configQuestionUse;
-	}
-	
-	
-	
-	
-
-
-
-
-	
-	
-	
-	
-	
 }

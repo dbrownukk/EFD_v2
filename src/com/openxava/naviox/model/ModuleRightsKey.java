@@ -8,7 +8,8 @@ import javax.persistence.*;
  */
 
 public class ModuleRightsKey implements java.io.Serializable {
-
+	
+	
 	@Id @ManyToOne
 	@JoinColumn(name="roles_name")
 	private Role role;

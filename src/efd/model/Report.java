@@ -21,7 +21,7 @@ public class Report extends Identifiable{
 
 
 	@Required
-	@Column(length=45, nullable=false, unique = true)
+	@Column(length=100, nullable=false, unique = true)
 	private String name;
 
 	

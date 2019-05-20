@@ -18,30 +18,19 @@ public class GoCopyTopic extends ViewBaseAction {
 	public void execute() throws Exception {
 
 		// get Topic List
-		List<ReusableConfigTopic> topic = XPersistence.getManager().createQuery("from ReusableConfigTopic").getResultList();
-		
-		System.out.println("topic 1 = "+topic.get(1).getTopic().toString());
-		
+		List<ReusableConfigTopic> topic = XPersistence.getManager().createQuery("from ReusableConfigTopic")
+				.getResultList();
+
 		TopicList topicList = new TopicList();
-		
-		
-		
-		
-		
-		
+
 		System.out.println("in dialog call");
 		showDialog();
 		getView().setTitle("Enter Topic to copy from");
-		
+
 		getView().setModelName("TopicList");
-		
-		setControllers("CopyinTopicQuestions", "Dialog"); 
-	
-	
+
+		setControllers("CopyinTopicQuestions", "Dialog");
+
 	}
-	
-	
-	
-	
 
 }

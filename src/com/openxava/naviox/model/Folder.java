@@ -8,6 +8,7 @@ import org.openxava.annotations.*;
 import org.openxava.jpa.*;
 import org.openxava.model.*;
 import org.openxava.util.*;
+import org.openxava.validators.*;
 
 /**
  * 
@@ -15,12 +16,17 @@ import org.openxava.util.*;
  */
 
 @Entity
-@Table(name="OXFOLDERS")
+@Table(name="OXFOLDERS", indexes={
+	@Index(columnList="name"), 
+})
 @View(members="name, parent, icon; calculatedSubfolders; calculatedModules") 
 public class Folder extends Identifiable implements java.io.Serializable {
+	
+	@Transient
+	private boolean creatingROOT = false; 
 		
 	@Column(length=25) @Required
-	private String name;
+	private String name; 
 	
 	@Column(length=40) 
 	@Stereotype("ICON") 
@@ -66,6 +72,19 @@ public class Folder extends Identifiable implements java.io.Serializable {
 		return getName();
 	}
 	
+	@Hidden
+	public boolean isRoot() { 
+		return "ROOT".equals(name);
+	}
+	
+	@PreCreate
+	public void _rootNotDuplicated() { 
+		if (creatingROOT) return;
+		if (isRoot()) {
+			throw new ValidationException("root_folder_already_exists"); 
+		}
+	}
+	
 	public static Folder find(String oid) {
 		return XPersistence.getManager().find(Folder.class, oid);
 	}
@@ -76,13 +95,51 @@ public class Folder extends Identifiable implements java.io.Serializable {
  		return (Folder) query.getSingleResult();  		 				
 	}
 	
-	public static Collection<Folder> findByParent(Folder parent) {
-		String condition = parent == null?"is null":"= :parent";
+	public static Folder getROOT() { 
+		try {
+			return findByName("ROOT");
+		}
+		catch (NoResultException ex) {
+			return null;
+		}		
+	}
+	
+	public static List<Folder> findByParent(Folder parent) { 
+		String condition = null;
+		if (parent == null || parent.isRoot()) {
+			condition = "(f.parent is null and not f = :parent) or f.parent = :parent";
+			try {
+				if (parent == null) parent = findByName("ROOT");
+			}
+			catch (NoResultException ex) {
+				condition = "f.parent is null";
+			}			
+		}
+		else {
+			condition = "f.parent = :parent";
+		}
 		Query query = XPersistence.getManager().createQuery(
-			"from Folder f where f.parent " + condition + " order by f.orderInFolder"); 
+			"from Folder f where " + condition + " order by f.orderInFolder"); 
 	 	if (parent != null) query.setParameter("parent", parent);
 	 	return query.getResultList();  		 		
 	}
+	
+	public static void updateROOT() { 
+		Folder root = null;
+		try {			
+			root = findByName("ROOT");
+		}
+		catch (NoResultException ex) {
+			root = new Folder(); 
+			root.setName("ROOT");
+			root.creatingROOT = true;
+			XPersistence.getManager().persist(root);
+		}
+		root.setModules(Module.findInRoot());
+		root.setSubfolders(findByParent(null));
+	}
+	
+
 	
 	public void moduleUp(int index) { 
 		elementUp(modules, index);
@@ -138,6 +195,11 @@ public class Folder extends Identifiable implements java.io.Serializable {
 	}
 
 	public void setName(String name) {
+		if (isRoot()) {
+			if (!name.equals("ROOT")) {
+				throw new ValidationException("cannot_change_root_folder_name"); 
+			}
+		}
 		this.name = name;
 	}
 
@@ -155,6 +217,9 @@ public class Folder extends Identifiable implements java.io.Serializable {
 
 	public void setSubfolders(List<Folder> subfolders) { 	
 		this.subfolders = subfolders;
+		if (this.subfolders != null) { 
+			this.subfolders.stream().filter(s -> !s.isRoot()).forEach(s -> s.setParent(this));
+		}
 	}
 
 	public List<Module> getModules() { 
@@ -163,6 +228,9 @@ public class Folder extends Identifiable implements java.io.Serializable {
 
 	public void setModules(List<Module> modules) {
 		this.modules = modules;
+		if (this.modules != null) { 
+			this.modules.stream().forEach(m -> m.setFolder(this));
+		}
 	}
 
 	public Integer getOrderInFolder() {
@@ -180,5 +248,5 @@ public class Folder extends Identifiable implements java.io.Serializable {
 	public void setIcon(String icon) {
 		this.icon = icon;
 	}
-	
+
 }

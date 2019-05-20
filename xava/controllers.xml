@@ -31,10 +31,20 @@
 			mode="detail" icon="view-list" />
 	</controller>
 
+
+	<controller name="GoOIHMReports">
+		<action name="Reports" class="efd.actions.GoOIHMReports"
+			mode="detail" icon="file-excel" />
+	</controller>
+
 	<controller name="CopyStudy">
 		<action name="copy" class="efd.actions.CopyStudy" />
 	</controller>
 
+	<controller name="OIHMReports">
+		<action name="Run" class="efd.actions.OIHMReports"
+			takes-long="true" />
+	</controller>
 
 
 	<controller name="GoCopyinTopicQuestions">
@@ -72,6 +82,9 @@
 		<action name="Template Spreadsheet" mode="detail"
 			in-each-row="false" class="efd.actions.CreateXlsFileAction" />
 	</controller>
+
+
+
 
 
 
@@ -178,6 +191,9 @@
 	</controller>
 
 
+
+
+
 	<controller name="LivelihoodZone">
 		<extends controller="EFD_HM" />
 		<action name="filteredsearch" hidden="true" image="search.gif"
@@ -210,7 +226,22 @@
 		<action name="edit" hidden="false" icon="pencil"
 			class="efd.actions.EditStdOfLivingElement">
 		</action>
+	</controller>
 
+	<controller name="ReportSpecUse">
+		<action name="new" hidden="false" label="New"
+			icon="library-plus" class="efd.actions.RSUnewmanytomany">
+		</action>
+		<action name="remove" hidden="false" label="Remove"
+			icon="delete" in-each-row="true"
+			class="efd.actions.RSUremovemanytomany">
+		</action>
+		<action name="edit" hidden="false" label="Edit" icon="pencil"
+			in-each-row="true" class="efd.actions.RSUeditmanytomany">
+		</action>
+		<action name="add" hidden="false" label="Add" icon="table-row-plus-after"
+			in-each-row="true" class="efd.actions.RSUaddhhmanytomany">
+		</action>
 
 	</controller>
 
@@ -387,5 +418,24 @@
 		by-default="almost-always" class="efd.actions.ConfigQuestionUseSave"> <set 
 		property="resetAfter" value="false" /> </action> <action name="cancel" class="org.openxava.actions.CancelAction" 
 		/> </controller> -->
+
+
+
+
+	<controller name="CustomReportSpec">
+		<extends controller="TypicalNotResetOnSave" />
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
+	</controller>
+
+
+	<controller name="HouseholdMember">
+		<extends controller="TypicalNotResetOnSave" />
+		<action name="save" mode="detail" by-default="if-possible"
+			class="efd.actions.HouseholdMemberSave" image="save.gif"
+			icon="content-save" keystroke="Control S" />
+
+	</controller>
+
 
 </controllers>

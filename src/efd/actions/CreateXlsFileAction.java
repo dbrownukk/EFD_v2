@@ -78,7 +78,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			
 				addError("Template failed to be created");
 			}
-			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario); // 2
+			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, scenario);
 			
 			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
 			

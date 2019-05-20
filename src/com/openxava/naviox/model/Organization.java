@@ -136,4 +136,5 @@ public class Organization implements java.io.Serializable {
 	public int hashCode() {
 		return getId().hashCode();
 	}
+
 }

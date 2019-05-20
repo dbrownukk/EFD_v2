@@ -8,7 +8,7 @@ import javax.persistence.*;
 import org.openxava.annotations.*;
 import org.openxava.model.*;
 
-@Views({ @View(members = "specName,totalQuantilePercentage,warningMessage,quantile,reportSpecUse,report, Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType}"),
+@Views({ @View(members = "specName,totalQuantilePercentage,warningMessage,Report{report},Quantile{quantile},ReportSpecUse{reportSpecUse}, Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType},ConfigAnswer{configAnswer}"),
 		@View(name = "rst", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "rt", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "cat", members = "specName,quantile,rType,report,resourceSubType") })
@@ -30,7 +30,7 @@ public class CustomReportSpec extends Identifiable {
 
 	@ManyToMany
 	@JoinTable(name = "ReportInclusion")
-	@NewAction("ManyToMany.new")
+	//@NewAction("ManyToMany.new")
 	private Collection<Report> report;
 
 	@ManyToMany
@@ -47,8 +47,31 @@ public class CustomReportSpec extends Identifiable {
 	private Collection<Category> category;
 
 	@OneToMany(mappedBy = "customReportSpec")
+	@NewAction("ReportSpecUse.new")
+	@EditAction("ReportSpecUse.edit")
+	@RemoveSelectedAction("ReportSpecUse.remove")
 	@ListProperties("study.studyName,study.referenceYear")
 	private Collection<ReportSpecUse> reportSpecUse;
+	
+	
+	
+	/*
+	 * replacing with onetomany configAnswer
+	 * Select HH where answer matches answer for question 
+	 * 
+	@ManyToMany
+	@JoinTable(name = "HouseholdInclusionRule")
+	@NewAction("")
+	@ListProperties("prompt,level,answerType")
+	private Collection<ConfigQuestion> configQuestion;
+	
+	*/
+	
+	@OneToMany(mappedBy = "customReportSpec")
+	@ListProperties("answer")
+	private Collection<ConfigAnswer> configAnswer;
+
+	
 
 	// ----------------------------------------------------------------------------------------------//
 	// Is quantile total above or not equal to 100%
@@ -145,5 +168,18 @@ public class CustomReportSpec extends Identifiable {
 	public void setQuantile(Collection<Quantile> quantile) {
 		this.quantile = quantile;
 	}
+
+
+	public Collection<ConfigAnswer> getConfigAnswer() {
+		return configAnswer;
+	}
+
+
+	public void setConfigAnswer(Collection<ConfigAnswer> configAnswer) {
+		this.configAnswer = configAnswer;
+	}
+
+
+
 
 }

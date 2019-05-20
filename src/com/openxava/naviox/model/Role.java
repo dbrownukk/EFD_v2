@@ -40,6 +40,7 @@ public class Role implements java.io.Serializable {
 	public static Role findJoinedRole() {
 		return find("joined");
 	}
+		
 	public static Role createJoinedRole() {
 		Role joinedRole = new Role();		
 		joinedRole.setName("joined"); 			

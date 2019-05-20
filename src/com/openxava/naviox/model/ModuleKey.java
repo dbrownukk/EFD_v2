@@ -11,6 +11,7 @@ import org.openxava.annotations.*;
 
 public class ModuleKey implements java.io.Serializable {
 	
+	
 	@Id @Column(length=50) @ReadOnly
 	private String application;
 	

@@ -194,6 +194,13 @@ public class User implements java.io.Serializable {
 	private Collection<Organization> organizations; 
 	
 	@ManyToMany
+	@JoinTable( // Though we use default names because a JPA bug generating schema
+		name="OXUSERS_OXROLES",
+		joinColumns=
+			@JoinColumn(name="OXUSERS_NAME", referencedColumnName="NAME"),
+		inverseJoinColumns=
+			@JoinColumn(name="ROLES_NAME", referencedColumnName="NAME")
+	)	
 	private Collection<Role> roles;
 	
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)

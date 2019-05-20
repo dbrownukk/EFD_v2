@@ -178,9 +178,21 @@ public class ConfigQuestion extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "lovType")
 	private QuestionLOVType questionLOVType;
 
+	/*************************************************************************************************/
+	/*
+	@ManyToMany(mappedBy="configQuestion")
+	private Collection <CustomReportSpec> customReportSpec;
+	
+	*/
+	/*************************************************************************************************/
+
+	
+	
 	public QuestionLOVType getQuestionLOVType() {
 		return questionLOVType;
 	}
+
+
 
 	public void setQuestionLOVType(QuestionLOVType questionLOVType) {
 		this.questionLOVType = questionLOVType;

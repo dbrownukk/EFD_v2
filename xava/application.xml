@@ -33,6 +33,7 @@
 		<controller name="Study" />
 		<controller name="GoCopyStudy" />
 		<controller name="GoCopyinTopicQuestions" />
+		<controller name="GoOIHMReports" />
 	</module>
 
 

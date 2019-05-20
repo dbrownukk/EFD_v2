@@ -88,12 +88,14 @@ public class Module implements java.io.Serializable {
  		return query.getResultList();  		 		
  	}
 	
-	public static Collection<Module> findInRoot() {
- 		Query query = XPersistence.getManager().createQuery(
- 			"from Module m where m.folder = null order by m.application asc, m.name asc");  
- 		return query.getResultList();  		 		
+	public static List<Module> findInRoot() { 
+		Query query = XPersistence.getManager().createQuery(
+			"from Module m where m.folder is null or m.folder = :root order by m.orderInFolder"); 
+		Folder root = Folder.getROOT();
+		query.setParameter("root", root);
+ 		return query.getResultList();
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

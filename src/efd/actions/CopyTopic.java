@@ -1,5 +1,4 @@
 
-/* In Project module override standard add LZ to remove LZs already associated with Project */
 
 package efd.actions;
 
