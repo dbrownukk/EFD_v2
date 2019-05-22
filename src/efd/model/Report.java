@@ -24,6 +24,9 @@ public class Report extends Identifiable{
 	@Column(length=100, nullable=false, unique = true)
 	private String name;
 
+	@Required
+	@Column(unique=true, nullable=false)
+	private int code;
 	
 	@ManyToMany
 	@JoinTable(name="ReportInclusion")
@@ -46,6 +49,14 @@ public class Report extends Identifiable{
 
 	public void setCustomReportSpec(Collection<CustomReportSpec> customReportSpec) {
 		this.customReportSpec = customReportSpec;
+	}
+
+	public int getCode() {
+		return code;
+	}
+
+	public void setCode(int code) {
+		this.code = code;
 	}
 	
 	

@@ -2,6 +2,8 @@ package efd.model;
 
 import java.util.*;
 
+
+
 import javax.persistence.*;
 //import javax.validation.constraints.*;
 
@@ -15,9 +17,9 @@ import org.openxava.model.*;
 
 @Entity
 
-/* check that only one of Cat/RT/RST is used */
-//@EntityValidator(value = SingleResourceValidation.class, properties = { @PropertyValue(name = "category"),
-//		@PropertyValue(name = "resourceType"), @PropertyValue(name = "resourceSubType") }) 
+/* Unique constraints need to go in intersection tables for manytomany */
+
+
 
 public class CustomReportSpec extends Identifiable {
 
@@ -30,7 +32,8 @@ public class CustomReportSpec extends Identifiable {
 
 	@ManyToMany
 	@JoinTable(name = "ReportInclusion")
-	//@NewAction("ManyToMany.new")
+	@NewAction("")
+	
 	private Collection<Report> report;
 
 	@ManyToMany
@@ -68,7 +71,10 @@ public class CustomReportSpec extends Identifiable {
 	*/
 	
 	@OneToMany(mappedBy = "customReportSpec")
-	@ListProperties("answer")
+	@NewAction("")
+	@CollectionView("fromCRS")
+	@SearchListCondition(value="${configQuestionUse.configQuestion.level} = 1")  // Household q and a only
+	@ListProperties("configQuestionUse.configQuestion.prompt,answer")
 	private Collection<ConfigAnswer> configAnswer;
 
 	

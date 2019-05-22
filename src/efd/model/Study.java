@@ -16,7 +16,7 @@ import efd.model.ConfigQuestion.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
-@Views({ @View(members = "Study[studyName,projectlz,referenceYear;startDate,endDate, description;altCurrency,altExchangeRate,notes]"
+@Views({ @View(members = "Study[#studyName,projectlz,referenceYear;description,startDate,endDate;altCurrency,altExchangeRate,notes]"
 		+ ";warningMessage,"
 		+ ";Site{site};StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem};"
 		+ ";CharacteristicAssets/Resources{Land{characteristicsResourceLand}"

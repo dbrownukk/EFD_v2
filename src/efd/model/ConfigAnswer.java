@@ -9,8 +9,15 @@ import org.openxava.calculators.*;
 
 import efd.model.ConfigQuestion.*;
 
-//@View(members = "answer,textAnswer,integerAnswer,lovAnswer,decimalAnswer,intRangeAnswer,decRangeAnswer,answerType")
-@View(members = "answer,textAnswer,integerAnswer,decimalAnswer,intRangeAnswer,decRangeAnswer,answerType")
+
+@Views({
+@View(members = "answer,textAnswer,integerAnswer,lovAnswer,decimalAnswer,intRangeAnswer,decRangeAnswer,answerType"),
+@View(name = "fromCRS", members = "answer,configQuestionUse"),
+})
+
+@Tab(properties="configQuestionUse.configQuestion.prompt,configQuestionUse.configQuestion.level, answer,")
+
+
 
 @Entity
 
@@ -104,10 +111,10 @@ public class ConfigAnswer extends EFDIdentifiable {
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer integerAnswer;
 
-	@Transient
-	@NoCreate
-	@NoModify
+	
+	
 	@ManyToOne
+	//@Transient
 	@DescriptionsList(descriptionProperties = "lovValue")
 	private QuestionLOV lovAnswer;
 

@@ -127,7 +127,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		Site site = null;
 		if (!getView().getValueString("locationdistrict").isEmpty()) {
 			site = XPersistence.getManager().find(Site.class, study.getSite().getLocationid());
-		
+
 		}
 		Project project = XPersistence.getManager().find(Project.class, study.getProjectlz().getProjectid());
 
@@ -353,7 +353,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 				addQuestionLOVValidation(workbook, sheet, hhcSheet, hhrow, hhrow, 2, 2, style, questionId,
 						questionLOVType);
 				hhrow++;
-				// em("done LOV question build = ");
+				em("done LOV question build = ");
 			}
 
 		}
@@ -362,28 +362,29 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		 * 
 		 * Note that addLov is firstRow, numrows not firstRow LastRow....
 		 */
+		em("isheet 22 = " + isheet);
 
 		int numMembers = 21;
 
 		// hhmSheet.setDefaultColumnWidth(40);
+		em("about to do  sex lov  = " + isheet);
 		addLOV(sheet, hhmSheet, 4, 5, 2, numMembers, "Sex");
-
+		em("done sex lov  = " + isheet);
 		// Age and Year of Birth Integers
 		addNumberValidation(workbook, sheet, hhmSheet, 5, 6, 2, numMembers, style);
 		// Head of Household
 		addLOV(sheet, hhmSheet, 7, 8, 2, numMembers, "YesNo");
-
+		em("isheet 22 22 22 = " + isheet);
 		// Absent ?
 		addLOV(sheet, hhmSheet, 8, 9, 2, numMembers, "YesNo");
-
+		em("isheet 22 22 33 44 = " + isheet);
 		// Period away in Months
 		addNumberValidation(workbook, sheet, hhmSheet, 10, 10, 2, numMembers, style);
-
+		em("isheet 22 33  444 = " + isheet);
 		// Answer Validation
 		int qStartRow = 11;
 		for (i = 0; i < configQuestionUseHHM.size(); i++) {
-			em(
-					"hhm question data type = " + configQuestionUseHHM.get(i).getConfigQuestion().getAnswerType());
+			em("hhm question data type = " + configQuestionUseHHM.get(i).getConfigQuestion().getAnswerType());
 
 			answerType = configQuestionUseHHM.get(i).getConfigQuestion().getAnswerType();
 			level = configQuestionUseHHM.get(i).getConfigQuestion().getLevel();
@@ -398,8 +399,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 					&& (level.equals(Level.HouseholdMember))) {
 				Integer intRangeLower = configQuestionUseHHM.get(i).getConfigQuestion().getIntRangeLower();
 				Integer intRangeUpper = configQuestionUseHHM.get(i).getConfigQuestion().getIntRangeUpper();
+			
 				addIntegerRangeValidation(workbook, sheet, hhmSheet, qStartRow, qStartRow, 2, numMembers, style,
 						intRangeLower, intRangeUpper);
+			
 				qStartRow++;
 			} else if (answerType.equals(ConfigQuestion.AnswerType.DecimalRange)
 					&& (level.equals(Level.HouseholdMember))) {
@@ -409,17 +412,28 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 						decRangeLower, decRangeUpper);
 				qStartRow++;
 			} else if (answerType.equals(ConfigQuestion.AnswerType.LOV) && (level.equals(Level.HouseholdMember))) {
-				em("about to do HHM LOV question build = ");
+				
 				String questionId = configQuestionUseHHM.get(i).getConfigQuestion().getId();
+				
+				try {
+				
+				
+			
 				String questionLOVType = configQuestionUseHHC.get(i).getConfigQuestion().getQuestionLOVType().getId();
 				em("about to do HHM LOV questionID = " + questionId);
 				addQuestionLOVValidation(workbook, sheet, hhmSheet, qStartRow, qStartRow, 2, numMembers, style,
 						questionId, questionLOVType);
 				em("done HHM LOV question build = ");
 				qStartRow++;
+				}
+				catch(Exception ex)
+				{
+					System.out.println(ex);
+				}
 			}
 
 		}
+	
 
 		/* Asset Land Type */
 
@@ -505,7 +519,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 10, 10, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 12, 12, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 14, 14, style);
-		
 
 		/* Transfers */
 
@@ -610,23 +623,41 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	private void addIntegerRangeValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
 			int firstCol, int lastCol, CellStyle style, Integer intRangeLower, Integer intRangeUpper) {
 
+		
+		try {
 		CellRangeAddressList addressList = null;
-
+		
 		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
-
+		
 		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
-
+		
+		
+		
+	
+		
 		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
 				DVConstraint.ValidationType.INTEGER, DVConstraint.OperatorType.BETWEEN, intRangeLower.toString(),
 				intRangeUpper.toString());
-
+		
+		
+		
+		
+		
+	
 		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
 		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+	
 		validation.createErrorBox("", "Enter an Integer between " + intRangeLower + " and " + intRangeUpper);
 		validation.setEmptyCellAllowed(true);
 		validation.setShowErrorBox(true);
 		iSheet.addValidationData(validation);
-
+		}
+		catch(Exception ex)
+		{
+			em(ex);
+		}
+		
+		
 		/*
 		 * the above sets the validation but need to set the cell format to be Number
 		 */
@@ -737,8 +768,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		em("in configQuestion LOV. QID = " + questionID);
 
 		List<QuestionLOV> questionLOVs = XPersistence.getManager()
-				.createQuery("from QuestionLOV where questionLOVType_id  = '" + questionLOVTypeID + "')")
+				.createQuery("from QuestionLOV where questionLOVType_id  = '" + questionLOVTypeID + "'")
 				.getResultList();
+		
+		em("done get questionLOV");
 		// Get LOV Values for this LOVType and add to Validations sheet
 
 		for (int k = 0; k < questionLOVs.size(); k++) {
@@ -754,13 +787,12 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		name = vsheet.getWorkbook().createName();
 		validationRowCount++;
 
-		em("validation range in LOV = " + "!$A$" + validationRowCount + ":$" + questioncol + "$"
-				+ validationRowCount);
+		em("validation range in LOV = " + "!$A$" + validationRowCount + ":$" + questioncol + "$" + validationRowCount);
 		name.setRefersToFormula(
 				"Validations" + "!$A$" + validationRowCount + ":$" + questioncol + "$" + validationRowCount);
 
-		em("Name info = " + name.getNameName() + " " + name.getRefersToFormula() + " "
-				+ name.getSheetIndex() + " " + name.getSheetName());
+		em("Name info = " + name.getNameName() + " " + name.getRefersToFormula() + " " + name.getSheetIndex() + " "
+				+ name.getSheetName());
 
 		String rangeName = "q" + questionID.toString();
 
@@ -772,8 +804,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		// addressList = new CellRangeAddressList(8, 9, 2, 22);
 
-		em(
-				"addresslist = " + firstRow + "," + lastRow + "," + firstCol + "," + lastCol + "'" + rangeName);
+		em("addresslist = " + firstRow + "," + lastRow + "," + firstCol + "," + lastCol + "'" + rangeName);
 
 		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
 
@@ -881,12 +912,19 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		CellRangeAddressList addressList = null;
 		for (int l = 3; l < lastRow; l++) {
-			// em("LOV = "+rType);
-			addressList = new CellRangeAddressList(firstRow, l, firstCol, lastCol);
+			em("LOV = "+rType+firstRow+" "+l+" "+firstCol+" "+lastCol);
+			em(" LOV 12");
+			addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
+			//addressList = new CellRangeAddressList(firstRow, l, firstCol, lastCol);
+			em(" LOV 13");
 			DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
+			em(" LOV 14");
 			DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint(rType);
+			em(" LOV 15");
 			DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+			em(" LOV 16");
 			validation.setEmptyCellAllowed(true);
+			em(" LOV 1");
 			validation.setShowErrorBox(false); // Allows for other values - combo style
 			iSheet.addValidationData(validation);
 		}
@@ -920,15 +958,13 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		int sexRowNum = 17;
 		int yesNoRowNum = 18;
 		int inputResourceRowNum = 19;
-		
-		
+
 		int nonfpRowNum = 20;
-		int inputsRowNum=21;
-
-
+		int inputsRowNum = 21;
 
 		/* Land Types */
-		List<ResourceSubType> rst = XPersistence.getManager().createQuery("from ResourceSubType order by ResourceTypeName").getResultList();
+		List<ResourceSubType> rst = XPersistence.getManager()
+				.createQuery("from ResourceSubType order by ResourceTypeName").getResultList();
 
 		Row interviewRow = dataSheet.createRow(interviewRowNum);
 		Row laRow = dataSheet.createRow(landRowNum);
@@ -1056,18 +1092,16 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 				nonfp++;
 
 			}
-			
+
 			/* Inputs - Other Tradeable + NFS */
 			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Other Tradeable Goods".toString())
-					|| rst.get(k).getResourcetype().getResourcetypename().toString().equals("Non Food Purchase".toString())) {
+					|| rst.get(k).getResourcetype().getResourcetypename().toString()
+							.equals("Non Food Purchase".toString())) {
 				cell = inputsRow.createCell(inputs);
 				cell.setCellValue(rst.get(k).getResourcetypename());
 				inputs++;
 
 			}
-			
-			
-			
 
 		}
 
@@ -1083,9 +1117,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		String transcol = getCharForNumber(trans);
 		String wildfcol = getCharForNumber(wildf);
 		String nonfpcol = getCharForNumber(nonfp);
-		
+
 		String inputscol = getCharForNumber(inputs);
-		
 
 		/* Land */
 		name = dataSheet.getWorkbook().createName();
@@ -1161,27 +1194,25 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		name.setRefersToFormula("Validations" + "!$A$" + nonfpRowNum + ":$" + nonfpcol + "$" + nonfpRowNum);
 
 		name.setNameName("NonFoodPurchase");
-		
+
 		/* Inputs */
 		name = dataSheet.getWorkbook().createName();
 		inputsRowNum++;
 		name.setRefersToFormula("Validations" + "!$A$" + inputsRowNum + ":$" + inputscol + "$" + inputsRowNum);
 
 		name.setNameName("Inputs");
-		
-		
 
 		/* From Reference Table */
 		/* Area */
 
 		List<ReferenceCode> referenceCodeArea = XPersistence.getManager()
-				.createQuery("from ReferenceCode where ReferenceType = 'Area')").getResultList();
+				.createQuery("from ReferenceCode where ReferenceType = 'Area'").getResultList();
 		// Get ref codes for Area and add to Validations sheet
 		for (int k = 0; k < referenceCodeArea.size(); k++) {
 			cell = areaRow.createCell(area);
 			cell.setCellValue(referenceCodeArea.get(k).getReferenceName());
 			area++;
-			
+
 		}
 
 		String areacol = getCharForNumber(area); // Convert for drop list creation
@@ -1193,7 +1224,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		/* Unit */
 
 		List<ReferenceCode> referenceCodeUnit = XPersistence.getManager()
-				.createQuery("from ReferenceCode where ReferenceType = 'Unit')").getResultList();
+				.createQuery("from ReferenceCode where ReferenceType = 'Unit'").getResultList();
 		// Get ref codes for Unit and add to Validations sheet
 		for (int k = 0; k < referenceCodeUnit.size(); k++) {
 			cell = unitRow.createCell(unit);
@@ -1206,8 +1237,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		name = dataSheet.getWorkbook().createName();
 		unitRowNum++;
 
-		
-
 		name.setRefersToFormula("Validations" + "!$A$" + unitRowNum + ":$" + unitcol + "$" + unitRowNum);
 
 		name.setNameName("Unit");
@@ -1215,7 +1244,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		/* Sex */
 
 		List<ReferenceCode> referenceCodeSex = XPersistence.getManager()
-				.createQuery("from ReferenceCode where ReferenceType = 'Sex')").getResultList();
+				.createQuery("from ReferenceCode where ReferenceType = 'Sex'").getResultList();
 		for (int k = 0; k < referenceCodeSex.size(); k++) {
 			cell = sexRow.createCell(sex);
 			cell.setCellValue(referenceCodeSex.get(k).getReferenceName());
@@ -1227,8 +1256,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		name = dataSheet.getWorkbook().createName();
 		sexRowNum++;
 
-		
-
 		name.setRefersToFormula("Validations" + "!$A$" + sexRowNum + ":$" + sexcol + "$" + sexRowNum);
 
 		name.setNameName("Sex");
@@ -1236,7 +1263,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		/* Yes or No */
 
 		List<ReferenceCode> referenceCodeYesNo = XPersistence.getManager()
-				.createQuery("from ReferenceCode where ReferenceType = 'YesNo')").getResultList();
+				.createQuery("from ReferenceCode where ReferenceType = 'YesNo'").getResultList();
 		for (int k = 0; k < referenceCodeYesNo.size(); k++) {
 			cell = yesNoRow.createCell(yesno);
 			cell.setCellValue(referenceCodeYesNo.get(k).getReferenceName());
@@ -1257,7 +1284,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		/* Transfer Style */
 
 		List<ReferenceCode> referenceTStyle = XPersistence.getManager()
-				.createQuery("from ReferenceCode where ReferenceType = 'Transfer Style')").getResultList();
+				.createQuery("from ReferenceCode where ReferenceType = 'Transfer Style'").getResultList();
 		// Get ref codes for Transger Style Official / Unofficial and add to Validations
 		// sheet
 		for (int k = 0; k < referenceTStyle.size(); k++) {
@@ -1275,9 +1302,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		name.setNameName("TransferStyle");
 
 		/* Emp work Units */
-		
+
 		List<ReferenceCode> referenceCodeEmpUnit = XPersistence.getManager()
-				.createQuery("from ReferenceCode where ReferenceType = 'EmpUnit')").getResultList();
+				.createQuery("from ReferenceCode where ReferenceType = 'EmpUnit'").getResultList();
 		// Get ref codes for Unit and add to Validations sheet
 		for (int k = 0; k < referenceCodeEmpUnit.size(); k++) {
 			cell = empUnitRow.createCell(empUnit);
@@ -1446,7 +1473,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 				sheet.setValue(2, k, configQuestionUseHHC.get(i).getConfigQuestion().getPrompt(), textStyle);
 
 				AnswerType answerType = configQuestionUseHHC.get(i).getConfigQuestion().getAnswerType();
-				k++;   // row
+				k++; // row
 			}
 			// SetAnswerTypeValidation(sheet, 3,i+3,answerType) ; //col,row,type
 		}
@@ -2299,7 +2326,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 				rtunit = wgcharacteristicsresource.getWgresourceunit();
 				if (rtunit.isEmpty())
 					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
-				
+
 				if (rt.equals("Inputs")) {
 					em("get inputs for out put = " + resub + " " + rtunit);
 					sheet.setValue(2, row, resub, borderStyle);
@@ -2430,7 +2457,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		return columnLetter;
 
 	}
-	
+
 	private static void em(Object em) {
 		return;
 		//System.out.println(em);

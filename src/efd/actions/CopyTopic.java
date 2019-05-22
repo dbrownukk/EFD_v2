@@ -25,7 +25,7 @@ public class CopyTopic extends ViewBaseAction {
 			return;
 		}
 
-		System.out.println("in copy topic" + topicId + " " + studyId);
+		System.out.println("in copy topic aa " + topicId + " " + studyId);
 
 		// get topic questions and study
 		List<ConfigQuestion> topicConfigQuestions = XPersistence.getManager()
@@ -40,11 +40,18 @@ public class CopyTopic extends ViewBaseAction {
 
 		List<ConfigQuestionUse> currentQuestions = (List<ConfigQuestionUse>) study.getConfigQuestionUse();
 
+		
+		
+		
+		
+		
 		Iterator<ConfigQuestion> topicQuestioniterator = topicConfigQuestions.iterator();
-		System.out.println("in copy topic 22");
+		
+		System.out.println("in copy topic 22 ");
 		while (topicQuestioniterator.hasNext() && currentQuestions.size() > 0) {
 			System.out.println("in copy topic 221 size = " + currentQuestions.size());
 			for (int j = 0; j < currentQuestions.size(); j++) {
+				
 				System.out.println("in copy topic 223 " + j);
 				if (topicQuestioniterator.next().getId() == currentQuestions.get(j).getConfigQuestion().getId()) {
 					System.out.println("found an existing question");
@@ -53,7 +60,7 @@ public class CopyTopic extends ViewBaseAction {
 			}
 
 		}
-
+		System.out.println("done removes");
 		if (topicConfigQuestions.size() == 0) {
 			addWarning("Questions in Topic are already in this Study");
 			return;
@@ -81,7 +88,7 @@ public class CopyTopic extends ViewBaseAction {
 					getView().refreshCollections();
 					getView().refresh();
 				} catch (Exception e) {
-					// fails if QUestion alreay in this Study, buts thats ok
+					// fails if QUestion already in this Study, buts thats ok
 					// addMessage("caught XPersistence ex "+e);
 					System.out.println("did not commit questionUse");
 					break;

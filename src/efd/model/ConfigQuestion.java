@@ -15,10 +15,9 @@ import efd.model.HouseholdMember.*;
 import efd.validations.*;
 
 @Views({ @View(members = "Question[#topic,prompt,hint;level,answerType,gender,notes;questionLOVType;Ranges[#ageRangeLower,ageRangeUpper;"
-		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]") ,
-@View(name="FromTopic",members = "Question[#prompt,hint;level,answerType,gender,notes;questionLOVType;Ranges[#ageRangeLower,ageRangeUpper;"
-		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]")
-})
+		+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]"),
+		@View(name = "FromTopic", members = "Question[#prompt,hint;level,answerType,gender,notes;questionLOVType;Ranges[#ageRangeLower,ageRangeUpper;"
+				+ "intRangeLower,intRangeUpper;decRangeLower,decRangeUpper]]") })
 
 @Tab(properties = "topic.topic, prompt, answerType,hint,level,gender,ageRangeLower,ageRangeUpper", defaultOrder = "${topic} desc")
 
@@ -42,13 +41,12 @@ public class ConfigQuestion extends EFDIdentifiable {
 			System.out.println("in CQ pre per upd 2");
 			throw new IllegalStateException("Answer Type of Decimal Range requires Range Values");
 		}
-		if ((getAnswerType() == AnswerType.DecimalRange ) && ((Double.compare(getDecRangeLower(),getDecRangeUpper())>0)))
-		{
+		if ((getAnswerType() == AnswerType.DecimalRange)
+				&& ((Double.compare(getDecRangeLower(), getDecRangeUpper()) > 0))) {
 			System.out.println("in CQ pre per upd 2");
-			throw new IllegalStateException("Answer Type of Decimal Range requires the Lower Range Value to be less than Upper Range Value");
+			throw new IllegalStateException(
+					"Answer Type of Decimal Range requires the Lower Range Value to be less than Upper Range Value");
 		}
-				
-		
 
 		if ((getAnswerType() == AnswerType.IntegerRange)
 				&& (getIntRangeLower() == null || getIntRangeUpper() == null)) {
@@ -56,29 +54,25 @@ public class ConfigQuestion extends EFDIdentifiable {
 			throw new IllegalStateException("Answer Type of Integer Range requires Range Values");
 		}
 
-		if ((getAnswerType() == AnswerType.IntegerRange ) && (getIntRangeLower() > getIntRangeUpper()))
-		{
+		if ((getAnswerType() == AnswerType.IntegerRange) && (getIntRangeLower() > getIntRangeUpper())) {
 			System.out.println("in CQ pre per upd 4");
-			throw new IllegalStateException("Answer Type of Integer Range requires the Lower Range Value to be less than Upper Range Value");
+			throw new IllegalStateException(
+					"Answer Type of Integer Range requires the Lower Range Value to be less than Upper Range Value");
 		}
-		
-		if(getAgeRangeLower() == null)
+
+		if (getAgeRangeLower() == null)
 			setAgeRangeLower(0);
-		if(getAgeRangeUpper() == null)
+		if (getAgeRangeUpper() == null)
 			setAgeRangeUpper(0);
-		
-		if ((getLevel() == Level.HouseholdMember ) && (getAgeRangeLower() >= getAgeRangeUpper()) && 
-				(getAgeRangeLower()!= 0 && getAgeRangeUpper()!=0)
-				
-				
-				)
-		{
+
+		if ((getLevel() == Level.HouseholdMember) && (getAgeRangeLower() >= getAgeRangeUpper())
+				&& (getAgeRangeLower() != 0 && getAgeRangeUpper() != 0)
+
+		) {
 			System.out.println("in CQ pre per upd 5");
 			throw new IllegalStateException("Household Member Age Range Lower must be less than Upper Age ");
 		}
-		
-		
-		
+
 	}
 
 	@Required
@@ -116,8 +110,7 @@ public class ConfigQuestion extends EFDIdentifiable {
 	private String hint;
 	/*************************************************************************************************/
 
-	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@NoFrame
 	@DescriptionsList(descriptionProperties = "topic")
 	private ReusableConfigTopic topic;
@@ -126,13 +119,13 @@ public class ConfigQuestion extends EFDIdentifiable {
 	@Required
 	@OnChange(value = OnChangeQuestionLevel.class)
 	// @Editor("ValidValuesVerticalRadioButton")
-	//@DefaultValueCalculator(value=EnumCalculator.class,
-	//		properties={@PropertyValue(name="enumType", value="efd.model.ConfigQuestion.Level"),
-	//				@PropertyValue(name="value", value = "Study")
-	//				})
+	// @DefaultValueCalculator(value=EnumCalculator.class,
+	// properties={@PropertyValue(name="enumType",
+	// value="efd.model.ConfigQuestion.Level"),
+	// @PropertyValue(name="value", value = "Study")
+	// })
 	private Level level;
 
-	
 	public enum Level {
 		Study, Household, HouseholdMember
 	}
@@ -153,11 +146,9 @@ public class ConfigQuestion extends EFDIdentifiable {
 	private Integer ageRangeLower;
 	/*************************************************************************************************/
 	@Range(min = 0, max = 120)
-	//@DefaultValueCalculator(ZeroIntegerCalculator.class)
-	@DefaultValueCalculator(
-			 value=org.openxava.calculators.BigDecimalCalculator.class,
-			 properties={ @PropertyValue(name="value", value="120") }
-			)
+	// @DefaultValueCalculator(ZeroIntegerCalculator.class)
+	@DefaultValueCalculator(value = org.openxava.calculators.BigDecimalCalculator.class, properties = {
+			@PropertyValue(name = "value", value = "120") })
 	private Integer ageRangeUpper;
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "configQuestion")
@@ -180,19 +171,15 @@ public class ConfigQuestion extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	/*
-	@ManyToMany(mappedBy="configQuestion")
-	private Collection <CustomReportSpec> customReportSpec;
-	
-	*/
+	 * @ManyToMany(mappedBy="configQuestion") private Collection <CustomReportSpec>
+	 * customReportSpec;
+	 * 
+	 */
 	/*************************************************************************************************/
 
-	
-	
 	public QuestionLOVType getQuestionLOVType() {
 		return questionLOVType;
 	}
-
-
 
 	public void setQuestionLOVType(QuestionLOVType questionLOVType) {
 		this.questionLOVType = questionLOVType;
