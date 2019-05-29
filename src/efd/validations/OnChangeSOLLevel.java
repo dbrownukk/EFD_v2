@@ -16,7 +16,6 @@ public class OnChangeSOLLevel extends OnChangePropertyBaseAction {
 	@Inject
 	private String studyid;
 
-
 	public void execute() throws Exception {
 
 		System.out.println("in SOL level onchange");
@@ -40,11 +39,19 @@ public class OnChangeSOLLevel extends OnChangePropertyBaseAction {
 		System.out.println("level = " + getView().getValueString("level"));
 		System.out.println("config q level = " + getView().getAllValues().toString());
 
-		if (getNewValue().equals(ConfigQuestion.Level.HouseholdMember)) {
+		if (getNewValue().equals(StdOfLivingElement.StdLevel.HouseholdMember)) {
+			// if(getView().getValue("level").equals(StdOfLivingElement.StdLevel.HouseholdMember))
+			// {
 			System.out.println("show HH gender and ages b");
 			getView().setHidden("gender", false);
 			getView().setHidden("ageRangeLower", false);
 			getView().setHidden("ageRangeUpper", false);
+			if (getView().getValue("gender") == null)
+				getView().setValue("gender", StdOfLivingElement.Gender.Both);
+			if (getView().getValue("ageRangeLower") == null)
+				getView().setValue("ageRangeLower", 0);
+			if (getView().getValue("ageRangeUpper") == null)
+				getView().setValue("ageRangeUpper", 110);
 
 		}
 

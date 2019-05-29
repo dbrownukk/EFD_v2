@@ -1,20 +1,18 @@
 package efd.tests;
 
-import org.openxava.tests.*;
-import efd.model.*;
-
-import static org.openxava.jpa.XPersistence.*;
-
 import java.text.*;
 import java.util.*;
-
 import com.gargoylesoftware.htmlunit.*;
+import com.gargoylesoftware.htmlunit.html.*;
+import com.gargoylesoftware.htmlunit.javascript.host.*;
+
+import org.openxava.tests.*;
 
 
 public class ProjectTest extends ModuleTestBase{
 
-	public ProjectTest(String nameTest) {
-		super(nameTest, "EFD_HM", "Project");
+	public ProjectTest(String testName) {
+		super(testName, "EFD_HM", "Project");
 		
 	}
 	
@@ -22,7 +20,7 @@ public class ProjectTest extends ModuleTestBase{
 		
 		Date date = new Date();
 		
-		login("ohea", "ohea2019");
+		login("admin", "admin2018");
 		System.out.println("done login");
 		//Create
 		waitAJAX();

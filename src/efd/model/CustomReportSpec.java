@@ -33,6 +33,7 @@ public class CustomReportSpec extends Identifiable {
 	@ManyToMany
 	@JoinTable(name = "ReportInclusion")
 	@NewAction("")
+	@Column(unique=true)
 	
 	private Collection<Report> report;
 

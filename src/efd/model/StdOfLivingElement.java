@@ -28,7 +28,7 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	@PreUpdate
 	private void validate() throws Exception {
 
-		if ((level == Level.HouseholdMember) && gender == null) {
+		if ((level == StdLevel.HouseholdMember) && gender == null) {
 			System.out.println("HHM in validate HHM with no gender");
 			throw new IllegalStateException(
 
@@ -52,8 +52,10 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	private ResourceSubType resourcesubtype;
 	/*************************************************************************************************/
 	@Required
-	@Column(length = 45, nullable = false)
-	private String amount;
+	@Column(nullable = false)
+	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
+	@Min(1)
+	private Double amount;
 	// number of instances of the Resource sub type in whatever it’s unit of measure
 	// is (e.g. 100 Litres Kerosene) would have Amount 100
 	/*************************************************************************************************/
@@ -61,15 +63,23 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	@Required
 	@Digits(integer = 10, fraction = 3)
 	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
+	@Min(1)
 	private Double cost;
 	/*************************************************************************************************/
 	@Column(nullable = false)
 	@Required
 	@OnChange(value = OnChangeSOLLevel.class)
-	private Level level;
+	private StdLevel level;
+	
+	public enum StdLevel {
+		Household, HouseholdMember
+	}
+	
+	
 	/*************************************************************************************************/
 
-	@Editor("ValidValuesRadioButton")
+	//@Editor("ValidValuesRadioButton")
+	
 	private Gender gender;
 
 	public enum Gender {
@@ -77,16 +87,21 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	}
 
 	/*************************************************************************************************/
-	@Range(min = 0, max = 120)
-	@DefaultValueCalculator(ZeroIntegerCalculator.class)
-	private Integer ageRangeLower;
+	
+	
+	@DefaultValueCalculator(value=IntegerCalculator.class, properties=@PropertyValue(name="value", value="0"))
+	@Min(0)
+	@Max(100)
+	
+	private int ageRangeLower;
 	/*************************************************************************************************/
-	@Range(min = 0, max = 120)
-	@DefaultValueCalculator(
-			 value=org.openxava.calculators.BigDecimalCalculator.class,
-			 properties={ @PropertyValue(name="value", value="120") }
-			)
-	private Integer ageRangeUpper;
+	
+	
+	@DefaultValueCalculator(value=IntegerCalculator.class, properties=@PropertyValue(name="value", value="110"))
+	@Min(0)
+	@Max(110)
+
+	private int ageRangeUpper;
 
 	/*************************************************************************************************/
 	public Study getStudy() {
@@ -105,11 +120,13 @@ public class StdOfLivingElement extends EFDIdentifiable {
 		this.resourcesubtype = resourcesubtype;
 	}
 
-	public String getAmount() {
+
+
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(String amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 
@@ -121,12 +138,22 @@ public class StdOfLivingElement extends EFDIdentifiable {
 		this.cost = cost;
 	}
 
-	public Level getLevel() {
+
+
+	public StdLevel getLevel() {
 		return level;
 	}
 
-	public void setLevel(Level level) {
+	public void setLevel(StdLevel level) {
 		this.level = level;
+	}
+
+	public void setAgeRangeLower(int ageRangeLower) {
+		this.ageRangeLower = ageRangeLower;
+	}
+
+	public void setAgeRangeUpper(int ageRangeUpper) {
+		this.ageRangeUpper = ageRangeUpper;
 	}
 
 	public Integer getAgeRangeLower() {

@@ -15,7 +15,7 @@ public class StudyTest extends ModuleTestBase{
 		
 		login("admin", "admin2018");
 		assertNoErrors();
-/*
+
 		execute("CRUD.new");
 		
 		setValue("studyName", "JUNIT Test Study Name");
@@ -30,7 +30,7 @@ public class StudyTest extends ModuleTestBase{
 		
 		execute("CRUD.save");
 		assertNoErrors();
-		*/
+		
 		
 		
 		

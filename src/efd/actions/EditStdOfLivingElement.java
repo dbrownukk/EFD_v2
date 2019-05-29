@@ -11,7 +11,7 @@ public class EditStdOfLivingElement extends EditElementInCollectionAction  {
 		System.out.println("in edit StdOfLivingElement");
 		super.execute();
 		
-		if (getCollectionElementView().getValue("level").equals(ConfigQuestion.Level.HouseholdMember)) {
+		if (getCollectionElementView().getValue("level").equals(StdOfLivingElement.StdLevel.HouseholdMember)) {
 			System.out.println("show HH gender and ages b = "+getCollectionElementView().getValue("level"));
 			getCollectionElementView().setHidden("gender", false);
 			getCollectionElementView().setHidden("ageRangeLower", false);
