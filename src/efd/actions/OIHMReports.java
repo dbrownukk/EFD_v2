@@ -43,6 +43,7 @@ import efd.model.*;
 import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
 import efd.model.StdOfLivingElement.*;
+import efd.model.Transfer.*;
 import efd.model.WealthGroupInterview.*;
 
 public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsConstants {
@@ -77,6 +78,8 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	CellStyle title = null;
 	CellStyle cnumberStyle = null;
 
+	int errno = 0;
+
 	/******************************************************************************************************************************************/
 	@Override
 	public void execute() throws Exception {
@@ -98,6 +101,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		CustomReportSpec customReportSpec = XPersistence.getManager().find(CustomReportSpec.class, specID);
 
 		study = XPersistence.getManager().find(Study.class, studyId);
+
 		defaultDietItems = (List<DefaultDietItem>) study.getDefaultDietItem();
 
 		/* Only create reports if there are Validated Households */
@@ -132,31 +136,35 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		}
 		/******************************************************************************************************************************************/
 
+		errno = 50;
 		// Populate HH array hh
 		populateHHArray(households);
-
+		errno = 51;
 		// Filter according to Catalog/RT/RST/HH
 		filterHH(customReportSpec);
-
+		errno = 52;
 		// Calculate DI
 
 		calculateDI(); // uses hh filtered array based on CRS definition
-
+		errno = 54;
 		// Run reports
 		try {
 			JxlsWorkbook report = createReport(customReportSpec);
+			errno = 55;
 			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, report);
+			errno = 56;
 			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis());
+			errno = 57;
 		} catch (Exception e) {
-	System.out.println("Error in run report");
-			addError(e.getMessage());
+			addError(e + " Errno = " + errno);
 			closeDialog();
 			return;
 		}
 
 		closeDialog();
 
-		addMessage("Created OIHM Report for " + customReportSpec.getSpecName());
+		addMessage("Created OIHM Report for Study " + study.getStudyName() + " using Spec "
+				+ customReportSpec.getSpecName());
 
 	}
 
@@ -297,7 +305,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			hh.removeIf(n -> n.getDelete() == true);
 		} catch (Exception e) {
 			System.out.println("nothing filtered to remove");
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 		System.out.println("size of hh after all filter  = " + hh.size());
@@ -533,6 +541,36 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 				System.out.println("report 224");
 				createDIAfterSOLreport(ireportNumber, report);
 				break;
+			case 225:
+				System.out.println("report 225");
+				createCashIncomereport(ireportNumber, report);
+				break;
+			case 226:
+				System.out.println("report 226");
+				createFoodIncomereport(ireportNumber, report);
+				break;
+				/*
+			case 227:
+				System.out.println("report 227");
+				createCashIncomereport(ireportNumber, report);
+				break;
+			case 228:
+				System.out.println("report 228");
+				createCashIncomereport(ireportNumber, report);
+				break;
+			case 237:
+				System.out.println("report 237");
+				createCashIncomereport(ireportNumber, report);
+				break;
+			case 236:
+				System.out.println("report 236");
+				createCashIncomereport(ireportNumber, report);
+				break;
+			case 238:
+				System.out.println("report 238");
+				createCashIncomereport(ireportNumber, report);
+				break;
+*/
 			default:
 				break;
 			}
@@ -573,7 +611,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		int row = 1;
 		Double hhSOLC = 0.0;
 
-		System.out.println("hh 001");
+		System.out.println("In SOL Report 224");
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 25);
 		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 		reportWB.getSheet(isheet).setValue(2, row, "Standard of Living Requirement", textStyle);
@@ -583,20 +621,24 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		// uniqeHousehold = number of households in array that are relavant
 
 		for (HH hh3 : uniqueHousehold) {
+			errno = 101;
 			for (StdOfLivingElement stdOfLivingElement : hh3.getHousehold().getStudy().getStdOfLivingElement()) {
+				errno = 102;
+
 				if (stdOfLivingElement.getLevel().equals(StdLevel.Household)) {
+					errno = 103;
 					hhSOLC += (stdOfLivingElement.getCost() * stdOfLivingElement.getAmount());
 				} else if (stdOfLivingElement.getLevel().equals(StdLevel.HouseholdMember)) {
-
+					errno = 104;
 					for (HouseholdMember householdMember : hh3.getHousehold().getHouseholdMember()) {
 						hhSOLC += calcHhmSolc(hh3, stdOfLivingElement);
-
+						errno = 105;
 					}
 
 				}
 
 			}
-
+			errno = 106;
 			hh3.setHhSOLC(hhSOLC);
 
 		}
@@ -612,6 +654,212 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
 			row++;
 		}
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void createCashIncomereport(int isheet, Report report) {
+		int row = 1;
+		String type = "cash";
+
+		Double cropIncome = 0.0;
+		Double empIncome = 0.0;
+		Double lsIncome = 0.0;
+		Double trIncome = 0.0;
+		Double wfIncome = 0.0;
+
+		System.out.println("in cash income report");
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
+		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "Crop Income", textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, "Employment Income", textStyle);
+		reportWB.getSheet(isheet).setValue(4, row, "Livestock Income", textStyle);
+		reportWB.getSheet(isheet).setValue(5, row, "Transfer Income", textStyle);
+		reportWB.getSheet(isheet).setValue(6, row, "Wildfood Income", textStyle);
+
+		row = 3;
+
+		// hh is array of all data
+		// need an array of valid HH now left
+		// ordered by DI
+
+		for (HH hh2 : uniqueHousehold) {
+
+			// calc uses same func for food and cash - differentiate using type
+			
+			cropIncome = calcCropIncome(hh2, type);
+			empIncome = calcEmpIncome(hh2, type);
+			lsIncome = calcLSIncome(hh2, type);
+			trIncome = calcTransIncome(hh2, type);
+			wfIncome = calcWFIncome(hh2, type);
+
+			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, empIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(4, row, lsIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle);
+			row++;
+		}
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void createFoodIncomereport(int isheet, Report report) {
+		int row = 1;
+		String type = "food";
+
+		Double cropIncome = 0.0;
+		Double empIncome = 0.0;
+		Double lsIncome = 0.0;
+		Double trIncome = 0.0;
+		Double wfIncome = 0.0;
+
+		System.out.println("in food income report");
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
+		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "Crop Food Income", textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, "Employment Food Income", textStyle);
+		reportWB.getSheet(isheet).setValue(4, row, "Livestock Food Income", textStyle);
+		reportWB.getSheet(isheet).setValue(5, row, "Transfer Food Income", textStyle);
+		reportWB.getSheet(isheet).setValue(6, row, "Wildfood Food Income", textStyle);
+
+		row = 3;
+		System.out.println("in food income report done heading");
+
+
+		for (HH hh2 : uniqueHousehold) {
+
+			cropIncome = calcCropIncome(hh2, type);
+			System.out.println("fir 11");
+			empIncome = calcEmpIncome(hh2, type);
+			System.out.println("fir 22");
+			lsIncome = calcLSIncome(hh2, type);
+			System.out.println("fir 33");
+			trIncome = calcTransIncome(hh2, type);
+			System.out.println("fir 44");
+			wfIncome = calcWFIncome(hh2, type);
+			System.out.println("fir 55");
+
+			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, empIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(4, row, lsIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
+			reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle);
+			row++;
+		}
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private Double calcWFIncome(HH hh2, String type) {
+		Double wfTot = 0.0;
+
+		/* What about food payments? */
+
+		for (WildFood wf : hh2.getHousehold().getWildFood()) {
+
+			if (type == "cash") {
+				wfTot += wf.getUnitsSold() * wf.getPricePerUnit();
+			} else if (type == "food") {
+				wfTot += wf.getUnitsConsumed() * wf.getResourceSubType().getResourcesubtypekcal();
+			}
+		}
+
+		return wfTot;
+	}
+
+	/******************************************************************************************************************************************/
+
+	private Double calcTransIncome(HH hh2, String type) {
+		Double trTot = 0.0;
+
+		/* Handle transfer types food/cash/other */
+
+		for (Transfer tr : hh2.getHousehold().getTransfer()) {
+			if (type == "cash") {
+				if (tr.getTransferType().equals(TransferType.Food)) {
+					trTot += tr.getUnitsSold() * tr.getPricePerUnit() * tr.getPeopleReceiving() * tr.getTimesReceived();
+				} else // Cash or Other
+				{
+					trTot += tr.getPeopleReceiving() * tr.getTimesReceived() * tr.getCashTransferAmount();
+				}
+			} else if (type == "food" && tr.getTransferType().equals(TransferType.Food)) {
+				trTot += tr.getUnitsConsumed() * tr.getFoodResourceSubType().getResourcesubtypekcal()
+						* tr.getPeopleReceiving() * tr.getTimesReceived();
+
+			}
+
+		}
+		return trTot;
+	}
+
+	/******************************************************************************************************************************************/
+
+	private Double calcLSIncome(HH hh2, String type) { // LSS and LSP sales
+		Double lsTot = 0.0;
+		if (type == "cash") {
+			for (LivestockSales ls : hh2.getHousehold().getLivestockSales()) {
+				lsTot += ls.getUnitsSold() * ls.getPricePerUnit();
+			}
+
+			for (LivestockProducts lsp : hh2.getHousehold().getLivestockProducts()) {
+				lsTot += lsp.getUnitsSold() * lsp.getPricePerUnit();
+			}
+		} else if (type == "food") {
+			for (LivestockProducts lsp : hh2.getHousehold().getLivestockProducts()) {
+				lsTot += lsp.getUnitsConsumed() * lsp.getResourceSubType().getResourcesubtypekcal();
+			}
+		}
+
+		return lsTot;
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private Double calcEmpIncome(HH hh2, String type) {
+		Double empTot = 0.0;
+
+		/* What about food payments? for cash */
+
+		try {
+			for (Employment emp : hh2.getHousehold().getEmployment()) {
+				if (type == "cash") {
+					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * emp.getCashPaymentAmount();
+				} else if (type == "food") {
+					empTot += emp.getPeopleCount() * emp.getUnitsWorked()
+							* emp.getFoodResourceSubType().getResourcesubtypekcal();
+				}
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return empTot;
+
+	}
+
+	/******************************************************************************************************************************************/
+	private Double calcCropIncome(HH hh2, String type) {
+
+		Double cropTot = 0.0;
+
+		for (Crop crop : hh2.getHousehold().getCrop()) {
+			if (type == "cash") {
+
+				cropTot += crop.getUnitsSold() * crop.getPricePerUnit();
+			}
+			else if (type == "food") {
+				cropTot += crop.getUnitsConsumed()*crop.getResourceSubType().getResourcesubtypekcal();
+			}
+		}
+
+		return cropTot;
 	}
 
 	/******************************************************************************************************************************************/
@@ -695,7 +943,6 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 		List<HH> wildfoodList = thisHH.stream().filter(d -> d.type == "Wildfood").collect(Collectors.toList());
 
-
 		List<HH> livestockproductList = thisHH.stream().filter(d -> d.type == "LivestockProduct")
 				.collect(Collectors.toList());
 
@@ -715,10 +962,10 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 					cropOP += (icrop.getCrop().getUnitsConsumed().doubleValue()
 							* Double.valueOf(icrop.getCrop().getResourceSubType().getResourcesubtypekcal()));
-					
+
 				}
 			}
-			
+
 			if (wildfoodList.size() > 0) {
 				for (HH iwildfood : wildfoodList) {
 
@@ -825,7 +1072,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 		disposableIncome = totalIncome - costOfShortfall;
 
-		return (disposableIncome); 
+		return (disposableIncome);
 	}
 
 	/******************************************************************************************************************************************/

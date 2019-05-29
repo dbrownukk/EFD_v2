@@ -35,6 +35,7 @@ public class CustomReportSpec extends Identifiable {
 	@NewAction("")
 	@Column(unique=true)
 	
+	@NoModify
 	private Collection<Report> report;
 
 	@ManyToMany
