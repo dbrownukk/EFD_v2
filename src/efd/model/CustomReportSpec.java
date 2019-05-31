@@ -6,6 +6,7 @@ import java.util.*;
 
 import javax.persistence.*;
 //import javax.validation.constraints.*;
+import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 import org.openxava.model.*;
@@ -25,6 +26,10 @@ public class CustomReportSpec extends Identifiable {
 
 	@Column(length = 45)
 	@Required
+
+	//@Pattern(regexp = "[a-z-A-Z]*", message = "Spec Name has invalid characters")
+	@Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Spec Name has invalid characters")
+	
 	private String specName;
 
 	@OneToMany(mappedBy = "customReportSpec")

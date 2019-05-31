@@ -368,15 +368,15 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		// hhmSheet.setDefaultColumnWidth(40);
 		em("about to do  sex lov  = " + isheet);
-		addLOV(sheet, hhmSheet, 4, 5, 2, numMembers, "Sex");
+		addLOV(sheet, hhmSheet, 4, 4, 2, numMembers, "Sex");
 		em("done sex lov  = " + isheet);
 		// Age and Year of Birth Integers
 		addNumberValidation(workbook, sheet, hhmSheet, 5, 6, 2, numMembers, style);
 		// Head of Household
-		addLOV(sheet, hhmSheet, 7, 8, 2, numMembers, "YesNo");
+		addLOV(sheet, hhmSheet, 7, 7, 2, numMembers, "YesNo");
 		em("isheet 22 22 22 = " + isheet);
 		// Absent ?
-		addLOV(sheet, hhmSheet, 8, 9, 2, numMembers, "YesNo");
+		addLOV(sheet, hhmSheet, 8, 8, 2, numMembers, "YesNo");
 		em("isheet 22 22 33 44 = " + isheet);
 		// Period away in Months
 		addNumberValidation(workbook, sheet, hhmSheet, 10, 10, 2, numMembers, style);
@@ -2459,8 +2459,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	}
 
 	private static void em(Object em) {
-		return;
-		//System.out.println(em);
+		//return;
+		System.out.println(em);
 
 	}
 

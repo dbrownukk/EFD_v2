@@ -32,6 +32,8 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+import javax.persistence.*;
+
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.*;
 import org.openxava.actions.*;
@@ -104,6 +106,8 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 		defaultDietItems = (List<DefaultDietItem>) study.getDefaultDietItem();
 
+		/* Populate WHO table */
+
 		/* Only create reports if there are Validated Households */
 
 		List<Household> households = XPersistence.getManager()
@@ -146,6 +150,8 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		// Calculate DI
 
 		calculateDI(); // uses hh filtered array based on CRS definition
+		calculateAE(); // Calculate the Adult equivalent
+
 		errno = 54;
 		// Run reports
 		try {
@@ -165,6 +171,15 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 		addMessage("Created OIHM Report for Study " + study.getStudyName() + " using Spec "
 				+ customReportSpec.getSpecName());
+
+	}
+
+	private void calculateAE() {
+
+		for (HH hh2 : hh) {
+			System.out.println("in calculateAE");
+			hh2.hhAE = householdAE(hh2.household);
+		}
 
 	}
 
@@ -549,30 +564,30 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 				System.out.println("report 226");
 				createFoodIncomereport(ireportNumber, report);
 				break;
-				/*
+
 			case 227:
 				System.out.println("report 227");
-				createCashIncomereport(ireportNumber, report);
+				createLandAssetreport(ireportNumber, report);
 				break;
+
 			case 228:
 				System.out.println("report 228");
-				createCashIncomereport(ireportNumber, report);
+				createLivestockAssetreport(ireportNumber, report);
 				break;
+
 			case 237:
 				System.out.println("report 237");
-				createCashIncomereport(ireportNumber, report);
+				createHHMemberreport(ireportNumber, report);
 				break;
 			case 236:
 				System.out.println("report 236");
-				createCashIncomereport(ireportNumber, report);
+				createAdultEquivalentreport(ireportNumber, report);
 				break;
 			case 238:
 				System.out.println("report 238");
-				createCashIncomereport(ireportNumber, report);
+				createPopulationreport(ireportNumber, report);
 				break;
-*/
-			default:
-				break;
+
 			}
 		}
 
@@ -686,7 +701,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		for (HH hh2 : uniqueHousehold) {
 
 			// calc uses same func for food and cash - differentiate using type
-			
+
 			cropIncome = calcCropIncome(hh2, type);
 			empIncome = calcEmpIncome(hh2, type);
 			lsIncome = calcLSIncome(hh2, type);
@@ -728,7 +743,6 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		row = 3;
 		System.out.println("in food income report done heading");
 
-
 		for (HH hh2 : uniqueHousehold) {
 
 			cropIncome = calcCropIncome(hh2, type);
@@ -751,6 +765,318 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			row++;
 		}
 
+	}
+
+	/******************************************************************************************************************************************/
+	/**
+	 * @param isheet
+	 * @param report
+	 */
+	private void createLandAssetreport(int isheet, Report report) {
+		int row = 7;
+		int col = 2;
+
+		System.out.println("In SOL Report 227 - Land Assets");
+
+		ArrayList<HHSub> hhl = new ArrayList<>();
+
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
+		errno = 2271;
+		reportWB.getSheet(isheet).setValue(1, 6, "Household Number", textStyle);
+		errno = 2272;
+		/* need to create matrix of hh id against land assets */
+
+		/* How many land assets for this set of filtered households */
+
+		errno = 2273;
+
+		// Populate hhLand array for matrix
+		for (HH hh3 : uniqueHousehold) {
+			for (AssetLand assetLand : hh3.getHousehold().getAssetLand()) {
+				HHSub hhLand = new HHSub();
+
+				hhLand.setAssetLand(assetLand);
+				hhLand.setHhid(hh3.hhNumber);
+				hhLand.setAssetRST(assetLand.getResourceSubType());
+				hhLand.setAssetValue(assetLand.getNumberOfUnits());
+				hhLand.setHhDI(hh3.getHhDI());
+
+				hhl.add(hhLand);
+
+			}
+		}
+
+		for (HHSub land : hhl) {
+			System.out.println("land = " + land.getAssetRST().getResourcetypename());
+
+		}
+
+		List<HHSub> uniqueLand = hhl.stream().filter(distinctByKey(l -> l.getAssetRST())).collect(Collectors.toList());
+
+		// Populate the relevant column value for the RST
+		for (HHSub land : uniqueLand) {
+
+			land.setColumn(col);
+
+			Iterator<HHSub> hhlIterator = hhl.iterator();
+			while (hhlIterator.hasNext()) {
+
+				HHSub currentHHLand = hhlIterator.next();
+				if (currentHHLand.getAssetRST() == land.getAssetRST()) {
+					currentHHLand.setColumn(land.getColumn());
+				}
+			}
+
+			col++;
+		}
+
+		errno = 2274;
+
+		for (HHSub hhl2 : uniqueLand) {
+
+			// Heading
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 3, "Asset Category", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 4, "Land", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 5, "Asset Type", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 6, hhl2.getAssetRST().getResourcetypename(),
+					textStyle);
+
+			// HH data
+
+		}
+		// sort into DI order
+		hhl = (ArrayList<HHSub>) hhl.stream().sorted(Comparator.comparing(HHSub::getHhDI)).collect(Collectors.toList());
+
+		int currentHHid = 0;
+		for (HHSub hhl3 : hhl) {
+
+			if (currentHHid != hhl3.getHhid() && currentHHid != 0) {
+				row++;
+			}
+			currentHHid = hhl3.getHhid();
+			reportWB.getSheet(isheet).setValue(1, row, hhl3.getHhid(), textStyle);
+			reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row, hhl3.getAssetValue(), textStyle);
+
+		}
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void createLivestockAssetreport(int isheet, Report report) {
+		int row = 7;
+		int col = 2;
+		Double hhSOLC = 0.0;
+
+		System.out.println("In SOL Report 228 - Livestock Assets");
+
+		ArrayList<HHSub> hhl = new ArrayList<>();
+
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
+		errno = 2281;
+		reportWB.getSheet(isheet).setValue(1, 5, "Household Number", textStyle);
+		errno = 2282;
+		/* need to create matrix of hh id against land assets */
+
+		/* How many land assets for this set of filtered households */
+
+		errno = 2283;
+
+		// Populate hhLand array for matrix
+		for (HH hh3 : uniqueHousehold) {
+			for (AssetLiveStock assetLS : hh3.getHousehold().getAssetLiveStock()) {
+				HHSub hhLS = new HHSub();
+
+				hhLS.setAssetLivestock(assetLS);
+				hhLS.setHhid(hh3.hhNumber);
+				hhLS.setAssetRST(assetLS.getResourceSubType());
+				hhLS.setAssetValue(assetLS.getNumberOwnedAtStart());
+				hhLS.setHhDI(hh3.getHhDI());
+
+				hhl.add(hhLS);
+
+			}
+		}
+
+		for (HHSub ls : hhl) {
+			System.out.println("ls" + ls.getAssetRST().getResourcetypename());
+
+		}
+
+		List<HHSub> uniqueLS = hhl.stream().filter(distinctByKey(l -> l.getAssetRST())).collect(Collectors.toList());
+
+		// Populate the relevant column value for the RST
+		for (HHSub ls : uniqueLS) {
+
+			ls.setColumn(col);
+
+			Iterator<HHSub> hhlIterator = hhl.iterator();
+			while (hhlIterator.hasNext()) {
+
+				HHSub currentHHLS = hhlIterator.next();
+				if (currentHHLS.getAssetRST() == ls.getAssetRST()) {
+					currentHHLS.setColumn(ls.getColumn());
+				}
+			}
+
+			col++;
+		}
+
+		errno = 2284;
+
+		for (HHSub hhl2 : uniqueLS) {
+
+			// Heading
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 3, "Asset Category", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 4, "Livestock", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 5, "Asset Type", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 6, hhl2.getAssetRST().getResourcetypename(),
+					textStyle);
+
+			// HH data
+
+		}
+		// sort into DI order
+		hhl = (ArrayList<HHSub>) hhl.stream().sorted(Comparator.comparing(HHSub::getHhDI)).collect(Collectors.toList());
+
+		int currentHHid = 0;
+		for (HHSub hhl3 : hhl) {
+
+			if (currentHHid != hhl3.getHhid() && currentHHid != 0) {
+				row++;
+			}
+			currentHHid = hhl3.getHhid();
+			reportWB.getSheet(isheet).setValue(1, row, hhl3.getHhid(), textStyle);
+			reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row, hhl3.getAssetValue(), textStyle);
+
+		}
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void createHHMemberreport(int isheet, Report report) {
+		int row = 1;
+		int col = 9;
+
+		System.out.println("In HHMember report 237");
+		reportWB.getSheet(isheet).setColumnWidths(1, 10, 10, 10, 10, 10, 10, 10, 30, 30, 30, 30, 30);
+		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "Member", textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, "Age", textStyle);
+		reportWB.getSheet(isheet).setValue(4, row, "Sex", textStyle);
+		reportWB.getSheet(isheet).setValue(5, row, "Notes", textStyle);
+
+		/* Need any extra questions/answers that are deined for this Study */
+		/*
+		 * Question header obtained from just one household as all questions same for
+		 * hh/hhm in a study
+		 */
+
+		Optional<HH> findFirstHH = uniqueHousehold.stream().findFirst();
+
+		for (HouseholdMember member : findFirstHH.get().household.getHouseholdMember()) {
+			for (ConfigAnswer answer : member.getConfigAnswer()) {
+				String prompt = answer.getConfigQuestionUse().getConfigQuestion().getPrompt();
+				{
+					reportWB.getSheet(isheet).setValue(col, row, prompt, textStyle);
+				}
+
+			}
+
+		}
+
+		for (HH hh2 : uniqueHousehold) {
+
+			Collection<HouseholdMember> householdMember = hh2.getHousehold().getHouseholdMember();
+			List<HouseholdMember> hhm = householdMember.stream()
+					.sorted(Comparator.comparing(HouseholdMember::getHouseholdMemberNumber))
+					.collect(Collectors.toList());
+			for (HouseholdMember hh3 : hhm) {
+				row++;
+				reportWB.getSheet(isheet).setValue(1, row, hh2.getHhNumber(), textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, hh3.getHouseholdMemberNumber(), textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, hh3.getAge(), textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, hh3.getGender(), textStyle);
+				reportWB.getSheet(isheet).setValue(5, row, "Notes", textStyle);
+				col = 6;
+				// Answers
+				for (ConfigAnswer configAnswer : hh3.getConfigAnswer()) {
+					reportWB.getSheet(isheet).setValue(col, row, configAnswer.getAnswer(), textStyle);
+					col++;
+				}
+
+			}
+
+		}
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void createPopulationreport(int isheet, Report report) {
+		int row = 1;
+		System.out.println("Population Report");
+		reportWB.getSheet(isheet).setColumnWidths(1, 10, 20, 20);
+		reportWB.getSheet(isheet).setValue(1, row, "Age Range", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "Total Males", textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, "Total Females", textStyle);
+		reportWB.getSheet(isheet).setValue(1, row + 1, "0 - 4", textStyle);
+
+		int lower = 5;
+		int upper = 9;
+		row = 3;
+		// Print 5 - 9, 10 - 14 groups 
+		for (int i = 2; i < 21; i++) {
+			reportWB.getSheet(isheet).setValue(1, row, lower + " - " + upper, textStyle);
+			lower += 5;
+			upper += 5;
+			row++;
+		}
+
+		int ageMaleGroup[] = new int[20];
+		int ageFemaleGroup[] = new int[20];
+
+		for (HH hh2 : uniqueHousehold) {
+			for (HouseholdMember hhm : hh2.getHousehold().getHouseholdMember()) {
+
+				if (hhm.getGender().equals(Sex.Male))
+					ageMaleGroup[(int) Math.ceil(hhm.getAge() / 5)]++;
+				else if (hhm.getGender().equals(Sex.Female))
+					ageFemaleGroup[(int) Math.ceil(hhm.getAge() / 5)]++;
+			}
+		}
+		int i = 0;
+		row = 2;
+		for (int j : ageMaleGroup) {
+			reportWB.getSheet(isheet).setValue(2, row , j, textStyle);
+			row++;
+		}
+		row=2;
+		for (int j : ageFemaleGroup) {
+			reportWB.getSheet(isheet).setValue(3, row , j, textStyle);
+			row++;
+		}
+
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void createAdultEquivalentreport(int isheet, Report report) {
+		int row = 1;
+		System.out.println("Adult Equivalent report");
+		reportWB.getSheet(isheet).setColumnWidths(1, 30, 20);
+		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "Adult Daily Equivalent KCal", textStyle);
+
+		row = 3;
+
+		for (HH hh2 : uniqueHousehold) {
+
+			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, hh2.getHhAE(), textStyle);
+			row++;
+		}
 	}
 
 	/******************************************************************************************************************************************/
@@ -853,9 +1179,8 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			if (type == "cash") {
 
 				cropTot += crop.getUnitsSold() * crop.getPricePerUnit();
-			}
-			else if (type == "food") {
-				cropTot += crop.getUnitsConsumed()*crop.getResourceSubType().getResourcesubtypekcal();
+			} else if (type == "food") {
+				cropTot += crop.getUnitsConsumed() * crop.getResourceSubType().getResourcesubtypekcal();
 			}
 		}
 
@@ -1077,6 +1402,34 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 	/******************************************************************************************************************************************/
 
+	private Double householdAE(Household household) {
+
+		Double totAE = 0.0;
+		Double ageReq = 0.0;
+		int age = 0;
+		Sex gender;
+
+		for (HouseholdMember hhm : household.getHouseholdMember()) {
+			age = hhm.getAge();
+			gender = hhm.getGender();
+
+			WHOEnergyRequirements whoEnergey = WHOEnergyRequirements.findByAge(age);
+
+			System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " + whoEnergey.getMale() + " " + gender);
+			if (gender == Sex.Female) {
+				totAE += whoEnergey.getFemale();
+			} else if (gender == Sex.Male) {
+				totAE += whoEnergey.getMale();
+			}
+
+		}
+		/* AE = TE / 2600 */
+		totAE = totAE / 2600;
+		return (totAE);
+	}
+
+	/******************************************************************************************************************************************/
+
 	private void createHeaderPage(CustomReportSpec customReportSpec) {
 
 		int i = 5;
@@ -1178,6 +1531,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		private Household household;
 		private int hhNumber;
 		private Double hhDI;
+		private Double hhAE;
 		private Double hhSOLC;
 		private Collection<Category> category;
 		private ResourceType resourceType;
@@ -1198,6 +1552,14 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		private LivestockSales livestocksales;
 		private Transfer transfer;
 		private WildFood wildfood;
+
+		public Double getHhAE() {
+			return hhAE;
+		}
+
+		public void setHhAE(Double hhAE) {
+			this.hhAE = hhAE;
+		}
 
 		public Double getHhSOLC() {
 			return hhSOLC;
@@ -1381,6 +1743,73 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 		public void setLand(AssetLand land) {
 			this.land = land;
+		}
+
+	}
+
+	public static class HHSub {
+		private int hhid;
+		private AssetLand assetLand;
+		private AssetLiveStock assetLivestock;
+		private ResourceSubType assetRST;
+		private Double assetValue;
+		private Double hhDI;
+		private int column;
+
+		public int getHhid() {
+			return hhid;
+		}
+
+		public void setHhid(int hhid) {
+			this.hhid = hhid;
+		}
+
+		public AssetLand getAssetLand() {
+			return assetLand;
+		}
+
+		public void setAssetLand(AssetLand assetLand) {
+			this.assetLand = assetLand;
+		}
+
+		public AssetLiveStock getAssetLivestock() {
+			return assetLivestock;
+		}
+
+		public void setAssetLivestock(AssetLiveStock assetLivestock) {
+			this.assetLivestock = assetLivestock;
+		}
+
+		public ResourceSubType getAssetRST() {
+			return assetRST;
+		}
+
+		public void setAssetRST(ResourceSubType assetRST) {
+			this.assetRST = assetRST;
+		}
+
+		public Double getAssetValue() {
+			return assetValue;
+		}
+
+		public void setAssetValue(Double assetValue) {
+			this.assetValue = assetValue;
+		}
+
+		public Double getHhDI() {
+			return hhDI;
+		}
+
+		public void setHhDI(Double hhDI) {
+			this.hhDI = hhDI;
+		}
+
+		public int getColumn() {
+			return column;
+		}
+
+		public void setColumn(int column) {
+			this.column = column;
 		}
 
 	}
