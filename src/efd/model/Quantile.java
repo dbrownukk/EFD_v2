@@ -58,6 +58,14 @@ public class Quantile extends Identifiable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private CustomReportSpec customReportSpec;
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public int getSequence() {
 		return sequence;
 	}
@@ -74,14 +82,6 @@ public class Quantile extends Identifiable {
 		this.percentage = percentage;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public CustomReportSpec getCustomReportSpec() {
 		return customReportSpec;
 	}
@@ -89,5 +89,7 @@ public class Quantile extends Identifiable {
 	public void setCustomReportSpec(CustomReportSpec customReportSpec) {
 		this.customReportSpec = customReportSpec;
 	}
+
+
 
 }

@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.model.*;
 
-@Views({ @View(members = "specName,totalQuantilePercentage,warningMessage,Report{report},Quantile{quantile},ReportSpecUse{reportSpecUse}, Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType},ConfigAnswer{configAnswer}"),
+@Views({ @View(members = "specName,totalQuantilePercentage,warningMessage,Report{report},Quantile{quantile},Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType},ConfigAnswer{configAnswer}"),
 		@View(name = "rst", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "rt", members = "specName,quantile,rType,report,resourceSubType"),
 		@View(name = "cat", members = "specName,quantile,rType,report,resourceSubType") })
@@ -56,12 +56,12 @@ public class CustomReportSpec extends Identifiable {
 	@NewAction("")
 	private Collection<Category> category;
 
-	@OneToMany(mappedBy = "customReportSpec")
-	@NewAction("ReportSpecUse.new")
-	@EditAction("ReportSpecUse.edit")
-	@RemoveSelectedAction("ReportSpecUse.remove")
-	@ListProperties("study.studyName,study.referenceYear")
-	private Collection<ReportSpecUse> reportSpecUse;
+	//@OneToMany(mappedBy = "customReportSpec")
+	//@NewAction("ReportSpecUse.new")
+	//@EditAction("ReportSpecUse.edit")
+	//@RemoveSelectedAction("ReportSpecUse.remove")
+	//@ListProperties("study.studyName,study.referenceYear")
+	//private Collection<ReportSpecUse> reportSpecUse;
 	
 	
 	
@@ -166,13 +166,7 @@ public class CustomReportSpec extends Identifiable {
 		this.specName = specName;
 	}
 
-	public Collection<ReportSpecUse> getReportSpecUse() {
-		return reportSpecUse;
-	}
 
-	public void setReportSpecUse(Collection<ReportSpecUse> reportSpecUse) {
-		this.reportSpecUse = reportSpecUse;
-	}
 
 	public Collection<Quantile> getQuantile() {
 		return quantile;

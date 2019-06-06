@@ -37,10 +37,14 @@ public class RSUaddhhmanytomany extends GoAddElementsToCollectionAction {
 		if(studyid.isEmpty())
 		{
 			addError("Select a Study before adding Households");
+			return;
 			
 		}
 		
 		/* Which HH are already in RSU */
+		/*
+		if(!rsuid.isEmpty())
+		{
 		ReportSpecUse rsu = XPersistence.getManager().find(ReportSpecUse.class, rsuid);
 		
 		String excludehh = "";
@@ -49,8 +53,8 @@ public class RSUaddhhmanytomany extends GoAddElementsToCollectionAction {
 			System.out.println("exclude "+excludehh);
 		}
 		excludehh = StringUtils.chop(excludehh);
-		
-		
+		}
+		*/
 		
 		// Exclude not working so far..
 		//String condition = "${study} =" + "'"+studyid+"'"+" and ${household.id} not in ('"+excludehh+"')";
@@ -59,7 +63,7 @@ public class RSUaddhhmanytomany extends GoAddElementsToCollectionAction {
 
 		getTab().setPropertiesNames("householdNumber,householdName,interviewers,interviewDate");
 		getTab().setBaseCondition(condition );
-		
+	
 		
 	
 	}

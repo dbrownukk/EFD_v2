@@ -30,6 +30,7 @@ import efd.model.ConfigQuestion.*;
 		// + "ConfigQuestionUse{configQuestionUse}"),
 		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
 		@View(name = "StudyInterview", members = "studyName,referenceYear,spreadsheets"),
+		@View(name = "households", members = "household"),
 		@View(name = "FromQuestionUse", members = "Study[#studyName,topic,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]") })
 
 
@@ -348,8 +349,8 @@ public class Study extends EFDIdentifiable {
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy="study")
-	private Collection <ReportSpecUse> reportSpecUse;
+	//@OneToMany(mappedBy="study")
+	//private Collection <ReportSpecUse> reportSpecUse;
 	
 	
 	/*************************************************************************************************/
@@ -370,13 +371,7 @@ public class Study extends EFDIdentifiable {
 
 
 
-	public Collection<ReportSpecUse> getReportSpecUse() {
-		return reportSpecUse;
-	}
-
-	public void setReportSpecUse(Collection<ReportSpecUse> reportSpecUse) {
-		this.reportSpecUse = reportSpecUse;
-	}
+	
 
 	public Collection<ConfigAnswer> getConfigAnswer() {
 		return configAnswer;

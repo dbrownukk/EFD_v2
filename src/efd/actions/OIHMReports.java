@@ -34,11 +34,17 @@ import java.util.stream.*;
 
 import javax.persistence.*;
 
+import org.apache.commons.lang.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
+import org.openxava.model.*;
+import org.openxava.model.meta.*;
+import org.openxava.tab.*;
+import org.openxava.tab.impl.*;
 import org.openxava.util.jxls.*;
+import org.openxava.view.*;
 import org.openxava.web.servlets.*;
 
 import efd.model.*;
@@ -48,7 +54,7 @@ import efd.model.StdOfLivingElement.*;
 import efd.model.Transfer.*;
 import efd.model.WealthGroupInterview.*;
 
-public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsConstants {
+public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsConstants {
 
 	static Double RC = 2200.0 * 365;
 	static final int NUMBER_OF_REPORTS = 15;
@@ -56,13 +62,18 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	// private CustomReportSpec customReportSpec = null;
 	private List<Report> reportList;
 	private List<Household> households;
+	private List<Household> selectedHouseholds = new ArrayList<Household>();
+
 	private List<DefaultDietItem> defaultDietItems; // At Study not Household level
 	List<HH> uniqueHousehold;
+	List<Quantile> quantiles;
+	int numberOfQuantiles = 0;
 
 	JxlsSheet[] sheet = new JxlsSheet[NUMBER_OF_REPORTS];
 	JxlsWorkbook reportWB;
 
 	ArrayList<HH> hh = new ArrayList<>();
+	ArrayList<HH> hhSelected = new ArrayList<>();
 
 	private String forwardURI = null;
 
@@ -81,6 +92,8 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	CellStyle cnumberStyle = null;
 
 	int errno = 0;
+	Boolean isQuantile = false;
+	Boolean isSelectedHouseholds = false;
 
 	/******************************************************************************************************************************************/
 	@Override
@@ -89,6 +102,10 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		System.out.println("In Run OIHM Reports ");
 
 		String specID = getView().getValueString("customReportSpec.id");
+		if (specID.equals("")) {
+			addError("Choose a Report Spec");
+			return;
+		}
 
 		Object studyId = getPreviousView().getValue("id");
 
@@ -98,6 +115,42 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			return;
 		}
 
+		Tab targetTab = getView().getSubview("study.household").getCollectionTab();
+
+		Map[] selectedOnes = targetTab.getSelectedKeys();
+
+		System.out.println("selected keys a = " + selectedOnes.length);
+
+		if (selectedOnes.length != 0) {
+			isSelectedHouseholds = true; // One or more HH selected in dialog
+			for (int i = 0; i < selectedOnes.length; i++) {
+				Map<?, ?> key = selectedOnes[i];
+
+				Map<?, ?> membersNames = getView().getSubview("study.household").getMembersNames();
+				// System.out.println("mnames = "+i+" "+membersNames);
+				System.out.println("key = " + key.toString());
+
+				String subKey = key.toString().substring(4, 36);
+				System.out.println("sub key = " + subKey);
+
+				// Map househ = MapFacade.getValues("Household", sub, membersNames);
+
+				Household singleHHSelected = XPersistence.getManager().find(Household.class, subKey);
+
+				System.out.println("single hh selected = " + singleHHSelected);
+
+				HH e = new HH();
+				e.household = singleHHSelected;
+				hhSelected.add(e);
+
+				System.out.println(" hhselected size = " + hhSelected.size());
+
+				selectedHouseholds.add(singleHHSelected);
+			}
+
+		}
+
+		System.out.println("isselected = " + isSelectedHouseholds);
 		System.out.println("In Run OIHM Reports specid, studyid = " + specID + " " + studyId.toString());
 
 		CustomReportSpec customReportSpec = XPersistence.getManager().find(CustomReportSpec.class, specID);
@@ -138,11 +191,33 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			closeDialog();
 			return;
 		}
+
+		// Quantiles
+		if (customReportSpec.getQuantile().size() > 0 && customReportSpec.getTotalQuantilePercentage() != 100) {
+			addError("Quantile for this Report Spec is set but does not total 100%");
+			closeDialog();
+
+			return;
+		} else if (customReportSpec.getTotalQuantilePercentage() == 100) {
+			isQuantile = true;
+			quantiles = (List<Quantile>) customReportSpec.getQuantile();
+			numberOfQuantiles = customReportSpec.getQuantile().size();
+		}
+
 		/******************************************************************************************************************************************/
 
 		errno = 50;
-		// Populate HH array hh
-		populateHHArray(households);
+
+		// Populate HH array hh - use dialog selected list if entered
+
+		if (!isSelectedHouseholds) {
+			System.out.println("no hh selection");
+			populateHHArray(households);
+		} else if (isSelectedHouseholds) {
+			System.out.println("made a  hh selection");
+			populateHHArray(selectedHouseholds);
+		}
+
 		errno = 51;
 		// Filter according to Catalog/RT/RST/HH
 		filterHH(customReportSpec);
@@ -177,7 +252,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	private void calculateAE() {
 
 		for (HH hh2 : hh) {
-			System.out.println("in calculateAE");
+
 			hh2.hhAE = householdAE(hh2.household);
 		}
 
@@ -186,7 +261,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	private void calculateDI() {
 
 		for (HH hh2 : hh) {
-			System.out.println("in calculateDI 002");
+
 			hh2.hhDI = householdDI(hh2.household);
 		}
 
@@ -206,31 +281,26 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		System.out.println("size of hh before filter = " + hh.size());
 		System.out.println("filter 000");
 
-		if (customReportSpec.getReportSpecUse().size() > 0) // Apply Report Spec Usage Filter - HH must be Validated
-		{
-			System.out.println("filter 111");
-			for (ReportSpecUse reportSpecUse : customReportSpec.getReportSpecUse()) {
-				System.out.println("filter 222");
-				for (Household household : reportSpecUse.getHousehold()) {
-					System.out.println("filter 333");
-					for (HH hh2 : hh) {
-						System.out.println("filter 444");
-						if (hh2.getHousehold() != household) {
-							System.out.println("a RSU to delete ");
-							hh2.setDelete(true);
-
-							// Only if this rsu hh is for current study is this rsu used
-
-						} else if (household.getStudy() == study) {
-							System.out.println("a  RSU to save ");
-							hh2.setDelete(false);
-							break;
-						}
-					}
-
-				}
-			}
-		}
+		/*
+		 * Remove RSU from CRS if (customReportSpec.getReportSpecUse().size() > 0) //
+		 * Apply Report Spec Usage Filter - HH must be Validated {
+		 * 
+		 * for (ReportSpecUse reportSpecUse : customReportSpec.getReportSpecUse()) {
+		 * 
+		 * for (Household household : reportSpecUse.getHousehold()) {
+		 * 
+		 * for (HH hh2 : hh) {
+		 * 
+		 * if (hh2.getHousehold() != household) {
+		 * System.out.println("a RSU to delete "); hh2.setDelete(true);
+		 * 
+		 * // Only if this rsu hh is for current study is this rsu used
+		 * 
+		 * } else if (household.getStudy() == study) {
+		 * System.out.println("a  RSU to save "); hh2.setDelete(false); break; } }
+		 * 
+		 * } } }
+		 */
 
 		if (customReportSpec.getCategory().size() > 0) // Apply Category Filter
 		{
@@ -323,16 +393,18 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			// e.printStackTrace();
 		}
 
-		System.out.println("size of hh after all filter  = " + hh.size());
-		for (HH hh2 : hh) {
-			if (hh2.getResourceType() != null)
-				System.out.println("hh after filtering now equals = " + hh2.getHhNumber() + " "
-						+ hh2.getCategory().toArray().toString() + " " + (hh2.getResourceType().getResourcetypename()
-								+ " " + hh2.getResourceSubType().getResourcetypename()));
-			else
-				System.out.println("print an answer" + hh2.toString());
+		// System.out.println("size of hh after all filter = " + hh.size());
+		// for (HH hh2 : hh) {
+		// if (hh2.getResourceType() != null)
+		// System.out.println("hh after filtering now equals = " + hh2.getHhNumber() + "
+		// "
+		// + hh2.getCategory().toArray().toString() + " " +
+		// (hh2.getResourceType().getResourcetypename()
+		// + " " + hh2.getResourceSubType().getResourcetypename()));
+		// else
+		// System.out.println("print an answer" + hh2.toString());
 
-		}
+		// }
 
 	}
 
@@ -347,6 +419,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		System.out.println("in populateArray");
 
 		ConfigAnswer answer = null;
+
 		for (Household household : households) {
 
 			populateHHfromHousehold(household, answer);
@@ -366,15 +439,16 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 		}
 
-		for (HH hh2 : hh) {
-			if (hh2.getResourceType() != null)
-				System.out.println("hh in arraypop now equals = " + hh2.getHhNumber() + " "
-						+ hh2.getCategory().toArray().toString() + " " + (hh2.getResourceType().getResourcetypename()
-								+ " " + hh2.getResourceSubType().getResourcetypename()));
-			else
-				System.out.println("print an answer" + hh2.toString());
+		// for (HH hh2 : hh) {
+		// if (hh2.getResourceType() != null)
+		// System.out.println("hh in arraypop now equals = " + hh2.getHhNumber() + " "
+		// + hh2.getCategory().toArray().toString() + " " +
+		// (hh2.getResourceType().getResourcetypename()
+		// + " " + hh2.getResourceSubType().getResourcetypename()));
+		// else
+		// System.out.println("print an answer" + hh2.toString());
 
-		}
+		// }
 
 		System.out.println("end populateArray");
 
@@ -558,11 +632,11 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 				break;
 			case 225:
 				System.out.println("report 225");
-				createCashIncomereport(ireportNumber, report);
+				createIncomereport(ireportNumber, report, "cash");
 				break;
 			case 226:
 				System.out.println("report 226");
-				createFoodIncomereport(ireportNumber, report);
+				createIncomereport(ireportNumber, report, "food");
 				break;
 
 			case 227:
@@ -599,24 +673,49 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	private void createDIreport(int isheet, Report report) {
 
 		int row = 1;
-		System.out.println("hh 001");
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20);
-		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
-		reportWB.getSheet(isheet).setValue(2, row, "Disposable Income", textStyle);
 
-		row = 3;
+		System.out.println("in 223 drb quantie = " + isQuantile);
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20);
 
 		// hh is array of all data
 		// need an array of valid HH now left
 		// ordered by DI
 
-		for (HH hh2 : uniqueHousehold) {
-			System.out.println("hhDI 002");
-			// hh2.hhDI = householdDI(hh2.household);
+		if (isQuantile) {
+			Double totDI = 0.0;
+			reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20);
+			System.out.println("DI quantile ");
 
-			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
-			reportWB.getSheet(isheet).setValue(2, row, hh2.hhDI, textStyle);
+			for (HH hh3 : uniqueHousehold) {
+
+				totDI += hh3.getHhDI();
+
+			}
+			reportWB.getSheet(isheet).setValue(1, row, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, "Quantile %", textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, "Disposable Income", textStyle);
 			row++;
+
+			for (Quantile quantile : quantiles) {
+				Double quantileAmount = quantile.getPercentage() / 100.0 * totDI;
+				reportWB.getSheet(isheet).setValue(1, row, quantile.getName(), textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, quantile.getPercentage(), textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, quantileAmount, textStyle);
+				row++;
+			}
+
+		} else {
+			reportWB.getSheet(isheet).setColumnWidths(1, 20, 20);
+			System.out.println("DI non quantile ");
+			reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, "Disposable Income", textStyle);
+			row++;
+			for (HH hh2 : uniqueHousehold) {
+
+				reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, hh2.hhDI, textStyle);
+				row++;
+			}
 		}
 	}
 
@@ -627,16 +726,12 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		Double hhSOLC = 0.0;
 
 		System.out.println("In SOL Report 224");
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 25);
-		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
-		reportWB.getSheet(isheet).setValue(2, row, "Standard of Living Requirement", textStyle);
 
-		row = 3;
-
-		// uniqeHousehold = number of households in array that are relavant
+		// uniqeHousehold = number of households in array that are relevant
 
 		for (HH hh3 : uniqueHousehold) {
 			errno = 101;
+			hhSOLC = 0.0;
 			for (StdOfLivingElement stdOfLivingElement : hh3.getHousehold().getStudy().getStdOfLivingElement()) {
 				errno = 102;
 
@@ -658,24 +753,49 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 		}
 
-		// hh is array of all data
-		// need an array of valid HH now left
-		// ordered by DI
+		if (isQuantile) {
+			Double totSTOL = 0.0;
 
-		for (HH hh2 : uniqueHousehold) {
-			System.out.println("hhSOLC 002");
+			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30);
 
-			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
-			reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
+			List<HH> orderedHH = uniqueHousehold.stream().sorted(Comparator.comparing(HH::getHhSOLC))
+					.collect(Collectors.toList());
+
+			for (HH hh5 : orderedHH) {
+				totSTOL += hh5.getHhSOLC();
+			}
+
+			reportWB.getSheet(isheet).setValue(1, row, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, "Quantile %", textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, "Standard of Living Requirement", textStyle);
 			row++;
+
+			for (Quantile quantile : quantiles) {
+				Double quantileAmount = quantile.getPercentage() / 100.0 * totSTOL;
+				reportWB.getSheet(isheet).setValue(1, row, quantile.getName(), textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, quantile.getPercentage(), textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, quantileAmount, textStyle);
+				row++;
+			}
+		} else {
+			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30);
+			reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, "Standard of Living Requirement", textStyle);
+			row++;
+			for (HH hh2 : uniqueHousehold) {
+
+				reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
+				row++;
+			}
 		}
 	}
 
 	/******************************************************************************************************************************************/
 
-	private void createCashIncomereport(int isheet, Report report) {
+	private void createIncomereport(int isheet, Report report, String type) {
 		int row = 1;
-		String type = "cash";
+		// String type = "food" or "cash"
 
 		Double cropIncome = 0.0;
 		Double empIncome = 0.0;
@@ -683,88 +803,72 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		Double trIncome = 0.0;
 		Double wfIncome = 0.0;
 
-		System.out.println("in cash income report");
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
-		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
-		reportWB.getSheet(isheet).setValue(2, row, "Crop Income", textStyle);
-		reportWB.getSheet(isheet).setValue(3, row, "Employment Income", textStyle);
-		reportWB.getSheet(isheet).setValue(4, row, "Livestock Income", textStyle);
-		reportWB.getSheet(isheet).setValue(5, row, "Transfer Income", textStyle);
-		reportWB.getSheet(isheet).setValue(6, row, "Wildfood Income", textStyle);
+		String initType = StringUtils.capitalise(type);
+		
+		System.out.println("in  income report");
+		reportWB.getSheet(isheet).setColumnWidths(1, 25, 25, 25, 25, 25, 25, 25);
 
-		row = 3;
+		if (isQuantile) {
+			reportWB.getSheet(isheet).setValue(1, row, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, "Quantile %", textStyle);
+		} else {
 
-		// hh is array of all data
-		// need an array of valid HH now left
-		// ordered by DI
-
-		for (HH hh2 : uniqueHousehold) {
-
-			// calc uses same func for food and cash - differentiate using type
-
-			cropIncome = calcCropIncome(hh2, type);
-			empIncome = calcEmpIncome(hh2, type);
-			lsIncome = calcLSIncome(hh2, type);
-			trIncome = calcTransIncome(hh2, type);
-			wfIncome = calcWFIncome(hh2, type);
-
-			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
-			reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(3, row, empIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(4, row, lsIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle);
-			row++;
+			reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 		}
 
-	}
-
-	/******************************************************************************************************************************************/
-
-	private void createFoodIncomereport(int isheet, Report report) {
-		int row = 1;
-		String type = "food";
-
-		Double cropIncome = 0.0;
-		Double empIncome = 0.0;
-		Double lsIncome = 0.0;
-		Double trIncome = 0.0;
-		Double wfIncome = 0.0;
-
-		System.out.println("in food income report");
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
-		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
-		reportWB.getSheet(isheet).setValue(2, row, "Crop Food Income", textStyle);
-		reportWB.getSheet(isheet).setValue(3, row, "Employment Food Income", textStyle);
-		reportWB.getSheet(isheet).setValue(4, row, "Livestock Food Income", textStyle);
-		reportWB.getSheet(isheet).setValue(5, row, "Transfer Food Income", textStyle);
-		reportWB.getSheet(isheet).setValue(6, row, "Wildfood Food Income", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "Crop "+initType+" Income", textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, "Employment "+initType+" Income", textStyle);
+		reportWB.getSheet(isheet).setValue(4, row, "Livestock "+initType+" Income", textStyle);
+		reportWB.getSheet(isheet).setValue(5, row, "Transfer "+initType+" Income", textStyle);
+		reportWB.getSheet(isheet).setValue(6, row, "Wildfood "+initType+" Income", textStyle);
 
 		row = 3;
 		System.out.println("in food income report done heading");
 
-		for (HH hh2 : uniqueHousehold) {
+		if (isQuantile) {
 
-			cropIncome = calcCropIncome(hh2, type);
-			System.out.println("fir 11");
-			empIncome = calcEmpIncome(hh2, type);
-			System.out.println("fir 22");
-			lsIncome = calcLSIncome(hh2, type);
-			System.out.println("fir 33");
-			trIncome = calcTransIncome(hh2, type);
-			System.out.println("fir 44");
-			wfIncome = calcWFIncome(hh2, type);
-			System.out.println("fir 55");
+			for (HH hh3 : uniqueHousehold) {
+				cropIncome += calcCropIncome(hh3, type);
+				System.out.println("about to do calcempincome");
+				empIncome += calcEmpIncome(hh3, type);
+				System.out.println("done calcempincome");
+				lsIncome += calcLSIncome(hh3, type);
+				trIncome += calcTransIncome(hh3, type);
+				wfIncome += calcWFIncome(hh3, type);
 
-			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
-			reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(3, row, empIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(4, row, lsIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
-			reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle);
+			}
+
 			row++;
-		}
 
+			for (Quantile quantile : quantiles) {
+				reportWB.getSheet(isheet).setValue(1, row, quantile.getName(), textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, quantile.getPercentage(), textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, quantile.getPercentage() / 100.0 * cropIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, quantile.getPercentage() / 100.0 * empIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(5, row, quantile.getPercentage() / 100.0 * lsIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(6, row, quantile.getPercentage() / 100.0 * trIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(7, row, quantile.getPercentage() / 100.0 * wfIncome, textStyle);
+				row++;
+			}
+		} else {
+
+			for (HH hh2 : uniqueHousehold) {
+
+				cropIncome = calcCropIncome(hh2, type);
+				empIncome = calcEmpIncome(hh2, type);
+				lsIncome = calcLSIncome(hh2, type);
+				trIncome = calcTransIncome(hh2, type);
+				wfIncome = calcWFIncome(hh2, type);
+
+				reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, empIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, lsIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle);
+				row++;
+			}
+		}
 	}
 
 	/******************************************************************************************************************************************/
@@ -774,15 +878,21 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	 */
 	private void createLandAssetreport(int isheet, Report report) {
 		int row = 7;
-		int col = 2;
+		int col = 3;
+		Map<ResourceSubType, Double> landTot = new HashMap<>();
 
 		System.out.println("In SOL Report 227 - Land Assets");
 
 		ArrayList<HHSub> hhl = new ArrayList<>();
 
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20, 20, 20, 20);
 		errno = 2271;
-		reportWB.getSheet(isheet).setValue(1, 6, "Household Number", textStyle);
+		if (isQuantile) {
+			reportWB.getSheet(isheet).setValue(1, 6, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, 6, "Quantile %", textStyle);
+		} else {
+			reportWB.getSheet(isheet).setValue(1, 6, "Household Number", textStyle);
+		}
 		errno = 2272;
 		/* need to create matrix of hh id against land assets */
 
@@ -791,6 +901,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		errno = 2273;
 
 		// Populate hhLand array for matrix
+
 		for (HH hh3 : uniqueHousehold) {
 			for (AssetLand assetLand : hh3.getHousehold().getAssetLand()) {
 				HHSub hhLand = new HHSub();
@@ -803,14 +914,23 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 				hhl.add(hhLand);
 
+				if (landTot.containsKey(assetLand.getResourceSubType())) {
+					Double total = landTot.get(assetLand.getResourceSubType());
+					total += assetLand.getNumberOfUnits();
+					landTot.remove(assetLand.getResourceSubType());
+					landTot.put(assetLand.getResourceSubType(), total);
+
+				} else // create new
+				{
+					landTot.put(assetLand.getResourceSubType(), assetLand.getNumberOfUnits());
+				}
 			}
-		}
-
-		for (HHSub land : hhl) {
-			System.out.println("land = " + land.getAssetRST().getResourcetypename());
 
 		}
 
+		System.out.println("landout " + landTot.toString());
+
+		// get distinct list of RST
 		List<HHSub> uniqueLand = hhl.stream().filter(distinctByKey(l -> l.getAssetRST())).collect(Collectors.toList());
 
 		// Populate the relevant column value for the RST
@@ -841,24 +961,41 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 6, hhl2.getAssetRST().getResourcetypename(),
 					textStyle);
 
-			// HH data
-
 		}
 		// sort into DI order
+
+		int i;
 		hhl = (ArrayList<HHSub>) hhl.stream().sorted(Comparator.comparing(HHSub::getHhDI)).collect(Collectors.toList());
 
 		int currentHHid = 0;
 		for (HHSub hhl3 : hhl) {
-
+			i = 0;
 			if (currentHHid != hhl3.getHhid() && currentHHid != 0) {
 				row++;
 			}
-			currentHHid = hhl3.getHhid();
-			reportWB.getSheet(isheet).setValue(1, row, hhl3.getHhid(), textStyle);
-			reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row, hhl3.getAssetValue(), textStyle);
 
+			if (!isQuantile) {
+
+				currentHHid = hhl3.getHhid();
+				reportWB.getSheet(isheet).setValue(1, row, hhl3.getHhid(), textStyle);
+				reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row, hhl3.getAssetValue(), textStyle);
+			} else // Quantiles are set
+			{
+				System.out.println("i and number quant = " + i + " " + numberOfQuantiles);
+
+				for (Quantile quantile : quantiles) {
+					System.out.println("print quant value row and i " + row + " " + i);
+					reportWB.getSheet(isheet).setValue(1, row + i, quantile.getName(), textStyle);
+					reportWB.getSheet(isheet).setValue(2, row + i, quantile.getPercentage(), textStyle);
+					reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row + i,
+							quantile.getPercentage() / 100.0 * landTot.get(hhl3.getAssetRST()), textStyle);
+					i++;
+					if (i > numberOfQuantiles)
+						break;
+				}
+
+			}
 		}
-
 	}
 
 	/******************************************************************************************************************************************/
@@ -867,14 +1004,22 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		int row = 7;
 		int col = 2;
 		Double hhSOLC = 0.0;
+		Map<ResourceSubType, Double> lsTot = new HashMap<>();
 
 		System.out.println("In SOL Report 228 - Livestock Assets");
 
 		ArrayList<HHSub> hhl = new ArrayList<>();
 
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20, 20, 20, 20);
 		errno = 2281;
-		reportWB.getSheet(isheet).setValue(1, 5, "Household Number", textStyle);
+
+		if (isQuantile) {
+			reportWB.getSheet(isheet).setValue(1, 6, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, 6, "Quantile %", textStyle);
+		} else {
+			reportWB.getSheet(isheet).setValue(1, 6, "Household Number", textStyle);
+		}
+
 		errno = 2282;
 		/* need to create matrix of hh id against land assets */
 
@@ -894,6 +1039,17 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 				hhLS.setHhDI(hh3.getHhDI());
 
 				hhl.add(hhLS);
+
+				if (lsTot.containsKey(assetLS.getResourceSubType())) {
+					Double total = lsTot.get(assetLS.getResourceSubType());
+					total += assetLS.getNumberOwnedAtStart();
+					lsTot.remove(assetLS.getResourceSubType());
+					lsTot.put(assetLS.getResourceSubType(), total);
+
+				} else // create new
+				{
+					lsTot.put(assetLS.getResourceSubType(), assetLS.getNumberOwnedAtStart());
+				}
 
 			}
 		}
@@ -936,20 +1092,38 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			// HH data
 
 		}
+		errno = 2285;
 		// sort into DI order
 		hhl = (ArrayList<HHSub>) hhl.stream().sorted(Comparator.comparing(HHSub::getHhDI)).collect(Collectors.toList());
-
+		int i;
 		int currentHHid = 0;
+		errno = 2286;
 		for (HHSub hhl3 : hhl) {
-
+			i = 0;
 			if (currentHHid != hhl3.getHhid() && currentHHid != 0) {
 				row++;
 			}
-			currentHHid = hhl3.getHhid();
-			reportWB.getSheet(isheet).setValue(1, row, hhl3.getHhid(), textStyle);
-			reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row, hhl3.getAssetValue(), textStyle);
+			if (!isQuantile) {
 
+				currentHHid = hhl3.getHhid();
+				reportWB.getSheet(isheet).setValue(1, row, hhl3.getHhid(), textStyle);
+				reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row, hhl3.getAssetValue(), textStyle);
+			} else {
+
+				for (Quantile quantile : quantiles) {
+					System.out.println("print quant value row and i " + row + " " + i);
+					reportWB.getSheet(isheet).setValue(1, row + i, quantile.getName(), textStyle);
+					reportWB.getSheet(isheet).setValue(2, row + i, quantile.getPercentage(), textStyle);
+					reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row + i,
+							quantile.getPercentage() / 100.0 * lsTot.get(hhl3.getAssetRST()), textStyle);
+					i++;
+					if (i > numberOfQuantiles)
+						break;
+				}
+
+			}
 		}
+		errno = 2287;
 
 	}
 
@@ -957,35 +1131,40 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 	private void createHHMemberreport(int isheet, Report report) {
 		int row = 1;
-		int col = 9;
-
+		int col = 6;
+		errno = 2371;
 		System.out.println("In HHMember report 237");
-		reportWB.getSheet(isheet).setColumnWidths(1, 10, 10, 10, 10, 10, 10, 10, 30, 30, 30, 30, 30);
+		reportWB.getSheet(isheet).setColumnWidths(1, 15, 10, 10, 10, 10, 10, 10, 30, 30, 30, 30, 30);
 		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 		reportWB.getSheet(isheet).setValue(2, row, "Member", textStyle);
 		reportWB.getSheet(isheet).setValue(3, row, "Age", textStyle);
 		reportWB.getSheet(isheet).setValue(4, row, "Sex", textStyle);
 		reportWB.getSheet(isheet).setValue(5, row, "Notes", textStyle);
 
-		/* Need any extra questions/answers that are deined for this Study */
+		/* Need any extra questions/answers that are defined for this Study */
 		/*
 		 * Question header obtained from just one household as all questions same for
 		 * hh/hhm in a study
 		 */
-
+		errno = 2372;
+		System.out.println("In HHMember report 2372");
 		Optional<HH> findFirstHH = uniqueHousehold.stream().findFirst();
+		System.out.println("In HHMember report done find first" + findFirstHH.toString());
 
 		for (HouseholdMember member : findFirstHH.get().household.getHouseholdMember()) {
+			System.out.println("hhmember question get ");
 			for (ConfigAnswer answer : member.getConfigAnswer()) {
+				System.out.println("hhm prompt = " + answer.getConfigQuestionUse().getConfigQuestion().getPrompt());
 				String prompt = answer.getConfigQuestionUse().getConfigQuestion().getPrompt();
-				{
-					reportWB.getSheet(isheet).setValue(col, row, prompt, textStyle);
-				}
+
+				reportWB.getSheet(isheet).setValue(col, row, prompt, textStyle);
+				col++;
 
 			}
 
 		}
-
+		errno = 2373;
+		System.out.println("In HHMember report 2373");
 		for (HH hh2 : uniqueHousehold) {
 
 			Collection<HouseholdMember> householdMember = hh2.getHousehold().getHouseholdMember();
@@ -998,7 +1177,7 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 				reportWB.getSheet(isheet).setValue(2, row, hh3.getHouseholdMemberNumber(), textStyle);
 				reportWB.getSheet(isheet).setValue(3, row, hh3.getAge(), textStyle);
 				reportWB.getSheet(isheet).setValue(4, row, hh3.getGender(), textStyle);
-				reportWB.getSheet(isheet).setValue(5, row, "Notes", textStyle);
+				reportWB.getSheet(isheet).setValue(5, row, hh3.getNotes(), textStyle);
 				col = 6;
 				// Answers
 				for (ConfigAnswer configAnswer : hh3.getConfigAnswer()) {
@@ -1009,6 +1188,9 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			}
 
 		}
+
+		errno = 2374;
+		System.out.println("In HHMember report 2374");
 	}
 
 	/******************************************************************************************************************************************/
@@ -1016,47 +1198,83 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 	private void createPopulationreport(int isheet, Report report) {
 		int row = 1;
 		System.out.println("Population Report");
-		reportWB.getSheet(isheet).setColumnWidths(1, 10, 20, 20);
-		reportWB.getSheet(isheet).setValue(1, row, "Age Range", textStyle);
-		reportWB.getSheet(isheet).setValue(2, row, "Total Males", textStyle);
-		reportWB.getSheet(isheet).setValue(3, row, "Total Females", textStyle);
-		reportWB.getSheet(isheet).setValue(1, row + 1, "0 - 4", textStyle);
 
-		int lower = 5;
-		int upper = 9;
-		row = 3;
-		// Print 5 - 9, 10 - 14 groups 
-		for (int i = 2; i < 21; i++) {
-			reportWB.getSheet(isheet).setValue(1, row, lower + " - " + upper, textStyle);
-			lower += 5;
-			upper += 5;
-			row++;
-		}
+		if (!isQuantile) {
+			reportWB.getSheet(isheet).setColumnWidths(1, 10, 20, 20);
+			reportWB.getSheet(isheet).setValue(1, row, "Age Range", textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, "Total Males", textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, "Total Females", textStyle);
+			reportWB.getSheet(isheet).setValue(1, row + 1, "0 - 4", textStyle);
 
-		int ageMaleGroup[] = new int[20];
-		int ageFemaleGroup[] = new int[20];
-
-		for (HH hh2 : uniqueHousehold) {
-			for (HouseholdMember hhm : hh2.getHousehold().getHouseholdMember()) {
-
-				if (hhm.getGender().equals(Sex.Male))
-					ageMaleGroup[(int) Math.ceil(hhm.getAge() / 5)]++;
-				else if (hhm.getGender().equals(Sex.Female))
-					ageFemaleGroup[(int) Math.ceil(hhm.getAge() / 5)]++;
+			int lower = 5;
+			int upper = 9;
+			row = 3;
+			// Print 5 - 9, 10 - 14 groups
+			for (int i = 2; i < 21; i++) {
+				reportWB.getSheet(isheet).setValue(1, row, lower + " - " + upper, textStyle);
+				lower += 5;
+				upper += 5;
+				row++;
 			}
-		}
-		int i = 0;
-		row = 2;
-		for (int j : ageMaleGroup) {
-			reportWB.getSheet(isheet).setValue(2, row , j, textStyle);
-			row++;
-		}
-		row=2;
-		for (int j : ageFemaleGroup) {
-			reportWB.getSheet(isheet).setValue(3, row , j, textStyle);
-			row++;
-		}
 
+			int ageMaleGroup[] = new int[20];
+			int ageFemaleGroup[] = new int[20];
+
+			for (HH hh2 : uniqueHousehold) {
+				for (HouseholdMember hhm : hh2.getHousehold().getHouseholdMember()) {
+
+					if (hhm.getGender().equals(Sex.Male))
+						ageMaleGroup[(int) Math.ceil(hhm.getAge() / 5)]++;
+					else if (hhm.getGender().equals(Sex.Female))
+						ageFemaleGroup[(int) Math.ceil(hhm.getAge() / 5)]++;
+				}
+			}
+			int i = 0;
+			row = 2;
+			for (int j : ageMaleGroup) {
+				reportWB.getSheet(isheet).setValue(2, row, j, textStyle);
+				row++;
+			}
+			row = 2;
+			for (int j : ageFemaleGroup) {
+				reportWB.getSheet(isheet).setValue(3, row, j, textStyle);
+				row++;
+			}
+		} else { // Quantile
+			Double totMale = 0.0;
+			Double totFemale = 0.0;
+
+			reportWB.getSheet(isheet).setColumnWidths(1, 10, 20, 20, 20);
+			reportWB.getSheet(isheet).setValue(1, 1, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, 1, "Quantile %", textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, "Male%", textStyle);
+			reportWB.getSheet(isheet).setValue(4, row, "Female%", textStyle);
+
+			for (HH hh3 : uniqueHousehold) {
+
+				for (HouseholdMember hhm3 : hh3.getHousehold().getHouseholdMember()) {
+
+					if (hhm3.getGender().equals(Sex.Male)) {
+
+						totMale += 1.0;
+					} else if (hhm3.getGender().equals(Sex.Female)) {
+
+						totFemale += 1.0;
+					}
+				}
+
+			}
+
+			row = 2;
+			for (Quantile quantile : quantiles) {
+				reportWB.getSheet(isheet).setValue(1, row, quantile.getName(), textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, quantile.getPercentage(), textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, quantile.getPercentage() * totMale / 100.0, textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, quantile.getPercentage() * totFemale / 100.0, textStyle);
+				row++;
+			}
+
+		}
 
 	}
 
@@ -1064,18 +1282,42 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 	private void createAdultEquivalentreport(int isheet, Report report) {
 		int row = 1;
+		Double totAE = 0.0;
+
 		System.out.println("Adult Equivalent report");
-		reportWB.getSheet(isheet).setColumnWidths(1, 30, 20);
+		reportWB.getSheet(isheet).setColumnWidths(1, 30, 30);
 		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 		reportWB.getSheet(isheet).setValue(2, row, "Adult Daily Equivalent KCal", textStyle);
 
 		row = 3;
 
-		for (HH hh2 : uniqueHousehold) {
+		for (HH hh3 : uniqueHousehold) {
+			totAE += hh3.getHhAE();
+		}
 
-			reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
-			reportWB.getSheet(isheet).setValue(2, row, hh2.getHhAE(), textStyle);
-			row++;
+		if (!isQuantile) {
+			for (HH hh2 : uniqueHousehold) {
+				reportWB.getSheet(isheet).setColumnWidths(1, 30, 30);
+				reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, "Adult Daily Equivalent KCal", textStyle);
+
+				reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, hh2.getHhAE(), textStyle);
+				row++;
+			}
+		} else { // Quantiles
+
+			row = 2;
+			reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 30);
+			reportWB.getSheet(isheet).setValue(1, 1, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, 1, "Quantile %", textStyle);
+			reportWB.getSheet(isheet).setValue(3, 1, "Adult Daily Equivalent KCal", textStyle);
+			for (Quantile qq : quantiles) {
+				reportWB.getSheet(isheet).setValue(1, row, qq.getSequence(), textStyle);
+				reportWB.getSheet(isheet).setValue(2, row, qq.getPercentage(), textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, qq.getPercentage() / 100.0 * totAE, textStyle);
+				row++;
+			}
 		}
 	}
 
@@ -1151,7 +1393,10 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		Double empTot = 0.0;
 
 		/* What about food payments? for cash */
-
+		if (hh2.getHousehold().getEmployment().size() == 0) {
+			System.out.println("no employment income");
+			return (0.0);
+		}
 		try {
 			for (Employment emp : hh2.getHousehold().getEmployment()) {
 				if (type == "cash") {
@@ -1260,7 +1505,6 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 		Double transfersOP = 0.0;
 
 		Double requiredCalories = 0.0;
-		System.out.println("DI 11");
 
 		List<HH> thisHH = hh.stream().filter(d -> d.household == household).collect(Collectors.toList());
 
@@ -1374,8 +1618,6 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 					* defaultDietItem.getPercentage() / 100);
 		}
 
-		System.out.println(("DV = " + dietValue));
-
 		// Diet Amount Purchased DA = Shortfall / Diet Value in KGs
 		Double dietAmountPurchased = 0.0;
 
@@ -1415,7 +1657,8 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 
 			WHOEnergyRequirements whoEnergey = WHOEnergyRequirements.findByAge(age);
 
-			System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " + whoEnergey.getMale() + " " + gender);
+			// System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " +
+			// whoEnergey.getMale() + " " + gender);
 			if (gender == Sex.Female) {
 				totAE += whoEnergey.getFemale();
 			} else if (gender == Sex.Male) {
@@ -1460,6 +1703,29 @@ public class OIHMReports extends ViewBaseAction implements IForwardAction, JxlsC
 			setSheetStyle(sheet[i - 3]);
 
 			i++;
+		}
+		i++;
+		// Selected HH
+		if (isSelectedHouseholds) {
+			sheet[0].setValue(2, i, "Households in Report", textStyle);
+			i++;
+			for (HH hh2 : hhSelected) {
+				System.out.println("selected hh = " + hh2.getHhNumber());
+				sheet[0].setValue(2, i,
+						hh2.getHousehold().getHouseholdNumber() + " " + hh2.getHousehold().getHouseholdName(),
+						textStyle);
+				i++;
+			}
+		} else {
+			sheet[0].setValue(2, i, "Households in Report", textStyle);
+			i++;
+			for (HH hh2 : uniqueHousehold) {
+
+				sheet[0].setValue(2, i,
+						hh2.getHousehold().getHouseholdNumber() + " " + hh2.getHousehold().getHouseholdName(),
+						textStyle);
+				i++;
+			}
 		}
 
 	}

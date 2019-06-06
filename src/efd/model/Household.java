@@ -184,8 +184,8 @@ public class Household extends EFDIdentifiable {
 	private Status status;
 
 	
-	@ManyToMany(mappedBy="household",cascade=CascadeType.ALL)
-	private Collection <ReportSpecUse> reportSpecUse;
+//	@ManyToMany(mappedBy="household",cascade=CascadeType.ALL)
+//	private Collection <ReportSpecUse> reportSpecUse;
 	
 	
 	
@@ -195,13 +195,7 @@ public class Household extends EFDIdentifiable {
 	
 
 
-	public Collection<ReportSpecUse> getReportSpecUse() {
-		return reportSpecUse;
-	}
 
-	public void setReportSpecUse(Collection<ReportSpecUse> reportSpecUse) {
-		this.reportSpecUse = reportSpecUse;
-	}
 
 	public Status getStatus() {
 		return status;
