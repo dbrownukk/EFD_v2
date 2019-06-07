@@ -90,6 +90,7 @@ public class HouseholdMember extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
+	@Range(min = 0, max = 12)
 	private int monthsAway;
 
 	/*************************************************************************************************/

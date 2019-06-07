@@ -34,9 +34,11 @@ import efd.model.ConfigQuestion.*;
 		@View(name = "FromQuestionUse", members = "Study[#studyName,topic,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]") })
 
 
-//@Tabs({
-//@Tab(name="StudyInterview", properties = "studyName,referenceYear, household.householdName")
-//})
+@Tab(
+		 rowStyles=@RowStyle(style="row-highlight", property="type", value="steady"),
+		  defaultOrder="${studyName} asc"
+		)
+
 
 @Entity
 

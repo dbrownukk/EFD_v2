@@ -27,6 +27,7 @@
 
 package efd.actions;
 
+import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
@@ -57,6 +58,7 @@ import efd.model.WealthGroupInterview.*;
 public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsConstants {
 
 	static Double RC = 2200.0 * 365;
+	private static DecimalFormat df2 = new DecimalFormat("#.##");
 	static final int NUMBER_OF_REPORTS = 15;
 	private Study study = null;
 	// private CustomReportSpec customReportSpec = null;
@@ -203,6 +205,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			quantiles = (List<Quantile>) customReportSpec.getQuantile();
 			numberOfQuantiles = customReportSpec.getQuantile().size();
 		}
+
+		if (isQuantile && households.size() < 20)
+			addWarning("Quantiles being used on Study with less than 20 Households");
 
 		/******************************************************************************************************************************************/
 
@@ -754,6 +759,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 		if (isQuantile) {
+			errno = 107;
 			Double totSTOL = 0.0;
 
 			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30);
@@ -778,6 +784,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				row++;
 			}
 		} else {
+			errno = 108;
 			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30);
 			reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 			reportWB.getSheet(isheet).setValue(2, row, "Standard of Living Requirement", textStyle);
@@ -789,6 +796,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				row++;
 			}
 		}
+		errno = 109;
 	}
 
 	/******************************************************************************************************************************************/
@@ -796,18 +804,20 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	private void createIncomereport(int isheet, Report report, String type) {
 		int row = 1;
 		// String type = "food" or "cash"
-
+		errno = 2261;
+		System.out.println("in income report 226/7");
 		Double cropIncome = 0.0;
 		Double empIncome = 0.0;
 		Double lsIncome = 0.0;
 		Double trIncome = 0.0;
 		Double wfIncome = 0.0;
+		int col = 0;
 
 		String initType = StringUtils.capitalise(type);
-		
+
 		System.out.println("in  income report");
 		reportWB.getSheet(isheet).setColumnWidths(1, 25, 25, 25, 25, 25, 25, 25);
-
+		errno = 2262;
 		if (isQuantile) {
 			reportWB.getSheet(isheet).setValue(1, row, "Quantile", textStyle);
 			reportWB.getSheet(isheet).setValue(2, row, "Quantile %", textStyle);
@@ -816,29 +826,30 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 		}
 
-		reportWB.getSheet(isheet).setValue(2, row, "Crop "+initType+" Income", textStyle);
-		reportWB.getSheet(isheet).setValue(3, row, "Employment "+initType+" Income", textStyle);
-		reportWB.getSheet(isheet).setValue(4, row, "Livestock "+initType+" Income", textStyle);
-		reportWB.getSheet(isheet).setValue(5, row, "Transfer "+initType+" Income", textStyle);
-		reportWB.getSheet(isheet).setValue(6, row, "Wildfood "+initType+" Income", textStyle);
+		if (isQuantile)
+			col = 3;
+		else
+			col = 2;
 
-		row = 3;
+		reportWB.getSheet(isheet).setValue(col++, row, "Crop " + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row, "Employment " + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row, "Livestock " + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row, "Transfer " + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row, "Wildfood " + initType + " Income", textStyle);
+		errno = 2263;
+		row = 2;
 		System.out.println("in food income report done heading");
 
 		if (isQuantile) {
-
+			errno = 2264;
 			for (HH hh3 : uniqueHousehold) {
 				cropIncome += calcCropIncome(hh3, type);
-				System.out.println("about to do calcempincome");
 				empIncome += calcEmpIncome(hh3, type);
-				System.out.println("done calcempincome");
 				lsIncome += calcLSIncome(hh3, type);
 				trIncome += calcTransIncome(hh3, type);
 				wfIncome += calcWFIncome(hh3, type);
 
 			}
-
-			row++;
 
 			for (Quantile quantile : quantiles) {
 				reportWB.getSheet(isheet).setValue(1, row, quantile.getName(), textStyle);
@@ -851,7 +862,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				row++;
 			}
 		} else {
-
+			errno = 2265;
 			for (HH hh2 : uniqueHousehold) {
 
 				cropIncome = calcCropIncome(hh2, type);
@@ -867,8 +878,11 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
 				reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle);
 				row++;
+
 			}
 		}
+		errno = 2266;
+		System.out.println("completed income report 226/7");
 	}
 
 	/******************************************************************************************************************************************/
@@ -877,7 +891,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	 * @param report
 	 */
 	private void createLandAssetreport(int isheet, Report report) {
-		int row = 7;
+		int row = 5;
 		int col = 3;
 		Map<ResourceSubType, Double> landTot = new HashMap<>();
 
@@ -888,10 +902,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20, 20, 20, 20);
 		errno = 2271;
 		if (isQuantile) {
-			reportWB.getSheet(isheet).setValue(1, 6, "Quantile", textStyle);
-			reportWB.getSheet(isheet).setValue(2, 6, "Quantile %", textStyle);
+			reportWB.getSheet(isheet).setValue(1, 4, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, 4, "Quantile %", textStyle);
 		} else {
-			reportWB.getSheet(isheet).setValue(1, 6, "Household Number", textStyle);
+			reportWB.getSheet(isheet).setValue(1, 4, "Household Number", textStyle);
 		}
 		errno = 2272;
 		/* need to create matrix of hh id against land assets */
@@ -955,10 +969,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		for (HHSub hhl2 : uniqueLand) {
 
 			// Heading
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 3, "Asset Category", textStyle);
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 4, "Land", textStyle);
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 5, "Asset Type", textStyle);
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 6, hhl2.getAssetRST().getResourcetypename(),
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 1, "Asset Category", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 2, "Land", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 3, "Asset Type", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 4, hhl2.getAssetRST().getResourcetypename(),
 					textStyle);
 
 		}
@@ -1001,8 +1015,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	/******************************************************************************************************************************************/
 
 	private void createLivestockAssetreport(int isheet, Report report) {
-		int row = 7;
-		int col = 2;
+		int row = 5;
+		int col = 3;
 		Double hhSOLC = 0.0;
 		Map<ResourceSubType, Double> lsTot = new HashMap<>();
 
@@ -1010,14 +1024,14 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		ArrayList<HHSub> hhl = new ArrayList<>();
 
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20, 20, 20, 20);
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20);
 		errno = 2281;
 
 		if (isQuantile) {
-			reportWB.getSheet(isheet).setValue(1, 6, "Quantile", textStyle);
-			reportWB.getSheet(isheet).setValue(2, 6, "Quantile %", textStyle);
+			reportWB.getSheet(isheet).setValue(1, 4, "Quantile", textStyle);
+			reportWB.getSheet(isheet).setValue(2, 4, "Quantile %", textStyle);
 		} else {
-			reportWB.getSheet(isheet).setValue(1, 6, "Household Number", textStyle);
+			reportWB.getSheet(isheet).setValue(1, 4, "Household Number", textStyle);
 		}
 
 		errno = 2282;
@@ -1076,6 +1090,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 
 			col++;
+
 		}
 
 		errno = 2284;
@@ -1083,10 +1098,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		for (HHSub hhl2 : uniqueLS) {
 
 			// Heading
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 3, "Asset Category", textStyle);
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 4, "Livestock", textStyle);
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 5, "Asset Type", textStyle);
-			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 6, hhl2.getAssetRST().getResourcetypename(),
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 1, "Asset Category", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 2, "Livestock", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 3, "Asset Type", textStyle);
+			reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 4, hhl2.getAssetRST().getResourcetypename(),
 					textStyle);
 
 			// HH data
@@ -1134,7 +1149,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int col = 6;
 		errno = 2371;
 		System.out.println("In HHMember report 237");
-		reportWB.getSheet(isheet).setColumnWidths(1, 15, 10, 10, 10, 10, 10, 10, 30, 30, 30, 30, 30);
+		reportWB.getSheet(isheet).setColumnWidths(1, 15, 10, 10, 10, 10, 30, 30, 30, 30, 30, 30, 30);
 		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 		reportWB.getSheet(isheet).setValue(2, row, "Member", textStyle);
 		reportWB.getSheet(isheet).setValue(3, row, "Age", textStyle);
@@ -1161,7 +1176,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				col++;
 
 			}
-
+			break;
 		}
 		errno = 2373;
 		System.out.println("In HHMember report 2373");
@@ -1181,6 +1196,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				col = 6;
 				// Answers
 				for (ConfigAnswer configAnswer : hh3.getConfigAnswer()) {
+					reportWB.getSheet(isheet).setColumnWidths(col,35);
 					reportWB.getSheet(isheet).setValue(col, row, configAnswer.getAnswer(), textStyle);
 					col++;
 				}
@@ -1355,7 +1371,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				{
 					trTot += tr.getPeopleReceiving() * tr.getTimesReceived() * tr.getCashTransferAmount();
 				}
-			} else if (type == "food" && tr.getTransferType().equals(TransferType.Food)) {
+			} else if (type == "food" && tr.getTransferType().equals(TransferType.Food)
+					&& tr.getFoodResourceSubType() != null) {
 				trTot += tr.getUnitsConsumed() * tr.getFoodResourceSubType().getResourcesubtypekcal()
 						* tr.getPeopleReceiving() * tr.getTimesReceived();
 
@@ -1394,21 +1411,28 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		/* What about food payments? for cash */
 		if (hh2.getHousehold().getEmployment().size() == 0) {
-			System.out.println("no employment income");
+
 			return (0.0);
 		}
 		try {
+			System.out.println("type = " + type);
+
 			for (Employment emp : hh2.getHousehold().getEmployment()) {
 				if (type == "cash") {
+
 					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * emp.getCashPaymentAmount();
-				} else if (type == "food") {
+
+				} else if (type == "food" && emp.getFoodResourceSubType() != null) {
+
 					empTot += emp.getPeopleCount() * emp.getUnitsWorked()
 							* emp.getFoodResourceSubType().getResourcesubtypekcal();
-				}
+				} else
+					empTot = 0.0;
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			errno = 991;
 		}
 
 		return empTot;
@@ -1711,9 +1735,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			i++;
 			for (HH hh2 : hhSelected) {
 				System.out.println("selected hh = " + hh2.getHhNumber());
-				sheet[0].setValue(2, i,
-						hh2.getHousehold().getHouseholdNumber() + " " + hh2.getHousehold().getHouseholdName(),
-						textStyle);
+				sheet[0].setValue(2, i, hh2.getHousehold().getHouseholdNumber(), textStyle);
 				i++;
 			}
 		} else {
@@ -1721,9 +1743,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			i++;
 			for (HH hh2 : uniqueHousehold) {
 
-				sheet[0].setValue(2, i,
-						hh2.getHousehold().getHouseholdNumber() + " " + hh2.getHousehold().getHouseholdName(),
-						textStyle);
+				sheet[0].setValue(2, i, hh2.getHousehold().getHouseholdNumber(), textStyle);
 				i++;
 			}
 		}

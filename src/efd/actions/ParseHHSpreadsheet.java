@@ -29,6 +29,7 @@ import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
 import efd.model.WealthGroupInterview.*;
 
+import org.apache.commons.lang.*;
 import org.apache.commons.lang3.text.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.format.*;
@@ -162,7 +163,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		 * Wsheet(2, 3, 3, "Price Per Unit"));
 		 */
 
-		System.out.println("in xls parse ");
+		em("in xls parse ");
 
 		/*
 		 * does household and spreadsheet exist
@@ -212,7 +213,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		em("done get hhi");
 		/* Otherwise. delete assets from this Household */
 
-		System.out.println("in xls parse 2 ");
+		em("in xls parse 2 ");
 
 		String spreadsheetId = hhi.getSpreadsheet();
 
@@ -220,14 +221,14 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		// what schema?
 
-		// System.out.println("XP schema = "+XPersistence.getDefaultSchema());
+		// em("XP schema = "+XPersistence.getDefaultSchema());
 		String schema = XPersistence.getDefaultSchema();
-		System.out.println("schema = " + schema);
+		em("schema = " + schema);
 
 		try {
 			con = DataSourceConnectionProvider.getByComponent("Household").getConnection();
 
-			// System.out.println("schema con = "+con.getSchema().toString());
+			// em("schema con = "+con.getSchema().toString());
 			PreparedStatement ps;
 			if (schema != null) {
 				schema = schema + ".";
@@ -241,17 +242,18 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			rs.next();
 
 			InputStream input = rs.getBinaryStream("DATA"); /* get stream data as well */
-			System.out.println("done inputstream ");
+			em("done inputstream ");
 
 			/* Move to first row */
 
 			String spreadsheetPkey = rs.getString(1);
 
 			spreadsfile = find(spreadsheetPkey);
-			System.out.println("done attache file get");
+			em("done attache file get");
 			ps.close();
 
 			wb = WorkbookFactory.create(input);
+			wb.setMissingCellPolicy(MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
 		} catch (Exception ex) {
 			addError("Incomplete Spreadsheet data, correct spreadsheet and upload again", ex);
@@ -284,7 +286,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		// working for non embedded collections - use jdbc statement
 		// hhi.getConfigAnswer().removeAll(hhi.getConfigAnswer());
 
-		String hhid = hhi.getId();
+		
 
 		HouseholdMember hm = null;
 		for (HouseholdMember householdMember : hhi.getHouseholdMember()) {
@@ -305,7 +307,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		getView().findObject();
 
-		System.out.println("hhm tot now =" + hhi.getHouseholdMember().size());
+		em("hhm tot now =" + hhi.getHouseholdMember().size());
 
 		// hhi.getFoodPurchase().removeAll(hhi.getFoodPurchase());
 		// hhi.getNonFoodPurchase().removeAll(hhi.getNonFoodPurchase());
@@ -337,8 +339,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	}
 
 	private void em(String em) {
-		//System.out.println(em);
-		return;
+		System.out.println(em);
+		//return;
 
 	}
 
@@ -386,7 +388,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 	private void localMessage(String message) {
 		if (messaging == true) {
-			// System.out.println(message);
+			// em(message);
 			addMessage(message);
 		}
 	}
@@ -413,7 +415,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String studyName = hhi.getStudy().getStudyName() + " " + hhi.getStudy().getReferenceYear();
 		em("hhi studyName = " + studyName);
 
-		icell = sheet.getRow(3).getCell(2, Row.CREATE_NULL_AS_BLANK);
+		icell = sheet.getRow(3).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
 		em("first get = " + icell.getStringCellValue());
 
@@ -424,14 +426,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			return false;
 		}
 
-		// icell = sheet.getRow(5).getCell(2,
-		// Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+
 
 		
 		
 		
 		em("11");
-		String hhName = sheet.getRow(5).getCell(2, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+		String hhName = sheet.getRow(5).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 		
 		
 		
@@ -445,7 +446,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		if(icell.getCellType() == 0) // Date
 		{
 			em("set i date 22");
-			hhIDate =sheet.getRow(5).getCell(4,  Row.RETURN_NULL_AND_BLANK ).getDateCellValue();
+			hhIDate =sheet.getRow(5).getCell(4,  Row.MissingCellPolicy.CREATE_NULL_AS_BLANK ).getDateCellValue();
 			em("set i date 44");
 		}
 		else
@@ -457,7 +458,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		
 		
 		em("33");
-		String hhInterviewers = sheet.getRow(5).getCell(6, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+		String hhInterviewers = sheet.getRow(5).getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 		em("44");
 		if (hhName.isEmpty())
 			hhi.setHouseholdName(null);
@@ -519,7 +520,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		for (int i = 0; i < qsize; i++) {
 
 			try {
-				qcell = sheet.getRow(2 + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
+				qcell = sheet.getRow(2 + i).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
 			} catch (Exception ex) {
 				break;
@@ -532,7 +533,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			qa = new QandA();
 
-			acell = sheet.getRow(2 + i).getCell(2, Row.CREATE_NULL_AS_BLANK);
+			acell = sheet.getRow(2 + i).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
 			if (acell.getCellType() == Cell.CELL_TYPE_STRING) {
 
@@ -549,11 +550,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 			}
 
 			qa.setQuestion(qcell.getStringCellValue());
-			System.out.println("in loop 3");
+			em("in loop 3");
 			// if (qa.getAnswer().isEmpty()) { // answer is nullable so not needed
 			// qa.setAnswer("-");
 			// }
-			System.out.println("qanda = " + i + " " + qa.question + " " + qa.answer);
+			em("qanda = " + i + " " + qa.question + " " + qa.answer);
 			qand.add(qa);
 
 		}
@@ -608,6 +609,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String answerString = null;
 		String gender = null;
 		String head = null;
+		Integer age = 0;
+		Integer yob = 0;
 		String absent = null;
 		String absentReason = null;
 		int firstRow = 11;
@@ -653,14 +656,20 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				// hhm.setHouseholdMemberName(
 				// sheet.getRow(3).getCell(hhmcol).toString());
 				em("hhm  18 ");
-				gender = sheet.getRow(4).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
+				gender = sheet.getRow(4).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
 				em("hhm 19 ");
-				if (gender == "") {
+				age = (int) sheet.getRow(5).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue();
+				yob = ((int) (sheet.getRow(6).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+		
+				// Improve check for no more HH
+				if (gender == "" && age == 0 && yob == 0) {
 					em("no more members");
 					hhmcol = 23;
 					break;
 				}
 
+				gender = StringUtils.capitalize(gender); // now handles male/female as well as LOV Male/Female
+				
 				em("hhm 20 ");
 				if (gender.equals("Male")) {
 					hhm.setGender(Sex.Male);
@@ -670,12 +679,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					hhm.setGender(Sex.Unknown);
 				}
 
-				hhm.setAge((int) (sheet.getRow(5).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+				
+				em("age in read ss = "+age);
+				hhm.setAge(age);
 
 				// calculated
 
-				hhm.setYearOfBirth(
-						(int) (sheet.getRow(6).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+				hhm.setYearOfBirth(yob);
 
 				if (hhm.getYearOfBirth() == 0) {
 					// calc year
@@ -702,10 +712,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				absent = sheet.getRow(8).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (absent.equals("Yes")) {
-					System.out.println("absent Y = " + absent);
+					em("absent Y = " + absent);
 					hhm.setAbsent(YN.Yes);
 				} else if (absent.equals("No")) {
-					System.out.println("absent N = " + absent);
+					em("absent N = " + absent);
 					hhm.setAbsent(YN.No);
 				}
 
@@ -886,7 +896,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						irow = sheet.getRow(i + 3);
 
 						if (irow == null) {
-							System.out.println("No more data in this sheet " + k + " " + i);
+							em("No more data in this sheet " + k + " " + i);
 							numberRows[k] = i;
 							i = 100;
 							j = 100;
@@ -900,15 +910,15 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						/*
 						 * Used for testing if (k == EMPLOYMENT) {
 						 * 
-						 * System.out.println("read cell type = " + cell[k][i][j].getCellType() +
+						 * em("read cell type = " + cell[k][i][j].getCellType() +
 						 * "ijk= " + k + " " + i + " " + j);
 						 * 
 						 * if (cell[k][i][j].getCellType() == 0)
-						 * System.out.println("read cell number type = " +
+						 * em("read cell number type = " +
 						 * cell[k][i][j].getNumericCellValue());
 						 * 
 						 * if (cell[k][i][j].getCellType() == 1)
-						 * System.out.println("read cell string type = " +
+						 * em("read cell string type = " +
 						 * cell[k][i][j].getStringCellValue()); }
 						 * 
 						 * 
@@ -917,7 +927,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						// if first column is blank then no more data in this sheet
 
 						if (cell[k][i][0].getCellType() == 3) {
-							// System.out.println("In read No more data in this sheet " + k + " " + i);
+							// em("In read No more data in this sheet " + k + " " + i);
 							numberRows[k] = i; // re included DRB 19/11/2018
 							i = 100;
 							j = 100;
@@ -931,20 +941,20 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							// record numrows in each sheet
 							numberRows[k] = i;
-							System.out.println("in read numberrows = " + numberRows[k] + " " + k);
+							em("in read numberrows = " + numberRows[k] + " " + k);
 							i = 100;
 							break;
 						}
 					}
 				}
 			} catch (Exception ex) {
-				System.out.println("in catch for get cell i j k =  " + ex + i + j + k);
+				em("in catch for get cell i j k =  " + ex + i + j + k);
 				addError("Error in number of columns in Sheet = " + k + " " + i + " " + j + " " + k);
 
 			}
 		}
 
-		System.out.println("done worksheet detail ");
+		em("done worksheet detail ");
 
 	}
 
@@ -964,13 +974,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String unitEntered = null;
 
 		// for (int p = 0; p < 15; p++)
-		// System.out.println("numrows array p = " + p + " " + numberRows[p]);
+		// em("numrows array p = " + p + " " + numberRows[p]);
 
 		/*
 		 * Note that a cell matrix is used - populated in getWorkSheetDetail above
 		 * 
 		 * print cell array for (i = 1; i < 15; i++) { for (j = 0; j < 10; j++) { for (k
-		 * = 0; k < 10; k++) System.out.println("Cell at i j k = " + i + j + k + " " +
+		 * = 0; k < 10; k++) em("Cell at i j k = " + i + j + k + " " +
 		 * cell[i][j][k]); } }
 		 */
 
@@ -980,21 +990,21 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				.getResultList();
 
 		for (ResourceType type : rst3) {
-			System.out.println("rst3 = " + type.getResourcetypename());
+			em("rst3 = " + type.getResourcetypename());
 		}
 
 		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) {
-			// System.out.println("in rt setup loop " + ASSETLAND + " " + INPUTS + " " + i +
+			// em("in rt setup loop " + ASSETLAND + " " + INPUTS + " " + i +
 			// " "
 			// + ws.get(i - 3).resourceType.toString());
 			try {
 				String qry = "from ResourceType where ResourceTypeName = '" + ws.get(i - 3).resourceType.toString()
 						+ "'";
-				System.out.println("qry = " + qry);
+				em("qry = " + qry);
 				rtype[i] = (ResourceType) XPersistence.getManager().createQuery(
 						"from ResourceType where ResourceTypeName = '" + ws.get(i - 3).resourceType.toString() + "'")
 						.getSingleResult();
-				System.out.println("in get RT = " + rtype[i].getResourcetypename() + " " + i);
+				em("in get RT = " + rtype[i].getResourcetypename() + " " + i);
 
 			} catch (Exception ex) {
 				em("Exception in rst query " + ws.get(i - 3).resourceType + " " + ex);
@@ -1013,14 +1023,14 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				case ASSETLAND:
 					try {
 						al = new AssetLand();
-						System.out.println("in set assetLand cell = i =" + i);
+						em("in set assetLand cell = i =" + i);
 						al.setLandTypeEnteredName(cell[i][j][0].getStringCellValue());
 						al.setUnit(cell[i][j][1].getStringCellValue());
 						al.setNumberOfUnits(getCellDouble(cell[i][j][2]));
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							System.out.println("done al get = " + rst.getResourcetypename());
+							em("done al get = " + rst.getResourcetypename());
 
 							al.setResourceSubType(rst);
 							al.setStatus(efd.model.Asset.Status.Valid);
@@ -1053,7 +1063,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				case ASSETLIVESTOCK:
 					try {
 						als = new AssetLiveStock();
-						System.out.println("in set assetLivestock cell = i =" + i);
+						em("in set assetLivestock cell = i =" + i);
 						als.setLiveStockTypeEnteredName(cell[i][j][0].getStringCellValue());
 						als.setUnit(cell[i][j][1].getStringCellValue());
 
@@ -1062,7 +1072,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done als get = " + rst.getResourcetypename());
+							// em("done als get = " + rst.getResourcetypename());
 
 							als.setResourceSubType(rst);
 							als.setStatus(efd.model.Asset.Status.Valid);
@@ -1096,7 +1106,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done atrade get = " + rst.getResourcetypename());
+							// em("done atrade get = " + rst.getResourcetypename());
 
 							atrade.setResourceSubType(rst);
 							atrade.setStatus(efd.model.Asset.Status.Valid);
@@ -1122,7 +1132,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				case ASSETFOOD:
 					try {
 						afood = new AssetFoodStock();
-						// System.out.println("in set assetfoodstock cell = i =" + i);
+						// em("in set assetfoodstock cell = i =" + i);
 						warnMessage = "Food Type ";
 						afood.setFoodTypeEnteredName(cell[i][j][0].getStringCellValue());
 						warnMessage = "Unit";
@@ -1183,7 +1193,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				case ASSETTREE:
 					try {
 						atree = new AssetTree();
-						System.out.println("in set assettree cell = i =" + i);
+						em("in set assettree cell = i =" + i);
 						atree.setTreeTypeEnteredName(cell[i][j][0].getStringCellValue());
 						atree.setUnit(cell[i][j][1].getStringCellValue());
 						atree.setNumberOwned(getCellDouble(cell[i][j][2]));
@@ -1191,7 +1201,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done atree get = " + rst.getResourcetypename());
+							// em("done atree get = " + rst.getResourcetypename());
 
 							atree.setResourceSubType(rst);
 							atree.setStatus(efd.model.Asset.Status.Valid);
@@ -1217,7 +1227,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				case ASSETCASH:
 					try {
 						acash = new AssetCash();
-						System.out.println("in set assetcash cell = i =" + i);
+						em("in set assetcash cell = i =" + i);
 						warnMessage = "Currency";
 						acash.setCurrencyEnteredName(cell[i][j][0].getStringCellValue());
 						acash.setUnit("each"); // a default value - not used elsewhere
@@ -1229,13 +1239,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						for (icurr = 0; icurr < currency.size(); icurr++) {
 							if (currency.get(icurr).getCurrency().equals(cell[i][j][0].getStringCellValue())) {
-								System.out.println("cash 1 = " + currency.get(icurr).getCurrency());
-								System.out.println("cash 2 = " + cell[i][j][0].getStringCellValue());
+								em("cash 1 = " + currency.get(icurr).getCurrency());
+								em("cash 2 = " + cell[i][j][0].getStringCellValue());
 
 								// rst = checkSubType("Cash", rtype[i].getIdresourcetype().toString());
 								rst = checkSubType(cell[i][j][0].getStringCellValue(),
 										rtype[i].getIdresourcetype().toString());
-								System.out.println("in cash rst = " + rst);
+								em("in cash rst = " + rst);
 								acash.setStatus(efd.model.Asset.Status.Valid);
 								acash.setResourceSubType(rst);
 								break;
@@ -1258,7 +1268,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					}
 
 				case CROPS:
-					System.out.println("in CROPs");
+					em("in CROPs");
 					try {
 						acrop = new Crop();
 						warnMessage = "";
@@ -1286,10 +1296,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						warnMessage = "Percent Trade Market 3";
 						acrop.setPercentTradeMarket3(getCellDouble(cell[i][j][12]));
 
-						// System.out.println("in crop = " + cell[i][j][1].getStringCellValue());
+						// em("in crop = " + cell[i][j][1].getStringCellValue());
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done acrop get = " + rst.getResourcetypename());
+							// em("done acrop get = " + rst.getResourcetypename());
 
 							acrop.setResourceSubType(rst);
 							acrop.setStatus(efd.model.Asset.Status.Valid);
@@ -1317,7 +1327,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 					try {
 						alss = new LivestockSales();
-						System.out.println("in ls sales cell = i =" + i);
+						em("in ls sales cell = i =" + i);
 						alss.setLivestockType((cell[i][j][0].getStringCellValue()));
 						alss.setUnit(cell[i][j][1].getStringCellValue());
 
@@ -1335,11 +1345,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						alss.setMarket3(cell[i][j][9].getStringCellValue());
 						alss.setPercentTradeMarket3(getCellDouble(cell[i][j][10]));
 
-						// System.out.println("rtype = " + rtype[i].getIdresourcetype().toString());
+						// em("rtype = " + rtype[i].getIdresourcetype().toString());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done alss get = " + rst.getResourcetypename());
+							// em("done alss get = " + rst.getResourcetypename());
 
 							alss.setResourceSubType(rst);
 							alss.setStatus(efd.model.Asset.Status.Valid);
@@ -1388,11 +1398,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						alsp.setMarket3(cell[i][j][12].getStringCellValue());
 						alsp.setPercentTradeMarket3(getCellDouble(cell[i][j][13]));
 
-						System.out.println("about to do LSP checksubtype " + cell[i][j][0].getStringCellValue());
+						em("about to do LSP checksubtype " + cell[i][j][0].getStringCellValue());
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							System.out.println("done alsp get = " + rst.getResourcetypename());
+							em("done alsp get = " + rst.getResourcetypename());
 
 							alsp.setResourceSubType(rst);
 							alsp.setStatus(efd.model.Asset.Status.Valid);
@@ -1419,7 +1429,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					try {
 						aemp = new Employment();
 						int l = 0;
-						System.out.println("in emp  cell = i =" + i);
+						em("in emp  cell = i =" + i);
 						aemp.setEmploymentName((cell[i][j][l++].getStringCellValue()));
 						aemp.setPeopleCount(getCellDouble(cell[i][j][l++]));
 						aemp.setUnit((cell[i][j][l++].getStringCellValue()));
@@ -1428,24 +1438,24 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						aemp.setFoodPaymentFoodType((cell[i][j][l++].getStringCellValue()));
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
 						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
-						System.out.println("in emp  cell = i =" + i);
+						em("in emp  cell = i =" + i);
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation1(getCellDouble(cell[i][j][l++]));
 						aemp.setWorkLocation2(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation2(getCellDouble(cell[i][j][l++]));
 						aemp.setWorkLocation3(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation3(getCellDouble(cell[i][j][l++]));
-						System.out.println("in emp  cell = l =" + l);
+						em("in emp  cell = l =" + l);
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done emp get = " + rst.getResourcetypename());
-							System.out.println("in emp  status is valid 1");
+							// em("done emp get = " + rst.getResourcetypename());
+							em("in emp  status is valid 1");
 							aemp.setResourceSubType(rst);
 
 							aemp.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(aemp.getUnit(), rst))
 								aemp.setStatus(efd.model.Asset.Status.Invalid);
-							System.out.println("in emp  status is invalid 1");
+							em("in emp  status is invalid 1");
 						} else {
 
 							aemp.setStatus(efd.model.Asset.Status.Invalid);
@@ -1468,7 +1478,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								aemp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
-						System.out.println("in emp  33");
+						em("in emp  33");
 						hhi.getEmployment().add(aemp);
 						// getView().refreshCollections();
 						k = 100;
@@ -1478,7 +1488,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 					catch (Exception ex) {
 						addMessage("Problem parsing Employee worksheet");
-						System.out.println("Error in Emp = " + ex);
+						em("Error in Emp = " + ex);
 						k = 100;
 						break breaksheet;
 					}
@@ -1487,23 +1497,23 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						at = new Transfer();
 						int l = 0;
 
-						System.out.println("Official text = " + cell[i][j][l].getStringCellValue());
+						em("Official text = " + cell[i][j][l].getStringCellValue());
 
 						if (cell[i][j][l++].getStringCellValue().equals("Official"))
 							at.setIsOfficial(true);
 						else
 							at.setIsOfficial(false);
 
-						// System.out.println("Official boolean set to = "+at.getIsOfficial());
+						// em("Official boolean set to = "+at.getIsOfficial());
 
 						// Handle the enum
 
-						System.out.println("Transfer 000 j l " + j + " " + l);
+						em("Transfer 000 j l " + j + " " + l);
 
 						at.setSource(cell[i][j][l++].getStringCellValue());
 
 						String upperCaseTransferType = upperCaseFirst(cell[i][j][l].getStringCellValue());
-						System.out.println("Transfer 001 j l " + j + " " + l);
+						em("Transfer 001 j l " + j + " " + l);
 
 						if (upperCaseTransferType.equals("Cash"))
 							at.setTransferType(efd.model.Transfer.TransferType.Cash);
@@ -1512,14 +1522,14 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						if (upperCaseTransferType.equals("Food"))
 							at.setTransferType(efd.model.Transfer.TransferType.Food);
 						l++;
-						System.out.println("Transfer 00 2 j l " + j + " " + l);
+						em("Transfer 00 2 j l " + j + " " + l);
 
 						at.setPeopleReceiving(getCellDouble(cell[i][j][l++]));
 
 						at.setTimesReceived(getCellDouble(cell[i][j][l++]));
 						at.setCashTransferAmount(getCellDouble(cell[i][j][l++]));
 						at.setTransferFoodOtherType((cell[i][j][l++].getStringCellValue()));
-						System.out.println("Transfer 2222 j l " + j + " " + l);
+						em("Transfer 2222 j l " + j + " " + l);
 						at.setUnit(cell[i][j][l++].getStringCellValue());
 						if (at.getUnit().isEmpty())
 							at.setUnit("?"); // seem to have many examples where this is left blank..
@@ -1527,13 +1537,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						at.setUnitsTransferred(getCellDouble(cell[i][j][l++]));
 						at.setUnitsSold(getCellDouble(cell[i][j][l++]));
 						at.setPricePerUnit(getCellDouble(cell[i][j][l++]));
-						System.out.println("Transfer 3333 j l " + j + " " + l);
+						em("Transfer 3333 j l " + j + " " + l);
 						at.setOtherUse(getCellDouble(cell[i][j][l++]));
 						// at.setUnitsConsumed(getCellDouble(cell[i][j][l++]));
 						l++;
 						at.setMarket1(cell[i][j][l++].getStringCellValue());
 						at.setPercentTradeMarket1(getCellDouble(cell[i][j][l++]));
-						System.out.println("Transfer 4444  j l " + j + " " + l);
+						em("Transfer 4444  j l " + j + " " + l);
 						at.setMarket2(cell[i][j][l++].getStringCellValue());
 						at.setPercentTradeMarket2(getCellDouble(cell[i][j][l++]));
 
@@ -1562,7 +1572,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						 * 
 						 * Crops, Wild Food, Food Purchases, Livestock, Livestock Products
 						 */
-						System.out.println("Transfer 111 j l " + j + " " + l);
+						em("Transfer 111 j l " + j + " " + l);
 						if (!cell[i][j][6].getStringCellValue().isEmpty()) {
 							if (((rst = checkSubType(cell[i][j][6].getStringCellValue(),
 									rtype[CROPS].getIdresourcetype().toString())) != null)
@@ -1623,7 +1633,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							System.out.println("done wildfood get =  " + rst.getResourcetypename());
+							em("done wildfood get =  " + rst.getResourcetypename());
 
 							awf.setResourceSubType(rst);
 							awf.setStatus(efd.model.Asset.Status.Valid);
@@ -1679,11 +1689,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							if ((rst1 = checkSubType(cell[i][j][0].getStringCellValue(),
 									rtype[ASSETTRADEABLE].getIdresourcetype().toString())) != null) {
-								System.out.println("tradeable  found ");
+								em("tradeable  found ");
 								assetOK1 = true;
 								rst = rst1;
 							} else {
-								System.out.println("back in inputs rst not found ");
+								em("back in inputs rst not found ");
 							}
 
 							if ((rst2 = checkSubType(cell[i][j][0].getStringCellValue(),
@@ -1750,7 +1760,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			}
 		}
-		System.out.println("done set resource");
+		em("done set resource");
 	}
 
 	/**************************************************************************************************************************************************************************************************/
@@ -1801,7 +1811,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		// Change to use .isEmpty
 
-		System.out.println("in checkSubTypeEntered " + unitEntered + " " + rst.getResourcesubtypeunit());
+		em("in checkSubTypeEntered " + unitEntered + " " + rst.getResourcesubtypeunit());
 		if (unitEntered.isEmpty() || unitEntered.equals(null)) {
 			// empty thus invalid
 			return false;
@@ -1837,13 +1847,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		em("checksubtype rst = " + resourceType);
 
-		System.out.println("var 1 = " + var1);
-		System.out.println("var 2 = " + var2);
-		System.out.println("var 3 = " + var3);
+		em("var 1 = " + var1);
+		em("var 2 = " + var2);
+		em("var 3 = " + var3);
 
 		try {
 
-			System.out.println("in rst try 555");
+			em("in rst try 555");
 
 			rsty = (ResourceSubType) XPersistence.getManager()
 					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'" + "and ("
@@ -1851,11 +1861,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							+ "'" + ") ")
 					.setMaxResults(1).getSingleResult();
 
-			System.out.println("rsty = " + rsty.getResourcetypename());
+			em("rsty = " + rsty.getResourcetypename());
 
 			return (rsty);
 		} catch (Exception ex) {
-			System.out.println("Exception:rst not found rsty = " + rsty + " " + ex);
+			em("Exception:rst not found rsty = " + rsty + " " + ex);
 
 			return (rsty);
 		}
@@ -1876,10 +1886,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	 * 
 	 * // return RST that is not a synonym - just catch exception that the synonym
 	 * does // not exist catch (Exception ex) {
-	 * System.out.println("return cash rsty =  " + rsty.getResourcetypename());
+	 * em("return cash rsty =  " + rsty.getResourcetypename());
 	 * return rsty; }
 	 * 
-	 * // System.out.println("done rst get syn query in check sub type ");
+	 * // em("done rst get syn query in check sub type ");
 	 * 
 	 * // otherwise get the RST for the Synonym
 	 * 
@@ -1888,7 +1898,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	 * rsty.getResourcesubtypesynonym().getIdresourcesubtype().toString()); return
 	 * rstysyn; }
 	 *
-	 * catch (Exception ex) { System.out.println("Failed checkSubType " + ex);
+	 * catch (Exception ex) { em("Failed checkSubType " + ex);
 	 * return null; // no record found to match data entered
 	 * 
 	 * }
@@ -1942,16 +1952,16 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		Double d = 0.0;
 
 		if (acell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-			// System.out.println("in getDouble Number = "+acell.getNumericCellValue());
+			// em("in getDouble Number = "+acell.getNumericCellValue());
 			return acell.getNumericCellValue();
 		} else if (acell.getCellType() == 1) {
-			// System.out.println("in getDouble String = ");
+			// em("in getDouble String = ");
 			return Double.valueOf(d);
 		} else if (acell.getCellType() == Cell.CELL_TYPE_BLANK) {
-			// System.out.println("in getDouble Empty = "+Double.valueOf(d));
+			// em("in getDouble Empty = "+Double.valueOf(d));
 			return Double.valueOf(d);
 		}
-		// System.out.println("returning from getcelldouble "+d);
+		// em("returning from getcelldouble "+d);
 		return d;
 
 	}
@@ -1976,32 +1986,32 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		Double dtest;
 
 		try {
-			// System.out.println("check cell type = " + cname);
+			// em("check cell type = " + cname);
 			cell = sheet.getRow(y).getCell(x, Row.CREATE_NULL_AS_BLANK);
 
-			// System.out.println("77 cell type in check cell = " + cell.getCellType());
+			// em("77 cell type in check cell = " + cell.getCellType());
 			/*
-			 * System.out.println("Cell Type = "+cell.getCellType());
-			 * System.out.println("Cell Type Blank = "+cell.CELL_TYPE_BLANK);
-			 * System.out.println("Cell Type Bool = "+cell.CELL_TYPE_BOOLEAN);
-			 * System.out.println("Cell Type Formula = "+cell.CELL_TYPE_FORMULA);
-			 * System.out.println("Cell Type Numeric = "+cell.CELL_TYPE_NUMERIC);
-			 * System.out.println("Cell Type String = "+cell.CELL_TYPE_STRING);
+			 * em("Cell Type = "+cell.getCellType());
+			 * em("Cell Type Blank = "+cell.CELL_TYPE_BLANK);
+			 * em("Cell Type Bool = "+cell.CELL_TYPE_BOOLEAN);
+			 * em("Cell Type Formula = "+cell.CELL_TYPE_FORMULA);
+			 * em("Cell Type Numeric = "+cell.CELL_TYPE_NUMERIC);
+			 * em("Cell Type String = "+cell.CELL_TYPE_STRING);
 			 */
 
 			if (cell.getCellType() == 0) /* is a valid cell with String or Number and test the fetch */
 			{
-				// System.out.println("in cell type 0 check for numeric ");
+				// em("in cell type 0 check for numeric ");
 				try {
-					// System.out.println("in try ");
+					// em("in try ");
 					dtest = cell.getNumericCellValue();
-					// System.out.println("done try ");
+					// em("done try ");
 				} catch (Exception ex) {
 					{
 						if (!nullable) {
 							addError("Incomplete Spreadsheet data '" + cname + "' is empty ");
 							// You can throw any runtime exception here
-							System.out.println("caught in check cell");
+							em("caught in check cell");
 						}
 						return false;
 					}
@@ -2013,25 +2023,25 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					return false;
 				}
 			} else if (cell.getCellType() == 1) {
-				// System.out.println("in cell type 1 check for string null? " + nullable +
+				// em("in cell type 1 check for string null? " + nullable +
 				// cell.getStringCellValue());
 				try {
 					stest = cell.getStringCellValue();
 					if (stest.isEmpty() && nullable) {
-						// System.out.println("in cell type 1 check for string return false");
+						// em("in cell type 1 check for string return false");
 						return false;
 					}
 
 				} catch (Exception ex) {
 					if (nullable) /* empty is ok */
 					{
-						// System.out.println("nullable string return false");
+						// em("nullable string return false");
 						return false;
 					}
 					if (!nullable) {
 						addError("Incomplete Spreadsheet data '" + cname + "' is empty ");
 						// You can throw any runtime exception here
-						// System.out.println("caught in check cell");
+						// em("caught in check cell");
 					}
 					return false;
 
@@ -2050,7 +2060,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			}
 
-			// System.out.println("return true");
+			// em("return true");
 			localMessage(cname + " is correct");
 			return true;
 
@@ -2059,7 +2069,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		catch (Exception ex) {
 			addError("Incomplete Spreadsheet data '" + cname + "' Error - correct spreadsheet and upload again");
 			// You can throw any runtime exception here
-			// System.out.println("caught in check cell");
+			// em("caught in check cell");
 			return false;
 		}
 
