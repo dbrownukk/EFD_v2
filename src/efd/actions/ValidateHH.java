@@ -56,6 +56,8 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			return;
 		}
 
+		
+		
 		System.out.println("DONE hhi ");
 		/*************************************************************************************************/
 		/*
@@ -74,6 +76,10 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 		List<Transfer> tran = (List<Transfer>) hhi.getTransfer();
 		List<WildFood> wf = (List<WildFood>) hhi.getWildFood();
 		List<Inputs> ins = (List<Inputs>) hhi.getInputs();
+		
+		
+		Collection<HouseholdMember> householdMembers = hhi.getHouseholdMember();
+		
 		
 
 		System.out.println("DONE LISTS ");
@@ -184,6 +190,19 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 		}
 
+		
+		for (Iterator<HouseholdMember> iterator = householdMembers.iterator(); iterator.hasNext();) {
+			HouseholdMember householdMember = iterator.next();
+			
+			if(householdMember.getMonthsAway() >12)
+			{
+			addMessage("Household Member Months Away is greater than 12 - Valid values are between 0 and 12 ");
+			isinvalid = true;
+			break;
+			}
+		}
+		
+		
 		//System.out.println("DONE NFP ");
 		if (isinvalid)
 			addMessage("Validation Complete with Invalid Assets");

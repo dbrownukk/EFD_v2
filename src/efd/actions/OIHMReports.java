@@ -33,23 +33,20 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.*;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.util.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
-import org.openxava.model.*;
-import org.openxava.model.meta.*;
 import org.openxava.tab.*;
-import org.openxava.tab.impl.*;
 import org.openxava.util.jxls.*;
-import org.openxava.view.*;
 import org.openxava.web.servlets.*;
 
+import efd.actions.OIHMReports.*;
 import efd.model.*;
-import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
 import efd.model.StdOfLivingElement.*;
 import efd.model.Transfer.*;
@@ -62,13 +59,14 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	static final int NUMBER_OF_REPORTS = 15;
 	private Study study = null;
 	// private CustomReportSpec customReportSpec = null;
+
 	private List<Report> reportList;
-	private List<Household> households;
 	private List<Household> selectedHouseholds = new ArrayList<Household>();
 
 	private List<DefaultDietItem> defaultDietItems; // At Study not Household level
 	List<HH> uniqueHousehold;
 	List<Quantile> quantiles;
+
 	int numberOfQuantiles = 0;
 
 	JxlsSheet[] sheet = new JxlsSheet[NUMBER_OF_REPORTS];
@@ -76,6 +74,11 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	ArrayList<HH> hh = new ArrayList<>();
 	ArrayList<HH> hhSelected = new ArrayList<>();
+	ArrayList<QuantHousehold> quanthh = new ArrayList<>();
+	
+	List<HH> orderedQuantSeq = null;
+	Map<Integer, Double> quantAvg=null;
+	
 
 	private String forwardURI = null;
 
@@ -276,6 +279,96 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		uniqueHousehold.forEach(u -> {
 			System.out.println("hh in createdireport = " + u.hhNumber + " " + u.getHhDI());
 		});
+
+		// If QUantile then need to calc which quantile each unique HH is in
+		final int[] qpoint = new int[20];
+		if (isQuantile) {
+			// unique HH are in order of DI set in order of Disposable Income
+			int numberInQuantileDataset = uniqueHousehold.size();
+			System.out.println("number quants = " + numberInQuantileDataset);
+			// ith observation = q (n + 1)
+			// q = quantile % /100
+			// n = number of observations
+			// https://www.statisticshowto.datasciencecentral.com/quantile-definition-find-easy-steps/
+
+			boolean isFirstRun = true;
+			int currentPercentage = 0;
+			for (Quantile qq : quantiles) {
+
+				Double qVal = (double) ((qq.getPercentage()) * (1 + numberInQuantileDataset));
+
+				// qVal is the position at which the percentage is valid (round down to nearest
+				// int)
+				System.out.println("number quants = " + numberInQuantileDataset);
+				System.out.println(" drb total =  = " + qq.getPercentage() * (numberInQuantileDataset + 1) / 100);
+
+				currentPercentage += qq.getPercentage(); // get current + previous quantile percentage
+				qpoint[qq.getSequence()] += currentPercentage * (numberInQuantileDataset + 1) / 100;
+
+				System.out.println("qpoint = " + qq.getSequence() + " " + qpoint[qq.getSequence()]);
+
+				if (qq.getSequence() > 1)
+					isFirstRun = false;
+
+				for (HH unhh : uniqueHousehold) {
+					System.out.println("hh num + DI = " + unhh.getHhDI() + " " + unhh.getHhNumber());
+				}
+
+				int i = 1;
+				for (HH unhh : uniqueHousehold) {
+					if (isFirstRun) {
+
+						System.out.println("first run " + qq.getSequence() + " " + qpoint[qq.getSequence()]+" "+i);
+
+						if (i <= qpoint[qq.getSequence()]) {
+
+							System.out.println("setting in first run ");
+							QuantHousehold qqhh = new QuantHousehold();
+							qqhh.setHousehold(unhh.getHousehold());
+							qqhh.setQuantile(qq);
+							quanthh.add(qqhh);
+							unhh.setQuantSeq(qq.getSequence());
+						}
+					} else if (!isFirstRun) {
+						System.out.println("not first run " + qq.getSequence() + " " + qpoint[qq.getSequence()] + " "
+								+ qpoint[qq.getSequence() - 1]+" "+i);
+
+						if (i <= qpoint[qq.getSequence()] && i > qpoint[qq.getSequence() - 1]) {
+							System.out.println("setting in second +  run ");
+							QuantHousehold qqhh = new QuantHousehold();
+							qqhh.setHousehold(unhh.getHousehold());
+							qqhh.setQuantile(qq);
+							quanthh.add(qqhh);
+							unhh.setQuantSeq(qq.getSequence());
+
+						}
+
+					}
+					i++;
+				}
+
+			}
+		}
+
+		// sort the uhh list by quant seq
+
+		List<HH> orderedQuantSeq = uniqueHousehold.stream().sorted(Comparator.comparing(HH::getQuantSeq))
+				.collect(Collectors.toList());
+
+		Map<Integer, Double> result = orderedQuantSeq.stream()
+				.collect(Collectors.groupingBy(HH::getQuantSeq, TreeMap::new, Collectors.averagingDouble(HH::getHhDI)));
+
+		System.out.println("rr = " + result.toString());
+
+		Double tot = 0.0;
+		int currentSeq = 0;
+		for (HH uhh : orderedQuantSeq) {
+
+			{
+				System.out.println("uhh = " + uhh.getHousehold().getHouseholdNumber() + " " + uhh.getQuantSeq());
+			}
+
+		}
 
 	}
 
@@ -678,6 +771,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	private void createDIreport(int isheet, Report report) {
 
 		int row = 1;
+		int i = 0;
+		Double[] qval = new Double[20];
 
 		System.out.println("in 223 drb quantie = " + isQuantile);
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20);
@@ -691,23 +786,39 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20);
 			System.out.println("DI quantile ");
 
-			for (HH hh3 : uniqueHousehold) {
+			// for (HH hh3 : uniqueHousehold) {
 
-				totDI += hh3.getHhDI();
+			// totDI += hh3.getHhDI();
 
-			}
+			// }
+
+			// DI for a quantile is sum of DI for the HH in quantile - held in quanthh
+
+			orderedQuantSeq = uniqueHousehold.stream().sorted(Comparator.comparing(HH::getQuantSeq))
+					.collect(Collectors.toList());
+			
+			quantAvg = orderedQuantSeq.stream()
+					.collect(Collectors.groupingBy(HH::getQuantSeq, TreeMap::new, Collectors.averagingDouble(HH::getHhDI)));
+			
+		
 			reportWB.getSheet(isheet).setValue(1, row, "Quantile", textStyle);
 			reportWB.getSheet(isheet).setValue(2, row, "Quantile %", textStyle);
 			reportWB.getSheet(isheet).setValue(3, row, "Disposable Income", textStyle);
 			row++;
 
 			for (Quantile quantile : quantiles) {
-				Double quantileAmount = quantile.getPercentage() / 100.0 * totDI;
+				Double avg = quantAvg.get(quantile.getSequence());
+				
+				if (avg == null)
+					avg = 0.0;
+				avg = Double.parseDouble(df2.format(avg));
 				reportWB.getSheet(isheet).setValue(1, row, quantile.getName(), textStyle);
 				reportWB.getSheet(isheet).setValue(2, row, quantile.getPercentage(), textStyle);
-				reportWB.getSheet(isheet).setValue(3, row, quantileAmount, textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, avg, textStyle);
 				row++;
 			}
+
+			
 
 		} else {
 			reportWB.getSheet(isheet).setColumnWidths(1, 20, 20);
@@ -761,8 +872,17 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		if (isQuantile) {
 			errno = 107;
 			Double totSTOL = 0.0;
+			
+			
+			
+			List<HH>orderedQuantSOL = uniqueHousehold.stream().sorted(Comparator.comparing(HH::getQuantSeq))
+					.collect(Collectors.toList());
+			
+			Map<Integer, Double> quantAvgSOL = orderedQuantSOL.stream()
+					.collect(Collectors.groupingBy(HH::getQuantSeq, TreeMap::new, Collectors.averagingDouble(HH::getHhSOLC)));
+			
 
-			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30);
+			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30, 30);
 
 			List<HH> orderedHH = uniqueHousehold.stream().sorted(Comparator.comparing(HH::getHhSOLC))
 					.collect(Collectors.toList());
@@ -774,25 +894,39 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			reportWB.getSheet(isheet).setValue(1, row, "Quantile", textStyle);
 			reportWB.getSheet(isheet).setValue(2, row, "Quantile %", textStyle);
 			reportWB.getSheet(isheet).setValue(3, row, "Standard of Living Requirement", textStyle);
+			reportWB.getSheet(isheet).setValue(4, row, "Disposable Income", textStyle);
 			row++;
 
 			for (Quantile quantile : quantiles) {
+				Double avgDI = quantAvg.get(quantile.getSequence());
+				if (avgDI == null)
+					avgDI = 0.0;
+				avgDI = Double.parseDouble(df2.format(avgDI));
+				Double avgSOL = quantAvgSOL.get(quantile.getSequence());
+				if (avgSOL == null)
+					avgSOL = 0.0;
+				avgSOL = Double.parseDouble(df2.format(avgSOL));
+				
 				Double quantileAmount = quantile.getPercentage() / 100.0 * totSTOL;
 				reportWB.getSheet(isheet).setValue(1, row, quantile.getName(), textStyle);
 				reportWB.getSheet(isheet).setValue(2, row, quantile.getPercentage(), textStyle);
-				reportWB.getSheet(isheet).setValue(3, row, quantileAmount, textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, avgSOL, textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, avgDI, textStyle);
 				row++;
 			}
 		} else {
 			errno = 108;
-			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30);
+			reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30);
 			reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 			reportWB.getSheet(isheet).setValue(2, row, "Standard of Living Requirement", textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, "Disposable Income", textStyle);
 			row++;
 			for (HH hh2 : uniqueHousehold) {
 
 				reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
 				reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
+				reportWB.getSheet(isheet).setValue(3, row, hh2.getHhDI(), textStyle);
+
 				row++;
 			}
 		}
@@ -998,7 +1132,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				System.out.println("i and number quant = " + i + " " + numberOfQuantiles);
 
 				for (Quantile quantile : quantiles) {
-					System.out.println("print quant value row and i " + row + " " + i);
+					// System.out.println("print quant value row and i " + row + " " + i);
 					reportWB.getSheet(isheet).setValue(1, row + i, quantile.getName(), textStyle);
 					reportWB.getSheet(isheet).setValue(2, row + i, quantile.getPercentage(), textStyle);
 					reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row + i,
@@ -1126,7 +1260,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			} else {
 
 				for (Quantile quantile : quantiles) {
-					System.out.println("print quant value row and i " + row + " " + i);
+					// System.out.println("print quant value row and i " + row + " " + i);
 					reportWB.getSheet(isheet).setValue(1, row + i, quantile.getName(), textStyle);
 					reportWB.getSheet(isheet).setValue(2, row + i, quantile.getPercentage(), textStyle);
 					reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row + i,
@@ -1196,7 +1330,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				col = 6;
 				// Answers
 				for (ConfigAnswer configAnswer : hh3.getConfigAnswer()) {
-					reportWB.getSheet(isheet).setColumnWidths(col,35);
+					reportWB.getSheet(isheet).setColumnWidths(col, 35);
 					reportWB.getSheet(isheet).setValue(col, row, configAnswer.getAnswer(), textStyle);
 					col++;
 				}
@@ -1663,7 +1797,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		disposableIncome = totalIncome - costOfShortfall;
 
-		return (disposableIncome);
+		return Double.parseDouble(df2.format(disposableIncome));
+
 	}
 
 	/******************************************************************************************************************************************/
@@ -1692,7 +1827,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 		/* AE = TE / 2600 */
 		totAE = totAE / 2600;
-		return (totAE);
+
+		return Double.parseDouble(df2.format(totAE));
 	}
 
 	/******************************************************************************************************************************************/
@@ -1807,6 +1943,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	}
 
 	/******************************************************************************************************************************************/
+
 	/******************************************************************************************************************************************/
 
 	/*
@@ -1838,6 +1975,33 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		private LivestockSales livestocksales;
 		private Transfer transfer;
 		private WildFood wildfood;
+		private Quantile quantile;
+		private Double avgDI;
+		private int quantSeq;
+
+		public int getQuantSeq() {
+			return quantSeq;
+		}
+
+		public void setQuantSeq(int quantSeq) {
+			this.quantSeq = quantSeq;
+		}
+
+		public Double getAvgDI() {
+			return avgDI;
+		}
+
+		public void setAvgDI(Double avgDI) {
+			this.avgDI = avgDI;
+		}
+
+		public Quantile getQuantile() {
+			return quantile;
+		}
+
+		public void setQuantile(Quantile quantile) {
+			this.quantile = quantile;
+		}
 
 		public Double getHhAE() {
 			return hhAE;
@@ -2096,6 +2260,40 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		public void setColumn(int column) {
 			this.column = column;
+		}
+
+	}
+
+	public class QuantHousehold {
+
+		private Quantile quantile;
+
+		private Household household;
+
+		private Double averageDI;
+
+		public Double getAverageDI() {
+			return averageDI;
+		}
+
+		public void setAverageDI(Double averageDI) {
+			this.averageDI = averageDI;
+		}
+
+		public Quantile getQuantile() {
+			return quantile;
+		}
+
+		public void setQuantile(Quantile quantile) {
+			this.quantile = quantile;
+		}
+
+		public Household getHousehold() {
+			return household;
+		}
+
+		public void setHousehold(Household household) {
+			this.household = household;
 		}
 
 	}

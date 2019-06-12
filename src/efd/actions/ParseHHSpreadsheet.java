@@ -725,7 +725,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				}
 
 				hhm.setMonthsAway(
-						(int) (sheet.getRow(10).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+						(int) (sheet.getRow(10).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue()));
 				if (hhm.getMonthsAway() == 0) {
 					hhm.setAbsent(YN.No);
 				} else
