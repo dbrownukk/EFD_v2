@@ -32,7 +32,15 @@
 	</controller>
 
 
+	<controller name="CRSL">
+		<action name="search" class="efd.actions.CRSLSearch"
+			image="search.gif" />
+	</controller>
+
+
 	<controller name="GoOIHMReports">
+		<object name="status" class="java.lang.String"
+			value="Validated" />
 		<action name="Reports" class="efd.actions.GoOIHMReports"
 			mode="detail" icon="file-excel" />
 	</controller>
@@ -44,6 +52,7 @@
 	<controller name="OIHMReports">
 		<action name="Run" class="efd.actions.OIHMReports"
 			takes-long="true" />
+
 	</controller>
 
 
@@ -178,6 +187,7 @@
 
 
 	<controller name="Household">
+		<object name="status" class="java.lang.String" value="All" />
 		<extends controller="EFD_HM" />
 		<env-var name="XAVA_SEARCH_ACTION"
 			value="CRUD.searchByViewKey" />
@@ -187,6 +197,7 @@
 			class="efd.actions.ParseHHSpreadsheet" />
 		<action name="Validate" label="Validate" icon="marker-check"
 			mode="detail" in-each-row="false" class="efd.actions.ValidateHH" />
+
 
 	</controller>
 
@@ -228,23 +239,16 @@
 		</action>
 	</controller>
 
-	<controller name="ReportSpecUse">
-		<action name="new" hidden="false" label="New"
-			icon="library-plus" class="efd.actions.RSUnewmanytomany">
-		</action>
-		<action name="remove" hidden="false" label="Remove"
-			icon="delete" in-each-row="true"
-			class="efd.actions.RSUremovemanytomany">
-		</action>
-		<action name="edit" hidden="false" label="Edit" icon="pencil"
-			in-each-row="true" class="efd.actions.RSUeditmanytomany">
-		</action>
-		<action name="add" hidden="false" label="Add" icon="table-row-plus-after"
-			in-each-row="true" class="efd.actions.RSUaddhhmanytomany">
-		</action>
-
-	</controller>
-
+	<!-- <controller name="ReportSpecUse"> <extends controller="EFD_HM" /> <action 
+		name="add" hidden="false" label="Add" icon="table-row-plus-after" in-each-row="true" 
+		class="efd.actions.RSUaddhhmanytomany"> </action> </controller> -->
+	<!-- <action name="new" hidden="false" label="New" icon="library-plus" class="efd.actions.RSUnewmanytomany"> 
+		</action> <action name="remove" hidden="false" label="Remove" icon="delete" 
+		in-each-row="true" class="efd.actions.RSUremovemanytomany"> </action> <action 
+		name="edit" hidden="false" label="Edit" icon="pencil" in-each-row="true" 
+		class="efd.actions.RSUeditmanytomany"> </action> <action name="add" hidden="false" 
+		label="Add" icon="table-row-plus-after" in-each-row="true" class="efd.actions.RSUaddhhmanytomany"> 
+		</action> </controller> -->
 
 
 
@@ -436,6 +440,10 @@
 			icon="content-save" keystroke="Control S" />
 
 	</controller>
+
+
+
+
 
 
 </controllers>

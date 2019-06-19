@@ -62,6 +62,9 @@
 	</module>
 
 
+
+
+
 	<!-- <module name="StudyInterview"> <model name="Study" /> <view name="StudyInterview"/> 
 		<tab name="StudyInterview"/> <env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange" 
 		/> </module> -->
