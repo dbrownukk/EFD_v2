@@ -6,7 +6,14 @@ import javax.persistence.*;
 
 import org.openxava.annotations.*;
 
+import efd.action.*;
+
 @View(members = "customReportSpec,study")
+
+//@Tab(
+//properties="household.householdNumber",
+//baseCondition="${household.status} = 1"
+//)
 
 public class CustomReportSpecList {
 
@@ -21,7 +28,9 @@ public class CustomReportSpecList {
 	@NoCreate
 	@NoModify
 	// @DescriptionsList(descriptionProperties = "studyName,referenceYear")
+	@SearchAction("")
 	@ReferenceView("households")
+	
 	private Study study;
 
 	public Study getStudy() {

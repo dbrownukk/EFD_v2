@@ -18,8 +18,12 @@ import efd.validations.*;
 
 @Table(name = "Quantile",
 uniqueConstraints = {
-		@UniqueConstraint(name = "unique_quantile", columnNames = { "customReportSpec_id","name" }) })
+		@UniqueConstraint(name = "unique_quantile", columnNames = { "customReportSpec_id","name" }),
+		@UniqueConstraint(name ="unique_sequence",columnNames= {"customReportSpec_id","sequence"})
+		})
 
+
+@Tab(properties="name,sequence, percentage+")
 @Entity
 
 
@@ -28,10 +32,18 @@ public class Quantile extends Identifiable {
 	@PrePersist
 	public void calcNextSeq() throws Exception{
 		System.out.println("in prepersist for quantile ");
-		Query query = XPersistence.getManager().createQuery("select max(sequence) from Quantile where customReportSpec_id = :crsid");
+		Query query = XPersistence.getManager().createQuery("select count(*) from Quantile where customReportSpec_id = :crsid");
+		System.out.println("in prepersist for quantile  11");
 		query.setParameter("crsid",getCustomReportSpec().getId());
-		Integer lastNumber = (Integer) query.getSingleResult();
-		Integer nextNumber = lastNumber == null?1:lastNumber+1;
+		System.out.println("in prepersist for quantile 22");
+		long lastNumber = (Long) query.getSingleResult();
+		System.out.println("in prepersist for quantile 33");
+		System.out.println("in prepersist for quantile ");
+		Integer nextNumber;
+		if (lastNumber == 0)
+			nextNumber = 1;
+		else
+			nextNumber = (int) (lastNumber+1);
 		System.out.println("nextnumber = "+nextNumber);
 		setSequence(nextNumber);
 	}

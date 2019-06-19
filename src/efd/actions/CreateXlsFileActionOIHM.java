@@ -254,6 +254,11 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		CreationHelper createHelper = workbook.getCreationHelper();
 
 		datestyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+		datestyle.setBorderBottom(CellStyle.BORDER_THIN);
+		datestyle.setBorderTop(CellStyle.BORDER_THIN);
+		datestyle.setBorderRight(CellStyle.BORDER_THIN);
+		datestyle.setBorderLeft(CellStyle.BORDER_THIN);
+
 
 		// DataFormat format = workbook.createDataFormat();
 
@@ -527,6 +532,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 4, 4, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 5, 5, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 6, 6, style);
+		addLOV(sheet, transSheet, 3, numRows - 1, 7, 7, "FoodStocks");
 		addLOV(sheet, transSheet, 3, numRows - 1, 8, 8, "Unit");
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 9, 9, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 10, 10, style);
@@ -571,7 +577,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		// now hide validation sheet
 
-		workbook.setSheetHidden(workbook.getSheetIndex("Validations"), true);
+		//workbook.setSheetHidden(workbook.getSheetIndex("Validations"), true);
 
 		/* Return the spreadsheet */
 		em("printed ss ");
@@ -1425,12 +1431,13 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		sheet.setValue(4, 4, "Site: ", textStyle);
 		em("in printInterview 1");
-
-		String locationdistrict = getView().getValueString("site.locationdistrict");
+		
+		String locationdistrict = study.getSite().getSubdistrict();
+		//String locationdistrict = getView().getValueString("site.locationdistrict");
 		if (locationdistrict != null)
 			sheet.setValue(5, 4, locationdistrict, borderStyle);
 		else
-			sheet.setValue(5, 4, "", borderStyle);
+			sheet.setValue(5, 4, "unknown", borderStyle);
 
 		sheet.setValue(2, 6, "Household Name: ", textStyle);
 		sheet.setValue(3, 6, "", borderStyle);
@@ -1440,10 +1447,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		sheet.setValue(6, 4, "Study Start Date: ", textStyle);
 
+		sheet.setValue(7, 4, study.getStartDate(), borderStyle);
 		sheet.setValue(7, 4, study.getStartDate(), dateStyle);
+		
 
-		// sheet.setValue(6, 8, "Type of Year: ", textStyle);
-		// sheet.setValue(7, 8, "", borderStyle);
 
 		sheet.setValue(2, 10, "Spreadsheet Version " + currentVersion.getCurrentVersion());
 

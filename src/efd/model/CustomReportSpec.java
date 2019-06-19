@@ -32,6 +32,8 @@ public class CustomReportSpec extends Identifiable {
 	
 	private String specName;
 
+	@ListProperties("name,sequence, percentage+")
+	@AddAction("")
 	@OneToMany(mappedBy = "customReportSpec")
 	private Collection<Quantile> quantile;
 

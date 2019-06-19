@@ -134,6 +134,8 @@ public class Study extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	//@SearchListCondition(value="${status} = 4", forViews="households") 
+	// does not work
 	private Collection<Household> household;
 	/*************************************************************************************************/
 	// Assets

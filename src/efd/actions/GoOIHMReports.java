@@ -66,6 +66,7 @@ public class GoOIHMReports extends ViewBaseAction {
 		getView().setValue("study.id", studyid);
 		
 		
+		
 	}
 
 }

@@ -10,6 +10,7 @@ import org.openxava.calculators.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
 
+import efd.actions.*;
 import efd.model.WealthGroupInterview.*;
 import efd.validations.*;
 
@@ -18,6 +19,9 @@ import efd.validations.*;
 		+ ";Trees{assetTree};Cash{assetCash}};Crops{crop}"
 		+ ";LiveStockSales{livestockSales};LiveStockProducts{livestockProducts};Employment{employment}"
 		+ ";Transfer{transfer};WildFood{wildFood};Inputs{inputs}")
+
+//@Tab(filter=ValidHouseholds.class, properties = "study.studyName,study.referenceYear, householdNumber, householdName, status",
+//baseCondition="${status}=?")
 
 @Tab(properties = "study.studyName,study.referenceYear, householdNumber, householdName, status")
 

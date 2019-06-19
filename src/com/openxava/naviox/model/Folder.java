@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import org.apache.commons.logging.*;
 import org.openxava.annotations.*;
 import org.openxava.jpa.*;
 import org.openxava.model.*;
@@ -21,6 +22,8 @@ import org.openxava.validators.*;
 })
 @View(members="name, parent, icon; calculatedSubfolders; calculatedModules") 
 public class Folder extends Identifiable implements java.io.Serializable {
+	
+	private static Log log = LogFactory.getLog(Folder.class); 
 	
 	@Transient
 	private boolean creatingROOT = false; 
@@ -92,7 +95,13 @@ public class Folder extends Identifiable implements java.io.Serializable {
 	public static Folder findByName(String name) { 
  		Query query = XPersistence.getManager().createQuery("from Folder f where f.name = :name");
  		query.setParameter("name", name);
- 		return (Folder) query.getSingleResult();  		 				
+ 		List<Folder> folders = query.getResultList();
+ 		if (folders.isEmpty()) throw new NoResultException();
+ 		int count = folders.size();
+ 		if (count > 1) {
+ 			log.warn(XavaResources.getString("non_unique_folder_name", name, count), new NonUniqueResultException());
+ 		}
+ 		return folders.get(0);
 	}
 	
 	public static Folder getROOT() { 
@@ -187,7 +196,8 @@ public class Folder extends Identifiable implements java.io.Serializable {
 	@PreRemove
 	private void annulModulesReferences() {
 		// Because some database does not annul by default
-		for (Module m: getModules()) m.setFolder(null);
+		if (modules == null) return;
+		for (Module m: modules) m.setFolder(null);
 	}
 
 	public String getName() {
