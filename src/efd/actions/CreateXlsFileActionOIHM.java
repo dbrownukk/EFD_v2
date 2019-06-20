@@ -49,6 +49,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	String resub;
 	String rtunit;
 	String studyID;
+	int errno = 0;
 
 	List<ConfigQuestionUse> configQuestionUseHHC = null;
 	List<ConfigQuestionUse> configQuestionUseHHM = null;
@@ -75,7 +76,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
 
 		} catch (NullPointerException em) {
-			addError("Template failed to be created - Null ");
+			addError("Template failed to be created - Null "+errno+" ");
 		}
 
 	}
@@ -1409,6 +1410,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		 * 
 		 * Single row table CurrentVersion
 		 */
+		errno = 10001;
 		CurrentVersion currentVersion = (CurrentVersion) XPersistence.getManager().createQuery("from CurrentVersion")
 				.getSingleResult();
 
@@ -1431,14 +1433,17 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		sheet.setValue(4, 4, "Site: ", textStyle);
 		em("in printInterview 1");
-		
+		errno = 10004;
 		String locationdistrict = study.getSite().getSubdistrict();
+		errno = 10005;
 		//String locationdistrict = getView().getValueString("site.locationdistrict");
 		if (locationdistrict != null)
 			sheet.setValue(5, 4, locationdistrict, borderStyle);
 		else
 			sheet.setValue(5, 4, "unknown", borderStyle);
 
+		errno = 10006;
+		
 		sheet.setValue(2, 6, "Household Name: ", textStyle);
 		sheet.setValue(3, 6, "", borderStyle);
 
@@ -1453,7 +1458,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 
 		sheet.setValue(2, 10, "Spreadsheet Version " + currentVersion.getCurrentVersion());
-
+		errno = 10010;
 	}
 
 	/**************************************************************************************************************************************************/

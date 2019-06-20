@@ -187,7 +187,6 @@
 
 
 	<controller name="Household">
-		<object name="status" class="java.lang.String" value="All" />
 		<extends controller="EFD_HM" />
 		<env-var name="XAVA_SEARCH_ACTION"
 			value="CRUD.searchByViewKey" />

@@ -423,7 +423,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		{
 			addWarning("Spreadsheet is not for current Study . Spreadsheet Study Name + Reference Year = "
 					+ icell.getStringCellValue() + ", Study Project = " + studyName);
-			return false;
+			//return false;
 		}
 
 
@@ -614,6 +614,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String absent = null;
 		String absentReason = null;
 		int firstRow = 11;
+		
 
 		HouseholdMember hhm = null;
 
@@ -667,6 +668,18 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					hhmcol = 23;
 					break;
 				}
+				
+				
+				
+				if(yob == 0 && age == 0)
+				{
+					em("age and yob not entered");
+					addError("Parse Failed - Age and Year of Birth entered in spreadsheet for Household Member "+(hhmcol - 1));
+					return 23001;
+				}
+				
+				
+
 
 				gender = StringUtils.capitalize(gender); // now handles male/female as well as LOV Male/Female
 				
@@ -679,22 +692,37 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					hhm.setGender(Sex.Unknown);
 				}
 
-				
+				int thisYear = hhm.getHousehold().getStudy().getReferenceYear();
 				em("age in read ss = "+age);
+				em("yob in read ss = "+yob);
 				hhm.setAge(age);
 
 				// calculated
 
 				hhm.setYearOfBirth(yob);
+				//hhm.setYearOfBirth(thisYear - hhm.getAge());  // ignore entered YOB unless it is 0 or age is 0
 
-				if (hhm.getYearOfBirth() == 0) {
-					// calc year
 
-					int thisYear = hhm.getHousehold().getStudy().getReferenceYear();
-
-					hhm.setYearOfBirth(thisYear - hhm.getAge());
+				// Validate Age and YOB
+				if(age == null || age < 0 || age > 120 )
+				{
+					addError("Parse Failed - Age incorrect for Household Member "+(hhmcol - 1));
+					return 23002;
 				}
-
+				if(age == 0) // use YOB to calc Age
+				{
+					em("Age is 0, this year - yob"+thisYear+" "+hhm.getYearOfBirth() );
+					hhm.setAge(thisYear-hhm.getYearOfBirth());
+				}
+				
+				if(yob == 0)
+				{
+					em("YOB is 0, this year - yob"+thisYear+" "+hhm.getYearOfBirth() );
+					hhm.setYearOfBirth(thisYear-age);
+				}
+				
+				
+				
 				em("hh 23 ");
 				head = sheet.getRow(7).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (head.equals("Yes")) {
@@ -738,7 +766,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			} catch (Exception ex) {
 				addError("Parse Failed - Wrong template for Household Members " + ex);
-				return (23001);
+				return (23003);
 			}
 
 			/*

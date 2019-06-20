@@ -1479,12 +1479,13 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 		reportWB.getSheet(isheet).setValue(2, row, "Member", textStyle);
 		reportWB.getSheet(isheet).setValue(3, row, "Age", textStyle);
-		reportWB.getSheet(isheet).setValue(4, row, "Sex", textStyle);
-		reportWB.getSheet(isheet).setValue(5, row, "Head of Household", textStyle);
-		reportWB.getSheet(isheet).setValue(6, row, "Absent", textStyle);
-		reportWB.getSheet(isheet).setValue(7, row, "Reason for Absense", textStyle);
-		reportWB.getSheet(isheet).setValue(8, row, "Months Absent", textStyle);
-		reportWB.getSheet(isheet).setValue(9, row, "Notes", textStyle);
+		reportWB.getSheet(isheet).setValue(4, row, "Year of Birth", textStyle);
+		reportWB.getSheet(isheet).setValue(5, row, "Sex", textStyle);
+		reportWB.getSheet(isheet).setValue(6, row, "Head of Household", textStyle);
+		reportWB.getSheet(isheet).setValue(7, row, "Absent", textStyle);
+		reportWB.getSheet(isheet).setValue(8, row, "Reason for Absence", textStyle);
+		reportWB.getSheet(isheet).setValue(9, row, "Months Absent", textStyle);
+		reportWB.getSheet(isheet).setValue(10, row, "Notes", textStyle);
 
 		/* Need any extra questions/answers that are defined for this Study */
 		/*
@@ -1522,12 +1523,13 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				reportWB.getSheet(isheet).setValue(1, row, hh2.getHhNumber(), textStyle);
 				reportWB.getSheet(isheet).setValue(2, row, hh3.getHouseholdMemberNumber(), textStyle);
 				reportWB.getSheet(isheet).setValue(3, row, hh3.getAge(), textStyle);
-				reportWB.getSheet(isheet).setValue(4, row, hh3.getGender(), textStyle);
-				reportWB.getSheet(isheet).setValue(5, row, hh3.getHeadofHousehold(), textStyle);
-				reportWB.getSheet(isheet).setValue(6, row, hh3.getAbsent(), textStyle);
-				reportWB.getSheet(isheet).setValue(7, row, hh3.getReasonForAbsence(), textStyle);
-				reportWB.getSheet(isheet).setValue(8, row, hh3.getMonthsAway(), textStyle);
-				reportWB.getSheet(isheet).setValue(9, row, hh3.getNotes(), textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, hh3.getYearOfBirth(), textStyle);
+				reportWB.getSheet(isheet).setValue(5, row, hh3.getGender(), textStyle);
+				reportWB.getSheet(isheet).setValue(6, row, hh3.getHeadofHousehold(), textStyle);
+				reportWB.getSheet(isheet).setValue(7, row, hh3.getAbsent(), textStyle);
+				reportWB.getSheet(isheet).setValue(8, row, hh3.getReasonForAbsence(), textStyle);
+				reportWB.getSheet(isheet).setValue(9, row, hh3.getMonthsAway(), textStyle);
+				reportWB.getSheet(isheet).setValue(10, row, hh3.getNotes(), textStyle);
 				
 				
 				col = 10;

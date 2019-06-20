@@ -62,7 +62,7 @@ public class HouseholdMember extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	@Required
-	@Range(min = 1, max = 120)
+	@Range(min = 0, max = 120)
 	@OnChange(OnChangeAge.class)
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer age;
