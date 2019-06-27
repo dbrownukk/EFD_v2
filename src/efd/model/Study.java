@@ -137,6 +137,7 @@ public class Study extends EFDIdentifiable {
 	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	//@SearchListCondition(value="${status} = 4", forViews="households") 
 	// does not work
+	@OnSelectElementAction(value="Study.HHActionSelect",forViews="households")  
 	private Collection<Household> household;
 	/*************************************************************************************************/
 	// Assets

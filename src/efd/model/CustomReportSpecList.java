@@ -7,6 +7,7 @@ import javax.persistence.*;
 import org.openxava.annotations.*;
 
 import efd.action.*;
+import efd.validations.*;
 
 @View(members = "customReportSpec,study")
 
@@ -21,7 +22,7 @@ public class CustomReportSpecList {
 	@NoCreate
 	@NoModify
 	@DescriptionsList(descriptionProperties = "specName")
-
+	@OnChange(OnChangeCRSList.class)  //if crs has a restriction filter on HH then disable choice of HH 
 	private CustomReportSpec customReportSpec;
 
 	@ManyToOne
@@ -29,6 +30,7 @@ public class CustomReportSpecList {
 	@NoModify
 	// @DescriptionsList(descriptionProperties = "studyName,referenceYear")
 	@SearchAction("")
+	
 	@ReferenceView("households")
 	
 	private Study study;
