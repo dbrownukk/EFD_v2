@@ -47,15 +47,18 @@ public class CustomReportSpec extends Identifiable {
 
 	@ManyToMany
 	@NewAction("")
+	@Column(unique=true)
 	private Collection<ResourceType> resourceType;
 
 	@ManyToMany
 	@NewAction("")
 	@ListProperties("resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
+	@Column(unique=true)
 	private Collection<ResourceSubType> resourceSubType;
 
 	@ManyToMany
 	@NewAction("")
+	@Column(unique=true)
 	private Collection<Category> category;
 
 	//@OneToMany(mappedBy = "customReportSpec")
@@ -74,6 +77,7 @@ public class CustomReportSpec extends Identifiable {
 	@ManyToMany
 	@JoinTable(name = "HouseholdInclusionRule")
 	@NewAction("")
+	
 	@ListProperties("prompt,level,answerType")
 	private Collection<ConfigQuestion> configQuestion;
 	
@@ -81,6 +85,7 @@ public class CustomReportSpec extends Identifiable {
 	
 	@OneToMany(mappedBy = "customReportSpec")
 	@NewAction("")
+	@AddAction("CustomReportSpec.add") 
 	@CollectionView("fromCRS")
 	@SearchListCondition(value="${configQuestionUse.configQuestion.level} = 1")  // Household q and a only
 	@ListProperties("configQuestionUse.configQuestion.prompt,answer")

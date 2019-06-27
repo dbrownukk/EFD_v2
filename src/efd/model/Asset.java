@@ -17,6 +17,7 @@ public class Asset {
 
 	@Column(name = "Status", nullable = false)
 	@OnChange(OnChangeAssetStatus.class)
+	@DisplaySize(15)
 	private Status status;
 
 	public enum Status {

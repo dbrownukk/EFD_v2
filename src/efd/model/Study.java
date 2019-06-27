@@ -130,6 +130,7 @@ public class Study extends EFDIdentifiable {
 	// @NoFrame(forViews = "FromWGCommunity")
 	@ReferenceView("FromStudy")
 	@JoinColumn(name = "CLocation")
+	
 	private Site site;
 
 	/*************************************************************************************************/

@@ -86,8 +86,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	}
 
 	ArrayList<Wsheet> ws = new ArrayList<>();
-	
-	
+
 	/* Cells to hold all spreadsheet values */
 	/* Sheet / Row / Col */
 
@@ -286,8 +285,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		// working for non embedded collections - use jdbc statement
 		// hhi.getConfigAnswer().removeAll(hhi.getConfigAnswer());
 
-		
-
 		HouseholdMember hm = null;
 		for (HouseholdMember householdMember : hhi.getHouseholdMember()) {
 			hm = XPersistence.getManager().find(HouseholdMember.class, householdMember.getId());
@@ -340,7 +337,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 	private void em(String em) {
 		System.out.println(em);
-		//return;
+		// return;
 
 	}
 
@@ -423,42 +420,29 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		{
 			addWarning("Spreadsheet is not for current Study . Spreadsheet Study Name + Reference Year = "
 					+ icell.getStringCellValue() + ", Study Project = " + studyName);
-			//return false;
+			// return false;
 		}
 
-
-
-		
-		
-		
 		em("11");
 		String hhName = sheet.getRow(5).getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
-		
-		
-		
-		
-		
-		em("22 ct = "+sheet.getRow(5).getCell(4).getCellType());
-		
-		
+
+		em("22 ct = " + sheet.getRow(5).getCell(4).getCellType());
+
 		icell = sheet.getRow(5).getCell(4);
-		em("get icell type = "+icell.getCellType());
-		if(icell.getCellType() == 0) // Date
+		em("get icell type = " + icell.getCellType());
+		if (icell.getCellType() == 0) // Date
 		{
 			em("set i date 22");
-			hhIDate =sheet.getRow(5).getCell(4,  Row.MissingCellPolicy.CREATE_NULL_AS_BLANK ).getDateCellValue();
+			hhIDate = sheet.getRow(5).getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getDateCellValue();
 			em("set i date 44");
-		}
-		else
-		{
+		} else {
 			addError("Interview Date is empty and required");
-			return(false);
+			return (false);
 		}
-		
-		
-		
+
 		em("33");
-		String hhInterviewers = sheet.getRow(5).getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+		String hhInterviewers = sheet.getRow(5).getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
+				.getStringCellValue();
 		em("44");
 		if (hhName.isEmpty())
 			hhi.setHouseholdName(null);
@@ -470,8 +454,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		hhi.setInterviewers(hhInterviewers);
 
 		em(" end getInterviewDetails ");
-		return(true);
-		
+		return (true);
+
 	}
 
 	/**************************************************************************************************************************************************************************************************/
@@ -614,7 +598,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String absent = null;
 		String absentReason = null;
 		int firstRow = 11;
-		
 
 		HouseholdMember hhm = null;
 
@@ -657,32 +640,30 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				// hhm.setHouseholdMemberName(
 				// sheet.getRow(3).getCell(hhmcol).toString());
 				em("hhm  18 ");
-				gender = sheet.getRow(4).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getStringCellValue();
+				gender = sheet.getRow(4).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
+						.getStringCellValue();
 				em("hhm 19 ");
-				age = (int) sheet.getRow(5).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue();
-				yob = ((int) (sheet.getRow(6).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue()));
-		
+				age = (int) sheet.getRow(5).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
+						.getNumericCellValue();
+				yob = ((int) (sheet.getRow(6).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
+						.getNumericCellValue()));
+
 				// Improve check for no more HH
 				if (gender == "" && age == 0 && yob == 0) {
 					em("no more members");
 					hhmcol = 23;
 					break;
 				}
-				
-				
-				
-				if(yob == 0 && age == 0)
-				{
+
+				if (yob == 0 && age == 0) {
 					em("age and yob not entered");
-					addError("Parse Failed - Age and Year of Birth entered in spreadsheet for Household Member "+(hhmcol - 1));
+					addError("Parse Failed - Age and Year of Birth entered in spreadsheet for Household Member "
+							+ (hhmcol - 1));
 					return 23001;
 				}
-				
-				
-
 
 				gender = StringUtils.capitalize(gender); // now handles male/female as well as LOV Male/Female
-				
+
 				em("hhm 20 ");
 				if (gender.equals("Male")) {
 					hhm.setGender(Sex.Male);
@@ -693,36 +674,32 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				}
 
 				int thisYear = hhm.getHousehold().getStudy().getReferenceYear();
-				em("age in read ss = "+age);
-				em("yob in read ss = "+yob);
+				em("age in read ss = " + age);
+				em("yob in read ss = " + yob);
 				hhm.setAge(age);
 
 				// calculated
 
 				hhm.setYearOfBirth(yob);
-				//hhm.setYearOfBirth(thisYear - hhm.getAge());  // ignore entered YOB unless it is 0 or age is 0
-
+				// hhm.setYearOfBirth(thisYear - hhm.getAge()); // ignore entered YOB unless it
+				// is 0 or age is 0
 
 				// Validate Age and YOB
-				if(age == null || age < 0 || age > 120 )
-				{
-					addError("Parse Failed - Age incorrect for Household Member "+(hhmcol - 1));
+				if (age == null || age < 0 || age > 120) {
+					addError("Parse Failed - Age incorrect for Household Member " + (hhmcol - 1));
 					return 23002;
 				}
-				if(age == 0) // use YOB to calc Age
+				if (age == 0) // use YOB to calc Age
 				{
-					em("Age is 0, this year - yob"+thisYear+" "+hhm.getYearOfBirth() );
-					hhm.setAge(thisYear-hhm.getYearOfBirth());
+					em("Age is 0, this year - yob" + thisYear + " " + hhm.getYearOfBirth());
+					hhm.setAge(thisYear - hhm.getYearOfBirth());
 				}
-				
-				if(yob == 0)
-				{
-					em("YOB is 0, this year - yob"+thisYear+" "+hhm.getYearOfBirth() );
-					hhm.setYearOfBirth(thisYear-age);
+
+				if (yob == 0) {
+					em("YOB is 0, this year - yob" + thisYear + " " + hhm.getYearOfBirth());
+					hhm.setYearOfBirth(thisYear - age);
 				}
-				
-				
-				
+
 				em("hh 23 ");
 				head = sheet.getRow(7).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (head.equals("Yes")) {
@@ -752,8 +729,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					hhm.setReasonForAbsence(absentReason);
 				}
 
-				hhm.setMonthsAway(
-						(int) (sheet.getRow(10).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).getNumericCellValue()));
+				hhm.setMonthsAway((int) (sheet.getRow(10).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
+						.getNumericCellValue()));
 				if (hhm.getMonthsAway() == 0) {
 					hhm.setAbsent(YN.No);
 				} else
@@ -935,22 +912,18 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						cell[k][i][j] = sheet.getRow(i + 3).getCell((j + 1), Row.CREATE_NULL_AS_BLANK);
 
-						/*
-						 * Used for testing if (k == EMPLOYMENT) {
-						 * 
-						 * em("read cell type = " + cell[k][i][j].getCellType() +
-						 * "ijk= " + k + " " + i + " " + j);
-						 * 
-						 * if (cell[k][i][j].getCellType() == 0)
-						 * em("read cell number type = " +
-						 * cell[k][i][j].getNumericCellValue());
-						 * 
-						 * if (cell[k][i][j].getCellType() == 1)
-						 * em("read cell string type = " +
-						 * cell[k][i][j].getStringCellValue()); }
-						 * 
-						 * 
-						 */
+						// Used for testing
+
+						if (k == LIVESTOCKPRODUCT) {
+
+							em("LIVESTOCKPRODUCT read cell type = " + cell[k][i][j].getCellType() + "ijk= " + k + " " + i + " " + j);
+
+							if (cell[k][i][j].getCellType() == 0)
+								em("read cell number type = " + cell[k][i][j].getNumericCellValue());
+
+							if (cell[k][i][j].getCellType() == 1)
+								em("read cell string type = " + cell[k][i][j].getStringCellValue());
+						}
 
 						// if first column is blank then no more data in this sheet
 
@@ -1008,8 +981,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		 * Note that a cell matrix is used - populated in getWorkSheetDetail above
 		 * 
 		 * print cell array for (i = 1; i < 15; i++) { for (j = 0; j < 10; j++) { for (k
-		 * = 0; k < 10; k++) em("Cell at i j k = " + i + j + k + " " +
-		 * cell[i][j][k]); } }
+		 * = 0; k < 10; k++) em("Cell at i j k = " + i + j + k + " " + cell[i][j][k]); }
+		 * }
 		 */
 
 		/* set validation rtypes array */
@@ -1428,7 +1401,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						em("about to do LSP checksubtype " + cell[i][j][0].getStringCellValue());
 
-						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
+						if ((rst = checkSubType(alsp.getLivestockType()+" "+alsp.getLivestockProduct(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
 							em("done alsp get = " + rst.getResourcetypename());
 
@@ -1839,6 +1812,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		// Change to use .isEmpty
 
+		em("DRB RT = " + rst.getResourcetype().getResourcetypename());
+		em("DRB RST = " + rst.getResourcetypename());
 		em("in checkSubTypeEntered " + unitEntered + " " + rst.getResourcesubtypeunit());
 		if (unitEntered.isEmpty() || unitEntered.equals(null)) {
 			// empty thus invalid
@@ -1849,7 +1824,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		unitEntered = stripS(unitEntered);
 
-		if (unitRst.equals(unitEntered)) {
+		if (unitRst.toLowerCase().equals(unitEntered.toLowerCase())) {
 
 			return (true);
 		}
@@ -1879,6 +1854,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		em("var 2 = " + var2);
 		em("var 3 = " + var3);
 
+		
 		try {
 
 			em("in rst try 555");
@@ -1913,9 +1889,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	 * }
 	 * 
 	 * // return RST that is not a synonym - just catch exception that the synonym
-	 * does // not exist catch (Exception ex) {
-	 * em("return cash rsty =  " + rsty.getResourcetypename());
-	 * return rsty; }
+	 * does // not exist catch (Exception ex) { em("return cash rsty =  " +
+	 * rsty.getResourcetypename()); return rsty; }
 	 * 
 	 * // em("done rst get syn query in check sub type ");
 	 * 
@@ -1926,8 +1901,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	 * rsty.getResourcesubtypesynonym().getIdresourcesubtype().toString()); return
 	 * rstysyn; }
 	 *
-	 * catch (Exception ex) { em("Failed checkSubType " + ex);
-	 * return null; // no record found to match data entered
+	 * catch (Exception ex) { em("Failed checkSubType " + ex); return null; // no
+	 * record found to match data entered
 	 * 
 	 * }
 	 */

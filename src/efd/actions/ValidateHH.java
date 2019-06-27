@@ -56,8 +56,6 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			return;
 		}
 
-		
-		
 		System.out.println("DONE hhi ");
 		/*************************************************************************************************/
 		/*
@@ -76,23 +74,20 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 		List<Transfer> tran = (List<Transfer>) hhi.getTransfer();
 		List<WildFood> wf = (List<WildFood>) hhi.getWildFood();
 		List<Inputs> ins = (List<Inputs>) hhi.getInputs();
-		
-		
+
 		Collection<HouseholdMember> householdMembers = hhi.getHouseholdMember();
-		
-		
 
 		System.out.println("DONE LISTS ");
-		
+
 		for (i = 0; i < al.size(); i++) {
 			if (!al.get(i).getStatus().equals(Status.Valid)) {
-				
+
 				addMessage("Land Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
 		}
-		//System.out.println("DONE LAND ");
+		// System.out.println("DONE LAND ");
 		for (i = 0; i < als.size(); i++) {
 
 			if (!als.get(i).getStatus().toString().equals("Valid")) {
@@ -101,16 +96,16 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		//System.out.println("DONE LS ");
+		// System.out.println("DONE LS ");
 		for (i = 0; i < at.size(); i++) {
-	
+
 			if (!at.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Tradeable Assets still Invalid or Unchecked");
 				isinvalid = true;
 				break;
 			}
 		}
-		//System.out.println("DONE Trade ");
+		// System.out.println("DONE Trade ");
 		for (i = 0; i < afs.size(); i++) {
 			if (!afs.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Food Stock Assets still Invalid or Unchecked ");
@@ -118,7 +113,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		//System.out.println("DONE FS ");
+		// System.out.println("DONE FS ");
 		for (i = 0; i < atree.size(); i++) {
 			if (!atree.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Tree Assets still Invalid or Unchecked ");
@@ -126,7 +121,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		//System.out.println("DONE TREE ");
+		// System.out.println("DONE TREE ");
 		for (i = 0; i < ac.size(); i++) {
 			if (!ac.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Cash Assets still Invalid or Unchecked ");
@@ -134,8 +129,8 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		//System.out.println("DONE CASH ");
-		
+		// System.out.println("DONE CASH ");
+
 		for (i = 0; i < crop.size(); i++) {
 			if (!crop.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Crop Assets still Invalid or Unchecked ");
@@ -150,7 +145,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		
+
 		for (i = 0; i < lsp.size(); i++) {
 			if (!lsp.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Livestock Products still Invalid or Unchecked ");
@@ -165,7 +160,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		
+
 		for (i = 0; i < tran.size(); i++) {
 			if (!tran.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Transfers still Invalid or Unchecked");
@@ -173,7 +168,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		//System.out.println("DONE TRANS ");
+		// System.out.println("DONE TRANS ");
 		for (i = 0; i < wf.size(); i++) {
 			if (!wf.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Wild Food still Invalid or Unchecked ");
@@ -181,7 +176,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			}
 		}
-		//System.out.println("DONE WF ");
+		// System.out.println("DONE WF ");
 		for (i = 0; i < ins.size(); i++) {
 			if (!ins.get(i).getStatus().toString().equals("Valid")) {
 				addMessage("Inputs still Invalid or Unchecked ");
@@ -190,35 +185,28 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 		}
 
-		
 		for (Iterator<HouseholdMember> iterator = householdMembers.iterator(); iterator.hasNext();) {
 			HouseholdMember householdMember = iterator.next();
-			
-			if(householdMember.getMonthsAway() >12)
-			{
-			addMessage("Household Member Months Away is greater than 12 - Valid values are between 0 and 12 ");
-			isinvalid = true;
-			break;
+
+			if (householdMember.getMonthsAway() > 12) {
+				addMessage("Household Member Months Away is greater than 12 - Valid values are between 0 and 12 ");
+				isinvalid = true;
+				break;
 			}
-			if(householdMember.getAge()+)
-			
-			
+
+			// System.out.println("DONE NFP ");
+			if (isinvalid)
+				addMessage("Validation Complete with Invalid Assets");
+			else {
+				hhi.setStatus(WealthGroupInterview.Status.Validated);
+				getView().setEditable(false);
+				addActions("SetEditable.SetEditableHH");
+				getView().refresh();
+				addMessage("Validation Complete");
+			}
+
 			
 		}
-		
-		
-		//System.out.println("DONE NFP ");
-		if (isinvalid)
-			addMessage("Validation Complete with Invalid Assets");
-		else 
-		{
-			hhi.setStatus(WealthGroupInterview.Status.Validated);	
-			getView().setEditable(false);
-			addActions("SetEditable.SetEditableHH");
-			getView().refresh();
-			addMessage("Validation Complete");
-		}
-		
 		return;
 	}
 

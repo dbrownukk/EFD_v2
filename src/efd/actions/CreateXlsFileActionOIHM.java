@@ -10,6 +10,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import org.apache.commons.lang.*;
 import org.apache.poi.hssf.record.CFRuleRecord.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
@@ -61,7 +62,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 	public void execute() throws Exception {
 
-		em("in xls gen ");
+		em("in xls generate ");
 
 		try {
 
@@ -76,7 +77,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis()); // 3
 
 		} catch (NullPointerException em) {
-			addError("Template failed to be created - Null "+errno+" ");
+			addError("Template failed to be created " + errno + " ");
 		}
 
 	}
@@ -124,12 +125,18 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		/*
 		 * There may not be a Site or LZ
 		 */
-
 		Site site = null;
-		if (!getView().getValueString("locationdistrict").isEmpty()) {
+		
+		System.out.println(" on gen temp ss site = "+getView().getValueString("site.locationdistrict"));
+		
+		if (getView().getValueString("site.locationdistrict").isEmpty()) {
+			addError("Enter Site details before creating Template Spreadsheet");
+			return(null);
+		} else {
 			site = XPersistence.getManager().find(Site.class, study.getSite().getLocationid());
 
 		}
+
 		Project project = XPersistence.getManager().find(Project.class, study.getProjectlz().getProjectid());
 
 		/******************
@@ -260,7 +267,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		datestyle.setBorderRight(CellStyle.BORDER_THIN);
 		datestyle.setBorderLeft(CellStyle.BORDER_THIN);
 
-
 		// DataFormat format = workbook.createDataFormat();
 
 		style.setDataFormat(HSSFDataFormat.getBuiltinFormat("2"));
@@ -323,7 +329,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		 */
 		Level level = null;
 		AnswerType answerType = null;
-		int hhrow = 3;
+		int hhrow = 2;
 		for (i = 0; i < configQuestionUseHHC.size(); i++) {
 			// em("HH Validation build for question
 			// "+configQuestionUseHHC.get(i).getConfigQuestion().getPrompt());
@@ -405,10 +411,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 					&& (level.equals(Level.HouseholdMember))) {
 				Integer intRangeLower = configQuestionUseHHM.get(i).getConfigQuestion().getIntRangeLower();
 				Integer intRangeUpper = configQuestionUseHHM.get(i).getConfigQuestion().getIntRangeUpper();
-			
+
 				addIntegerRangeValidation(workbook, sheet, hhmSheet, qStartRow, qStartRow, 2, numMembers, style,
 						intRangeLower, intRangeUpper);
-			
+
 				qStartRow++;
 			} else if (answerType.equals(ConfigQuestion.AnswerType.DecimalRange)
 					&& (level.equals(Level.HouseholdMember))) {
@@ -418,28 +424,24 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 						decRangeLower, decRangeUpper);
 				qStartRow++;
 			} else if (answerType.equals(ConfigQuestion.AnswerType.LOV) && (level.equals(Level.HouseholdMember))) {
-				
+
 				String questionId = configQuestionUseHHM.get(i).getConfigQuestion().getId();
-				
+
 				try {
-				
-				
-			
-				String questionLOVType = configQuestionUseHHC.get(i).getConfigQuestion().getQuestionLOVType().getId();
-				em("about to do HHM LOV questionID = " + questionId);
-				addQuestionLOVValidation(workbook, sheet, hhmSheet, qStartRow, qStartRow, 2, numMembers, style,
-						questionId, questionLOVType);
-				em("done HHM LOV question build = ");
-				qStartRow++;
-				}
-				catch(Exception ex)
-				{
+
+					String questionLOVType = configQuestionUseHHC.get(i).getConfigQuestion().getQuestionLOVType()
+							.getId();
+					em("about to do HHM LOV questionID = " + questionId);
+					addQuestionLOVValidation(workbook, sheet, hhmSheet, qStartRow, qStartRow, 2, numMembers, style,
+							questionId, questionLOVType);
+					em("done HHM LOV question build = ");
+					qStartRow++;
+				} catch (Exception ex) {
 					System.out.println(ex);
 				}
 			}
 
 		}
-	
 
 		/* Asset Land Type */
 
@@ -578,7 +580,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		// now hide validation sheet
 
-		//workbook.setSheetHidden(workbook.getSheetIndex("Validations"), true);
+		// workbook.setSheetHidden(workbook.getSheetIndex("Validations"), true);
 
 		/* Return the spreadsheet */
 		em("printed ss ");
@@ -630,41 +632,28 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	private void addIntegerRangeValidation(HSSFWorkbook workbook, Sheet vsheet, Sheet iSheet, int firstRow, int lastRow,
 			int firstCol, int lastCol, CellStyle style, Integer intRangeLower, Integer intRangeUpper) {
 
-		
 		try {
-		CellRangeAddressList addressList = null;
-		
-		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
-		
-		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
-		
-		
-		
-	
-		
-		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
-				DVConstraint.ValidationType.INTEGER, DVConstraint.OperatorType.BETWEEN, intRangeLower.toString(),
-				intRangeUpper.toString());
-		
-		
-		
-		
-		
-	
-		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
-		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
-	
-		validation.createErrorBox("", "Enter an Integer between " + intRangeLower + " and " + intRangeUpper);
-		validation.setEmptyCellAllowed(true);
-		validation.setShowErrorBox(true);
-		iSheet.addValidationData(validation);
-		}
-		catch(Exception ex)
-		{
+			CellRangeAddressList addressList = null;
+
+			addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
+
+			DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
+
+			DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
+					DVConstraint.ValidationType.INTEGER, DVConstraint.OperatorType.BETWEEN, intRangeLower.toString(),
+					intRangeUpper.toString());
+
+			DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
+			validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+
+			validation.createErrorBox("", "Enter an Integer between " + intRangeLower + " and " + intRangeUpper);
+			validation.setEmptyCellAllowed(true);
+			validation.setShowErrorBox(true);
+			iSheet.addValidationData(validation);
+		} catch (Exception ex) {
 			em(ex);
 		}
-		
-		
+
 		/*
 		 * the above sets the validation but need to set the cell format to be Number
 		 */
@@ -777,7 +766,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		List<QuestionLOV> questionLOVs = XPersistence.getManager()
 				.createQuery("from QuestionLOV where questionLOVType_id  = '" + questionLOVTypeID + "'")
 				.getResultList();
-		
+
 		em("done get questionLOV");
 		// Get LOV Values for this LOVType and add to Validations sheet
 
@@ -919,10 +908,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		CellRangeAddressList addressList = null;
 		for (int l = 3; l < lastRow; l++) {
-			em("LOV = "+rType+firstRow+" "+l+" "+firstCol+" "+lastCol);
+			em("LOV = " + rType + firstRow + " " + l + " " + firstCol + " " + lastCol);
 			em(" LOV 12");
 			addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
-			//addressList = new CellRangeAddressList(firstRow, l, firstCol, lastCol);
+			// addressList = new CellRangeAddressList(firstRow, l, firstCol, lastCol);
 			em(" LOV 13");
 			DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
 			em(" LOV 14");
@@ -1436,14 +1425,14 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		errno = 10004;
 		String locationdistrict = study.getSite().getSubdistrict();
 		errno = 10005;
-		//String locationdistrict = getView().getValueString("site.locationdistrict");
+		// String locationdistrict = getView().getValueString("site.locationdistrict");
 		if (locationdistrict != null)
 			sheet.setValue(5, 4, locationdistrict, borderStyle);
 		else
 			sheet.setValue(5, 4, "unknown", borderStyle);
 
 		errno = 10006;
-		
+
 		sheet.setValue(2, 6, "Household Name: ", textStyle);
 		sheet.setValue(3, 6, "", borderStyle);
 
@@ -1454,8 +1443,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		sheet.setValue(7, 4, study.getStartDate(), borderStyle);
 		sheet.setValue(7, 4, study.getStartDate(), dateStyle);
-		
-
 
 		sheet.setValue(2, 10, "Spreadsheet Version " + currentVersion.getCurrentVersion());
 		errno = 10010;
@@ -2471,7 +2458,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	}
 
 	private static void em(Object em) {
-		//return;
+		// return;
 		System.out.println(em);
 
 	}

@@ -236,6 +236,12 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		calculateDI(); // uses hh filtered array based on CRS definition
 		calculateAE(); // Calculate the Adult equivalent
 
+		if(uniqueHousehold.size()==0) {
+			addError("No Households meet criteria, change Report Spec");
+			closeDialog();
+		return;
+		}
+		
 		errno = 54;
 		// Run reports
 		try {
@@ -353,15 +359,13 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		// sort the uhh list by quant seq
 
-		//List<HH> orderedQuantSeq = uniqueHousehold.stream().sorted(Comparator.comparing(HH::getQuantSeq))
-		//		.collect(Collectors.toList());
+		// List<HH> orderedQuantSeq =
+		// uniqueHousehold.stream().sorted(Comparator.comparing(HH::getQuantSeq))
+		// .collect(Collectors.toList());
 
-		//Map<Integer, Double> result = orderedQuantSeq.stream()
-		//		.collect(Collectors.groupingBy(HH::getQuantSeq, TreeMap::new, Collectors.averagingDouble(HH::getHhDI)));
-
-
-
-		
+		// Map<Integer, Double> result = orderedQuantSeq.stream()
+		// .collect(Collectors.groupingBy(HH::getQuantSeq, TreeMap::new,
+		// Collectors.averagingDouble(HH::getHhDI)));
 
 	}
 
@@ -396,7 +400,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		if (customReportSpec.getCategory().size() > 0) // Apply Category Filter
 		{
 			System.out.println("in Cat filter");
-			List<HH> hhCAT = hh.stream().filter(p -> p.getCategory() != null ).collect(Collectors.toList());
+			List<HH> hhCAT = hh.stream().filter(p -> p.getCategory() != null).collect(Collectors.toList());
 
 			for (HH hh2 : hhCAT) {
 
@@ -404,10 +408,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 					for (ResourceSubType resourceSubType : category.getResourceSubType()) {
 						if (resourceSubType != hh2.getResourceSubType()) {
-							//System.out.println("a Category RST to delete ");
+							// System.out.println("a Category RST to delete ");
 							hh2.setDelete(true);
 						} else {
-							//System.out.println("a Category RST to save ");
+							// System.out.println("a Category RST to save ");
 							hh2.setDelete(false);
 							break;
 						}
@@ -416,68 +420,61 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 				}
 			}
-			
+
 		}
-		
-		
 
 		if (customReportSpec.getResourceType().size() > 0) // Apply RST Filter
 		{
-			
-			List<HH> hhRT = hh.stream().filter(p -> p.getResourceType() != null ).collect(Collectors.toList());
-			
+
+			List<HH> hhRT = hh.stream().filter(p -> p.getResourceType() != null).collect(Collectors.toList());
+
 			for (HH hh2 : hhRT) {
-				
-				
 
 				for (ResourceType resourceType : customReportSpec.getResourceType()) {
-				
+
 					if (resourceType.getIdresourcetype() != hh2.getResourceType().getIdresourcetype()) {
-					
+
 						hh2.setDelete(true);
 					}
 
 					else {
-						
+
 						hh2.setDelete(false);
 						break;
 					}
-				
+
 				}
 			}
-			
+
 		}
-		
-		
-		
-		
+
 		if (customReportSpec.getResourceSubType().size() > 0) // Apply RST Filter
 		{
-			
-			List<HH> hhRST = hh.stream().filter(p -> p.getResourceSubType() != null ).collect(Collectors.toList());
-			
+
+			List<HH> hhRST = hh.stream().filter(p -> p.getResourceSubType() != null).collect(Collectors.toList());
+
 			for (HH hh2 : hhRST) {
 
 				for (ResourceSubType resourceSubType : customReportSpec.getResourceSubType()) {
 					if (resourceSubType.getIdresourcesubtype() != hh2.getResourceSubType().getIdresourcesubtype()) {
-					
+
 						hh2.setDelete(true);
 					} else {
-						
+
 						hh2.setDelete(false);
 						break;
 					}
 				}
 
 			}
-			
+
 		}
 
 		if (customReportSpec.getConfigAnswer().size() > 0) // Apply Q and A Filter
 		{
-		
+
 			System.out.println("in Q and A filter");
-			
+
 			for (HH hh2 : hh) {
 
 				for (ConfigAnswer configAnswer : customReportSpec.getConfigAnswer())
@@ -487,7 +484,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						hh2.setDelete(true);
 					} else {
 
-						//System.out.println("an  Answer to save " + hh2.getAnswer().getAnswer());
+						// System.out.println("an Answer to save " + hh2.getAnswer().getAnswer());
 						hh2.setDelete(false);
 						break;
 					}
@@ -869,7 +866,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				} else if (stdOfLivingElement.getLevel().equals(StdLevel.HouseholdMember)) {
 					errno = 104;
 					for (HouseholdMember householdMember : hh3.getHousehold().getHouseholdMember()) {
-						System.out.println("hhmember in SOLC = "+hh3.getHhNumber());
+						System.out.println("hhmember in SOLC = " + hh3.getHhNumber());
 						hhSOLC += calcHhmSolc(hh3, stdOfLivingElement);
 						errno = 105;
 					}
@@ -1144,6 +1141,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				hhLand.setQuantile(hh3.getQuantile());
 				hhl.add(hhLand);
 
+				
+				
+				
 				total = 0.0;
 
 				if (landTot.containsKey(assetLand.getResourceSubType())) {
@@ -1234,6 +1234,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			for (Quantile qqpr : quantiles) {
 				reportWB.getSheet(isheet).setValue(1, row, qqpr.getName(), textStyle);
 				reportWB.getSheet(isheet).setValue(2, row, qqpr.getPercentage(), textStyle);
+				
 				row++;
 			}
 			errno = 2277;
@@ -1262,11 +1263,11 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						Map<ResourceSubType, Double> collect = q2.stream().collect(Collectors
 								.groupingBy(HHSub::getAssetRST, Collectors.averagingDouble(HHSub::getAssetValue)));
 
-						System.out.println("q2 = " + hhs.getQuantSeq() + " " + " " + hhs.getAssetName() + " "
+						System.out.println("land asset q2 = " + hhs.getQuantSeq() +" " + " " + hhs.getAssetName() + " "
 								+ hhs.getAssetValue() + " double from group by =  " + collect.get(hhs.getAssetRST()));
 						Double val = fillDouble(collect.get(hhs.getAssetRST()));
 						reportWB.getSheet(isheet).setColumnWidths(hhs.getColumn(), 20);
-						reportWB.getSheet(isheet).setValue(hhs.getColumn(), hhs.getQuantSeq() + 4, val, textStyle);
+						reportWB.getSheet(isheet).setValue(hhs.getColumn(), hhs.getQuantSeq() + 5, val, textStyle);
 
 					}
 
@@ -1452,7 +1453,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 								+ hhs.getAssetValue() + " double from group by =  " + collect.get(hhs.getAssetRST()));
 						Double val = fillDouble(collect.get(hhs.getAssetRST()));
 						reportWB.getSheet(isheet).setColumnWidths(hhs.getColumn(), 20);
-						reportWB.getSheet(isheet).setValue(hhs.getColumn(), hhs.getQuantSeq() + 4, val, textStyle);
+						reportWB.getSheet(isheet).setValue(hhs.getColumn(), hhs.getQuantSeq() + 5, val, textStyle);
 
 					}
 
@@ -1494,6 +1495,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		 */
 		errno = 2372;
 		System.out.println("In HHMember report 2372");
+		
+		
+		
+		
 		Optional<HH> findFirstHH = uniqueHousehold.stream().findFirst();
 		System.out.println("In HHMember report done find first" + findFirstHH.toString());
 
@@ -1504,7 +1509,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				String prompt = answer.getConfigQuestionUse().getConfigQuestion().getPrompt();
 
 				reportWB.getSheet(isheet).setValue(col, row, prompt, textStyle);
-				reportWB.getSheet(isheet).setColumnWidths(col,30);
+				reportWB.getSheet(isheet).setColumnWidths(col, 30);
 				col++;
 
 			}
@@ -1530,8 +1535,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				reportWB.getSheet(isheet).setValue(8, row, hh3.getReasonForAbsence(), textStyle);
 				reportWB.getSheet(isheet).setValue(9, row, hh3.getMonthsAway(), textStyle);
 				reportWB.getSheet(isheet).setValue(10, row, hh3.getNotes(), textStyle);
-				
-				
+
 				col = 10;
 				// Answers
 				for (ConfigAnswer configAnswer : hh3.getConfigAnswer()) {
@@ -2051,28 +2055,26 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	/******************************************************************************************************************************************/
 
 	private void createHeaderPage(CustomReportSpec customReportSpec) {
+		final int STARTROW = 6;
+		int i = STARTROW; // used for row number
 
-		int i = 5; // used for row number
+		// June 25 - change to report details across page
 
-		
-		
 		sheet[0] = reportWB.addSheet("Custom Report Spec");
 		setSheetStyle(sheet[0]);
-		sheet[0].setColumnWidths(1, 40, 50);
-		
+		sheet[0].setColumnWidths(1, 40, 50, 50, 50, 50, 50, 50,50);
+
 		sheet[0].setValue(1, 1, "Date:", textStyle);
 		sheet[0].setValue(2, 1, new Date());
 		sheet[0].setValue(1, 2, "Spec Name:", textStyle);
 		sheet[0].setValue(2, 2, customReportSpec.getSpecName(), textStyle);
 		sheet[0].setValue(1, 3, "Study:", textStyle);
 		sheet[0].setValue(2, 3, study.getStudyName() + " " + study.getReferenceYear(), textStyle);
-		sheet[0].setValue(1, i, "Reports", textStyle);
+		sheet[0].setValue(2, STARTROW, "Reports", boldTopStyle);
 		/* get list of reports and create tabbed bsheets for each */
 
 		/* If no reports in custom report spec then use all reports */
-
-				
-		
+		i++;
 		if (customReportSpec.getReport().size() > 0)
 			reportList = (List<Report>) customReportSpec.getReport();
 		else
@@ -2086,81 +2088,136 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			i++;
 		}
-		i++;
+		i = STARTROW;
+
+		int col = 3;
 		// Selected HH
 		errno = 1101;
 		if (isSelectedHouseholds) {
-			sheet[0].setValue(1, i, "Selected Households in Report ", textStyle);
-			sheet[0].setValue(2, i, hhSelected.size(), textStyleBlue);
+			sheet[0].setValue(col, i, "Selected Households in Report = " + hhSelected.size(), boldTopStyle);
 			i++;
 			for (HH hh2 : hhSelected) {
-				System.out.println("selected hh = " + hh2.getHhNumber());
-				sheet[0].setValue(2, i, hh2.getHousehold().getHouseholdNumber(), textStyle);
+				sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber(), textStyle);
 				i++;
 			}
 		} else {
-			sheet[0].setValue(1, i, "Report Spec Households in Report", textStyle);
-			sheet[0].setValue(2, i, uniqueHousehold.size(), textStyleBlue);
+			sheet[0].setValue(col, i, "Report Spec Households in Report = " + uniqueHousehold.size(), boldTopStyle);
 			i++;
 			for (HH hh2 : uniqueHousehold) {
 
-				sheet[0].setValue(2, i, hh2.getHousehold().getHouseholdNumber(), textStyle);
+				sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber(), textStyle);
 				i++;
 			}
 		}
 
+		i = STARTROW;
+		col++;
 		errno = 1102;
-		if (customReportSpec.getCategory().size() > 0) {
-			i++;
-			sheet[0].setValue(1, i, "Categories Included", textStyle);
-			for (Category category : customReportSpec.getCategory()) {
-				sheet[0].setValue(2, i, category.getCategoryName(), textStyle);
-				i++;
-			}
 
+		sheet[0].setValue(col, i, "Categories Included", boldTopStyle);
+		i++;
+		for (Category category : customReportSpec.getCategory()) {
+			sheet[0].setValue(col, i, category.getCategoryName(), textStyle);
+			i++;
 		}
+
+		i = STARTROW;
+		col++;
 		errno = 1103;
-		if (customReportSpec.getResourceType().size() > 0) {
-			i++;
-			sheet[0].setValue(1, i, "Resources Included", textStyle);
-			for (ResourceType rt : customReportSpec.getResourceType()) {
-				sheet[0].setValue(2, i, rt.getResourcetypename(), textStyle);
-				i++;
-			}
 
+		sheet[0].setValue(col, i, "Resources Included", boldTopStyle);
+		i++;
+		for (ResourceType rt : customReportSpec.getResourceType()) {
+			sheet[0].setValue(col, i, rt.getResourcetypename(), textStyle);
+			i++;
 		}
+
+		i = STARTROW;
+		col++;
 
 		errno = 1104;
-		if (customReportSpec.getResourceSubType().size() > 0) {
+
+		sheet[0].setValue(col, i, "Resource Subtypes Included", boldTopStyle);
+		i++;
+		for (ResourceSubType rst : customReportSpec.getResourceSubType()) {
+			sheet[0].setValue(col, i, rst.getResourcetypename(), textStyle);
 			i++;
-			sheet[0].setValue(1, i, "Resource Subtypes Included", textStyle);
-			
-			for (ResourceSubType rst : customReportSpec.getResourceSubType()) {
-				sheet[0].setValue(2, i, rst.getResourcetypename(), textStyle);
-				i++;
-			}
 		}
+
+		i = STARTROW;
+		col++;
 		errno = 1105;
-		if (isQuantile ) {
-			i++;
-			sheet[0].setValue(1, i, "Quantiles Included", textStyle);
-			sheet[0].setValue(2, i, "Quantile Percent", textStyle);
+
+		sheet[0].setValue(col, i, "Quantiles Included", boldTopStyle);
+		sheet[0].setValue(col + 1, i, "Quantile Percent", boldTopStyle);
+
+		try {
 			i++;
 			for (Quantile q : quantiles) {
-				sheet[0].setValue(1, i, q.getName(), textStyle);
-				sheet[0].setValue(2, i, q.getPercentage(), textStyle);
+
+				sheet[0].setValue(col, i, q.getName(), textStyle);
+				sheet[0].setValue(col + 1, i, q.getPercentage(), textStyle);
 				i++;
 			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		/*
+		 * Q & A
+		 */
+
+		i = STARTROW;
+		col++;
+		errno = 1105;
+
+		sheet[0].setValue(col, i, "Household Questions Included", boldTopStyle);
+		sheet[0].setValue(col + 1, i, "Answer", boldTopStyle);
+
+		try {
+			i++;
+			for (ConfigAnswer ans : customReportSpec.getConfigAnswer()) {
+
+				String prompt = ans.getConfigQuestionUse().getConfigQuestion().getPrompt();
+				String answer = ans.getAnswer();
+				
+				sheet[0].setValue(col, i, prompt, textStyle);
+				sheet[0].setValue(col + 1, i, answer, textStyle);
+				i++;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
-		errno = 1106;
 		
-		if (study.getAltCurrency() !=null) {
-			sheet[0].setValue(2, i, "Reporting Currency", textStyle);
-			sheet[0].setValue(3, i, study.getAltCurrency().getCurrency(), textStyle);
 		
-		}
+		
+		/*
+		 * 
+		 * get Currency
+		 */
+		
 		errno = 1107;
+		String currency;
+
+		if (!study.getProjectlz().getAltCurrency().toString().isEmpty()) {
+			System.out.println("curr 1");
+			currency = study.getProjectlz().getAltCurrency().getCurrency().toString();
+		} else if (study.getSite().getCountry().getCurrency().isEmpty()) // use Country
+		{
+			System.out.println("curr 2");
+			currency = study.getSite().getLivelihoodZone().getCountry().getCurrency().toString();
+		} else {
+			System.out.println("curr 3");
+			currency = study.getSite().getCountry().getCurrency().toString();
+		}
+
+		sheet[0].setValue(1, 4, "Reporting Currency:", boldTopStyle);
+		sheet[0].setValue(2, 4, currency, textStyle);
+
+		errno = 1108;
 	}
 
 	/******************************************************************************************************************************************/
