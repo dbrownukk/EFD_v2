@@ -11,9 +11,6 @@ import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.util.*;
 
-import efd.actions.*;
-import efd.model.ConfigQuestion.*;
-
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
 @Views({ @View(members = "Study[#studyName,projectlz,referenceYear;description,startDate,endDate;altCurrency,altExchangeRate,notes]"

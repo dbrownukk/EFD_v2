@@ -53,7 +53,7 @@ public class WealthGroup {
 	// ----------------------------------------------------------------------------------------------//
 
 	@OneToMany(mappedBy = "wealthgroup")
-	//@ElementCollection
+	@AddAction("")
 	//@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,resourcesubtype.resourcesubtypeunit")
 	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,wgresourceunit")
 	

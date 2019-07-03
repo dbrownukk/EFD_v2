@@ -31,6 +31,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	JxlsStyle boldTopStyle = null;
 	JxlsStyle borderStyle = null;
 	JxlsStyle textStyle = null;
+	JxlsStyle textStyleWrap = null;
 	JxlsStyle dateStyle = null;
 	JxlsStyle numberStyle = null;
 	JxlsStyle f1Style = null;
@@ -178,6 +179,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		borderStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN,
 				BORDER_THIN);
 		textStyle = scenarioWB.addStyle(TEXT).setAlign(RIGHT);
+		textStyleWrap = scenarioWB.addStyle(TEXT).setAlign(RIGHT).setWrap(true);
 
 		scenarioWB.setDateFormat("dd/MM/yyyy");
 		em("date style = " + scenarioWB.getDateFormat());
@@ -523,7 +525,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addLOV(sheet, empSheet, 3, numRows - 1, 3, 3, "EmpUnit");
 		// addNumberValidation(workbook, sheet, empSheet, 3, numRows, 3, 3, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 4, 4, style);
-		addNumberValidation(workbook, sheet, empSheet, 3, 30, 5, 5, style);
+		
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 5, 5, style);// cash payment
+		
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 10, 10, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 12, 12, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 14, 14, style);
@@ -702,9 +706,13 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
 
-		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
-				DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0", "1000000");
+		//DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
+		//		DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0", "1000000");
 
+		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
+				DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0", "1000000001000");
+
+		
 		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
 		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
 		validation.createErrorBox("", "Enter a Number only");
@@ -909,18 +917,17 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		CellRangeAddressList addressList = null;
 		for (int l = 3; l < lastRow; l++) {
 			em("LOV = " + rType + firstRow + " " + l + " " + firstCol + " " + lastCol);
-			em(" LOV 12");
+			
 			addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
 			// addressList = new CellRangeAddressList(firstRow, l, firstCol, lastCol);
-			em(" LOV 13");
+			
 			DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
-			em(" LOV 14");
+			
 			DataValidationConstraint dvConstraint = dvHelper.createFormulaListConstraint(rType);
-			em(" LOV 15");
+			
 			DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
-			em(" LOV 16");
+			
 			validation.setEmptyCellAllowed(true);
-			em(" LOV 1");
 			validation.setShowErrorBox(false); // Allows for other values - combo style
 			iSheet.addValidationData(validation);
 		}
@@ -1457,7 +1464,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		 * need to get Config Questions and Answers for this Study ID where the usage
 		 * (ConfigQuestionUse) is at the Household level
 		 */
-		sheet.setColumnWidths(2, width, width, width, width, width, numwidth);
+	
+		sheet.setColumnWidths(2, width+10, width, width, width, width, numwidth);
 		sheet.setValue(2, 2, "Household Characteristics", boldRStyle);
 		sheet.setValue(3, 2, "Answers", boldRStyle);
 		configQuestionUseHHC = XPersistence.getManager().createQuery("from ConfigQuestionUse where study_ID = :studyid")
@@ -1469,7 +1477,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		for (i = 0; i < configQuestionUseHHC.size(); i++) {
 
 			if (configQuestionUseHHC.get(i).getConfigQuestion().getLevel() == Level.Household) {
-				sheet.setValue(2, k, configQuestionUseHHC.get(i).getConfigQuestion().getPrompt(), textStyle);
+				sheet.setValue(2, k, configQuestionUseHHC.get(i).getConfigQuestion().getPrompt(), textStyleWrap);
 
 				AnswerType answerType = configQuestionUseHHC.get(i).getConfigQuestion().getAnswerType();
 				k++; // row
@@ -1484,8 +1492,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		int i = 0;
 		int k = 0;
-
-		sheet.setColumnWidths(2, width, width, width, width, width, width, width, width, width, width, width, width,
+		
+		sheet.setColumnWidths(2, width+10, width, width, width, width, width, width, width, width, width, width, width,
 				width, width, width, width, width, width, width, width, width, width);
 
 		sheet.setValue(2, 2, "Household Members", boldRStyle);
@@ -1519,7 +1527,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		for (i = 0; i < configQuestionUseHHM.size(); i++) {
 
 			if (configQuestionUseHHM.get(i).getConfigQuestion().getLevel() == Level.HouseholdMember) {
-				sheet.setValue(2, k, configQuestionUseHHM.get(i).getConfigQuestion().getPrompt(), textStyle);
+				sheet.setValue(2, k, configQuestionUseHHM.get(i).getConfigQuestion().getPrompt(), textStyleWrap);
 				k++;
 			}
 

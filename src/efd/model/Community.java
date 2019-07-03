@@ -63,10 +63,12 @@ public class Community {
 	@RowAction("Spreadsheet.Template Spreadsheet")
 	@CollectionView("FromCommunity")
 	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
+	@AddAction("")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
 
 	@OneToMany(mappedBy = "community")//, cascade = CascadeType.ALL)
+	@AddAction("")
 	private Collection<CommunityYearNotes> communityyearnotes;
 	// ----------------------------------------------------------------------------------------------//
 

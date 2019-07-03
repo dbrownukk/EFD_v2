@@ -41,7 +41,9 @@ import org.openxava.tab.*;
 		@View(name = "NewlineProject", members = "projecttitle;pdate") })
 
 // model is OHEA or OIHM
-@Tab(filter = ProjectModelFilter.class, properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", baseCondition = "${model} = ?")
+// No longer required - Projects cross OHEA and OIHM 
+//@Tab(filter = ProjectModelFilter.class, properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", baseCondition = "${model} = ?")
+@Tab(properties = "projecttitle,pdate,altCurrency.description,altExchangeRate")
 
 
 @Table(name = "Project")
@@ -49,13 +51,23 @@ import org.openxava.tab.*;
 
 public class Project {
 
-
+/*
+ * June 2019 DRB No longer differentiation between OIHM and OHEA Project
+ * 
+ * Model field not removed
+ * 
 	@PrePersist
 	@PreUpdate
 	private void modelset() {
 
 		System.out.println("model in proj = " + getTheModel().toString());
 
+		ProjectModelFilter projectModelFilter = new ProjectModelFilter();
+		String name = projectModelFilter.getClass().getName();
+		
+		
+		
+		
 		String userName = Users.getCurrent();
 		User user = User.find(userName);
 
@@ -68,6 +80,7 @@ public class Project {
 		}
 
 	}
+	*/
 
 	@Id
 	@Hidden

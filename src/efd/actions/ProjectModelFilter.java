@@ -10,9 +10,6 @@ import org.openxava.util.*;
 import com.openxava.naviox.model.*;
 import com.openxava.naviox.model.Role;
 
-/**
- * @author Javier Paniza
- */
 
 public class ProjectModelFilter implements IFilter {
 
@@ -47,5 +44,6 @@ public class ProjectModelFilter implements IFilter {
 
 		return r;
 	}
+
 
 }
