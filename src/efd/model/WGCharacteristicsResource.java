@@ -33,10 +33,10 @@ properties = "wealthgroup.community.projectlz.projecttitle,"
 		)
 
 
-@Table(name = "wgcharacteristicsresource",
+@Table(name = "wgcharacteristicsresource",uniqueConstraints = {
+		@UniqueConstraint(name = "studyrst", columnNames = { "study_id", "WGResourceSubType","type" }) ,
+		@UniqueConstraint(name="community_wgc",columnNames = { "WGID", "WGResourceSubType"}) 	 })
 
-uniqueConstraints = {
-		@UniqueConstraint(name = "studyrst", columnNames = { "study_id", "WGResourceSubType","type" }) })
 
 
 public class WGCharacteristicsResource {

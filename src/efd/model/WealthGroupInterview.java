@@ -182,7 +182,7 @@ public class WealthGroupInterview {
 	private Collection<AssetCash> assetCash;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType.resourcetypename,cropType,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status, resourceSubType.resourcetypename,cropType,unit,unitsProduced, unitsSold,unitsOtherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Crop> crop;
 
@@ -192,23 +192,28 @@ public class WealthGroupInterview {
 	private Collection<LivestockSales> livestockSales;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType.resourcetypename, livestockType,livestockProduct,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status,resourceSubType.resourcetypename, livestockType,livestockProduct,unit,unitsProduced, unitsSold,unitsOtherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<LivestockProducts> livestockProducts;
 
 	@ElementCollection
+	
+	//@CollectionTable(uniqueConstraints= {
+	//	@UniqueConstraint(name = "unique_type", columnNames = { "WealthGroupInterview_WGIID", "ResourceSubType"}) })
+	
+	
 	@ListProperties("status, resourceSubType.resourcetypename,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodResourceSubType.resourcetypename,foodPaymentFoodType,foodPaymentUnit,foodPaymentUnitsPaidWork"
 			+ ",workLocation1,percentWorkLocation1,workLocation2,percentWorkLocation2,workLocation3,percentWorkLocation3")
 	private Collection<Employment> employment;
 
 	@ElementCollection
 	@ListProperties("status,resourceSubType.resourcetypename, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType.resourcetypename,transferFoodOtherType,"
-			+ " unit, unitsTransferred,unitsSold,pricePerUnit,otherUse,unitsConsumed"
+			+ " unit, unitsTransferred,unitsSold,otherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Transfer> transfer;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,pricePerUnit,unitsConsumed,otherUse"
+	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,otherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<WildFood> wildFood;
 

@@ -35,10 +35,13 @@ public class OnChangeSetHHStatus extends OnChangePropertyBaseAction {
 		System.out.println("in onchangeHHstatus 2");
 
 		Object currentRecord = getView().getValue("id");
-
+		System.out.println("hh id = "+currentRecord);
+		
 		// get database record and compare
 		Household hh = XPersistence.getManager().find(Household.class, currentRecord);
 
+		System.out.println("hh is "+hh.getHouseholdNumber());
+		
 		if (hh.getStatus().equals(Status.Validated)) {
 
 			getView().setEditable(false);

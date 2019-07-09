@@ -101,7 +101,7 @@ public class Household extends EFDIdentifiable {
 	// @ElementCollection
 	@NoCreate
 	@AddAction("")
-	//@ListProperties("configQuestionUse.configQuestion.prompt,answer")
+	// @ListProperties("configQuestionUse.configQuestion.prompt,answer")
 	@EditAction("ConfigAnswer.edit")
 	@ListProperties("configQuestionUse.configQuestion.prompt,configQuestionUse.configQuestion.answerType,displayAnswer")
 	private Collection<ConfigAnswer> configAnswer;
@@ -170,7 +170,7 @@ public class Household extends EFDIdentifiable {
 
 	@ElementCollection
 	@ListProperties("status,resourceSubType.resourcetypename, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType.resourcetypename,transferFoodOtherType,"
-			+ " unit, unitsTransferred,unitsSold,pricePerUnit,otherUse,unitsConsumed"
+			+ " unit, unitsTransferred,unitsSold,otherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Transfer> transfer;
 
@@ -184,22 +184,9 @@ public class Household extends EFDIdentifiable {
 	private Collection<Inputs> inputs;
 
 	@DisplaySize(25)
+	@Required
 	@OnChange(value = OnChangeSetHHStatus.class)
 	private Status status;
-
-	
-//	@ManyToMany(mappedBy="household",cascade=CascadeType.ALL)
-//	private Collection <ReportSpecUse> reportSpecUse;
-	
-	
-	
-	
-	
-	
-	
-
-
-
 
 	public Status getStatus() {
 		return status;

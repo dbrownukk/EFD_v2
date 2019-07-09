@@ -9,6 +9,7 @@ import org.apache.commons.lang3.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hsqldb.persist.*;
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
 
@@ -86,8 +87,9 @@ public class WealthGroup {
 
 	@Column(name = "WGPercent")
 	//@OnChange(OnChangeWgpercenttotal.class)
-	@Min(value = 1)
+	@Min(value = 0)
 	@Max(value = 100)
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//

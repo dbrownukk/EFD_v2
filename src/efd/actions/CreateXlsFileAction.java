@@ -3,6 +3,7 @@ package efd.actions;
 /* Write XLS template for Community Interview */
 
 import java.util.*;
+import java.util.stream.*;
 
 import javax.persistence.*;
 
@@ -65,6 +66,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 	private int row;
 	private String forwardURI = null;
+
+	Project project;
+	Site site;
+	static LivelihoodZone livelihoodZone;
 
 	public void execute() throws Exception {
 
@@ -194,9 +199,11 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		/* Get Community Data */
 
-		Project project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
+		project = XPersistence.getManager().find(Project.class, community.getProjectlz().getProjectid());
 
-		Site site = XPersistence.getManager().find(Site.class, community.getSite().getLocationid());
+		site = XPersistence.getManager().find(Site.class, community.getSite().getLocationid());
+
+		livelihoodZone = site.getLivelihoodZone();
 
 		/******************
 		 * Need to get charresource and types using getmanager and iterate
@@ -223,12 +230,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		}
 
-		filename = site.getLivelihoodZone().getLzname() + '_'
-				+ StringUtils.truncate(site.getLocationdistrict(), 8) + '_'
-				+ StringUtils.truncate(site.getSubdistrict(), 8) + '_'
+		filename = site.getLivelihoodZone().getLzname() + '_' + StringUtils.truncate(site.getLocationdistrict(), 8)
+				+ '_' + StringUtils.truncate(site.getSubdistrict(), 8) + '_'
 				+ StringUtils.truncate(wealthgroup.getWgnameeng(), 10);
 
-	
 		System.out.println("filename =" + filename);
 		filename = StringUtils.normalizeSpace(filename);
 		JxlsWorkbook scenarioWB = new JxlsWorkbook(filename);
@@ -651,6 +656,12 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int foodp = 0;
 		int nonfp = 0;
 		int empUnit = 0;
+		
+		
+		LocalUnit localUnit;
+		ArrayList<String> localUnits = new ArrayList<>();
+		
+		
 
 		for (int k = 0; k < rst.size(); k++) {
 			/* Land */
@@ -660,6 +671,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 				la++;
 
 			}
+			
 			/* LiveStock */
 			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Livestock".toString())) {
 				cell = lsRow.createCell(ls);
@@ -753,6 +765,12 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		name.setRefersToFormula("Validations" + "!$A$" + landRowNum + ":$" + lacol + "$" + landRowNum);
 		// lists..
 		name.setNameName("Land");
+		
+		// Any Land Local Units?
+		
+		
+		
+		
 
 		/* LS */
 		name = dataSheet.getWorkbook().createName();
@@ -831,17 +849,17 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		/* From Reference Table */
 		/* Area */
-		System.out.println("about to get area referencecode");
+		
 		List<ReferenceCode> referenceCodeArea = XPersistence.getManager()
 				.createQuery("from ReferenceCode where ReferenceType = 'Area'").getResultList();
 		// Get ref codes for Area and add to Validations sheet
-		System.out.println("done get area referencecode");
+		
 		for (int k = 0; k < referenceCodeArea.size(); k++) {
 			System.out.println("in area loop " + k);
 			cell = areaRow.createCell(area);
 			cell.setCellValue(referenceCodeArea.get(k).getReferenceName());
 			area++;
-			System.out.println("LA cell set to " + area + " " + cell.getStringCellValue());
+			
 		}
 
 		String areacol = getCharForNumber(area); // Convert for drop list creation
@@ -854,19 +872,43 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		List<ReferenceCode> referenceCodeUnit = XPersistence.getManager()
 				.createQuery("from ReferenceCode where ReferenceType = 'Unit'").getResultList();
-		// Get ref codes for Unit and add to Validations sheet
-		for (int k = 0; k < referenceCodeUnit.size(); k++) {
-			cell = unitRow.createCell(unit);
-			cell.setCellValue(referenceCodeUnit.get(k).getReferenceName());
-			unit++;
 
+		// Get ref codes for Unit and add to Validations sheet
+
+		for (int k = 0; k < referenceCodeUnit.size(); k++) {
+			localUnits.add(referenceCodeUnit.get(k).getReferenceName().trim());
 		}
+
+		
+
+		// Get any localunits for RST and livelihoodZone
+		
+		System.out.println("get any local units");
+		for (int k = 0; k < rst.size(); k++) {
+			localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
+			
+			if (localUnit != null && !rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
+				localUnits.add(localUnit.getName().trim());
+				
+			}
+			
+		}
+		
+		List<String> localus = localUnits.stream().distinct().collect(Collectors.toList());
+		
+		 for (String lu : localus) {
+			 System.out.println("in lus loop lunit = "+lu);
+			 cell = unitRow.createCell(unit);
+				cell.setCellValue(lu);
+				unit++;
+		}
+		unit--;
 
 		String unitcol = getCharForNumber(unit); // Convert for drop list creation
 		name = dataSheet.getWorkbook().createName();
 		unitRowNum++;
 
-		System.out.println("Unit cell info  " + unitRowNum + " " + unitcol);
+		//System.out.println("Unit cell info  " + unitRowNum + " " + unitcol);
 
 		name.setRefersToFormula("Validations" + "!$A$" + unitRowNum + ":$" + unitcol + "$" + unitRowNum);
 
@@ -876,7 +918,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		List<ReferenceCode> referenceTStyle = XPersistence.getManager()
 				.createQuery("from ReferenceCode where ReferenceType = 'Transfer Style'").getResultList();
-		// Get ref codes for Transger Style Official / Unofficial and add to Validations
+		// Get ref codes for Transfer Style Official / Unofficial and add to Validations
 		// sheet
 		for (int k = 0; k < referenceTStyle.size(); k++) {
 			cell = transStyleRow.createCell(transStyle);
@@ -952,6 +994,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 	private void printInterview(JxlsSheet sheet, Project project, Community community, WealthGroup wealthgroup) {
 
 		int j = 2;
+		/* Get current Version of OIHM/OHEA */
+
+		CurrentVersion currentVersion = (CurrentVersion) XPersistence.getManager().createQuery("from CurrentVersion")
+				.getSingleResult();
 
 		sheet.setColumnWidths(2, width, width, width, width, width, numwidth); /* set col widths */
 
@@ -969,6 +1015,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		sheet.setValue(2, 6, "Livelihood Zone", boldRStyle);
 		sheet.setValue(2, 8, "Number of Particpants", boldRStyle);
 		sheet.setValue(2, 10, "Wealth Group", boldRStyle);
+
+		sheet.setValue(2, 12, "Spreadsheet Version " + currentVersion.getCurrentVersion());
 
 		/* date validation */
 		sheet.setValue(4, 2, "Date", boldRStyle);
@@ -1340,9 +1388,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			sheet.setValue(3, 3, "Unit", boldTopStyle);
 			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
 			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(8, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
-			sheet.setValue(8, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(6, 3, "Units Other Use", boldTopStyle);
 			sheet.setValue(9, 3, "Market 1", boldTopStyle);
 			sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(11, 3, "Market 2", boldTopStyle);
@@ -1469,9 +1517,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			sheet.setValue(4, 3, "Unit", boldTopStyle);
 			sheet.setValue(5, 3, "Units Produced", boldTopStyle);
 			sheet.setValue(6, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(7, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(9, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(8, 3, "Units Consumed", boldTopStyle);
-			sheet.setValue(9, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(7, 3, "Units Other Use", boldTopStyle);
 			sheet.setValue(10, 3, "Market 1", boldTopStyle);
 			sheet.setValue(11, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(12, 3, "Market 2", boldTopStyle);
@@ -1609,9 +1657,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			sheet.setValue(9, 3, "Unit", boldTopStyle);
 			sheet.setValue(10, 3, "Units Received / Transferred", boldTopStyle);
 			sheet.setValue(11, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(12, 3, "Price per Unit", boldTopStyle);
-			sheet.setValue(13, 3, "Units Other Use", boldTopStyle);
-			sheet.setValue(14, 3, "Units Consumed", boldTopStyle);
+			sheet.setValue(14, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(12, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(13, 3, "Units Consumed", boldTopStyle);
 			sheet.setValue(15, 3, "Market 1", boldTopStyle);
 			sheet.setValue(16, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(17, 3, "Market 2", boldTopStyle);
@@ -1674,9 +1722,9 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			sheet.setValue(3, 3, "Unit", boldTopStyle);
 			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
 			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(6, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(8, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
-			sheet.setValue(8, 3, "Units Other Use", boldTopStyle);
+			sheet.setValue(6, 3, "Units Other Use", boldTopStyle);
 			sheet.setValue(9, 3, "Market 1", boldTopStyle);
 			sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(11, 3, "Market 2", boldTopStyle);

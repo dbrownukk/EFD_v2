@@ -12,7 +12,8 @@ import org.openxava.annotations.*;
 		@View(name = "UpdateLZ", members = "LivelihoodZone[lzname,country,project,site]"),
 		@View(name = "CreateLZ", members = "LivelihoodZone[lzname;country;lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname,country;lzzonemap"),
-		@View(name = "SimpleLZnomap", members = "lzname,country") 
+		@View(name = "SimpleLZnomap", members = "lzname,country") ,
+		@View(name = "FromLocalUnit", members = "LivelihoodZone[lzname,project]")
 })
 
 @Tab(properties = "lzname,country.description,country.isocountrycode,country.currency,lzzonemap")
@@ -75,15 +76,12 @@ public class LivelihoodZone  {
 	private Collection<Site> site;
 
 	@ManyToMany(mappedBy = "livelihoodZone")
-	// @ListProperties("projecttitle,pdate")
+	//@ListProperties(forViews="FromLocalUnit",value="projecttitle,pdate")
 	private Collection<Project> project;
 	
 	
 	@Version
 	private Integer version;
-	
-	
-	
 	
 	
 
@@ -144,7 +142,5 @@ public class LivelihoodZone  {
 	}
 
 
-
-	/* Get / set */
 
 }

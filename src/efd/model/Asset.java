@@ -7,6 +7,8 @@ import org.openxava.annotations.*;
 import efd.actions.*;
 import efd.validations.*;
 
+import efd.model.*;
+
 
 
 @MappedSuperclass
@@ -32,8 +34,35 @@ public class Asset {
 	@Column(name = "Unit", length = 50, nullable = false)
 	@Required
 	private String unit;
-
 	
+	
+	// Due to a Hibernate ddl generation bug am using localunit and localunit multiplier here instead of efd.model.LocalUnit
+	
+	@Hidden
+	@Column(name = "LocalUnit", length = 32, nullable = true)
+	private String localUnit;
+	
+	@Hidden
+	@Column(name = "LocalUnitMultiplier", nullable = true)
+	private Double localUnitMultiplier;
+	
+
+
+	public String getLocalUnit() {
+		return localUnit;
+	}
+
+	public void setLocalUnit(String localUnit) {
+		this.localUnit = localUnit;
+	}
+
+	public Double getLocalUnitMultiplier() {
+		return localUnitMultiplier;
+	}
+
+	public void setLocalUnitMultiplier(Double localUnitMultiplier) {
+		this.localUnitMultiplier = localUnitMultiplier;
+	}
 
 	public Status getStatus() {
 		return status;
@@ -43,7 +72,6 @@ public class Asset {
 		this.status = status;
 	}
 
-
 	public String getUnit() {
 		return unit;
 	}
@@ -51,7 +79,10 @@ public class Asset {
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
+	
 
+
+	
 
 
 }

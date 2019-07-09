@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import org.openxava.annotations.*;
 
-import efd.action.*;
+
 import efd.validations.*;
 
 @View(members = "customReportSpec,study")

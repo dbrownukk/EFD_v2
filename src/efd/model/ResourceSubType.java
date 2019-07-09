@@ -19,7 +19,9 @@ import org.openxava.util.*;
 
 @Views({ @View(members = "resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym,category"),
 	@View(name = "FromCategory", members = "resourcetype,resourcetypename,resourcesubtypeunit;resourcesubtypekcal,resourcesubtypesynonym"),
-		@View(name = "SimpleSubtype", members = "resourcetypename") })
+		@View(name = "SimpleSubtype", members = "resourcetypename"),
+		@View(name = "FromLocalUnit", members = "resourcetype;resourcetypename,resourcesubtypeunit") })
+
 
 @Tab(properties = "resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
 
@@ -98,8 +100,21 @@ public class ResourceSubType {
 	private Collection<CustomReportSpec> customReportSpecs;
 	
 	
+	@OneToMany(mappedBy="resourceSubType") 
+	private Collection<LocalUnit> localUnits;
 	
 	
+	
+	
+	
+	public Collection<LocalUnit> getLocalUnits() {
+		return localUnits;
+	}
+
+	public void setLocalUnits(Collection<LocalUnit> localUnits) {
+		this.localUnits = localUnits;
+	}
+
 	public Collection<CustomReportSpec> getCustomReportSpecs() {
 		return customReportSpecs;
 	}

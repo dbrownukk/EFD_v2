@@ -1,11 +1,13 @@
 package efd.actions;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.*;
 import javax.mail.*;
 import javax.persistence.*;
 
+import org.apache.commons.lang3.*;
 import org.apache.commons.validator.*;
 import org.hibernate.mapping.*;
 import org.openxava.actions.*;
@@ -32,7 +34,29 @@ public class FilteredSite extends ReferenceSearchAction {
 
 	public void execute() throws Exception {
 
-		if (efdModel == "OHEA") {
+		Boolean isConditionSet = false;
+		String resourceUnit = null;
+		Boolean isInOHEA = false;
+		
+		
+	
+		
+
+		try {
+			Map allValues = getPreviousView().getAllValues();
+			System.out.println("all values = " + allValues);
+
+			if (!getPreviousView().getValueString("wgid").isEmpty() || !getPreviousView().getValueString("communityid").isEmpty()
+					||!getView().getValueString("wgid").isEmpty() || !getView().getValueString("communityid").isEmpty()) {
+				isInOHEA = true;
+				System.out.println("in ohea set isInOHEA");
+			}
+		} catch (Exception e) {
+			// Previous did not exist 
+			//e.printStackTrace();
+		}
+		
+		if (isInOHEA) {
 
 			System.out.println("current proj " + getView().getValue("projectlz.projectid"));
 			// System.out.println("current site "
@@ -134,12 +158,17 @@ public class FilteredSite extends ReferenceSearchAction {
 		}
 		
 		
-		if (efdModel == "OIHM") {
+		if (!isInOHEA) {
+			Project project = null;
+			String condition = "'";
+			
+			
+			
 			System.out.println("in oihm site filteredsite");
 			
 			String projectId = getView().getValue("projectlz.projectid").toString();
 			try {
-			Project project = XPersistence.getManager().find(Project.class, projectId);
+			project = XPersistence.getManager().find(Project.class, projectId);
 			}catch (Exception ex) {
 
 				// failed to find a project as there is no country - carry on with no COuntry 
@@ -147,9 +176,37 @@ public class FilteredSite extends ReferenceSearchAction {
 			}
 			
 			
-			System.out.println("done project query");
+			System.out.println("done project query "+project.getLivelihoodZone());
 			
 			super.execute();
+			for (LivelihoodZone livelihoodZone : project.getLivelihoodZone()) {
+				for (Site site : livelihoodZone.getSite()) {
+					condition += site.getLocationid()+"','";
+				}
+				
+				
+				
+			}
+			if(condition.length()==1)  // nothing found 
+			{
+				System.out.println("condition unset");
+				getTab().setBaseCondition("${locationid} = '0'");
+			}
+			else
+			{
+			
+			condition = StringUtils.chop(condition);
+			condition = StringUtils.chop(condition);
+			System.out.println("condition = "+condition);
+			getTab().setBaseCondition("${locationid} in (" + condition + ")");
+			}
+			
+			
+			
+			
+			
+			
+			
 			//getTab().setBaseCondition("${country.isocountrycode} != '"+project.getAltCurrency().getIsocountrycode().toString()+"'");
 		
 		
