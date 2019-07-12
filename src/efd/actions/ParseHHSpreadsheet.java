@@ -114,6 +114,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	int numberRows[] = new int[16]; // Sheet / Rows
 
 	Crop acrop = null;
+	LivelihoodZone livelihoodZone = null;
 
 	public void execute() throws Exception {
 
@@ -214,6 +215,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		em("in xls parse 2 ");
 
+		
+		livelihoodZone = hhi.getStudy().getSite().getLivelihoodZone();
+				
+		
 		String spreadsheetId = hhi.getSpreadsheet();
 
 		Connection con = null;
@@ -973,6 +978,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String s1 = null, s2 = null;
 		String warnMessage = null;
 		String unitEntered = null;
+		Boolean isCorrectRST = false;
+		
 
 		// for (int p = 0; p < 15; p++)
 		// em("numrows array p = " + p + " " + numberRows[p]);
@@ -1015,9 +1022,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		}
 
 		for (i = ASSETLAND; i <= INPUTS; i++) { // Sheet
-			// em("in loop ASSETLAND TO INPUTS = " + i);
-			// breaksheet: for (j = 0; j < 35; j++) { // Row
-			breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
+		
+		breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
 				em("inp loop assets 777 " + numberRows[i] + " " + j);
 				switch (i) {
 
@@ -1035,6 +1041,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							al.setResourceSubType(rst);
 							al.setStatus(efd.model.Asset.Status.Valid);
+							isCorrectRST = true;
 
 							/* Is Unit Entered Valid for this resource */
 							em("done al get 11 ");
@@ -1045,6 +1052,25 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							al.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
+						// Was a Local Unit entered for this RST LZ combination?
+						em("about to do LAND  localunit");
+						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						em("Land localunit =" + localUnit.getName());
+						if (localUnit != null) {
+							
+
+							if (al.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+								
+								al.setUnit(localUnit.getName());
+								al.setLocalUnit(localUnit.getName());
+								al.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+								if (isCorrectRST) { // Is the correct RST entered and valid
+									al.setStatus(efd.model.Asset.Status.Valid);
+								}
+							}
+						}
+						
+						
 						hhi.getAssetLand().add(al);
 
 						em("done al get 33 ");
@@ -1303,6 +1329,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							// em("done acrop get = " + rst.getResourcetypename());
 
 							acrop.setResourceSubType(rst);
+							isCorrectRST = true;
 							acrop.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(acrop.getUnit(), rst))
 								acrop.setStatus(efd.model.Asset.Status.Invalid);
@@ -1310,6 +1337,26 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							acrop.setStatus(efd.model.Asset.Status.Invalid);
 						}
+						
+						// Was a Local Unit entered for this RST LZ combination?
+						em("about to do crops localunit");
+						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						em("crop localunit =" + localUnit.getName());
+						if (localUnit != null) {
+							
+
+							if (acrop.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+								
+								acrop.setUnit(localUnit.getName());
+								acrop.setLocalUnit(localUnit.getName());
+								acrop.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+								if (isCorrectRST) { // Is the correct RST entered and valid
+									acrop.setStatus(efd.model.Asset.Status.Valid);
+								}
+							}
+						}
+						
+						
 						hhi.getCrop().add(acrop);
 						// getView().refreshCollections();
 
@@ -1407,12 +1454,34 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							alsp.setResourceSubType(rst);
 							alsp.setStatus(efd.model.Asset.Status.Valid);
+							isCorrectRST = true;
 							if (!checkSubTypeEntered(alsp.getUnit(), rst))
 								alsp.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
 							alsp.setStatus(efd.model.Asset.Status.Invalid);
 						}
+						
+						// Was a Local Unit entered for this RST LZ combination?
+						em("about to do LSP localunit");
+						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						em("back from getLocalunit");
+						
+						if (localUnit != null) {
+
+								if (alsp.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+									
+									alsp.setUnit(localUnit.getName());
+									alsp.setLocalUnit(localUnit.getName());
+									alsp.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+									if (isCorrectRST) { // Is the correct RST entered and valid
+										alsp.setStatus(efd.model.Asset.Status.Valid);
+									}
+								}
+							}
+				
+						em("skipped lu");
+						
 						hhi.getLivestockProducts().add(alsp);
 						// getView().refreshCollections();
 						k = 100;
@@ -1432,21 +1501,34 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						int l = 0;
 						em("in emp  cell = i =" + i);
 						aemp.setEmploymentName((cell[i][j][l++].getStringCellValue()));
+						
 						aemp.setPeopleCount(getCellDouble(cell[i][j][l++]));
 						aemp.setUnit((cell[i][j][l++].getStringCellValue()));
+						em("emp = 1");
 						aemp.setUnitsWorked(getCellDouble(cell[i][j][l++]));
+						em("emp = 2");
 						aemp.setCashPaymentAmount(getCellDouble(cell[i][j][l++]));
+						em("emp = 3");
 						aemp.setFoodPaymentFoodType((cell[i][j][l++].getStringCellValue()));
+						em("emp = 4");
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
+						em("emp = 5");
 						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
-						em("in emp  cell = i =" + i);
+						
+						em(" empppp = 1");
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
+						em("1");
 						aemp.setPercentWorkLocation1(getCellDouble(cell[i][j][l++]));
+						em("2");
 						aemp.setWorkLocation2(cell[i][j][l++].getStringCellValue());
+						
+						em("3");
 						aemp.setPercentWorkLocation2(getCellDouble(cell[i][j][l++]));
+						em("4");
 						aemp.setWorkLocation3(cell[i][j][l++].getStringCellValue());
+						em("5");
 						aemp.setPercentWorkLocation3(getCellDouble(cell[i][j][l++]));
-						em("in emp  cell = l =" + l);
+						em("6");
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
 							// em("done emp get = " + rst.getResourcetypename());
@@ -1461,7 +1543,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							aemp.setStatus(efd.model.Asset.Status.Invalid);
 						}
-
+						em("7");
 						// If there is a food payment then need to validate food payment rst
 
 						if (!aemp.getFoodPaymentFoodType().isEmpty()) {
@@ -1471,6 +1553,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Livestock Product") != null)
 									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Food Purchase") != null)) {
 								aemp.setStatus(efd.model.Asset.Status.Valid);
+								isCorrectRST = true;
 							}
 
 							// Now need to check food unit is valid
@@ -1479,6 +1562,25 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								aemp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
+						// Was a Local Unit entered for this FoodPayment RST LZ combination?
+						
+						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, aemp.getFoodResourceSubType());
+						
+						if (localUnit != null) {
+							
+							if (aemp.getFoodPaymentUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+								
+								aemp.setFoodPaymentUnit(localUnit.getName());
+								aemp.setLocalUnit(localUnit.getName());
+								aemp.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+								if (isCorrectRST) { // Is the correct RST entered and valid
+									aemp.setStatus(efd.model.Asset.Status.Valid);
+								}
+							}
+						}
+						
+						
+						
 						em("in emp  33");
 						hhi.getEmployment().add(aemp);
 						// getView().refreshCollections();
@@ -1558,6 +1660,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							at.setResourceSubType(rst);
 							at.setStatus(efd.model.Asset.Status.Valid);
+							isCorrectRST = true;
 							if (!checkSubTypeEntered(at.getUnit(), rst))
 								at.setStatus(efd.model.Asset.Status.Invalid);
 
@@ -1596,6 +1699,27 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							}
 						}
+						
+						
+						
+						// Was a Local Unit entered for this RST LZ combination?
+						
+						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+					
+						if (localUnit != null) {
+							
+							if (at.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+								
+								at.setUnit(localUnit.getName());
+								at.setLocalUnit(localUnit.getName());
+								at.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+								if (isCorrectRST) { // Is the correct RST entered and valid
+									at.setStatus(efd.model.Asset.Status.Valid);
+								}
+							}
+						}
+						
+						
 						hhi.getTransfer().add(at);
 						// getView().refreshCollections();
 						k = 100;
@@ -1638,12 +1762,33 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							awf.setResourceSubType(rst);
 							awf.setStatus(efd.model.Asset.Status.Valid);
+							isCorrectRST = true;
 							if (!checkSubTypeEntered(awf.getUnit(), rst))
 								awf.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
 							awf.setStatus(efd.model.Asset.Status.Invalid);
 						}
+						
+						// Was a Local Unit entered for this RST LZ combination?
+					
+						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+				
+						if (localUnit != null) {
+							
+
+							if (awf.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+								em("local unit match, isCOrrectRST = " + isCorrectRST);
+								awf.setUnit(localUnit.getName());
+								awf.setLocalUnit(localUnit.getName());
+								awf.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+								if (isCorrectRST) { // Is the correct RST entered and valid
+									awf.setStatus(efd.model.Asset.Status.Valid);
+								}
+							}
+						}
+						
+						
 						hhi.getWildFood().add(awf);
 						getView().refreshCollections();
 						k = 100;
@@ -1720,7 +1865,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 										ins.getResource3UsedFor()))
 
 								{
-
+									isCorrectRST = true;
 									ins.setStatus(efd.model.Asset.Status.Valid);
 
 								}
@@ -1743,6 +1888,27 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						}
 
+						// Was a Local Unit entered for this RST LZ combination?
+						
+						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+					
+						if (localUnit != null) {
+						
+
+							if (ins.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+								
+								ins.setUnit(localUnit.getName());
+								ins.setLocalUnit(localUnit.getName());
+								ins.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+								if (isCorrectRST) { // Is the correct RST entered and valid
+									ins.setStatus(efd.model.Asset.Status.Valid);
+								}
+							}
+						}
+						
+						
+						
+						
 						em("done INPUTS " + ins.getItemPurchased());
 						hhi.getInputs().add(ins);
 

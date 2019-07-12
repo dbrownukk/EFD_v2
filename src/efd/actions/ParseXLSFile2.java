@@ -597,7 +597,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		}
 
 		for (i = ASSETLAND; i <= NONFOODPURCHASE; i++) { // Sheet
-
+			isCorrectRST = false;
 			breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
 
 				switch (i) {
@@ -1237,6 +1237,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 								rtype[i].getIdresourcetype().toString())) != null) {
 
 							at.setResourceSubType(rst);
+							
 							at.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(at.getUnit(), rst))
 								at.setStatus(efd.model.Asset.Status.Invalid);

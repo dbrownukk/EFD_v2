@@ -46,7 +46,7 @@ public class LocalUnit extends Identifiable {
 	@ManyToOne
 	@NoCreate
 	@ReferenceView("FromLocalUnit")
-	@SearchListCondition(value = "${resourcetype.resourcetypename} in ('Wild Foods', 'Crops', 'Livestock Products', 'Food Purchase','Land') ")
+	@SearchListCondition(value = "${resourcetype.resourcetypename} in ('Wild Foods', 'Crops', 'Livestock Products', 'Food Purchase','Land','Non Food Purchase','Other Tradeable Goods') ")
 	private ResourceSubType resourceSubType;
 
 	public String getName() {

@@ -7,6 +7,7 @@ import java.math.*;
 /* Write XLS template for OIHM Study */
 
 import java.util.*;
+import java.util.stream.*;
 
 import javax.persistence.*;
 
@@ -55,9 +56,15 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 	List<ConfigQuestionUse> configQuestionUseHHC = null;
 	List<ConfigQuestionUse> configQuestionUseHHM = null;
-
+	
+	
 	private int row;
 	private String forwardURI = null;
+	
+	
+	Project project;
+	Site site;
+	static LivelihoodZone livelihoodZone;
 
 	// Sheet sheet = null;
 
@@ -115,18 +122,15 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		em("studyID = " + studyID);
 
 		Study study = XPersistence.getManager().find(Study.class, studyID);
+		
+		
+		
 		/*
 		 * Check if Study Interview Results header exists and if so is still at
 		 * Generated status, otherwise do not allow
 		 *
-		 * TBD when StudyInt is create
-		 */
-
-		/* Get Study Data */
-		/*
-		 * There may not be a Site or LZ
-		 */
-		Site site = null;
+		
+		site = null;
 		
 		System.out.println(" on gen temp ss site = "+getView().getValueString("site.locationdistrict"));
 		
@@ -135,10 +139,12 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			return(null);
 		} else {
 			site = XPersistence.getManager().find(Site.class, study.getSite().getLocationid());
+			livelihoodZone = site.getLivelihoodZone();
+			project = study.getProjectlz();
 
 		}
 
-		Project project = XPersistence.getManager().find(Project.class, study.getProjectlz().getProjectid());
+		//Project project = XPersistence.getManager().find(Project.class, study.getProjectlz().getProjectid());
 
 		/******************
 		 * Need to get charresource and types using getmanager and iterate
@@ -381,20 +387,20 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		int numMembers = 21;
 
 		// hhmSheet.setDefaultColumnWidth(40);
-		em("about to do  sex lov  = " + isheet);
+		
 		addLOV(sheet, hhmSheet, 4, 4, 2, numMembers, "Sex");
-		em("done sex lov  = " + isheet);
+	
 		// Age and Year of Birth Integers
 		addNumberValidation(workbook, sheet, hhmSheet, 5, 6, 2, numMembers, style);
 		// Head of Household
 		addLOV(sheet, hhmSheet, 7, 7, 2, numMembers, "YesNo");
-		em("isheet 22 22 22 = " + isheet);
+		
 		// Absent ?
 		addLOV(sheet, hhmSheet, 8, 8, 2, numMembers, "YesNo");
-		em("isheet 22 22 33 44 = " + isheet);
+	
 		// Period away in Months
 		addNumberValidation(workbook, sheet, hhmSheet, 10, 10, 2, numMembers, style);
-		em("isheet 22 33  444 = " + isheet);
+	
 		// Answer Validation
 		int qStartRow = 11;
 		for (i = 0; i < configQuestionUseHHM.size(); i++) {
@@ -527,6 +533,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 4, 4, style);
 		
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 5, 5, style);// cash payment
+		
+		addLOV(sheet, empSheet, 3, numRows - 1, 6, 6, "FoodStocks");
+		addLOV(sheet, empSheet, 3, numRows - 1, 7, 7, "Unit");
+		addLOV(sheet, empSheet, 3, numRows - 1, 8, 8, "EmpUnit");
 		
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 10, 10, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 12, 12, style);
@@ -916,7 +926,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		CellRangeAddressList addressList = null;
 		for (int l = 3; l < lastRow; l++) {
-			em("LOV = " + rType + firstRow + " " + l + " " + firstCol + " " + lastCol);
+			//em("LOV = " + rType + firstRow + " " + l + " " + firstCol + " " + lastCol);
 			
 			addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
 			// addressList = new CellRangeAddressList(firstRow, l, firstCol, lastCol);
@@ -1013,6 +1023,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		int nonfp = 0;
 		int empUnit = 0;
 		int inputs = 0;
+		
+		
+		LocalUnit localUnit = null;;
+		ArrayList<String> localUnits = new ArrayList<>();
 
 		/* for HH */
 
@@ -1217,6 +1231,50 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			area++;
 
 		}
+		
+		// TODO could filter rst down for specific RT using .streams, however, performance is good so far.  
+		
+		// Get any localunits for RST and livelihoodZone
+		
+		
+			em("get any local area units");
+			em("lzname = "+livelihoodZone.getLzname());
+			em("rst get = "+rst.get(0).toString());
+			em("rst size = "+rst.size());
+			
+			
+			
+			em("about to do lu loop ");
+			for (int k = 0; k < rst.size(); k++) {
+				try {
+					localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
+					//em("localunit 11 ="+localUnit.getName());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (localUnit != null && rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
+					em("found local Land unit ="+localUnit.getName().trim());
+					localUnits.add(localUnit.getName().trim());
+					
+					
+				}
+				
+			}
+
+		
+		List<String> localus = localUnits.stream().distinct().collect(Collectors.toList());
+		 em("have lus");
+		 for (String lu : localus) {
+			 em("in lus loop lunit = "+lu);
+			 cell = areaRow.createCell(area);
+				cell.setCellValue(lu);
+				area++;
+		}
+		area--;
+		
+		
+		
 
 		String areacol = getCharForNumber(area); // Convert for drop list creation
 		name = dataSheet.getWorkbook().createName();
@@ -1225,20 +1283,47 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		name.setNameName("Area");
 
 		/* Unit */
+		
 
 		List<ReferenceCode> referenceCodeUnit = XPersistence.getManager()
 				.createQuery("from ReferenceCode where ReferenceType = 'Unit'").getResultList();
-		// Get ref codes for Unit and add to Validations sheet
-		for (int k = 0; k < referenceCodeUnit.size(); k++) {
-			cell = unitRow.createCell(unit);
-			cell.setCellValue(referenceCodeUnit.get(k).getReferenceName());
-			unit++;
 
+		// Get ref codes for Unit and add to Validations sheet
+
+		for (int k = 0; k < referenceCodeUnit.size(); k++) {
+			localUnits.add(referenceCodeUnit.get(k).getReferenceName().trim());
 		}
+
+		
+
+		// Get any localunits for RST and livelihoodZone
+		
+		em("get any local units");
+		for (int k = 0; k < rst.size(); k++) {
+			localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
+			
+			if (localUnit != null && !rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
+				localUnits.add(localUnit.getName().trim());
+				
+			}
+			
+		}
+		
+		localus = localUnits.stream().distinct().collect(Collectors.toList());
+		 em("have lus");
+		 for (String lu : localus) {
+			 em("in lus loop lunit = "+lu);
+			 cell = unitRow.createCell(unit);
+				cell.setCellValue(lu);
+				unit++;
+		}
+		unit--;
 
 		String unitcol = getCharForNumber(unit); // Convert for drop list creation
 		name = dataSheet.getWorkbook().createName();
 		unitRowNum++;
+
+		em("Unit cell info  " + unitRowNum + " " + unitcol);
 
 		name.setRefersToFormula("Validations" + "!$A$" + unitRowNum + ":$" + unitcol + "$" + unitRowNum);
 
@@ -2161,9 +2246,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(9, 3, "Unit", boldTopStyle);
 			sheet.setValue(10, 3, "Units Received / Transferred", boldTopStyle);
 			sheet.setValue(11, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(12, 3, "Price per Unit", boldTopStyle);
+			sheet.setValue(14, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(13, 3, "Units Other Use", boldTopStyle);
-			sheet.setValue(14, 3, "Units Consumed", boldTopStyle);
+			sheet.setValue(12, 3, "Units Consumed", boldTopStyle);
 			sheet.setValue(15, 3, "Market 1", boldTopStyle);
 			sheet.setValue(16, 3, "% Trade at 1", boldTopStyle);
 			sheet.setValue(17, 3, "Market 2", boldTopStyle);
@@ -2466,8 +2551,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	}
 
 	private static void em(Object em) {
-		return;
-		//System.out.println(em);
+		//return;
+		System.out.println(em);
 
 	}
 
