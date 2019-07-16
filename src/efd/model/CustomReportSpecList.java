@@ -28,7 +28,7 @@ public class CustomReportSpecList {
 	@ManyToOne
 	@NoCreate
 	@NoModify
-	// @DescriptionsList(descriptionProperties = "studyName,referenceYear")
+	@NoFrame
 	@SearchAction("")
 	
 	@ReferenceView("households")

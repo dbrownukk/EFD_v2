@@ -37,10 +37,10 @@ public class GoOIHMReports extends ViewBaseAction {
 
 		String studyid = getView().getValueString("id");
 
-		System.out.println("allvals in gooihmreports = " + allValues);
+		System.out.println("allvals in gooihmreports 1 = " + allValues);
 
 		showDialog();
-		getView().setTitle("Enter Custom Report Spec name to run");
+		getView().setTitle("Enter Custom Report Spec name to Run");
 
 		getView().setModelName("CustomReportSpecList");
 
@@ -49,7 +49,7 @@ public class GoOIHMReports extends ViewBaseAction {
 		Map allValues1 = getView().getAllValues();
 		// Map allValues2 = getView().getSubview("households").getAllValues();
 
-		System.out.println("allvals in gooihmreports 1 = " + allValues1);
+		System.out.println("allvals in gooihmreports 2 = " + allValues1);
 		// System.out.println("allvals in gooihmreports 2 = "+allValues2);
 
 		getView().setValue("study.id", studyid);

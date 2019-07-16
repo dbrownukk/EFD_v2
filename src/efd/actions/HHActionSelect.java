@@ -42,7 +42,10 @@ public class HHActionSelect extends OnSelectElementBaseAction {
 				|| crs.getCategory().size() > 0) {
 
 			System.out.println("in deselect");
-			getView().collectionDeselectAll();
+			// getView().collectionDeselectAll();
+			
+			getView().getSubview("study.household").collectionDeselectAll();
+			
 			addWarning(
 					"Selected Report Spec has Household inclusion rules. No explicit Households can be chosen below");
 

@@ -134,22 +134,22 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 				Map<?, ?> membersNames = getView().getSubview("study.household").getMembersNames();
 				// System.out.println("mnames = "+i+" "+membersNames);
-				System.out.println("key = " + key.toString());
+				// System.out.println("key = " + key.toString());
 
 				String subKey = key.toString().substring(4, 36);
-				System.out.println("sub key = " + subKey);
+				// System.out.println("sub key = " + subKey);
 
 				// Map househ = MapFacade.getValues("Household", sub, membersNames);
 
 				Household singleHHSelected = XPersistence.getManager().find(Household.class, subKey);
 
-				System.out.println("single hh selected = " + singleHHSelected);
+				// System.out.println("single hh selected = " + singleHHSelected);
 
 				HH e = new HH();
 				e.household = singleHHSelected;
 				hhSelected.add(e);
 
-				System.out.println(" hhselected size = " + hhSelected.size());
+				// System.out.println(" hhselected size = " + hhSelected.size());
 
 				selectedHouseholds.add(singleHHSelected);
 			}
@@ -207,6 +207,16 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		} else if (customReportSpec.getTotalQuantilePercentage() == 100) {
 			isQuantile = true;
 			quantiles = (List<Quantile>) customReportSpec.getQuantile();
+			
+			quantiles = quantiles.stream().sorted(Comparator.comparing(Quantile::getSequence)).collect(Collectors.toList());
+			
+			for(Quantile q:quantiles)
+				System.out.println("q = "+q.getSequence()+" "+q.getName());
+			
+			
+			uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
+					.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
+			
 			numberOfQuantiles = customReportSpec.getQuantile().size();
 		}
 
@@ -220,7 +230,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		// Populate HH array hh - use dialog selected list if entered
 
 		if (!isSelectedHouseholds) {
-			System.out.println("no hh selection befor epopulate hh array , households size = "+households.size());
+			System.out.println("no hh selection befor epopulate hh array , households size = " + households.size());
 			populateHHArray(households);
 		} else if (isSelectedHouseholds) {
 			System.out.println("made a  hh selection");
@@ -237,12 +247,12 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		System.out.println("done calc DI");
 		calculateAE(); // Calculate the Adult equivalent
 		System.out.println("done calc AE");
-		if(uniqueHousehold.size()==0) {
+		if (uniqueHousehold.size() == 0) {
 			addError("No Households meet criteria, change Report Spec");
 			closeDialog();
-		return;
+			return;
 		}
-		
+
 		errno = 54;
 		// Run reports
 		try {
@@ -267,14 +277,13 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	}
 
 	private void calculateAE() {
-		System.out.println("in calculateAE, no of hh = "+hh.size());
-		//for (HH hh2 : hh) {
+		System.out.println("in calculateAE, no of hh = " + hh.size());
+		// for (HH hh2 : hh) {
 
-		
 		for (HH hh2 : uniqueHousehold) {
-		
+
 			hh2.hhAE = householdAE(hh2.household);
-			
+
 		}
 
 	}
@@ -289,12 +298,12 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
 				.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
 
-		uniqueHousehold.forEach(u -> {
-			System.out.println("hh in createdireport = " + u.hhNumber + " " + u.getHhDI());
-		});
+		//uniqueHousehold.forEach(u -> {
+		//	System.out.println("hh in createdireport = " + u.hhNumber + " " + u.getHhDI());
+		//});
 
 		// If QUantile then need to calc which quantile each unique HH is in
-		final int[] qpoint = new int[20];
+		final int[] qpoint = new int[200];
 		if (isQuantile) {
 			// unique HH are in order of DI set in order of Disposable Income
 			int numberInQuantileDataset = uniqueHousehold.size();
@@ -320,12 +329,16 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 				System.out.println("qpoint = " + qq.getSequence() + " " + qpoint[qq.getSequence()]);
 
-				if (qq.getSequence() > 1)
+				
+				System.out.println("is this first run " + qq.getSequence()+" "+isFirstRun);
+				if (qq.getSequence() > 1) {
+					
 					isFirstRun = false;
-
-				for (HH unhh : uniqueHousehold) {
-					System.out.println("hh num + DI = " + unhh.getHhDI() + " " + unhh.getHhNumber());
 				}
+				// for (HH unhh : uniqueHousehold) {
+				// System.out.println("hh num + DI = " + unhh.getHhDI() + " " +
+				// unhh.getHhNumber());
+				// }
 
 				int i = 1;
 				for (HH unhh : uniqueHousehold) {
@@ -363,8 +376,6 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 		}
 
-
-
 	}
 
 	/******************************************************************************************************************************************/
@@ -400,43 +411,65 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			System.out.println("in Cat filter");
 			List<HH> hhCAT = hh.stream().filter(p -> p.getCategory() != null).collect(Collectors.toList());
 
-			for (HH hh2 : hhCAT) {
-
-				for (Category category : customReportSpec.getCategory()) {
-
-					for (ResourceSubType resourceSubType : category.getResourceSubType()) {
-						if (resourceSubType != hh2.getResourceSubType()) {
-							// System.out.println("a Category RST to delete ");
-							hh2.setDelete(true);
-						} else {
-							// System.out.println("a Category RST to save ");
-							hh2.setDelete(false);
-							break;
-						}
-
+			for (Category category : customReportSpec.getCategory()) {
+				for (HH hh2 : hhCAT) {
+					if (hh2.getResourceSubType().getCategory() == category) {
+						// System.out.println(
+						// "rst is in this category in CRS " +
+						// hh2.getResourceSubType().getResourcetypename());
+						hh2.setDelete(false);
+					} else {
+						// System.out.println(
+						// "rst is not in this category in CRS " +
+						// hh2.getResourceSubType().getResourcetypename());
+						hh2.setDelete(true);
 					}
-
 				}
+
+				/*
+				 * for (Category category : customReportSpec.getCategory()) {
+				 * System.out.println("cat = " + category.getCategoryName()); for
+				 * (ResourceSubType resourceSubType : category.getResourceSubType()) {
+				 * System.out.println("cat RST and RST = " +
+				 * resourceSubType.getResourcetypename() + " " +
+				 * hh2.getResourceSubType().getResourcetypename()); if (resourceSubType !=
+				 * hh2.getResourceSubType()) {
+				 * System.out.println("a Category RST to delete "+hh2.getResourceSubType().
+				 * getResourcetypename()); hh2.setDelete(true); } else {
+				 * System.out.println("a Category RST to save "+hh2.getResourceSubType().
+				 * getResourcetypename()); hh2.setDelete(false); break; }
+				 * 
+				 * }
+				 * 
+				 * }
+				 */
 			}
 
 		}
 
+		System.out.println("After CAT hh = " + hh.size());
 		if (customReportSpec.getResourceType().size() > 0) // Apply RST Filter
-		{
 
+		{
+			System.out.println("in RT filter");
 			List<HH> hhRT = hh.stream().filter(p -> p.getResourceType() != null).collect(Collectors.toList());
+			System.out.println("After RT size  hh2 = " + hhRT.size());
 
 			for (HH hh2 : hhRT) {
 
 				for (ResourceType resourceType : customReportSpec.getResourceType()) {
-
-					if (resourceType.getIdresourcetype() != hh2.getResourceType().getIdresourcetype()) {
-
+					// System.out.println("RT in loop = "+resourceType.getResourcetypename());
+					if (resourceType != hh2.getResourceType()) {
+						// System.out.println("In RT rt and hh2 rt NO Match
+						// "+resourceType.getResourcetypename()+"
+						// "+hh2.getResourceType().getResourcetypename());
 						hh2.setDelete(true);
 					}
 
 					else {
-
+						// System.out.println("In RT rt and hh2 rt TRUE MATCH
+						// "+resourceType.getResourcetypename()+"
+						// "+hh2.getResourceType().getResourcetypename());
 						hh2.setDelete(false);
 						break;
 					}
@@ -446,9 +479,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		}
 
+		System.out.println("After RT hh = " + hh.size());
 		if (customReportSpec.getResourceSubType().size() > 0) // Apply RST Filter
 		{
-
+			System.out.println("in RST filter");
 			List<HH> hhRST = hh.stream().filter(p -> p.getResourceSubType() != null).collect(Collectors.toList());
 
 			for (HH hh2 : hhRST) {
@@ -468,6 +502,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		}
 
+		System.out.println("After RST hh = " + hh.size());
 		if (customReportSpec.getConfigAnswer().size() > 0) // Apply Q and A Filter
 		{
 
@@ -490,26 +525,25 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		}
 
+		System.out.println("After Questions hh = " + hh.size());
 		try {
 			hh.removeIf(n -> n.getDelete() == true);
 		} catch (Exception e) {
 			System.out.println("nothing filtered to remove");
 			// e.printStackTrace();
 		}
+/*
+		System.out.println("size of hh after all filter = " + hh.size());
+		for (HH hh2 : hh) {
+			if (hh2.getResourceType() != null)
+				System.out.println("hh after filtering now equals = " + hh2.getHhNumber() + " "
+						+ hh2.getCategory().toArray().toString() + " " + (hh2.getResourceType().getResourcetypename()
+								+ " " + hh2.getResourceSubType().getResourcetypename()));
+			else
+				System.out.println("print an answer" + hh2.toString());
 
-		// System.out.println("size of hh after all filter = " + hh.size());
-		// for (HH hh2 : hh) {
-		// if (hh2.getResourceType() != null)
-		// System.out.println("hh after filtering now equals = " + hh2.getHhNumber() + "
-		// "
-		// + hh2.getCategory().toArray().toString() + " " +
-		// (hh2.getResourceType().getResourcetypename()
-		// + " " + hh2.getResourceSubType().getResourcetypename()));
-		// else
-		// System.out.println("print an answer" + hh2.toString());
-
-		// }
-
+		}
+*/
 	}
 
 	/******************************************************************************************************************************************/
@@ -525,21 +559,22 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		ConfigAnswer answer = null;
 
 		for (Household household : households) {
-			System.out.println("hh in populate hh and hh size = "+household.getHouseholdName()+" "+hh.size());
+			System.out.println("hh in populate hh and hh size = " + household.getHouseholdName() + " " + hh.size());
 			populateHHfromHousehold(household, answer);
-//Needs to go back in ......
-			//for (ConfigAnswer configAnswer : household.getConfigAnswer()) {
-			//	System.out.println("answer = " + configAnswer.getAnswer());
-			//	addTohhArray(household, null, null, null, configAnswer, "Answer", null, null, null, null, null, null,
-				//		null, null, null, null, null, null, null);
+
+			for (ConfigAnswer configAnswer : household.getConfigAnswer()) {
+				System.out.println("answer = " + configAnswer.getAnswer());
+				addTohhArray(household, null, null, null, configAnswer, "Answer", null, null, null, null, null, null,
+						null, null, null, null, null, null, null);
 				/*
 				 * Found a HH with required answer - now iterate back through hh to populate
 				 * assets
 				 */
 
-			//	populateHHfromHousehold(household, configAnswer);
-			//	System.out.println("hh in populate hh from configAnswer hh size = "+household.getHouseholdName()+" "+hh.size());
-			//}
+				populateHHfromHousehold(household, configAnswer);
+				System.out.println("hh in populate hh from configAnswer hh size =" + household.getHouseholdName() + " "
+						+ hh.size());
+			}
 
 		}
 
@@ -554,26 +589,23 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		// }
 
-		System.out.println("end populateArray"+hh.size());
-		
-	
+		System.out.println("end populateArray" + hh.size());
 
 	}
 
 	/******************************************************************************************************************************************/
 
 	private void populateHHfromHousehold(Household household, ConfigAnswer answer) {
-		
-		
-		//System.out.println("in populateHHfromHosuehold, hosuehold = "+household.getHouseholdName()+" answer = "+answer.getConfigQuestionUse().getConfigQuestion().getPrompt());;
-		
-		System.out.println("assetland size = "+household.getAssetLand().size());
-		System.out.println("assetfs size = "+household.getAssetFoodStock().size());
-		
-		
-		
+
+		// System.out.println("in populateHHfromHosuehold, hosuehold =
+		// "+household.getHouseholdName()+" answer =
+		// "+answer.getConfigQuestionUse().getConfigQuestion().getPrompt());;
+
+		System.out.println("assetland size = " + household.getAssetLand().size());
+		System.out.println("assetfs size = " + household.getAssetFoodStock().size());
+
 		for (AssetLand asset : household.getAssetLand()) {
-			
+
 			ResourceSubType resourceSubType = asset.getResourceSubType();
 			Collection<Category> category = asset.getResourceSubType().getCategory(); // List of Categories that
 																						// include this RST
@@ -1150,9 +1182,6 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				hhLand.setQuantile(hh3.getQuantile());
 				hhl.add(hhLand);
 
-				
-				
-				
 				total = 0.0;
 
 				if (landTot.containsKey(assetLand.getResourceSubType())) {
@@ -1243,17 +1272,17 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			for (Quantile qqpr : quantiles) {
 				reportWB.getSheet(isheet).setValue(1, row, qqpr.getName(), textStyle);
 				reportWB.getSheet(isheet).setValue(2, row, qqpr.getPercentage(), textStyle);
-				
+
 				row++;
 			}
 			errno = 2277;
 
 			row = 5;
 
-			for (HHSub hh : hhllist) {
-				System.out.println("hhllist = " + hh.getQuantSeq() + " " + hh.getAssetRST().getResourcetypename() + " "
-						+ hh.getColumn());
-			}
+			//for (HHSub hh : hhllist) {
+			//	System.out.println("hhllist = " + hh.getQuantSeq() + " " + hh.getAssetRST().getResourcetypename() + " "
+			//			+ hh.getColumn());
+			//}
 
 			// Quantile check with many RSTs
 			errno = 2278;
@@ -1272,7 +1301,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						Map<ResourceSubType, Double> collect = q2.stream().collect(Collectors
 								.groupingBy(HHSub::getAssetRST, Collectors.averagingDouble(HHSub::getAssetValue)));
 
-						System.out.println("land asset q2 = " + hhs.getQuantSeq() +" " + " " + hhs.getAssetName() + " "
+						System.out.println("land asset q2 = " + hhs.getQuantSeq() + " " + " " + hhs.getAssetName() + " "
 								+ hhs.getAssetValue() + " double from group by =  " + collect.get(hhs.getAssetRST()));
 						Double val = fillDouble(collect.get(hhs.getAssetRST()));
 						reportWB.getSheet(isheet).setColumnWidths(hhs.getColumn(), 20);
@@ -1436,10 +1465,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			row = 5;
 
-			for (HHSub hh : hhllist) {
-				System.out.println("hhllist = " + hh.getQuantSeq() + " " + hh.getAssetRST().getResourcetypename() + " "
-						+ hh.getColumn());
-			}
+		//	for (HHSub hh : hhllist) {
+		//		System.out.println("hhllist = " + hh.getQuantSeq() + " " + hh.getAssetRST().getResourcetypename() + " "
+		//				+ hh.getColumn());
+		//	}
 
 			// Quantile check with many RSTs
 			errno = 22810;
@@ -1458,8 +1487,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						Map<ResourceSubType, Double> collect = q2.stream().collect(Collectors
 								.groupingBy(HHSub::getAssetRST, Collectors.averagingDouble(HHSub::getAssetValue)));
 
-						System.out.println("q2 = " + hhs.getQuantSeq() + " " + " " + hhs.getAssetName() + " "
-								+ hhs.getAssetValue() + " double from group by =  " + collect.get(hhs.getAssetRST()));
+						//System.out.println("q2 = " + hhs.getQuantSeq() + " " + " " + hhs.getAssetName() + " "
+						//		+ hhs.getAssetValue() + " double from group by =  " + collect.get(hhs.getAssetRST()));
 						Double val = fillDouble(collect.get(hhs.getAssetRST()));
 						reportWB.getSheet(isheet).setColumnWidths(hhs.getColumn(), 20);
 						reportWB.getSheet(isheet).setValue(hhs.getColumn(), hhs.getQuantSeq() + 5, val, textStyle);
@@ -1504,10 +1533,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		 */
 		errno = 2372;
 		System.out.println("In HHMember report 2372");
-		
-		
-		
-		
+
 		Optional<HH> findFirstHH = uniqueHousehold.stream().findFirst();
 		System.out.println("In HHMember report done find first" + findFirstHH.toString());
 
@@ -2035,12 +2061,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	private Double householdAE(Household household) {
 
-		System.out.println("in householdAE calc, household = "+household.getHouseholdName());
-		
-		
-		
-		
-		
+		System.out.println("in householdAE calc, household = " + household.getHouseholdName());
+
 		Double totAE = 0.0;
 		Double ageReq = 0.0;
 		int age = 0;
@@ -2052,7 +2074,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			WHOEnergyRequirements whoEnergey = WHOEnergyRequirements.findByAge(age);
 
-			System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " +whoEnergey.getMale() + " " + gender);
+			//System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " + whoEnergey.getMale() + " " + gender);
 			if (gender == Sex.Female) {
 				totAE += whoEnergey.getFemale();
 			} else if (gender == Sex.Male) {
@@ -2060,14 +2082,13 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 
 		}
-		
+
 		/* AE = TE / 2600 */
-		
-		
+
 		totAE = totAE / 2600;
-		System.out.println("done householdAE calc");
+		//System.out.println("done householdAE calc");
 		return Double.parseDouble(df2.format(totAE));
-		
+
 	}
 
 	/******************************************************************************************************************************************/
@@ -2080,7 +2101,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		sheet[0] = reportWB.addSheet("Custom Report Spec");
 		setSheetStyle(sheet[0]);
-		sheet[0].setColumnWidths(1, 40, 50, 50, 50, 50, 50, 50,50,50);
+		sheet[0].setColumnWidths(1, 40, 50, 50, 50, 50, 50, 50, 50, 50);
 
 		sheet[0].setValue(1, 1, "Date:", textStyle);
 		sheet[0].setValue(2, 1, new Date());
@@ -2111,19 +2132,23 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int col = 3;
 		// Selected HH
 		errno = 1101;
+		String hhName;
 		if (isSelectedHouseholds) {
 			sheet[0].setValue(col, i, "Selected Households in Report = " + hhSelected.size(), boldTopStyle);
 			i++;
 			for (HH hh2 : hhSelected) {
-				sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber()+" - "+hh2.getHousehold().getHouseholdName(), textStyle);
+				if ((hhName = hh2.getHousehold().getHouseholdName()) == null)
+					hhName = "-";
+				sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber() + " - " + hhName, textStyle);
 				i++;
 			}
 		} else {
 			sheet[0].setValue(col, i, "Report Spec Households in Report = " + uniqueHousehold.size(), boldTopStyle);
 			i++;
 			for (HH hh2 : uniqueHousehold) {
-
-				sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber()+" - "+hh2.getHousehold().getHouseholdName(), textStyle);
+				if ((hhName = hh2.getHousehold().getHouseholdName()) == null)
+					hhName = "-";
+				sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber() + " - " + hhName, textStyle);
 				i++;
 			}
 		}
@@ -2179,7 +2204,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			// e.printStackTrace();
 			System.out.println("No quantile");
 		}
 
@@ -2200,25 +2225,22 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 				String prompt = ans.getConfigQuestionUse().getConfigQuestion().getPrompt();
 				String answer = ans.getAnswer();
-				
+
 				sheet[0].setValue(col, i, prompt, textStyle);
 				sheet[0].setValue(col + 1, i, answer, textStyle);
 				i++;
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
+			// e.printStackTrace();
 			System.out.println("No config answer");
 		}
-		
-		
-		
-		
+
 		/*
 		 * 
 		 * get Currency
 		 */
-		
+
 		errno = 1107;
 		String currency;
 

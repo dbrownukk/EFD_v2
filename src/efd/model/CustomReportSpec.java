@@ -85,7 +85,7 @@ public class CustomReportSpec extends Identifiable {
 	
 	@OneToMany(mappedBy = "customReportSpec")
 	@NewAction("")
-	@AddAction("CustomReportSpec.add") 
+	//@AddAction("CustomReportSpec.add") 
 	@CollectionView("fromCRS")
 	@SearchListCondition(value="${configQuestionUse.configQuestion.level} = 1")  // Household q and a only
 	@ListProperties("configQuestionUse.configQuestion.prompt,answer")

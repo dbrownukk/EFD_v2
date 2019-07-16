@@ -13,6 +13,7 @@ public class OnChangeCRSList extends OnChangePropertyBaseAction {
 	@Override
 	public void execute() throws Exception {
 
+
 		String studyid = getView().getValueString("study.id");
 		String crsid = getView().getValueString("customReportSpec.id");
 
@@ -33,12 +34,20 @@ public class OnChangeCRSList extends OnChangePropertyBaseAction {
 				|| crs.getCategory().size() > 0) {
 			System.out.println("in deselect");
 
+	
+			
 			getView().getSubview("study.household").collectionDeselectAll();
+			
+		
+			
+			
+			
 			addWarning(
 					"Selected Report Spec has Household inclusion rules. No explicit Households can be chosen below");
 
 		} else {
 			System.out.println("in select");
+			
 		}
 
 	}
