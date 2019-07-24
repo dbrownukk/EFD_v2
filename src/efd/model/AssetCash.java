@@ -17,7 +17,7 @@ public class AssetCash extends Asset{
 	
 
 	@Column(name = "Currency", length = 3, nullable=false)
-	@Required
+	// @Required Bug in elementcollection
 	private String currencyEnteredName;
 	
 	@Column(name = "Amount" ,precision=10, scale=2)
@@ -30,6 +30,25 @@ public class AssetCash extends Asset{
 	
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Cash'")
 	private ResourceSubType resourceSubType;
+	
+	
+	@Column(precision = 10, scale = 5)
+	@Digits(integer = 10, fraction = 5)
+	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
+
+	private double exchangeRate;
+	
+	
+
+
+
+	public double getExchangeRate() {
+		return exchangeRate;
+	}
+
+	public void setExchangeRate(double exchangeRate) {
+		this.exchangeRate = exchangeRate;
+	}
 
 	public String getCurrencyEnteredName() {
 		return currencyEnteredName;

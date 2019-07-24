@@ -145,7 +145,7 @@ public class Household extends EFDIdentifiable {
 	private Collection<AssetTree> assetTree;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType.resourcetypename,currencyEnteredName,amount")
+	@ListProperties("status, resourceSubType.resourcetypename,currencyEnteredName,exchangeRate,amount")
 	private Collection<AssetCash> assetCash;
 
 	@ElementCollection

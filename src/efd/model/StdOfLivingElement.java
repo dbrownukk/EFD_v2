@@ -48,7 +48,9 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
 	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename", condition = "${resourcetype.resourcetypename} = 'Non Food Purchase'")
-
+	@NoCreate
+	
+	@NoModify
 	private ResourceSubType resourcesubtype;
 	/*************************************************************************************************/
 	@Required

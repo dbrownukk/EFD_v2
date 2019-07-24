@@ -7,6 +7,7 @@
 package efd.actions;
 
 import java.io.*;
+import java.math.*;
 import java.sql.*;
 import java.text.*;
 import java.time.*;
@@ -30,6 +31,7 @@ import efd.model.HouseholdMember.*;
 import efd.model.WealthGroupInterview.*;
 
 import org.apache.commons.lang.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.format.*;
@@ -115,6 +117,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 	Crop acrop = null;
 	LivelihoodZone livelihoodZone = null;
+	Household hhi = null;
 
 	public void execute() throws Exception {
 
@@ -146,7 +149,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		ws.add(new Wsheet(ASSETTRADEABLE, "Other Tradeable Goods", 4, 0));
 		ws.add(new Wsheet(ASSETFOOD, "Food Stocks", 3, 0)); // 3
 		ws.add(new Wsheet(ASSETTREE, "Trees", 4, 0));
-		ws.add(new Wsheet(ASSETCASH, "Cash", 2, 0));
+		ws.add(new Wsheet(ASSETCASH, "Cash", 3, 0));
 		ws.add(new Wsheet(CROPS, "Crops", 13, 0));
 		ws.add(new Wsheet(LIVESTOCKSALE, "Livestock", 11, 0));
 		ws.add(new Wsheet(LIVESTOCKPRODUCT, "Livestock Products", 14, 0));
@@ -192,7 +195,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		// getView().refresh();
 		em("about to get hhi" + hhId);
-		Household hhi = XPersistence.getManager().find(Household.class, hhId);
+		hhi = XPersistence.getManager().find(Household.class, hhId);
 		if (hhi.getSpreadsheet().isEmpty()) {
 			addWarning("Upload completed Interview Spreadsheet before parsing");
 			return;
@@ -215,10 +218,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		em("in xls parse 2 ");
 
-		
 		livelihoodZone = hhi.getStudy().getSite().getLivelihoodZone();
-				
-		
+
 		String spreadsheetId = hhi.getSpreadsheet();
 
 		Connection con = null;
@@ -921,7 +922,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if (k == LIVESTOCKPRODUCT) {
 
-							em("LIVESTOCKPRODUCT read cell type = " + cell[k][i][j].getCellType() + "ijk= " + k + " " + i + " " + j);
+							em("LIVESTOCKPRODUCT read cell type = " + cell[k][i][j].getCellType() + "ijk= " + k + " "
+									+ i + " " + j);
 
 							if (cell[k][i][j].getCellType() == 0)
 								em("read cell number type = " + cell[k][i][j].getNumericCellValue());
@@ -979,7 +981,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		String warnMessage = null;
 		String unitEntered = null;
 		Boolean isCorrectRST = false;
-		
 
 		// for (int p = 0; p < 15; p++)
 		// em("numrows array p = " + p + " " + numberRows[p]);
@@ -1022,8 +1023,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		}
 
 		for (i = ASSETLAND; i <= INPUTS; i++) { // Sheet
-		
-		breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
+
+			breaksheet: for (j = 0; j < numberRows[i]; j++) { // ws num rows in each sheet Row
 				em("inp loop assets 777 " + numberRows[i] + " " + j);
 				switch (i) {
 
@@ -1055,12 +1056,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do LAND  localunit");
 						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
-						em("Land localunit =" + localUnit.getName());
+						// em("Land localunit =" + localUnit.getName());
 						if (localUnit != null) {
-							
 
 							if (al.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
-								
+
 								al.setUnit(localUnit.getName());
 								al.setLocalUnit(localUnit.getName());
 								al.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
@@ -1069,8 +1069,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								}
 							}
 						}
-						
-						
+
 						hhi.getAssetLand().add(al);
 
 						em("done al get 33 ");
@@ -1257,11 +1256,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						em("in set assetcash cell = i =" + i);
 						warnMessage = "Currency";
 						acash.setCurrencyEnteredName(cell[i][j][0].getStringCellValue());
+						System.out.println("CURRENCY ENTERED = " + acash.getCurrencyEnteredName());
 						acash.setUnit("each"); // a default value - not used elsewhere
 
 						warnMessage = "Currency Amount";
 						acash.setAmount(getCellDouble(cell[i][j][1]));
-
+						warnMessage = "Currency Exchage Rate";
+						acash.setExchangeRate((cell[i][j][2].getNumericCellValue()));
 						/* check against currency */
 
 						for (icurr = 0; icurr < currency.size(); icurr++) {
@@ -1281,8 +1282,69 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							}
 
 						}
+
+						/*
+						 * if Currency is not LZ currency or Proect Alt Currency (with exchange rate)
+						 * then use Exchange Rate entered in aemp
+						 */
+
+						warnMessage = "Currency Exchange Rate Calc";
+
+						String lzCurrency;
+						try {
+							lzCurrency = livelihoodZone.getCountry().getCurrency();
+						} catch (Exception e1) {
+							// No LZ, thus use Country Currency
+							lzCurrency = hhi.getStudy().getSite().getCountry().getCurrency();
+						}
+
+						String studyAltCurrency = hhi.getStudy().getAltCurrency().getCurrency();
+
+						String cashCurrency = acash.getResourceSubType().getResourcetypename();
+
+						BigDecimal zero = new BigDecimal(0.0);
+
+						BigDecimal studyAltExchangeRate = hhi.getStudy().getAltExchangeRate();
+
+						double studyAltExhangeRateDouble = 0.0;
+						try {
+
+							studyAltExhangeRateDouble = studyAltExchangeRate.doubleValue();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							// e.printStackTrace();
+
+						}
+
+						if (cashCurrency.equalsIgnoreCase(lzCurrency)) {
+
+							acash.setExchangeRate(1);
+						} else if (cashCurrency.equalsIgnoreCase(studyAltCurrency)) {
+
+							if (studyAltExhangeRateDouble <= 0) {
+
+								acash.setStatus(efd.model.Asset.Status.Invalid);
+							} else {
+
+								acash.setAmount(acash.getAmount() * studyAltExhangeRateDouble);
+								acash.setExchangeRate(studyAltExhangeRateDouble);
+							}
+						} else if (!cashCurrency.equals(lzCurrency)
+								&& !cashCurrency.equalsIgnoreCase(studyAltCurrency)) {
+							/* need to check exchange rate is >0 */
+
+							if (acash.getExchangeRate() <= 0) {
+
+								acash.setStatus(efd.model.Asset.Status.Invalid);
+							} else {
+
+								acash.setAmount(acash.getAmount() * acash.getExchangeRate());
+							}
+						}
+
 						hhi.getAssetCash().add(acash);
-						getView().refreshCollections();
+						// getView().refreshCollections();
+
 						k = 100;
 						break;
 
@@ -1337,16 +1399,15 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							acrop.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						
+
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do crops localunit");
 						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
-						em("crop localunit =" + localUnit.getName());
+
 						if (localUnit != null) {
-							
 
 							if (acrop.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
-								
+
 								acrop.setUnit(localUnit.getName());
 								acrop.setLocalUnit(localUnit.getName());
 								acrop.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
@@ -1355,8 +1416,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								}
 							}
 						}
-						
-						
+
 						hhi.getCrop().add(acrop);
 						// getView().refreshCollections();
 
@@ -1448,7 +1508,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						em("about to do LSP checksubtype " + cell[i][j][0].getStringCellValue());
 
-						if ((rst = checkSubType(alsp.getLivestockType()+" "+alsp.getLivestockProduct(), // is this a valid resource type?
+						if ((rst = checkSubType(alsp.getLivestockType() + " " + alsp.getLivestockProduct(), // is this a
+																											// valid
+																											// resource
+																											// type?
 								rtype[i].getIdresourcetype().toString())) != null) {
 							em("done alsp get = " + rst.getResourcetypename());
 
@@ -1461,27 +1524,27 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							alsp.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						
+
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do LSP localunit");
 						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
 						em("back from getLocalunit");
-						
+
 						if (localUnit != null) {
 
-								if (alsp.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
-									
-									alsp.setUnit(localUnit.getName());
-									alsp.setLocalUnit(localUnit.getName());
-									alsp.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
-									if (isCorrectRST) { // Is the correct RST entered and valid
-										alsp.setStatus(efd.model.Asset.Status.Valid);
-									}
+							if (alsp.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
+
+								alsp.setUnit(localUnit.getName());
+								alsp.setLocalUnit(localUnit.getName());
+								alsp.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
+								if (isCorrectRST) { // Is the correct RST entered and valid
+									alsp.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
-				
+						}
+
 						em("skipped lu");
-						
+
 						hhi.getLivestockProducts().add(alsp);
 						// getView().refreshCollections();
 						k = 100;
@@ -1501,7 +1564,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						int l = 0;
 						em("in emp  cell = i =" + i);
 						aemp.setEmploymentName((cell[i][j][l++].getStringCellValue()));
-						
+
 						aemp.setPeopleCount(getCellDouble(cell[i][j][l++]));
 						aemp.setUnit((cell[i][j][l++].getStringCellValue()));
 						em("emp = 1");
@@ -1514,14 +1577,14 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
 						em("emp = 5");
 						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
-						
+
 						em(" empppp = 1");
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
 						em("1");
 						aemp.setPercentWorkLocation1(getCellDouble(cell[i][j][l++]));
 						em("2");
 						aemp.setWorkLocation2(cell[i][j][l++].getStringCellValue());
-						
+
 						em("3");
 						aemp.setPercentWorkLocation2(getCellDouble(cell[i][j][l++]));
 						em("4");
@@ -1563,13 +1626,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						}
 
 						// Was a Local Unit entered for this FoodPayment RST LZ combination?
-						
+
 						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, aemp.getFoodResourceSubType());
-						
+
 						if (localUnit != null) {
-							
+
 							if (aemp.getFoodPaymentUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
-								
+
 								aemp.setFoodPaymentUnit(localUnit.getName());
 								aemp.setLocalUnit(localUnit.getName());
 								aemp.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
@@ -1578,9 +1641,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								}
 							}
 						}
-						
-						
-						
+						if (StringUtils.isEmpty(aemp.getUnit()))
+							aemp.setUnit("Each");
 						em("in emp  33");
 						hhi.getEmployment().add(aemp);
 						// getView().refreshCollections();
@@ -1590,7 +1652,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					}
 
 					catch (Exception ex) {
-						addMessage("Problem parsing Employee worksheet");
+						addMessage("Problem parsing Employment worksheet");
 						em("Error in Emp = " + ex);
 						k = 100;
 						break breaksheet;
@@ -1699,17 +1761,15 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							}
 						}
-						
-						
-						
+
 						// Was a Local Unit entered for this RST LZ combination?
-						
+
 						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
-					
+
 						if (localUnit != null) {
-							
+
 							if (at.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
-								
+
 								at.setUnit(localUnit.getName());
 								at.setLocalUnit(localUnit.getName());
 								at.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
@@ -1718,8 +1778,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								}
 							}
 						}
-						
-						
+
 						hhi.getTransfer().add(at);
 						// getView().refreshCollections();
 						k = 100;
@@ -1769,13 +1828,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						} else {
 							awf.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						
+
 						// Was a Local Unit entered for this RST LZ combination?
-					
+
 						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
-				
+
 						if (localUnit != null) {
-							
 
 							if (awf.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
 								em("local unit match, isCOrrectRST = " + isCorrectRST);
@@ -1787,8 +1845,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								}
 							}
 						}
-						
-						
+
 						hhi.getWildFood().add(awf);
 						getView().refreshCollections();
 						k = 100;
@@ -1841,7 +1898,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							} else {
 								em("back in inputs rst not found ");
 							}
-
+							em("in INPUTS rst = "+cell[i][j][0].getStringCellValue());
 							if ((rst2 = checkSubType(cell[i][j][0].getStringCellValue(),
 									rtype[NONFOODPURCHASE].getIdresourcetype().toString())) != null) {
 
@@ -1852,7 +1909,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							if (assetOK1 || assetOK2)
 
 							{
-
+								System.out.println("INPUTS valid");
 								// check Unit entered
 
 								ins.setResourceSubType(rst);
@@ -1871,17 +1928,18 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								}
 
 								else {
-
+									System.out.println("INPUTS Resources  invalid");
 									ins.setStatus(efd.model.Asset.Status.Invalid);
 								}
 
 								if (!checkSubTypeEntered(ins.getUnit(), rst)) {
+									System.out.println("INPUTS units invalid");
 									ins.setStatus(efd.model.Asset.Status.Invalid);
 
 								}
 
 							} else {
-
+								System.out.println("INPUTS ELSE invalid");
 								ins.setStatus(efd.model.Asset.Status.Invalid);
 
 							}
@@ -1889,14 +1947,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						}
 
 						// Was a Local Unit entered for this RST LZ combination?
-						
+
 						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
-					
+
 						if (localUnit != null) {
-						
 
 							if (ins.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
-								
+
 								ins.setUnit(localUnit.getName());
 								ins.setLocalUnit(localUnit.getName());
 								ins.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
@@ -1905,10 +1962,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								}
 							}
 						}
-						
-						
-						
-						
+
 						em("done INPUTS " + ins.getItemPurchased());
 						hhi.getInputs().add(ins);
 
@@ -2020,13 +2074,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		em("var 2 = " + var2);
 		em("var 3 = " + var3);
 
-		
 		try {
 
 			em("in rst try 555");
 
 			rsty = (ResourceSubType) XPersistence.getManager()
-					.createQuery("from ResourceSubType where resourcetype = '" + resourceType + "'" + "and ("
+					.createQuery("from ResourceSubType where reourcetype  = '" + resourceType + "'" + "and ("
 							+ "upper(resourcetypename) = '" + var2 + "'" + " or " + "upper(resourcetypename) = '" + var3
 							+ "'" + ") ")
 					.setMaxResults(1).getSingleResult();

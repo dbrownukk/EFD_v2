@@ -51,36 +51,23 @@ import org.openxava.tab.*;
 
 public class Project {
 
-/*
- * June 2019 DRB No longer differentiation between OIHM and OHEA Project
- * 
- * Model field not removed
- * 
+
 	@PrePersist
 	@PreUpdate
-	private void modelset() {
+	private void checkExchangeRate() {
 
-		System.out.println("model in proj = " + getTheModel().toString());
-
-		ProjectModelFilter projectModelFilter = new ProjectModelFilter();
-		String name = projectModelFilter.getClass().getName();
-		
-		
-		
-		
-		String userName = Users.getCurrent();
-		User user = User.find(userName);
-
-		if (user.hasRole("oihm_user")) {
-			this.model = "OIHM";
-	
-		} else if (user.hasRole("ohea_user")) {
-			this.model = "OHEA";
-	
+		/* in Project persist/update check if ALt currency used - needs an alt exc rate  */
+				
+				
+		if(this.getAltCurrency()!=null && this.getAltExchangeRate() == null)
+		{
+			System.out.println("Need to stop update");
+		throw new javax.validation.ValidationException(
+				XavaResources.getString("If Alternate Currency set, enter an Exchange rate to use"));
 		}
 
 	}
-	*/
+	
 
 	@Id
 	@Hidden

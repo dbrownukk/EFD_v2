@@ -100,6 +100,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	int errno = 0;
 	Boolean isQuantile = false;
 	Boolean isSelectedHouseholds = false;
+	String  currency2;
 
 	/******************************************************************************************************************************************/
 	@Override
@@ -207,16 +208,16 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		} else if (customReportSpec.getTotalQuantilePercentage() == 100) {
 			isQuantile = true;
 			quantiles = (List<Quantile>) customReportSpec.getQuantile();
-			
-			quantiles = quantiles.stream().sorted(Comparator.comparing(Quantile::getSequence)).collect(Collectors.toList());
-			
-			for(Quantile q:quantiles)
-				System.out.println("q = "+q.getSequence()+" "+q.getName());
-			
-			
+
+			quantiles = quantiles.stream().sorted(Comparator.comparing(Quantile::getSequence))
+					.collect(Collectors.toList());
+
+			for (Quantile q : quantiles)
+				System.out.println("q = " + q.getSequence() + " " + q.getName());
+
 			uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
 					.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
-			
+
 			numberOfQuantiles = customReportSpec.getQuantile().size();
 		}
 
@@ -298,9 +299,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
 				.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
 
-		//uniqueHousehold.forEach(u -> {
-		//	System.out.println("hh in createdireport = " + u.hhNumber + " " + u.getHhDI());
-		//});
+		// uniqueHousehold.forEach(u -> {
+		// System.out.println("hh in createdireport = " + u.hhNumber + " " +
+		// u.getHhDI());
+		// });
 
 		// If QUantile then need to calc which quantile each unique HH is in
 		final int[] qpoint = new int[200];
@@ -329,10 +331,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 				System.out.println("qpoint = " + qq.getSequence() + " " + qpoint[qq.getSequence()]);
 
-				
-				System.out.println("is this first run " + qq.getSequence()+" "+isFirstRun);
+				System.out.println("is this first run " + qq.getSequence() + " " + isFirstRun);
 				if (qq.getSequence() > 1) {
-					
+
 					isFirstRun = false;
 				}
 				// for (HH unhh : uniqueHousehold) {
@@ -532,18 +533,17 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			System.out.println("nothing filtered to remove");
 			// e.printStackTrace();
 		}
-/*
-		System.out.println("size of hh after all filter = " + hh.size());
-		for (HH hh2 : hh) {
-			if (hh2.getResourceType() != null)
-				System.out.println("hh after filtering now equals = " + hh2.getHhNumber() + " "
-						+ hh2.getCategory().toArray().toString() + " " + (hh2.getResourceType().getResourcetypename()
-								+ " " + hh2.getResourceSubType().getResourcetypename()));
-			else
-				System.out.println("print an answer" + hh2.toString());
-
-		}
-*/
+		/*
+		 * System.out.println("size of hh after all filter = " + hh.size()); for (HH hh2
+		 * : hh) { if (hh2.getResourceType() != null)
+		 * System.out.println("hh after filtering now equals = " + hh2.getHhNumber() +
+		 * " " + hh2.getCategory().toArray().toString() + " " +
+		 * (hh2.getResourceType().getResourcetypename() + " " +
+		 * hh2.getResourceSubType().getResourcetypename())); else
+		 * System.out.println("print an answer" + hh2.toString());
+		 * 
+		 * }
+		 */
 	}
 
 	/******************************************************************************************************************************************/
@@ -1279,10 +1279,11 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			row = 5;
 
-			//for (HHSub hh : hhllist) {
-			//	System.out.println("hhllist = " + hh.getQuantSeq() + " " + hh.getAssetRST().getResourcetypename() + " "
-			//			+ hh.getColumn());
-			//}
+			// for (HHSub hh : hhllist) {
+			// System.out.println("hhllist = " + hh.getQuantSeq() + " " +
+			// hh.getAssetRST().getResourcetypename() + " "
+			// + hh.getColumn());
+			// }
 
 			// Quantile check with many RSTs
 			errno = 2278;
@@ -1465,10 +1466,11 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			row = 5;
 
-		//	for (HHSub hh : hhllist) {
-		//		System.out.println("hhllist = " + hh.getQuantSeq() + " " + hh.getAssetRST().getResourcetypename() + " "
-		//				+ hh.getColumn());
-		//	}
+			// for (HHSub hh : hhllist) {
+			// System.out.println("hhllist = " + hh.getQuantSeq() + " " +
+			// hh.getAssetRST().getResourcetypename() + " "
+			// + hh.getColumn());
+			// }
 
 			// Quantile check with many RSTs
 			errno = 22810;
@@ -1487,8 +1489,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						Map<ResourceSubType, Double> collect = q2.stream().collect(Collectors
 								.groupingBy(HHSub::getAssetRST, Collectors.averagingDouble(HHSub::getAssetValue)));
 
-						//System.out.println("q2 = " + hhs.getQuantSeq() + " " + " " + hhs.getAssetName() + " "
-						//		+ hhs.getAssetValue() + " double from group by =  " + collect.get(hhs.getAssetRST()));
+						// System.out.println("q2 = " + hhs.getQuantSeq() + " " + " " +
+						// hhs.getAssetName() + " "
+						// + hhs.getAssetValue() + " double from group by = " +
+						// collect.get(hhs.getAssetRST()));
 						Double val = fillDouble(collect.get(hhs.getAssetRST()));
 						reportWB.getSheet(isheet).setColumnWidths(hhs.getColumn(), 20);
 						reportWB.getSheet(isheet).setValue(hhs.getColumn(), hhs.getQuantSeq() + 5, val, textStyle);
@@ -2074,7 +2078,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			WHOEnergyRequirements whoEnergey = WHOEnergyRequirements.findByAge(age);
 
-			//System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " + whoEnergey.getMale() + " " + gender);
+			// System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " +
+			// whoEnergey.getMale() + " " + gender);
 			if (gender == Sex.Female) {
 				totAE += whoEnergey.getFemale();
 			} else if (gender == Sex.Male) {
@@ -2086,7 +2091,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		/* AE = TE / 2600 */
 
 		totAE = totAE / 2600;
-		//System.out.println("done householdAE calc");
+		// System.out.println("done householdAE calc");
 		return Double.parseDouble(df2.format(totAE));
 
 	}
@@ -2101,7 +2106,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		sheet[0] = reportWB.addSheet("Custom Report Spec");
 		setSheetStyle(sheet[0]);
-		sheet[0].setColumnWidths(1, 40, 50, 50, 50, 50, 50, 50, 50, 50);
+		sheet[0].setColumnWidths(1, 40, 50, 50, 50, 50, 50, 25, 25, 50, 50);
 
 		sheet[0].setValue(1, 1, "Date:", textStyle);
 		sheet[0].setValue(2, 1, new Date());
@@ -2214,6 +2219,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		i = STARTROW;
 		col++;
+		col++;
 		errno = 1105;
 
 		sheet[0].setValue(col, i, "Household Questions Included", boldTopStyle);
@@ -2241,21 +2247,60 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		 * get Currency
 		 */
 
-		errno = 1107;
-		String currency;
-
-		if (!study.getProjectlz().getAltCurrency().toString().isEmpty()) {
-			System.out.println("curr 1");
-			currency = study.getProjectlz().getAltCurrency().getCurrency().toString();
-		} else if (study.getSite().getCountry().getCurrency().isEmpty()) // use Country
-		{
-			System.out.println("curr 2");
-			currency = study.getSite().getLivelihoodZone().getCountry().getCurrency().toString();
-		} else {
-			System.out.println("curr 3");
-			currency = study.getSite().getCountry().getCurrency().toString();
+		String currency = "UNKOWN";
+		
+		
+		System.out.println("about to get currency 2 ");
+		
+		
+		
+		
+		try {
+			System.out.println("currency test 1");
+			if(!StringUtils.isEmpty(study.getSite().getLivelihoodZone().getCountry().getCurrency()))
+			{
+				System.out.println("currency 1 set ");
+				currency = study.getSite().getLivelihoodZone().getCountry().getCurrency();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			System.out.println("currency 1 catch ");
+			System.out.println("currency test 2");
+			try {
+				System.out.println("in currency try test 2");
+				if (!StringUtils.isEmpty(study.getProjectlz().getAltCurrency().getCurrency()))
+				{
+					System.out.println("currency 2 set ");
+					currency = study.getProjectlz().getAltCurrency().getCurrency();
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				//e1.printStackTrace();
+				System.out.println("currency 2 catch ");
+			}
 		}
+		
+		
+	
+		
+		
+				
+				
+				
+		
+		errno = 1107;
+		
+		
+		System.out.println("done currency get");
+		
+		
 
+		errno = 1107_3;
+	
+		
+
+		System.out.println(" done currency get");
 		sheet[0].setValue(1, 4, "Reporting Currency:", boldTopStyle);
 		sheet[0].setValue(2, 4, currency, textStyle);
 

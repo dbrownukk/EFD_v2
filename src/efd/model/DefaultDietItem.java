@@ -39,7 +39,8 @@ public class DefaultDietItem extends EFDIdentifiable {
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
 	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename", condition = "e.resourcetype.resourcetypename in ('Crops','Wild Foods','Livestock Products','Food Purchase','Food Stocks')")
-
+	@NoCreate
+	@NoModify
 	private ResourceSubType resourcesubtype;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)

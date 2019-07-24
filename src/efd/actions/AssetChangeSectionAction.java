@@ -56,7 +56,7 @@ public class AssetChangeSectionAction extends ChangeSectionAction implements IMo
 
 			
 			
-			System.out.println("in assetchange section "+getActiveSection()+getViewObject());
+			//System.out.println("in assetchange section "+getActiveSection()+getViewObject());
 			
 			
 		
@@ -66,7 +66,7 @@ public class AssetChangeSectionAction extends ChangeSectionAction implements IMo
 			sessionTab = rType[iactiveSection];
 	
 
-		System.out.println("sessiontab  = " + sessionTab +" "+sactiveSection);
+			//System.out.println("sessiontab  = " + sessionTab +" "+sactiveSection);
 
 		
 

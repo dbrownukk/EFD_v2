@@ -115,11 +115,26 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 			
 			
 			if (!isInOHEA) {
+				
+				/* if SIte has no LZ, using COuntry only then no localUnits will apply */
+				
 				System.out.println("its OIHM ");
 				String studyid = getPreviousView().getValueString("id");
 
 				Study study = XPersistence.getManager().find(Study.class, studyid);
 				thisProject = study.getProjectlz();
+				
+				Site site = study.getSite();
+				if(site.getLivelihoodZone()==null)
+				{
+					/* No LZ thus no LocalUnits */
+					getView().setValue("wgresourceunit", resourceSubType.getResourcesubtypeunit());
+					
+					System.out.println("NO LZ");
+					
+					return;
+				}
+				
 
 			} else // isInOHEA, thus get Proj from Community
 			{
@@ -128,7 +143,7 @@ public class OnChangeResourceType extends OnChangePropertyBaseAction {
 				String wgid = getPreviousView().getValueString("wgid");
 				WealthGroup  wealthgroup = XPersistence.getManager().find(WealthGroup.class, wgid);
 				thisProject = wealthgroup.getCommunity().getProjectlz();
-
+				
 			}
 
 			for (LocalUnit localUnit : localUnits) {
