@@ -4,16 +4,20 @@
 	<default-module>
 		<controller name="EFD_HM" />
 	</default-module>	<!-- <module name="Reports"> </module> -->
+
+<!--  
 	<module name="WealthGroupInterview">
 		<env-var name="XAVA_SEARCH_ACTION"
 			value="CRUD.searchExecutingOnChange" />
 		<model name="WealthGroupInterview" />
+		<controller name="TypicalNotResetOnSave"
+			excluded-actions="new" />
 		<controller name="ParseSpreadsheet" />
 		<controller name="ChartList" />
 		<controller name="ReportList" />
-		<!-- <controller name="SetReadOnly"/> <controller name="SetEditable"/> -->
+	
 	</module>
-
+-->
 	<!-- <module name="Household"> <env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchByViewKey" 
 		/> <model name="Household" /> <controller name="ParseHHSpreadsheet" /> </module> -->
 
@@ -27,7 +31,8 @@
 	</module>
 
 	<module name="Study">
-		<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange" />
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
 		<model name="Study" />
 		<controller name="TypicalNotResetOnSave" />
 		<controller name="Study" />
@@ -40,14 +45,14 @@
 
 
 	<module name="ConfigQuestionUse">
-		<model name="ConfigQuestionUse" />
+
 		<env-var name="XAVA_SEARCH_ACTION"
 			value="CRUD.searchExecutingOnChange" />
 		<controller name="ConfigQuestionUse" />
 	</module>
 
 	<module name="ConfigQuestion">
-		<model name="ConfigQuestion" />
+
 		<env-var name="XAVA_SEARCH_ACTION"
 			value="CRUD.searchExecutingOnChange" />
 		<controller name="ConfigQuestion" />
@@ -56,7 +61,8 @@
 
 	<module name="StdOfLivingElement">
 
-		<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange" />
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
 		<model name="StdOfLivingElement" />
 		<controller name="TypicalNotResetOnSave" />
 	</module>

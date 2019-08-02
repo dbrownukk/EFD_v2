@@ -74,16 +74,18 @@
 			image="excel.gif" icon="file-excel" takes-long="true"
 			class="efd.actions.CreateXlsFileActionOIHM" />
 
-		<!-- <action name="CopyinTopicQuestions" mode="detail" icon="view-list" 
-			class="efd.actions.GoCopyTopic" /> <action name="CopyStudy" mode="detail" 
-			icon="view-list" class="efd.actions.GoCopyStudy" /> -->
+
 
 		<action name="newSiteFromStudy" hidden="true" mode="detail"
-			class="efd.actions.NewSiteFromStudy">
-			<action name="init" on-init="true" hidden="true"
-				class="efd.actions.SetEfdOIHMModel" />
+			class="efd.actions.NewSiteFromStudy" />
 
-		</action>
+		<action name="HHActionSelect" hidden="true"
+			class="efd.actions.HHActionSelect" />
+
+
+		<action name="init" on-init="true" hidden="true"
+			class="efd.actions.SetEfdOIHMModel" />
+
 	</controller>
 
 	<controller name="Spreadsheet">
@@ -98,9 +100,8 @@
 
 
 	<controller name="ParseSpreadsheet">
-		<extends controller="TypicalNotResetOnSave" />
 		<action name="Parse Spreadsheet"
-			label="Parse Interview Spreadsheet 2" icon="file-excel" mode="detail"
+			label="Parse Interview Spreadsheet" icon="file-excel" mode="detail"
 			in-each-row="false" class="efd.actions.ParseXLSFile2" />
 		<action name="Validate" label="Validate" icon="marker-check"
 			mode="detail" in-each-row="false" class="efd.actions.ValidateWGI" />
@@ -224,8 +225,8 @@
 			class="efd.actions.CharacteristicsResourceNew" />
 		<action name="save" mode="detail" by-default="if-possible"
 			class="efd.actions.CharacteristicsResourceSave" image="save.gif"
-			icon="content-save" keystroke="Control S">
-		</action>
+			icon="content-save" keystroke="Control S" />
+
 
 
 	</controller>
@@ -234,8 +235,8 @@
 	<controller name="StdOfLivingElement">
 		<extends controller="EFD_HM" />
 		<action name="edit" hidden="false" icon="pencil"
-			class="efd.actions.EditStdOfLivingElement">
-		</action>
+			class="efd.actions.EditStdOfLivingElement" />
+
 	</controller>
 
 	<!-- <controller name="ReportSpecUse"> <extends controller="EFD_HM" /> <action 
@@ -303,7 +304,7 @@
 	<controller name="AttachedFiles">
 		<action name="add"
 			class="org.openxava.actions.AddFileToFilesetAction" icon="attachment"
-			image="attach.gif" takes_long="true" />
+			image="attach.gif" takes-long="true" />
 		<action name="remove"
 			class="org.openxava.actions.RemoveFileFromFilesetAction"
 			icon="delete" image="delete.gif" confirm="true" />
@@ -344,14 +345,14 @@
 
 		<action name="afterquery" after-each-request="true"
 			hidden="true" mode="detail"
-			class="efd.validations.InitQuestionUseAnswerType">
-		</action>
+			class="efd.validations.InitQuestionUseAnswerType" />
+
 
 		<action name="save" mode="detail" by-default="if-possible"
 			class="efd.actions.ConfigQuestionUseSave" image="save.gif"
-			icon="content-save" keystroke="Control S">
+			icon="content-save" keystroke="Control S" />
 
-		</action>
+
 
 	</controller>
 
@@ -360,14 +361,14 @@
 		<extends controller="EFD_HM" />
 
 		<action name="edit" image="edit.gif" icon="pencil"
-			class="efd.actions.EditConfigAnswer">
-		</action>
+			class="efd.actions.EditConfigAnswer" />
+
 
 
 		<action name="save" mode="detail" by-default="if-possible"
 			class="efd.actions.ConfigAnswerSave" image="save.gif"
-			icon="content-save" keystroke="Control S">
-		</action>
+			icon="content-save" keystroke="Control S" />
+
 
 
 	</controller>
@@ -441,6 +442,17 @@
 	</controller>
 
 
+
+	<controller name="WealthGroupInterview">
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
+		<extends controller="TypicalNotResetOnSave"
+			excluded-actions="new" />
+		<extends controller="ParseSpreadsheet" />
+		<extends controller="ChartList" />
+		<extends controller="ReportList" />
+
+	</controller>
 
 
 
