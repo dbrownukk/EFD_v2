@@ -36,17 +36,19 @@ public class AssetCash extends Asset{
 	@Digits(integer = 10, fraction = 5)
 	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 
-	private double exchangeRate;
+	private BigDecimal exchangeRate;
 	
 	
 
 
 
-	public double getExchangeRate() {
-		return exchangeRate;
+
+
+	public BigDecimal getExchangeRate() {
+		return exchangeRate == null?BigDecimal.ZERO:exchangeRate;
 	}
 
-	public void setExchangeRate(double exchangeRate) {
+	public void setExchangeRate(BigDecimal exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
 

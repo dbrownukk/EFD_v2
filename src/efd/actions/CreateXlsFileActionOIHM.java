@@ -1438,7 +1438,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		}
 
 		// Collections.sort(inputStrings);
-		for (int k = 0; k < inputStrings.size(); k++) {
+		// BUG ISSUE #355
+		
+		for (int k = 0; k < 255; k++) {
+			//for (int k = 0; k < inputStrings.size(); k++) {
 			cell = inputResourceRow.createCell(inputResource);
 			cell.setCellValue(inputStrings.get(k).toString());
 			inputResource++;

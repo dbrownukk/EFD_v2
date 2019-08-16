@@ -165,6 +165,8 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 		livelihoodZone = wgi.getWealthgroup().getCommunity().getSite().getLivelihoodZone();
 
+		em("lz ==== " + wgi.getWealthgroup().getCommunity().getSite().getLivelihoodZone().getLzname());
+
 		String spreadsheetId = wgi.getSpreadsheet();
 
 		Connection con = null;
@@ -633,9 +635,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						LocalUnit localUnit = getLocalUnit(livelihoodZone, rst);
 						em("isCorrectRST = " + isCorrectRST);
 
-						if (!localUnit.getName().isEmpty()) {
-							em("localunit in Land 1 = " + al.getUnit().trim());
-							em("localunit in Land 2 = " + localUnit.getName().trim());
+						if (localUnit != null) {
 
 							if (al.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
 								em("local unit match, isCOrrectRST = " + isCorrectRST);
@@ -842,7 +842,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						System.out.println("in set assetcash done set amount");
 
-						acash.setExchangeRate((cell[i][j][2].getNumericCellValue()));
+						acash.setExchangeRate((BigDecimal.valueOf(cell[i][j][2].getNumericCellValue())));
 
 						System.out.println("cash exchange rate = " + acash.getExchangeRate());
 
@@ -891,7 +891,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						System.out.println("current currency acash = " + cashCurrency);
 						if (cashCurrency.equalsIgnoreCase(lzCurrency)) {
-							acash.setExchangeRate(1);
+							acash.setExchangeRate(BigDecimal.valueOf(1));
 						} else if (cashCurrency.equalsIgnoreCase(projAltCurrency)) {
 
 							if (projAltExhangeRateDouble <= 0) {
@@ -900,16 +900,18 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							} else {
 
 								acash.setAmount(acash.getAmount() * projAltExhangeRateDouble);
-								acash.setExchangeRate(projAltExhangeRateDouble);
+								acash.setExchangeRate(BigDecimal.valueOf(projAltExhangeRateDouble));
 							}
 						} else if (!cashCurrency.equals(lzCurrency)
 								&& !cashCurrency.equalsIgnoreCase(projAltCurrency)) {
 							/* need to check exchange rate is >0 */
 
-							if (acash.getExchangeRate() <= 0) {
+							if (acash.getExchangeRate().intValue() <= 0) {
 								acash.setStatus(efd.model.Asset.Status.Invalid);
 							} else {
-								acash.setAmount(acash.getAmount() * acash.getExchangeRate());
+
+								acash.setAmount(acash.getExchangeRate().multiply(BigDecimal.valueOf(acash.getAmount()))
+										.doubleValue());
 							}
 						}
 
@@ -953,11 +955,11 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						acrop.setMarket2(cell[i][j][11].getStringCellValue());
 						warnMessage = "Percent Trade Market 3";
 						acrop.setPercentTradeMarket3(getCellDouble(cell[i][j][12]));
-
-						// System.out.println("in crop = " + cell[i][j][1].getStringCellValue());
+						warnMessage = "RST check";
+						System.out.println("in crop = " + cell[i][j][1].getStringCellValue());
 						if ((rst = checkSubType(cell[i][j][0].getStringCellValue(), // is this a valid resource type?
 								rtype[i].getIdresourcetype().toString())) != null) {
-							// System.out.println("done acrop get = " + rst.getResourcetypename());
+							System.out.println("done acrop get = " + rst.getResourcetypename());
 							isCorrectRST = true;
 							acrop.setResourceSubType(rst);
 							acrop.setStatus(efd.model.Asset.Status.Valid);
@@ -970,14 +972,14 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do crops localunit");
-						LocalUnit localUnit = getLocalUnit(livelihoodZone, rst);
-						em("crop localunit =" + localUnit.getName());
-						if (!localUnit.getName().isEmpty()) {
-							em("localunit in crops = " + "z" + acrop.getUnit().trim() + "z" + localUnit.getName().trim()
-									+ "z");
 
+
+						LocalUnit localUnit = getLocalUnit(livelihoodZone, rst);
+
+						if (localUnit != null) {
+							em("crop local unit");
 							if (acrop.getUnit().trim().equalsIgnoreCase(localUnit.getName().trim())) {
-								em("local unit match, isCOrrectRST = " + isCorrectRST);
+
 								acrop.setUnit(localUnit.getName());
 								acrop.setLocalUnit(localUnit.getName());
 								acrop.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
@@ -986,7 +988,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 								}
 							}
 						}
-
+						em("about to add CROP");
 						wgi.getCrop().add(acrop);
 						getView().refreshCollections();
 
@@ -996,7 +998,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 					}
 
 					catch (Exception ex) {
-						addMessage("Problem parsing Crops worksheet - " + warnMessage);
+						addMessage("Problem parsing Crops worksheet - " + warnMessage + ex);
 						k = 100;
 						break breaksheet;
 					}
@@ -1101,7 +1103,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						em("about to do LSP localunit");
 						LocalUnit localUnit = getLocalUnit(livelihoodZone, rst);
 						em("LSP localunit =" + localUnit.getName());
-						if (!localUnit.getName().isEmpty()) {
+						if (localUnit != null) {
 							em("localunit in LSP = " + "z" + alsp.getUnit().trim() + "z" + localUnit.getName().trim()
 									+ "z");
 
@@ -1133,7 +1135,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 					try {
 						aemp = new Employment();
 						int l = 0;
-						System.out.println("in emp  cell = i =" + i);
+
 						aemp.setEmploymentName((cell[i][j][l++].getStringCellValue()));
 
 						aemp.setPeopleCount(getCellDouble(cell[i][j][l++]));
@@ -1143,7 +1145,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						aemp.setFoodPaymentFoodType((cell[i][j][l++].getStringCellValue()));
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
 						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
-						System.out.println("in emp  cell = i =" + i);
+
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation1(getCellDouble(cell[i][j][l++]));
 						aemp.setWorkLocation2(cell[i][j][l++].getStringCellValue());
@@ -1175,30 +1177,30 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							/* check Food as payment entered is valid */
 							if ((rst = checkSubType(aemp.getFoodPaymentFoodType(),
 									rtype[CROPS].getIdresourcetype().toString())) != null) {
-								em("1");
+
 								aemp.setStatus(efd.model.Asset.Status.Valid);
 								aemp.setFoodResourceSubType(rst);
 								isCorrectRST = true;
 							} else if ((rst = checkSubType(aemp.getFoodPaymentFoodType(),
 									rtype[WILDFOOD].getIdresourcetype().toString())) != null) {
-								em("2");
+
 								aemp.setStatus(efd.model.Asset.Status.Valid);
 								aemp.setFoodResourceSubType(rst);
 								isCorrectRST = true;
 							} else if ((rst = checkSubType(aemp.getFoodPaymentFoodType(),
 									rtype[LIVESTOCKPRODUCT].getIdresourcetype().toString())) != null) {
-								em("3");
+
 								aemp.setStatus(efd.model.Asset.Status.Valid);
 								aemp.setFoodResourceSubType(rst);
 								isCorrectRST = true;
 							} else if ((rst = checkSubType(aemp.getFoodPaymentFoodType(),
 									rtype[FOODPURCHASE].getIdresourcetype().toString())) != null) {
-								em("4");
+
 								aemp.setStatus(efd.model.Asset.Status.Valid);
 								aemp.setFoodResourceSubType(rst);
 								isCorrectRST = true;
 							}
-							em("emp food payment = " + rst.getResourcetypename());
+
 							// Now need to check food unit is valid
 
 							if (!checkSubTypeEntered(aemp.getFoodPaymentUnit(), rst)) {
@@ -1262,7 +1264,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						at.setSource(cell[i][j][l++].getStringCellValue());
 
 						String upperCaseTransferType = upperCaseFirst(cell[i][j][l].getStringCellValue());
-						System.out.println("Transfer 001 j l " + j + " " + l);
 
 						if (upperCaseTransferType.equals("Cash"))
 							at.setTransferType(efd.model.Transfer.TransferType.Cash);
@@ -1353,7 +1354,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						em("about to do Transfer Food  localunit");
 						LocalUnit localUnit = getLocalUnit(livelihoodZone, rst);
 						em("trans localunit =" + localUnit.getName());
-						if (!localUnit.getName().isEmpty()) {
+						if (localUnit != null) {
 							em("localunit in EMP = " + "z" + at.getUnit().trim() + "z" + localUnit.getName().trim()
 									+ "z");
 
@@ -1513,7 +1514,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						em("about to do FoodPurchase localunit");
 						LocalUnit localUnit = getLocalUnit(livelihoodZone, rst);
 						em("AFP localunit =" + localUnit.getName());
-						if (!localUnit.getName().isEmpty()) {
+						if (localUnit != null) {
 							em("localunit in AFP = " + "z" + afp.getUnit().trim() + "z" + localUnit.getName().trim()
 									+ "z");
 
@@ -1593,7 +1594,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 	public static LocalUnit getLocalUnit(LivelihoodZone lz, ResourceSubType rst) {
 
-		// System.out.println("get local unit lz = " + lz.getLzname());
+		// System.out.println("get local unit lz = " + lz.getLzid());
 		// System.out.println("get local unit rst =" + rst.getIdresourcesubtype());
 
 		LocalUnit localUnit = null;
@@ -1602,7 +1603,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 					"from LocalUnit where livelihoodZone_LZID = :lz and resourceSubType_IDResourceSubType = :rst ")
 					.setParameter("lz", lz.getLzid()).setParameter("rst", rst.getIdresourcesubtype()).getSingleResult();
 		} catch (Exception e) {
-		//	System.out.println("nothing found exception");
+			// System.out.println("nothing found exception");
 			return null;
 		}
 
@@ -1716,8 +1717,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 				return rsty;
 			}
 
-			
-
 			// otherwise get the RST for the Synonym
 			em("CST 103");
 			ResourceSubType rstysyn = (ResourceSubType) XPersistence.getManager().find(ResourceSubType.class,
@@ -1783,16 +1782,16 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 		Double d = 0.0;
 
 		if (acell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-			System.out.println("in getDouble Number = " + acell.getNumericCellValue());
+
 			return acell.getNumericCellValue();
 		} else if (acell.getCellType() == 1) {
-			System.out.println("in getDouble String = ");
+
 			return Double.valueOf(d);
 		} else if (acell.getCellType() == Cell.CELL_TYPE_BLANK) {
-			System.out.println("in getDouble Empty = " + Double.valueOf(d));
+
 			return Double.valueOf(d);
 		}
-		// System.out.println("returning from getcelldouble "+d);
+
 		return d;
 
 	}

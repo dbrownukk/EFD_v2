@@ -13,7 +13,7 @@ import org.openxava.util.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
-@Views({ @View(members = "Study[#studyName,projectlz,referenceYear;description,startDate,endDate;altCurrency,altExchangeRate,notes]"
+@Views({ @View(members = "Study[#studyName,projectlz,referenceYear;description,startDate,endDate;notes]"
 		+ ";warningMessage,"
 		+ ";Site{site};StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem};"
 		+ ";CharacteristicAssets/Resources{Land{characteristicsResourceLand}"
@@ -28,7 +28,7 @@ import org.openxava.util.*;
 		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
 		@View(name = "StudyInterview", members = "studyName,referenceYear,spreadsheets"),
 		@View(name = "households", members = "household"),
-		@View(name = "FromQuestionUse", members = "Study[#studyName,topic,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]") })
+		@View(name = "FromQuestionUse", members = "Study[#studyName,topic,referenceYear,startDate,endDate;description]") })
 
 
 @Tab(
@@ -87,28 +87,30 @@ public class Study extends EFDIdentifiable {
 	@Column(length = 45)
 	private String description;
 	/*************************************************************************************************/
+	
+	//@Hidden // 16/8/2019 - see issue #352
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = true)
-	@NoModify
-	@NoCreate
-	@DescriptionsList(descriptionProperties = "currency")
+	//@NoModify
+	//@NoCreate
+	//@DescriptionsList(descriptionProperties = "currency")
 	private Country altCurrency;
 	/*************************************************************************************************/
+	//@Hidden // 16/8/2019 - see issue #352
 	@Column(precision = 10, scale = 5)
 	@Digits(integer = 10, fraction = 5)
-	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
+	//@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 	private BigDecimal altExchangeRate;
 	/*************************************************************************************************/
-	@ManyToOne //(fetch = FetchType.LAZY, // The reference is loaded on demand
-			// optional = false)
+	@ManyToOne (fetch = FetchType.LAZY,optional = false)
 	// @Required NOT required in OIHM a Study can just be part of a Project without
 	// LZ and Site, but may have an LZ and Site
 	@DescriptionsList(descriptionProperties = "projecttitle,pdate") //,  showReferenceView=true)
 	@JoinColumn(name = "CProject")
 	// @OnChange(OnChangeClearCommunity.class)
 	@Required
-	@ReferenceView("SimpleProject")
-	//@NoCreate
+	//@ReferenceView("SimpleProject")
+	@NoCreate
 	//@NoModify
 	private Project projectlz;
 	/*************************************************************************************************/

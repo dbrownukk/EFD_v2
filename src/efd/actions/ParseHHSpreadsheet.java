@@ -1262,7 +1262,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						warnMessage = "Currency Amount";
 						acash.setAmount(getCellDouble(cell[i][j][1]));
 						warnMessage = "Currency Exchage Rate";
-						acash.setExchangeRate((cell[i][j][2].getNumericCellValue()));
+						double exrate = cell[i][j][2].getNumericCellValue();
+						acash.setExchangeRate(BigDecimal.valueOf(exrate));
 						/* check against currency */
 
 						for (icurr = 0; icurr < currency.size(); icurr++) {
@@ -1285,7 +1286,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						/*
 						 * if Currency is not LZ currency or Proect Alt Currency (with exchange rate)
-						 * then use Exchange Rate entered in aemp
+						 * then use Exchange Rate entered in acash
 						 */
 
 						warnMessage = "Currency Exchange Rate Calc";
@@ -1318,7 +1319,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if (cashCurrency.equalsIgnoreCase(lzCurrency)) {
 
-							acash.setExchangeRate(1);
+							acash.setExchangeRate(BigDecimal.valueOf(1.00));
 						} else if (cashCurrency.equalsIgnoreCase(studyAltCurrency)) {
 
 							if (studyAltExhangeRateDouble <= 0) {
@@ -1327,18 +1328,18 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							} else {
 
 								acash.setAmount(acash.getAmount() * studyAltExhangeRateDouble);
-								acash.setExchangeRate(studyAltExhangeRateDouble);
+								acash.setExchangeRate(BigDecimal.valueOf(studyAltExhangeRateDouble));
 							}
 						} else if (!cashCurrency.equals(lzCurrency)
 								&& !cashCurrency.equalsIgnoreCase(studyAltCurrency)) {
 							/* need to check exchange rate is >0 */
 
-							if (acash.getExchangeRate() <= 0) {
+							if (acash.getExchangeRate().intValue() <= 0) {
 
 								acash.setStatus(efd.model.Asset.Status.Invalid);
 							} else {
 
-								acash.setAmount(acash.getAmount() * acash.getExchangeRate());
+								acash.setAmount(acash.getExchangeRate().multiply(BigDecimal.valueOf(acash.getAmount())).doubleValue());
 							}
 						}
 

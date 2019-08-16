@@ -17,9 +17,7 @@ import efd.validations.*;
 import efd.actions.*;
 
 @Views({ @View(members = "Site[#livelihoodZone;country;locationdistrict;subdistrict;gpslocation]"),
-//	@Views({ @View(members = "Site[locationdistrict;subdistrict;gpslocation]"),
 		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone"),
-//		@View(name = "SimpleSite", members = "locationdistrict"),
 		@View(name = "LZSite", members = "locationdistrict;subdistrict;gpslocation"),
 		@View(name = "FromWealthGroup", members = "locationdistrict,subdistrict,livelihoodZone;"),
 		@View(name = "FromStudy", members = "locationdistrict,subdistrict,gpslocation;country, livelihoodZone"),
@@ -77,8 +75,7 @@ public class Site {
 	@ListProperties("cinterviewdate,cinterviewsequence,civf,civm")
 	private Collection<Community> community;
 
-	// OIHM LZ is now optional Site must now be for a Country or LZ
-	// Need validation code
+
 
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@NoFrame

@@ -100,7 +100,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	int errno = 0;
 	Boolean isQuantile = false;
 	Boolean isSelectedHouseholds = false;
-	String  currency2;
+	String currency2;
 
 	/******************************************************************************************************************************************/
 	@Override
@@ -2248,59 +2248,24 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		 */
 
 		String currency = "UNKOWN";
-		
-		
+
 		System.out.println("about to get currency 2 ");
-		
-		
-		
-		
+
 		try {
-			System.out.println("currency test 1");
-			if(!StringUtils.isEmpty(study.getSite().getLivelihoodZone().getCountry().getCurrency()))
-			{
-				System.out.println("currency 1 set ");
+			if (StringUtils.isEmpty(study.getProjectlz().getAltCurrency().getCurrency())) {
 				currency = study.getSite().getLivelihoodZone().getCountry().getCurrency();
+			} else {
+				currency = study.getProjectlz().getAltCurrency().getCurrency();
 			}
-		} catch (Exception e) {
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			System.out.println("currency 1 catch ");
-			System.out.println("currency test 2");
-			try {
-				System.out.println("in currency try test 2");
-				if (!StringUtils.isEmpty(study.getProjectlz().getAltCurrency().getCurrency()))
-				{
-					System.out.println("currency 2 set ");
-					currency = study.getProjectlz().getAltCurrency().getCurrency();
-				}
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				//e1.printStackTrace();
-				System.out.println("currency 2 catch ");
-			}
+			// e1.printStackTrace();
+
 		}
-		
-		
-	
-		
-		
-				
-				
-				
-		
+
 		errno = 1107;
-		
-		
-		System.out.println("done currency get");
-		
-		
 
 		errno = 1107_3;
-	
-		
-
-		System.out.println(" done currency get");
 		sheet[0].setValue(1, 4, "Reporting Currency:", boldTopStyle);
 		sheet[0].setValue(2, 4, currency, textStyle);
 
