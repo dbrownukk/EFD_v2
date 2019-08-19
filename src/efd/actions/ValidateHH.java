@@ -6,6 +6,7 @@ import org.openxava.jpa.*;
 import org.openxava.view.*;
 import org.openxava.view.View;
 
+import java.math.*;
 import java.util.*;
 
 import org.openxava.actions.*;
@@ -199,7 +200,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 
 		/* Cash Validation */;
 		for (i = 0; i < ac.size(); i++) {
-			if (!(ac.get(i).getAmount() >= 0)) {
+			if ((ac.get(i).getAmount().compareTo(new BigDecimal("0"))) < 0 ) {
 				ac.get(i).setStatus(Asset.Status.Invalid);
 				cashIsInvalid = true;
 				break;

@@ -89,18 +89,18 @@ public class Study extends EFDIdentifiable {
 	/*************************************************************************************************/
 	
 	//@Hidden // 16/8/2019 - see issue #352
-	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-			optional = true)
+	//@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
+	//		optional = true)
 	//@NoModify
 	//@NoCreate
 	//@DescriptionsList(descriptionProperties = "currency")
-	private Country altCurrency;
+	//private Country altCurrency;
 	/*************************************************************************************************/
 	//@Hidden // 16/8/2019 - see issue #352
-	@Column(precision = 10, scale = 5)
-	@Digits(integer = 10, fraction = 5)
+	//@Column(precision = 10, scale = 5)
+	//@Digits(integer = 10, fraction = 5)
 	//@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
-	private BigDecimal altExchangeRate;
+	//private BigDecimal altExchangeRate;
 	/*************************************************************************************************/
 	@ManyToOne (fetch = FetchType.LAZY,optional = false)
 	// @Required NOT required in OIHM a Study can just be part of a Project without
@@ -124,7 +124,7 @@ public class Study extends EFDIdentifiable {
 	private Collection<DefaultDietItem> defaultDietItem;
 
 	/*************************************************************************************************/
-	@ManyToOne(fetch = FetchType.LAZY, optional = true) // cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = CascadeType.REMOVE)
 	@SearchAction("Community.filteredSitesearch")
 	// @NoFrame(forViews = "FromWGCommunity")
 	@ReferenceView("FromStudy")
@@ -142,7 +142,7 @@ public class Study extends EFDIdentifiable {
 	// Assets
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	// @ElementCollection // Not usable with EditAction
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Land')"
 			+ "AND ${this.id} = ${study.id}")
@@ -154,7 +154,7 @@ public class Study extends EFDIdentifiable {
 	private Collection<WGCharacteristicsResource> characteristicsResourceLand;
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
 	//		+ "AND ${this.id} = ${study.id}")
 	@Condition("${type} = 'Livestock' AND ${this.id} = ${study.id}")
@@ -165,7 +165,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestock;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Other Tradeable Goods')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -175,7 +175,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTradeable;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename in ('Crops','Wild Foods','Livestock Products') ${this.id} = ${study.id}")
 	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Food Stocks')"  
 	//		+ "AND ${this.id} = ${study.id}")
@@ -188,7 +188,7 @@ public class Study extends EFDIdentifiable {
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceFoodstock;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Trees')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -198,7 +198,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTree;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Cash')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -213,7 +213,7 @@ public class Study extends EFDIdentifiable {
 	// Non Assets
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	// @ElementCollection //- will not work with SearchListCondition
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Crops')"
 			+ "AND ${this.id} = ${study.id}")
@@ -224,7 +224,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceCrop;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Sales')"
 	//		+ "AND ${this.id} = ${study.id}")
 	@Condition("${type} = 'Livestock Sales' AND ${this.id} = ${study.id}")
@@ -235,7 +235,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockSales;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Products')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -245,7 +245,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockProducts;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Employment')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -255,7 +255,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceEmployment;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Transfers')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -265,7 +265,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTransfers;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Wild Foods')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -277,7 +277,7 @@ public class Study extends EFDIdentifiable {
 	
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study")
+	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
 	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Non Food Purchase')"
 	//		+ "AND ${this.id} = ${study.id}")
 	
@@ -420,22 +420,6 @@ public class Study extends EFDIdentifiable {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public Country getAltCurrency() {
-		return altCurrency;
-	}
-
-	public void setAltCurrency(Country altCurrency) {
-		this.altCurrency = altCurrency;
-	}
-
-	public BigDecimal getAltExchangeRate() {
-		return altExchangeRate;
-	}
-
-	public void setAltExchangeRate(BigDecimal altExchangeRate) {
-		this.altExchangeRate = altExchangeRate;
 	}
 
 	public Project getProjectlz() {

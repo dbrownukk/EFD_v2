@@ -838,7 +838,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						warnMessage = "Currency Amount";
 						System.out.println("in set assetcash set amount cell = " + cell[i][j][1].getNumericCellValue());
-						acash.setAmount(getCellDouble(cell[i][j][1]));
+						acash.setCurrencyEnteredAmount(BigDecimal.valueOf(getCellDouble(cell[i][j][1])));
 
 						System.out.println("in set assetcash done set amount");
 
@@ -867,52 +867,51 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						 * 
 						 */
 
-						String lzCurrency = livelihoodZone.getCountry().getCurrency();
+						String lzCurrency = "";
 
-						String projAltCurrency = wgi.getWealthgroup().getCommunity().getProjectlz().getAltCurrency()
-								.getCurrency();
+						// LZ must have country
+						lzCurrency = livelihoodZone.getCountry().getCurrency();
+						// GETS TO HERE
+						System.out.println("111111");
 
-						String cashCurrency = acash.getResourceSubType().getResourcetypename();
-
-						BigDecimal zero = new BigDecimal(0.0);
-
-						BigDecimal projAltExchangeRate = wgi.getWealthgroup().getCommunity().getProjectlz()
-								.getAltExchangeRate();
-
-						double projAltExhangeRateDouble = 0.0;
+						String projectAltCurrency;
 						try {
-
-							projAltExhangeRateDouble = projAltExchangeRate.doubleValue();
+							projectAltCurrency = wgi.getWealthgroup().getCommunity().getProjectlz().getAltCurrency()
+									.getCurrency();
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							// e.printStackTrace();
-
+							projectAltCurrency = "";
 						}
 
-						System.out.println("current currency acash = " + cashCurrency);
-						if (cashCurrency.equalsIgnoreCase(lzCurrency)) {
-							acash.setExchangeRate(BigDecimal.valueOf(1));
-						} else if (cashCurrency.equalsIgnoreCase(projAltCurrency)) {
+						System.out.println("22222");
 
-							if (projAltExhangeRateDouble <= 0) {
+						String enteredCashCurrency;
+						try {
+							enteredCashCurrency = acash.getResourceSubType().getResourcetypename();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							// e.printStackTrace();
+							enteredCashCurrency = "";
+						}
 
-								acash.setStatus(efd.model.Asset.Status.Invalid);
-							} else {
+						System.out.println("enteredCashCurrency " + enteredCashCurrency);
+						System.out.println("lzCurrency " + lzCurrency);
+						System.out.println("projectAltCurrency " + projectAltCurrency);
 
-								acash.setAmount(acash.getAmount() * projAltExhangeRateDouble);
-								acash.setExchangeRate(BigDecimal.valueOf(projAltExhangeRateDouble));
-							}
-						} else if (!cashCurrency.equals(lzCurrency)
-								&& !cashCurrency.equalsIgnoreCase(projAltCurrency)) {
-							/* need to check exchange rate is >0 */
+						System.out.println("33333");
 
-							if (acash.getExchangeRate().intValue() <= 0) {
-								acash.setStatus(efd.model.Asset.Status.Invalid);
-							} else {
-
-								acash.setAmount(acash.getExchangeRate().multiply(BigDecimal.valueOf(acash.getAmount()))
-										.doubleValue());
-							}
+						if (enteredCashCurrency.equals(lzCurrency)) {
+							System.out.println("entered currency == lz currency");
+							acash.setExchangeRate(BigDecimal.valueOf(1.00));
+						}
+						if (enteredCashCurrency.equals(projectAltCurrency)) {
+							System.out.println("entered currency == proj alt currency");
+							acash.setExchangeRate(
+									wgi.getWealthgroup().getCommunity().getProjectlz().getAltExchangeRate());
+						} else {
+							System.out.println("use entered exchange rate ");
+							acash.setExchangeRate(acash.getExchangeRate());
 						}
 
 						wgi.getAssetCash().add(acash);
@@ -972,7 +971,6 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do crops localunit");
-
 
 						LocalUnit localUnit = getLocalUnit(livelihoodZone, rst);
 

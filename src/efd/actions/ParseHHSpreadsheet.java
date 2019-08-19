@@ -1260,11 +1260,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						acash.setUnit("each"); // a default value - not used elsewhere
 
 						warnMessage = "Currency Amount";
-						acash.setAmount(getCellDouble(cell[i][j][1]));
-						warnMessage = "Currency Exchage Rate";
+						acash.setCurrencyEnteredAmount(BigDecimal.valueOf(getCellDouble(cell[i][j][1])));
+						warnMessage = "Currency Exchange Rate";
 						double exrate = cell[i][j][2].getNumericCellValue();
 						acash.setExchangeRate(BigDecimal.valueOf(exrate));
-						/* check against currency */
+						/* check is currency a valid currency */
 
 						for (icurr = 0; icurr < currency.size(); icurr++) {
 							if (currency.get(icurr).getCurrency().equals(cell[i][j][0].getStringCellValue())) {
@@ -1285,63 +1285,70 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						}
 
 						/*
-						 * if Currency is not LZ currency or Proect Alt Currency (with exchange rate)
+						 * if Currency is not LZ currency or Project Alt Currency (with exchange rate)
 						 * then use Exchange Rate entered in acash
 						 */
 
 						warnMessage = "Currency Exchange Rate Calc";
 
-						String lzCurrency;
+						String lzCurrency = "";
+
+						// LZ must have country
+						lzCurrency = livelihoodZone.getCountry().getCurrency();
+						// GETS TO HERE
+						System.out.println("111111");
+
+						
+						
+						
+						
+						String projectAltCurrency;
 						try {
-							lzCurrency = livelihoodZone.getCountry().getCurrency();
-						} catch (Exception e1) {
-							// No LZ, thus use Country Currency
-							lzCurrency = hhi.getStudy().getSite().getCountry().getCurrency();
-						}
-
-						String studyAltCurrency = hhi.getStudy().getAltCurrency().getCurrency();
-
-						String cashCurrency = acash.getResourceSubType().getResourcetypename();
-
-						BigDecimal zero = new BigDecimal(0.0);
-
-						BigDecimal studyAltExchangeRate = hhi.getStudy().getAltExchangeRate();
-
-						double studyAltExhangeRateDouble = 0.0;
-						try {
-
-							studyAltExhangeRateDouble = studyAltExchangeRate.doubleValue();
+							projectAltCurrency = hhi.getStudy().getProjectlz().getAltCurrency().getCurrency();
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							// e.printStackTrace();
-
+							projectAltCurrency = "";
 						}
 
-						if (cashCurrency.equalsIgnoreCase(lzCurrency)) {
+						
+						
+						
+						
+						System.out.println("22222");
 
+						String enteredCashCurrency;
+						try {
+							enteredCashCurrency = acash.getResourceSubType().getResourcetypename();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							// e.printStackTrace();
+							enteredCashCurrency = "";
+						}
+
+						
+						System.out.println("enteredCashCurrency "+enteredCashCurrency);
+						System.out.println("lzCurrency "+lzCurrency);
+						System.out.println("projectAltCurrency "+projectAltCurrency);
+						
+						System.out.println("33333");
+					
+						if(enteredCashCurrency.equals(lzCurrency)) {
+							System.out.println("entered currency == lz currency"); 
 							acash.setExchangeRate(BigDecimal.valueOf(1.00));
-						} else if (cashCurrency.equalsIgnoreCase(studyAltCurrency)) {
-
-							if (studyAltExhangeRateDouble <= 0) {
-
-								acash.setStatus(efd.model.Asset.Status.Invalid);
-							} else {
-
-								acash.setAmount(acash.getAmount() * studyAltExhangeRateDouble);
-								acash.setExchangeRate(BigDecimal.valueOf(studyAltExhangeRateDouble));
-							}
-						} else if (!cashCurrency.equals(lzCurrency)
-								&& !cashCurrency.equalsIgnoreCase(studyAltCurrency)) {
-							/* need to check exchange rate is >0 */
-
-							if (acash.getExchangeRate().intValue() <= 0) {
-
-								acash.setStatus(efd.model.Asset.Status.Invalid);
-							} else {
-
-								acash.setAmount(acash.getExchangeRate().multiply(BigDecimal.valueOf(acash.getAmount())).doubleValue());
-							}
 						}
+						if (enteredCashCurrency.equals(projectAltCurrency)) {
+							System.out.println("entered currency == proj alt currency");
+							acash.setExchangeRate(hhi.getStudy().getProjectlz().getAltExchangeRate());
+							// acash.setAmount(acash.getCurrencyEnteredAmount().multiply(acash.getExchangeRate()));
+
+						} 
+						else {
+							System.out.println("use entered exchange rate ");
+							acash.setExchangeRate(acash.getExchangeRate());
+						}
+						
+						//acash.setAmount(acash.getCurrencyEnteredAmount().multiply(acash.getExchangeRate()));
 
 						hhi.getAssetCash().add(acash);
 						// getView().refreshCollections();
@@ -1899,7 +1906,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							} else {
 								em("back in inputs rst not found ");
 							}
-							em("in INPUTS rst = "+cell[i][j][0].getStringCellValue());
+							em("in INPUTS rst = " + cell[i][j][0].getStringCellValue());
 							if ((rst2 = checkSubType(cell[i][j][0].getStringCellValue(),
 									rtype[NONFOODPURCHASE].getIdresourcetype().toString())) != null) {
 

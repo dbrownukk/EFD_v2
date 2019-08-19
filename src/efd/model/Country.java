@@ -1,5 +1,6 @@
 package efd.model;
 
+import java.math.*;
 import java.util.*;
 
 import javax.persistence.*;
@@ -52,10 +53,10 @@ public class Country {
 	@Required
 	private String currency;
 	
-	
+	/*
 	@OneToMany(mappedBy="country")
 	private Collection<Site> site;
-	
+	*/
 	
 	@Column(name="CurrencySymbol",length=1)
 	private String currencySymbol;

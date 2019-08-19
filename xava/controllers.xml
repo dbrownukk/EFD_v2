@@ -23,7 +23,6 @@
 
 	<controller name="EFD_HM">
 		<extends controller="TypicalNotResetOnSave" />
-
 	</controller>
 
 	<controller name="GoCopyStudy">
@@ -137,10 +136,10 @@
 			label="Non-Food Expenditure(Normalised)" mode="detail"
 			icon="view-list"
 			class="efd.reports.NonFoodExpenditureChartNormalised" />
-		<action name="Food Consumed" label="Food Consumed"
+		<action name="Food Consumed" label="Food Income"
 			mode="detail" icon="view-list" class="efd.reports.FoodConsumedChart" />
 		<action name="Food Consumed(Normalised)"
-			label="Food Consumed(Normalised)" mode="detail" icon="view-list"
+			label="Food Income(Normalised)" mode="detail" icon="view-list"
 			class="efd.reports.FoodConsumedChartNormalised" />
 		<action name="Cash Income" label="Cash Income" mode="detail"
 			icon="view-list" class="efd.reports.CashIncomeChart" />
@@ -165,7 +164,7 @@
 
 
 	<controller name="ProjectReports">
-		<extends controller="EFD_HM" />
+	<!-- 	<extends controller="EFD_HM" />  -->
 		<action name="ProjectExcel" label="ProjectExcel" icon="excel"
 			class="efd.reports.ProjectExcel" image="excel.gif" mode="detail" />
 	</controller>

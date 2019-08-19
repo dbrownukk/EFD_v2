@@ -23,13 +23,10 @@ public class FilteredLZ extends ReferenceSearchAction {
 
 		System.out.println("model = " + efdModel);
 
-		if (efdModel == "OHEA") {
-			/* If in standalone Site the filter is not needed */
+		if (efdModel == "OHEA" || efdModel == "OIHM") {
+			/* OIHM Site must now behave same as OHEA see Issue 352  */
 
-			System.out.println("In Filter1 " + getView().getMembersNames());
-			System.out.println("In Filter2 " + getView().getBaseModelName());
-
-			// System.out.println("vnames"+getView().);
+		
 
 			try {
 				getPreviousView().getValue("projectlz.projectid");
@@ -63,29 +60,18 @@ public class FilteredLZ extends ReferenceSearchAction {
 
 			}
 
-			// System.out.println(inlist);
-
-			// getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and ${LZ} in
-			// (select lz.lzid from LivelihoodZone lz join lz.project pr "
-			// + " where pr.projectid = '" + cprojectid + ")'");
+		
 
 			getTab().setBaseCondition("${lzid} in (" + inlist + ")");
 		}
-
+/*
 		if (efdModel == "OIHM") {
-			// LZ in SIte in a Study in a Project
-			
-			//String projectId = getPreviousView().getValue("projectlz.projectid").toString();
-			//Project project = XPersistence.getManager().find(Project.class, projectId);
-			
-			//System.out.println("project country = "+project.getAltCurrency().getIsocountrycode());
-			//System.out.println("project country = "+project.getAltCurrency().getIdcountry());
 			
 			super.execute();
-			//getTab().setBaseCondition("${country.isocountrycode} != '"+project.getAltCurrency().getIsocountrycode().toString()+"'");
+		
 
 		}
-
+*/
 	}
 
 }

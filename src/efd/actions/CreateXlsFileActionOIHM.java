@@ -121,6 +121,14 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		Study study = XPersistence.getManager().find(Study.class, studyID);
 		site = study.getSite();
+		
+		if (site == null)
+		{
+			addError("Add Site details before creating Template Spreadsheet");
+			throw new NullPointerException("No Site");
+		}
+		
+		
 		livelihoodZone = site.getLivelihoodZone();
 
 		/*
@@ -1913,20 +1921,13 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 				// TODO Auto-generated catch block
 				// e.printStackTrace();
 
-				System.out.println("in printassetcash get site country curr");
-				try {
-					System.out.println("in try printassetcash get site country curr");
-					lzCurrency = site.getCountry().getCurrency();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					// e1.printStackTrace();
 					lzCurrency = "Unknown";
 
 				}
 
-			}
+			
 
-			System.out.println("in printassetcash done get  curr ");
+			
 			sheet.setValue(2, 1, "Livelihood Zone Currency = " + lzCurrency);
 
 			sheet.setValue(2, 3, "Currency", boldTopStyle);

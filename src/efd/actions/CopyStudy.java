@@ -49,8 +49,6 @@ public class CopyStudy extends ViewBaseAction {
 			newStudy.setEndDate(study.getEndDate());
 			message = "Done End Date";
 			newStudy.setNotes(study.getNotes());
-			newStudy.setAltCurrency(study.getAltCurrency());
-			newStudy.setAltExchangeRate(study.getAltExchangeRate());
 			message = "Done AltExchangeRate ";
 			newStudy.setDescription(study.getDescription());
 			message = "Done Description ";

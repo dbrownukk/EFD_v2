@@ -57,28 +57,17 @@ public class FilteredSite extends ReferenceSearchAction {
 		}
 		
 		if (isInOHEA) {
-
-			System.out.println("current proj " + getView().getValue("projectlz.projectid"));
-			// System.out.println("current site "
-			// +getView().getValue("site.locationid"));
-
-			// System.out.println("In Site Filter from Comm "+getView().getSearchKeyName());
-
+			System.out.println("isInOHEA");
 			/* need to set project context */
 			if (getView().getValueString("projectlz.projectid").isEmpty()) {
 				throw new IllegalStateException(XavaResources.getString("Site lookup must be in context of a Project"));
 			}
 
-			// String locid =
-			// getPreviousView().getValue("site.locationid").toString();
-			// String cprojectid =
-			// getPreviousView().getValue("projectlz.projectid").toString();
 			super.execute();
 			String locid = getPreviousView().getValueString("site.locationid");
 			String cprojectid = getPreviousView().getValueString("projectlz.projectid");
 
-			// System.out.println("locid = "+locid);
-			// System.out.println("cprojectid = "+cprojectid);
+		
 			/*
 			 * select sites that are valid for current LZ in project LZ for this Project
 			 */
@@ -113,27 +102,15 @@ public class FilteredSite extends ReferenceSearchAction {
 			String alist = "";
 
 			for (int j = 0; j < com.size(); j++) {
-				// System.out.println("in loop alist");
-
-				// System.out.println("in loop2");
-				// System.out.println("Comsiteid = "+com.get(j).getSite());
-				// System.out.println("ComProjid = "+com.get(j).getProjectlz());
-
-				// System.out.println("ComSite = "+com.get(j).getSite().toString());
-				// System.out.println("in loop 1"+com.get(j).getSite().getLocationid());
+				
 				alist += "'" + com.get(j).getSite().getLocationid() + "'";
 				if (j + 1 == com.size())
 					break;
 				alist += ",";
-				// System.out.println(j);
+				
 			}
 
-			// System.out.println("inlist ="+inlist);
-			// System.out.println("alist = "+alist);
-
-			// getTab().setBaseCondition("${locationid} != '" + locid + "'" + " and
-			// ${LZ} in (select lz.lzid from LivelihoodZone lz join lz.project pr "
-			// + " where pr.projectid = '" + cprojectid + ")'");
+			
 
 			if (lzs.isEmpty() && com.isEmpty()) /* No existing Sites/LZS in this project */
 			{
@@ -159,6 +136,7 @@ public class FilteredSite extends ReferenceSearchAction {
 		
 		
 		if (!isInOHEA) {
+			System.out.println("isInOIHM");
 			Project project = null;
 			String condition = "'";
 			
@@ -167,18 +145,29 @@ public class FilteredSite extends ReferenceSearchAction {
 			System.out.println("in oihm site filteredsite");
 			
 			String projectId = getView().getValue("projectlz.projectid").toString();
+			System.out.println("projectid =  "+projectId);
+			
+			
 			try {
 			project = XPersistence.getManager().find(Project.class, projectId);
+			System.out.println("project =  "+project.getProjecttitle());
 			}catch (Exception ex) {
-
-				// failed to find a project as there is no country - carry on with no COuntry 
+				System.out.println("Failed to find Project "+ex);
+				// failed to find a project 
 		   
 			}
 			
 			
-			System.out.println("done project query "+project.getLivelihoodZone());
+			System.out.println("done project query "+project.getLivelihoodZone().size());
 			
 			super.execute();
+			
+			System.out.println("condition before set = "+condition); 
+			
+			
+			
+			
+			
 			for (LivelihoodZone livelihoodZone : project.getLivelihoodZone()) {
 				for (Site site : livelihoodZone.getSite()) {
 					condition += site.getLocationid()+"','";

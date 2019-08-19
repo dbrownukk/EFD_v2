@@ -57,7 +57,7 @@ public class LivelihoodZone  {
 	@ReferenceView(forViews="DEFAULT",value="FullCountry")
 	})
 	
-	@DescriptionsList
+	@DescriptionsList(descriptionProperties="description,currency")
 	private Country country;
 	
 

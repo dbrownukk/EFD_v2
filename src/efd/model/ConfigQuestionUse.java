@@ -71,9 +71,6 @@ public class ConfigQuestionUse extends EFDIdentifiable {
 	@ManyToOne(optional = false)
 	//@SearchListCondition("${configQuestion.id} != ${id}")
 	
-	// TODO
-	// TODO
-	
 	@DescriptionsList(
 			 descriptionProperties="prompt", // 3
 			 forViews="fromRSU" // 4

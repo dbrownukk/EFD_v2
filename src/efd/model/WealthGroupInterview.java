@@ -178,7 +178,7 @@ public class WealthGroupInterview {
 	private Collection<AssetTree> assetTree;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType.resourcetypename,currencyEnteredName,exchangeRate,amount")
+	@ListProperties("status, resourceSubType.resourcetypename,currencyEnteredName,currencyEnteredAmount,exchangeRate,amount")
 	private Collection<AssetCash> assetCash;
 
 	@ElementCollection

@@ -243,7 +243,7 @@ public class Project {
 	}
 
 	public BigDecimal getAltExchangeRate() {
-		return altExchangeRate;
+		return altExchangeRate  == null?BigDecimal.ZERO:altExchangeRate;
 	}
 
 	public void setAltExchangeRate(BigDecimal altExchangeRate) {

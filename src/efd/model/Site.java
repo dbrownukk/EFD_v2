@@ -16,21 +16,21 @@ import com.openxava.naviox.model.*;
 import efd.validations.*;
 import efd.actions.*;
 
-@Views({ @View(members = "Site[#livelihoodZone;country;locationdistrict;subdistrict;gpslocation]"),
+@Views({ @View(members = "Site[#livelihoodZone;locationdistrict;subdistrict;gpslocation]"),
 		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone"),
 		@View(name = "LZSite", members = "locationdistrict;subdistrict;gpslocation"),
 		@View(name = "FromWealthGroup", members = "locationdistrict,subdistrict,livelihoodZone;"),
-		@View(name = "FromStudy", members = "locationdistrict,subdistrict,gpslocation;country, livelihoodZone"),
+		@View(name = "FromStudy", members = "locationdistrict,subdistrict,gpslocation; livelihoodZone"),
 		@View(name = "NewlineSite", members = "locationdistrictsubdistrict;gpslocation;livelihoodZone;") })
 
 @Entity
 
-@Tab(editors = "List", rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), properties = "livelihoodZone.lzname,country.description,locationdistrict,subdistrict,gpslocation"
-// , properties = "livelihoodZone.project.projecttitle,livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"  // cannot show project as there maybe more than 1 for this LZ / Site combo
+@Tab(editors = "List", rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), properties = "livelihoodZone.lzname,locationdistrict,subdistrict,gpslocation"
 		, defaultOrder = "${livelihoodZone.lzname} asc,${locationdistrict} asc,${subdistrict} asc")
 
-@EntityValidator(value = OIHMCountryLZ.class, properties = { @PropertyValue(name = "country"),
-		@PropertyValue(name = "livelihoodZone"), @PropertyValue(name = "model") }) // Cannot use Inject in validation
+// Not needed as a Study Site must be part of a LZ 
+//@EntityValidator(value = OIHMCountryLZ.class, properties = { @PropertyValue(name = "country"),
+//		@PropertyValue(name = "livelihoodZone"), @PropertyValue(name = "model") }) // Cannot use Inject in validation
 																					// code
 
 @Table(name = "Site", uniqueConstraints = {
@@ -65,7 +65,8 @@ public class Site {
 
 	@ReferenceView("SimpleLZnomap")
 	@NoFrame
-	// @NoCreate
+	@Required
+	@NoCreate
 	// @NoModify
 	@JoinColumn(name = "LZ")
 	// @OnChange(value = OnChangeSiteCountry.class)
@@ -76,13 +77,15 @@ public class Site {
 	private Collection<Community> community;
 
 
-
+	// NOT REQUIRED - removed from Views 
+	/*
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@NoFrame
 	// @SearchAction(value="LivelihoodZone.filteredsearch")
 	@ReferenceView("SimpleCountry")
 	// @OnChange(value = OnChangeSiteCountry.class)
 	private Country country;
+	*/
 
 	@OneToMany(mappedBy = "site", cascade = CascadeType.REMOVE)
 	// @ListProperties("cinterviewdate,cinterviewsequence,civf,civm")
@@ -106,14 +109,6 @@ public class Site {
 
 	public void setModel(String model) {
 		this.model = model;
-	}
-
-	public Country getCountry() {
-		return country;
-	}
-
-	public void setCountry(Country country) {
-		this.country = country;
 	}
 
 	public String getLocationid() {

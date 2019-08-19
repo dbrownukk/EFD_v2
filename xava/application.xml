@@ -42,7 +42,7 @@
 	</module>
 
 
-
+<!--  
 
 	<module name="ConfigQuestionUse">
 
@@ -67,7 +67,7 @@
 		<controller name="TypicalNotResetOnSave" />
 	</module>
 
-
+-->
 
 
 
