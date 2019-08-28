@@ -24,11 +24,11 @@ public class AssetCash extends Asset{
 	@Column(name = "Amount")
 	@Depends("currencyEnteredAmount,exchangeRate")
 	public BigDecimal getAmount() {
-		return(currencyEnteredAmount.multiply(exchangeRate));
-	};
+		return currencyEnteredAmount.multiply(exchangeRate);
+	}
 	
 	
-	
+	@DisplaySize(value = 10)
 	@Column(name = "CurrencyEnteredAmount")
 	private BigDecimal currencyEnteredAmount;
 	

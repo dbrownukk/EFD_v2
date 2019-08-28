@@ -1296,42 +1296,27 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						// LZ must have country
 						lzCurrency = livelihoodZone.getCountry().getCurrency();
 						// GETS TO HERE
-						System.out.println("111111");
-
-						
-						
-						
+					
+	
 						
 						String projectAltCurrency;
 						try {
 							projectAltCurrency = hhi.getStudy().getProjectlz().getAltCurrency().getCurrency();
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							// e.printStackTrace();
+							
 							projectAltCurrency = "";
 						}
 
-						
-						
-						
-						
-						System.out.println("22222");
 
 						String enteredCashCurrency;
 						try {
 							enteredCashCurrency = acash.getResourceSubType().getResourcetypename();
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							// e.printStackTrace();
+							
 							enteredCashCurrency = "";
 						}
 
-						
-						System.out.println("enteredCashCurrency "+enteredCashCurrency);
-						System.out.println("lzCurrency "+lzCurrency);
-						System.out.println("projectAltCurrency "+projectAltCurrency);
-						
-						System.out.println("33333");
+				
 					
 						if(enteredCashCurrency.equals(lzCurrency)) {
 							System.out.println("entered currency == lz currency"); 
@@ -1340,7 +1325,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						if (enteredCashCurrency.equals(projectAltCurrency)) {
 							System.out.println("entered currency == proj alt currency");
 							acash.setExchangeRate(hhi.getStudy().getProjectlz().getAltExchangeRate());
-							// acash.setAmount(acash.getCurrencyEnteredAmount().multiply(acash.getExchangeRate()));
+						
 
 						} 
 						else {
@@ -1348,10 +1333,15 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							acash.setExchangeRate(acash.getExchangeRate());
 						}
 						
-						//acash.setAmount(acash.getCurrencyEnteredAmount().multiply(acash.getExchangeRate()));
+						if(acash.getExchangeRate().compareTo(BigDecimal.valueOf(0.0))!=1)
+						{
+							
+							acash.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						
 
 						hhi.getAssetCash().add(acash);
-						// getView().refreshCollections();
+						
 
 						k = 100;
 						break;

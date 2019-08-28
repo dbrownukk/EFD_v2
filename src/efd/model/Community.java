@@ -101,7 +101,7 @@ public class Community {
 	@OnChange(OnChangeClearCommunity.class)
 	@ReferenceView("SimpleProject")
 	@NoCreate
-	@NoModify
+	//@NoModify
 	
 	private Project projectlz;	
 	// ----------------------------------------------------------------------------------------------//

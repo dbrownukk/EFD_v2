@@ -120,7 +120,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				System.out.println("Land Units set Invalid ");
 				break;
 			}
-			
+
 		}
 
 		/* Livestock Validation */
@@ -136,11 +136,11 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				livestockIsInvalid = true;
 				break;
 			} else if (!als.get(i).getStatus().toString().equals("Valid")) {
-				//addMessage("Livestock Assets still Invalid or Unchecked");
+				// addMessage("Livestock Assets still Invalid or Unchecked");
 				livestockIsInvalid = true;
 				break;
 			}
-			
+
 		}
 
 		/* Tradeable Validation */
@@ -161,7 +161,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				tradeIsInvalid = true;
 				break;
 			}
-			
+
 		}
 
 		/* Food Stocks */
@@ -176,7 +176,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				fsIsInvalid = true;
 				break;
 			}
-			
+
 		}
 		/* Trees */
 		for (i = 0; i < atree.size(); i++) {
@@ -195,22 +195,23 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				treeIsInvalid = true;
 				break;
 			}
-			
+
 		}
 
 		/* Cash Validation */;
 		for (i = 0; i < ac.size(); i++) {
-			if ((ac.get(i).getAmount().compareTo(new BigDecimal("0"))) < 0 ) {
+
+			System.out.println("amount and exrate = "+ac.get(i).getAmount().intValue()+" "+ac.get(i).getExchangeRate().intValue());
+			if (ac.get(i).getAmount().intValue() > 0 && ac.get(i).getExchangeRate().intValue() > 0) {
+				ac.get(i).setStatus(Asset.Status.Valid);
+				
+			} else {
+
+				System.out.println("Amount is not >0 " + ac.get(i).getAmount().intValue());
 				ac.get(i).setStatus(Asset.Status.Invalid);
 				cashIsInvalid = true;
-				break;
+				
 			}
-
-			else if (!ac.get(i).getStatus().toString().equals("Valid")) {
-				cashIsInvalid = true;
-				break;
-			}
-			
 		}
 
 		/* Crop Validation */
@@ -244,7 +245,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				cropIsInvalid = true;
 				break;
 			}
-			
+
 		}
 
 		/* Livestock Sales Validation */
@@ -274,7 +275,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				lssIsInvalid = true;
 				break;
 			}
-			
+
 		}
 
 		/* Livestock Products Validation */
@@ -283,7 +284,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 
 			lspSum = lsp.get(i).getPercentTradeMarket1() + lsp.get(i).getPercentTradeMarket2()
 					+ lsp.get(i).getPercentTradeMarket3();
-			System.out.println("tot = "+lspSum);
+			System.out.println("tot = " + lspSum);
 			if (lsp.get(i).getUnitsSold() > 0 && lsp.get(i).getPricePerUnit() < 0) {
 				System.out.println("LSP 111");
 				lsp.get(i).setStatus(Asset.Status.Invalid);
@@ -309,7 +310,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				lspIsInvalid = true;
 				break;
 			}
-			
+
 		}
 		System.out.println("done lsp validation");
 		/* Employment Validation */
@@ -327,7 +328,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				empIsInvalid = true;
 				break;
 			}
-			
+
 		}
 		System.out.println("done emp validation");
 		/* Transfers Validation */
@@ -374,7 +375,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				transIsInvalid = true;
 				break;
 			}
-			
+
 		}
 		System.out.println("done transfers validation");
 		/* Wildfood Validation */
@@ -403,7 +404,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				wfIsInvalid = true;
 				break;
 			}
-			
+
 		}
 		System.out.println("done wf validation");
 		/* Inputs Validation */
@@ -430,7 +431,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				inpIsInvalid = true;
 				break;
 			}
-			
+
 		}
 
 		for (Iterator<HouseholdMember> iterator = householdMembers.iterator(); iterator.hasNext();) {
@@ -443,7 +444,6 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 		}
 
-		
 		if (landIsInvalid)
 			addMessage("Land Assets still Invalid or Unchecked");
 		if (livestockIsInvalid)

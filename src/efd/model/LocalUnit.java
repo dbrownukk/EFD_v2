@@ -33,7 +33,7 @@ public class LocalUnit extends Identifiable {
 	private String name;
 
 	@DefaultValueCalculator(ZeroDoubleCalculator.class)
-	@Min(0)
+	@Positive
 	private Double multipleOfStandardMeasure;
 
 	@Required

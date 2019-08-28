@@ -895,11 +895,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							enteredCashCurrency = "";
 						}
 
-						System.out.println("enteredCashCurrency " + enteredCashCurrency);
-						System.out.println("lzCurrency " + lzCurrency);
-						System.out.println("projectAltCurrency " + projectAltCurrency);
-
-						System.out.println("33333");
+	
 
 						if (enteredCashCurrency.equals(lzCurrency)) {
 							System.out.println("entered currency == lz currency");
@@ -914,6 +910,14 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 							acash.setExchangeRate(acash.getExchangeRate());
 						}
 
+						if(acash.getExchangeRate().compareTo(BigDecimal.valueOf(0.0))!=1)
+						{
+							em("exchange rate is invalid ");
+							em("exrate 222 = "+acash.getExchangeRate());
+							
+							acash.setStatus(efd.model.Asset.Status.Invalid);
+						}
+						
 						wgi.getAssetCash().add(acash);
 						getView().refreshCollections();
 						k = 100;
