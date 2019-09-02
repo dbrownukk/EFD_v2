@@ -201,7 +201,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 		/* Cash Validation */;
 		for (i = 0; i < ac.size(); i++) {
 
-			System.out.println("amount and exrate = "+ac.get(i).getAmount().intValue()+" "+ac.get(i).getExchangeRate().intValue());
+		
 			if (ac.get(i).getAmount().intValue() > 0 && ac.get(i).getExchangeRate().intValue() > 0) {
 				ac.get(i).setStatus(Asset.Status.Valid);
 				

@@ -160,11 +160,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		ws.add(new Wsheet(NONFOODPURCHASE, "Non Food Purchase", 4, 0)); // used for INPUTS
 
-		/*
-		 * ws.add(new Wsheet(2, 3, 1, "Livestock Type")); ws.add(new Wsheet(2, 3, 2,
-		 * "Unit")); ws.add(new Wsheet(2, 3, 3, "Owned at Start of Year")); ws.add(new
-		 * Wsheet(2, 3, 3, "Price Per Unit"));
-		 */
 
 		em("in xls parse ");
 
@@ -342,8 +337,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	}
 
 	private void em(String em) {
-		System.out.println(em);
-		// return;
+		//System.out.println(em);
+		 return;
 
 	}
 

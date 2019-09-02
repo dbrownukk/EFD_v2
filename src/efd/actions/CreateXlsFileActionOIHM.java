@@ -121,14 +121,12 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		Study study = XPersistence.getManager().find(Study.class, studyID);
 		site = study.getSite();
-		
-		if (site == null)
-		{
+
+		if (site == null) {
 			addError("Add Site details before creating Template Spreadsheet");
 			throw new NullPointerException("No Site");
 		}
-		
-		
+
 		livelihoodZone = site.getLivelihoodZone();
 
 		/*
@@ -506,6 +504,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, cropSheet, 3, 30, 9, 9, style);
 		addNumberValidation(workbook, sheet, cropSheet, 3, 30, 11, 11, style);
 		addNumberValidation(workbook, sheet, cropSheet, 3, 30, 13, 13, style);
+		addMarketsFormula(workbook, cropSheet, 'J', 'O');
 
 		/* Livestock Sales */
 
@@ -517,6 +516,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, lssSheet, 3, 30, 7, 7, style);
 		addNumberValidation(workbook, sheet, lssSheet, 3, 30, 9, 9, style);
 		addNumberValidation(workbook, sheet, lssSheet, 3, 30, 11, 11, style);
+		addMarketsFormula(workbook, lssSheet, 'H', 'M');
 
 		/* Livestock Products */
 
@@ -530,6 +530,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, lspSheet, 3, 30, 10, 10, style);
 		addNumberValidation(workbook, sheet, lspSheet, 3, 30, 12, 12, style);
 		addNumberValidation(workbook, sheet, lspSheet, 3, 30, 14, 14, style);
+		addMarketsFormula(workbook, lspSheet, 'K', 'P');
 
 		/* Employment */
 
@@ -548,6 +549,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 10, 10, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 12, 12, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 14, 14, style);
+		addMarketsFormula(workbook, empSheet, 'K', 'P');
 
 		/* Transfers */
 
@@ -567,6 +569,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 15, 15, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 17, 17, style);
 		addNumberValidation(workbook, sheet, transSheet, 3, 30, 19, 19, style);
+		addMarketsFormula(workbook, transSheet, 'P', 'U');
 
 		/* Wild Foods */
 
@@ -582,6 +585,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, wildfSheet, 3, 30, 9, 9, style);
 		addNumberValidation(workbook, sheet, wildfSheet, 3, 30, 11, 11, style);
 		addNumberValidation(workbook, sheet, wildfSheet, 3, 30, 13, 13, style);
+		addMarketsFormula(workbook, wildfSheet, 'J', 'O');
 
 		/* Inputs */
 
@@ -597,11 +601,11 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addNumberValidation(workbook, sheet, inputsSheet, 3, 30, 10, 10, style);
 
 		em("done inputs num validation " + wildfSheet.getSheetName());
-		addInputsFormula(workbook, inputsSheet); // allows for 1 formula per sheet
+		addMarketsFormula(workbook, inputsSheet, 'G', 'L'); // allows for 1 formula per sheet (,, startCol, totCol)
 
 		// now hide validation sheet
 
-		// workbook.setSheetHidden(workbook.getSheetIndex("Validations"), true);
+		workbook.setSheetHidden(workbook.getSheetIndex("Validations"), true);
 
 		/* Return the spreadsheet */
 		em("printed ss ");
@@ -614,38 +618,72 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	/**************************************************************************************************************************************************/
 	/* Validations */
 	/**************************************************************************************************************************************************/
-	private void addInputsFormula(HSSFWorkbook workbook, Sheet iSheet) {
+	private void addMarketsFormula(HSSFWorkbook workbook, Sheet iSheet, char startCol, char totCol) {
 
-		Cell cell = null;
 		int k = 0;
 		int j = 0;
 
-		em("add formula");
-		if (iSheet.getSheetName() == "Inputs") // Add % in cols G + I + K and put in L
-		{
-			// Create conditional format rule for this sheet
-			// Is RED until value = 100%
+		HSSFSheet mysheet = workbook.getSheet(iSheet.getSheetName());
 
-			HSSFSheet mysheet = workbook.getSheet("inputs");
+		HSSFSheetConditionalFormatting my_cond_format_layer = mysheet.getSheetConditionalFormatting();
+		HSSFConditionalFormattingRule rule = my_cond_format_layer
+				.createConditionalFormattingRule(ComparisonOperator.EQUAL, "100");
+		HSSFConditionalFormattingRule rule2 = my_cond_format_layer
+				.createConditionalFormattingRule(ComparisonOperator.NOT_EQUAL, "100");
 
-			HSSFSheetConditionalFormatting my_cond_format_layer = mysheet.getSheetConditionalFormatting();
-			HSSFConditionalFormattingRule rule = my_cond_format_layer
-					.createConditionalFormattingRule(ComparisonOperator.NOT_EQUAL, "100", null);
+		// HSSFConditionalFormattingRule rule = my_cond_format_layer
+		// .createConditionalFormattingRule(ComparisonOperator.NOT_EQUAL, "100", null);
 
-			HSSFPatternFormatting patternFmt = rule.createPatternFormatting();
-			patternFmt.setFillBackgroundColor(RED);
+		HSSFPatternFormatting patternFmt = rule.createPatternFormatting();
+		patternFmt.setFillBackgroundColor(GREEN);
+		HSSFPatternFormatting patternFmt2 = rule2.createPatternFormatting();
+		patternFmt2.setFillBackgroundColor(RED);
 
-			CellRangeAddress[] addresses = { CellRangeAddress.valueOf("L4:L29") };
+		String range = totCol + "4:" + totCol + "29";
 
-			my_cond_format_layer.addConditionalFormatting(addresses, rule);
+		CellRangeAddress[] addresses = { CellRangeAddress.valueOf(range) };
 
-			for (k = 3; k < 29; k++) {
-				// em("add formula pre =" + k);
-				j = k + 1;
-				iSheet.getRow(k).createCell(11).setCellFormula("G" + j + "+I" + j + "+K" + j);
-			}
+		ConditionalFormattingRule[] cfRules = { rule, rule2 };
+
+		my_cond_format_layer.addConditionalFormatting(addresses, rule, rule2);
+
+		char firstCol = startCol;
+		char secondCol = firstCol;
+		;
+		secondCol++;
+		secondCol++;
+		char thirdCol = secondCol;
+		thirdCol++;
+		thirdCol++;
+
+		int displayTot = (int) totCol - (int) 'A';
+
+		for (k = 3; k < 29; k++) {
+
+			j = k + 1;
+
+			String formula = "+" + firstCol + j + "+" + secondCol + j + "+" + thirdCol + j;
+
+			iSheet.getRow(k).createCell(displayTot).setCellFormula(formula);
+
 		}
 
+	}
+
+	/**************************************************************************************************************************************************/
+	private void calcUnitsConsumed(JxlsSheet sheet, char unitsProducedCol, char unitsSoldCol, char unitsOtherCol,
+			int unitsConsumedCol) {
+
+		// Calc for Units Consumeed
+		// Units Consumed = unitsProduced-unitsSold-UnitsOther
+
+		for (int j = 4; j < 30; j++) {
+			String formula = "+" + unitsProducedCol + j + "-" + unitsSoldCol + j + "-" + unitsOtherCol + j;
+
+			sheet.setFormula(unitsConsumedCol, j, formula);
+
+		}
+		
 	}
 
 	/**************************************************************************************************************************************************/
@@ -722,10 +760,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		addressList = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
 
 		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
-
-		// DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
-		// DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0",
-		// "1000000");
 
 		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
 				DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0", "1000000001000");
@@ -1020,13 +1054,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		int empUnit = 0;
 		int inputs = 0;
 
-	
-		
 		LocalUnit localUnit;
 		LocalUnit localArea;
 		ArrayList<String> localUnits = new ArrayList<>();
 		ArrayList<String> localAreas = new ArrayList<>();
-		
 
 		/* for HH */
 
@@ -1290,18 +1321,18 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		// Get any localunits for RST and livelihoodZone
 
 		/*
-		em("get any local units");
-		for (int k = 0; k < rst.size(); k++) {
-
-			localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
-
-			if (localUnit != null && !rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
-				localUnits.add(localUnit.getName().trim());
-
-			}
-		 
-		}
-		*/
+		 * em("get any local units"); for (int k = 0; k < rst.size(); k++) {
+		 * 
+		 * localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
+		 * 
+		 * if (localUnit != null &&
+		 * !rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
+		 * localUnits.add(localUnit.getName().trim());
+		 * 
+		 * }
+		 * 
+		 * }
+		 */
 		List<String> localus = localUnits.stream().distinct().collect(Collectors.toList());
 		em("have lus");
 		for (String lu : localus) {
@@ -1447,9 +1478,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		// Collections.sort(inputStrings);
 		// BUG ISSUE #355
-		
+
 		for (int k = 0; k < 255; k++) {
-			//for (int k = 0; k < inputStrings.size(); k++) {
+			// for (int k = 0; k < inputStrings.size(); k++) {
 			cell = inputResourceRow.createCell(inputResource);
 			cell.setCellValue(inputStrings.get(k).toString());
 			inputResource++;
@@ -1921,13 +1952,10 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 				// TODO Auto-generated catch block
 				// e.printStackTrace();
 
-					lzCurrency = "Unknown";
+				lzCurrency = "Unknown";
 
-				}
+			}
 
-			
-
-			
 			sheet.setValue(2, 1, "Livelihood Zone Currency = " + lzCurrency);
 
 			sheet.setValue(2, 3, "Currency", boldTopStyle);
@@ -1984,67 +2012,66 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 	/**************************************************************************************************************************************************/
 	private void printCrops(JxlsSheet sheet) {
-		{
-			/* Crops Sheet - */
 
-			sheet.setValue(2, 3, "Crop Type", boldTopStyle);
-			sheet.setValue(3, 3, "Unit", boldTopStyle);
-			sheet.setValue(4, 3, "Units Produced", boldTopStyle);
-			sheet.setValue(5, 3, "Units Sold", boldTopStyle);
-			sheet.setValue(8, 3, "Price per Unit", boldTopStyle);
-			sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
-			sheet.setValue(6, 3, "Units Other Use", boldTopStyle);
-			sheet.setValue(9, 3, "Market 1", boldTopStyle);
-			sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
-			sheet.setValue(11, 3, "Market 2", boldTopStyle);
-			sheet.setValue(12, 3, "% Trade at 2", boldTopStyle);
-			sheet.setValue(13, 3, "Market 3", boldTopStyle);
-			sheet.setValue(14, 3, "% Trade at 3", boldTopStyle);
+		/* Crops Sheet - */
 
-			sheet.setColumnWidths(2, width, width, numwidth, numwidth, numwidth, numwidth, numwidth, width, numwidth,
-					width, numwidth, width, numwidth); /* set col widths */
+		sheet.setValue(2, 3, "Crop Type", boldTopStyle);
+		sheet.setValue(3, 3, "Unit", boldTopStyle);
+		sheet.setValue(4, 3, "Units Produced", boldTopStyle);
+		sheet.setValue(5, 3, "Units Sold", boldTopStyle);
+		sheet.setValue(8, 3, "Price per Unit", boldTopStyle);
+		sheet.setValue(7, 3, "Units Consumed", boldTopStyle);
+		sheet.setValue(6, 3, "Units Other Use", boldTopStyle);
+		sheet.setValue(9, 3, "Market 1", boldTopStyle);
+		sheet.setValue(10, 3, "% Trade at 1", boldTopStyle);
+		sheet.setValue(11, 3, "Market 2", boldTopStyle);
+		sheet.setValue(12, 3, "% Trade at 2", boldTopStyle);
+		sheet.setValue(13, 3, "Market 3", boldTopStyle);
+		sheet.setValue(14, 3, "% Trade at 3", boldTopStyle);
+		sheet.setValue(15, 3, "% Total", boldTopStyle);
 
-			/* set grid for data input */
+		sheet.setColumnWidths(2, width, width, numwidth, numwidth, numwidth, numwidth, numwidth, width, numwidth, width,
+				numwidth, width, numwidth); /* set col widths */
 
-			int col = 2;
-			int row = 4;
-			while (col < 15) {
-				while (row < numRows) {
-					sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
-					row++;
-				}
-				col++;
-				row = 4;
+		/* set grid for data input */
+
+		int col = 2;
+		int row = 4;
+		while (col < 15) {
+			while (row < numRows) {
+				sheet.setValue(col, row, "", borderStyle); /* set borders for data input fields */
+				row++;
 			}
-
+			col++;
 			row = 4;
-			int cropsrow = 5;
-			// get resource sub type //
-			for (int k = 0; k < chrs.size(); k++) {
-				/* Get Resource Sub Type */
-				WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
-						.find(WGCharacteristicsResource.class, chrs.get(k));
+		}
 
-				/* Get Resource Type */
-				ResourceType rst = XPersistence.getManager().find(ResourceType.class,
-						wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
+		row = 4;
+		int cropsrow = 5;
+		// get resource sub type //
+		for (int k = 0; k < chrs.size(); k++) {
+			/* Get Resource Sub Type */
+			WGCharacteristicsResource wgcharacteristicsresource = XPersistence.getManager()
+					.find(WGCharacteristicsResource.class, chrs.get(k));
 
-				rt = rst.getResourcetypename();
-				resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
-				rtunit = wgcharacteristicsresource.getWgresourceunit();
-				if (rtunit.isEmpty())
-					rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
+			/* Get Resource Type */
+			ResourceType rst = XPersistence.getManager().find(ResourceType.class,
+					wgcharacteristicsresource.getResourcesubtype().getResourcetype().getIdresourcetype());
 
-				if (rt.contains("Crops")) {
-					sheet.setValue(2, row, resub, borderStyle);
-					sheet.setValue(3, row, rtunit, borderStyle);
-					row++;
-				}
+			rt = rst.getResourcetypename();
+			resub = wgcharacteristicsresource.getResourcesubtype().getResourcetypename();
+			rtunit = wgcharacteristicsresource.getWgresourceunit();
+			if (rtunit.isEmpty())
+				rtunit = wgcharacteristicsresource.getResourcesubtype().getResourcesubtypeunit();
 
+			if (rt.contains("Crops")) {
+				sheet.setValue(2, row, resub, borderStyle);
+				sheet.setValue(3, row, rtunit, borderStyle);
+				row++;
 			}
 
 		}
-
+		calcUnitsConsumed(sheet, 'D', 'E', 'F', 7);
 	}
 
 	/**************************************************************************************************************************************************/
@@ -2063,6 +2090,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(10, 3, "% Trade at 2", boldTopStyle);
 			sheet.setValue(11, 3, "Market 3", boldTopStyle);
 			sheet.setValue(12, 3, "% Trade at 3", boldTopStyle);
+			sheet.setValue(13, 3, "% Total", boldTopStyle);
 
 			sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth, numwidth, width, width, numwidth, width,
 					numwidth, width, numwidth); /* set col widths */
@@ -2107,7 +2135,6 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			}
 
 		}
-
 	}
 
 	/**************************************************************************************************************************************************/
@@ -2129,6 +2156,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(13, 3, "% Trade at 2", boldTopStyle);
 			sheet.setValue(14, 3, "Market 3", boldTopStyle);
 			sheet.setValue(15, 3, "% Trade at 3", boldTopStyle);
+			sheet.setValue(16, 3, "% Total", boldTopStyle);
 
 			sheet.setColumnWidths(2, width, width, width, numwidth, numwidth, numwidth, numwidth, numwidth, width,
 					numwidth, width, numwidth, width, numwidth); /* set col widths */
@@ -2173,6 +2201,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			}
 
 		}
+		calcUnitsConsumed(sheet, 'E', 'F', 'G', 8);
 
 	}
 
@@ -2195,6 +2224,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(13, 3, "% Work at 2", boldTopStyle);
 			sheet.setValue(14, 3, "Work Location 3", boldTopStyle);
 			sheet.setValue(15, 3, "% Trade at 3", boldTopStyle);
+			sheet.setValue(16, 3, "% Total", boldTopStyle);
 
 			sheet.setColumnWidths(2, width, numwidth, numwidth, numwidth, numwidth, width, numwidth, numwidth, width,
 					numwidth, width, numwidth, width, numwidth); /* set col widths */
@@ -2269,6 +2299,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(18, 3, "% Trade at 2", boldTopStyle);
 			sheet.setValue(19, 3, "Market 3", boldTopStyle);
 			sheet.setValue(20, 3, "% Trade at 3", boldTopStyle);
+			sheet.setValue(21, 3, "% Total", boldTopStyle);
 
 			sheet.setColumnWidths(2, width, width, width, numwidth, numwidth, numwidth, width, numwidth, numwidth,
 					numwidth, numwidth, numwidth, numwidth, width, numwidth, width, numwidth, width, numwidth);
@@ -2313,6 +2344,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			}
 
 		}
+		calcUnitsConsumed(sheet, 'J', 'K', 'M', 12);
 
 	}
 
@@ -2334,6 +2366,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(12, 3, "% Trade at 2", boldTopStyle);
 			sheet.setValue(13, 3, "Market 3", boldTopStyle);
 			sheet.setValue(14, 3, "% Trade at 3", boldTopStyle);
+			sheet.setValue(15, 3, "% Total", boldTopStyle);
 
 			sheet.setColumnWidths(2, width, width, numwidth, numwidth, numwidth, numwidth, numwidth, width, numwidth,
 					width, numwidth, width, numwidth);
@@ -2377,7 +2410,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			}
 
 		}
-
+		calcUnitsConsumed(sheet, 'D', 'E', 'F', 7);
 	}
 
 	/**************************************************************************************************************************************************/
@@ -2390,11 +2423,12 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 			sheet.setValue(4, 3, "Units Purchased", boldTopStyle);
 			sheet.setValue(5, 3, "Price per Unit", boldTopStyle);
 			sheet.setValue(6, 3, "Resource 1 Used For", boldTopStyle);
-			sheet.setValue(7, 3, "%", boldTopStyle);
+			sheet.setValue(7, 3, "Resource 1 %", boldTopStyle);
 			sheet.setValue(8, 3, "Resource 2 Used For", boldTopStyle);
-			sheet.setValue(9, 3, "%", boldTopStyle);
+			sheet.setValue(9, 3, "Resource 2 %", boldTopStyle);
 			sheet.setValue(10, 3, "Resource 3 Used For", boldTopStyle);
-			sheet.setValue(11, 3, "%", boldTopStyle);
+			sheet.setValue(11, 3, "Resource 3 %", boldTopStyle);
+			sheet.setValue(12, 3, "Total %", boldTopStyle);
 
 			sheet.setColumnWidths(2, width, width, numwidth, numwidth, width, numwidth, width, numwidth, width,
 					numwidth);

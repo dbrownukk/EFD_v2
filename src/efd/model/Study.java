@@ -110,7 +110,7 @@ public class Study extends EFDIdentifiable {
 	// @OnChange(OnChangeClearCommunity.class)
 	@Required
 	//@ReferenceView("SimpleProject")
-	@NoCreate
+	//@NoCreate
 	//@NoModify
 	private Project projectlz;
 	/*************************************************************************************************/
