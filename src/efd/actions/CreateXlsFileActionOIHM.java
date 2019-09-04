@@ -1479,18 +1479,28 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		// Collections.sort(inputStrings);
 		// BUG ISSUE #355
 
-		for (int k = 0; k < 255; k++) {
+		// switch LOV lookup from Horiz ro Vert as list is over 255 (max for xls )
+		
+		inputResource = 150;  // Start row for validation array - vertical list
+		
+		for (int k = 0; k < inputStrings.size(); k++) {
 			// for (int k = 0; k < inputStrings.size(); k++) {
-			cell = inputResourceRow.createCell(inputResource);
+			//cell = inputResourceRow.createCell(inputResource);
+			//cell.setCellValue(inputStrings.get(k).toString());
+			//inputResource++;
+			inputResourceRow = dataSheet.createRow(inputResource);	
+			cell = inputResourceRow.createCell(0);
 			cell.setCellValue(inputStrings.get(k).toString());
 			inputResource++;
+			
 		}
 
 		String inputResourceCol = getCharForNumber(inputResource); // Convert for drop list creation
 		name = dataSheet.getWorkbook().createName();
 		inputResourceRowNum++;
-		name.setRefersToFormula(
-				"Validations" + "!$A$" + inputResourceRowNum + ":$" + inputResourceCol + "$" + inputResourceRowNum);
+	//	name.setRefersToFormula(
+	//			"Validations" + "!$A$150" + inputResourceRowNum + ":$" + inputResourceCol + "$" + inputResourceRowNum);
+		name.setRefersToFormula("Validations" + "!$A$150:$A$" + inputResource);
 		name.setNameName("InputResource");
 
 	}

@@ -1604,14 +1604,20 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if (!aemp.getFoodPaymentFoodType().isEmpty()) {
 							/* check Food as payment entered is valid */
-							if ((checkSubType(aemp.getFoodPaymentFoodType(), "Crop") != null) // then it is a valid
-									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Wild Foods") != null)
-									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Livestock Product") != null)
-									|| (checkSubType(aemp.getFoodPaymentFoodType(), "Food Purchase") != null)) {
-								aemp.setStatus(efd.model.Asset.Status.Valid);
+							em("check resource food type == "+aemp.getFoodPaymentFoodType());
+							if ((rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[CROPS].getIdresourcetype())) != null //Crops
+							||	(rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[LIVESTOCKPRODUCT].getIdresourcetype())) != null
+								||	(rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[WILDFOOD].getIdresourcetype())) != null
+									||	(rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[ASSETFOOD].getIdresourcetype())) != null){
+									aemp.setFoodResourceSubType(rst);
+									aemp.setStatus(efd.model.Asset.Status.Valid);
 								isCorrectRST = true;
 							}
-
+							else
+							{
+								isCorrectRST=false;
+								aemp.setStatus(efd.model.Asset.Status.Invalid);
+							}
 							// Now need to check food unit is valid
 
 							if (!checkSubTypeEntered(aemp.getFoodPaymentUnit(), rst))
