@@ -47,9 +47,12 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@Required
-	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename", condition = "${resourcetype.resourcetypename} = 'Non Food Purchase'")
+	// @DescriptionsList(descriptionProperties =
+	// "resourcetype.resourcetypename,resourcetypename", condition =
+	// "${resourcetype.resourcetypename} = 'Non Food Purchase'")
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename", condition = "${resourcetype.resourcetypename} in ('Non Food Purchase','Food Purchase','Other Tradeable Goods')")
 	@NoCreate
-	
+
 	@NoModify
 	private ResourceSubType resourcesubtype;
 	/*************************************************************************************************/
@@ -72,16 +75,15 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	@Required
 	@OnChange(value = OnChangeSOLLevel.class)
 	private StdLevel level;
-	
+
 	public enum StdLevel {
 		Household, HouseholdMember
 	}
-	
-	
+
 	/*************************************************************************************************/
 
-	//@Editor("ValidValuesRadioButton")
-	
+	// @Editor("ValidValuesRadioButton")
+
 	private Gender gender;
 
 	public enum Gender {
@@ -89,17 +91,15 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	}
 
 	/*************************************************************************************************/
-	
-	
-	@DefaultValueCalculator(value=IntegerCalculator.class, properties=@PropertyValue(name="value", value="0"))
+
+	@DefaultValueCalculator(value = IntegerCalculator.class, properties = @PropertyValue(name = "value", value = "0"))
 	@Min(0)
 	@Max(100)
-	
+
 	private int ageRangeLower;
 	/*************************************************************************************************/
-	
-	
-	@DefaultValueCalculator(value=IntegerCalculator.class, properties=@PropertyValue(name="value", value="110"))
+
+	@DefaultValueCalculator(value = IntegerCalculator.class, properties = @PropertyValue(name = "value", value = "110"))
 	@Min(0)
 	@Max(110)
 
@@ -122,8 +122,6 @@ public class StdOfLivingElement extends EFDIdentifiable {
 		this.resourcesubtype = resourcesubtype;
 	}
 
-
-
 	public Double getAmount() {
 		return amount;
 	}
@@ -139,8 +137,6 @@ public class StdOfLivingElement extends EFDIdentifiable {
 	public void setCost(Double cost) {
 		this.cost = cost;
 	}
-
-
 
 	public StdLevel getLevel() {
 		return level;

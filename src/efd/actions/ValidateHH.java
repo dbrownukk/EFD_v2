@@ -113,9 +113,10 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				landIsInvalid = true;
 				System.out.println("Land Units not > = 0 ");
 				break;
-			}
-
-			else if (!al.get(i).getStatus().equals(Status.Valid)) {
+			} else if (al.get(i).getResourceSubType() == null) {
+				landIsInvalid = true;
+				break;
+			} else if (!al.get(i).getStatus().equals(Status.Valid)) {
 				landIsInvalid = true;
 				System.out.println("Land Units set Invalid ");
 				break;
@@ -129,6 +130,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 
 			if (!(als.get(i).getNumberOwnedAtStart() >= 0)) {
 				als.get(i).setStatus(Asset.Status.Invalid);
+				livestockIsInvalid = true;
+				break;
+			} else if (als.get(i).getResourceSubType() == null) {
 				livestockIsInvalid = true;
 				break;
 			} else if (als.get(i).getNumberOwnedAtStart() >= 0 && als.get(i).getPricePerUnit() < 0) {
@@ -151,6 +155,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				at.get(i).setStatus(Asset.Status.Invalid);
 				tradeIsInvalid = true;
 				break;
+			} else if (at.get(i).getResourceSubType() == null) {
+				tradeIsInvalid = true;
+				break;
 			} else if (at.get(i).getNumberOwned() >= 0 && at.get(i).getPricePerUnit() < 0) {
 				at.get(i).setStatus(Asset.Status.Invalid);
 				tradeIsInvalid = true;
@@ -170,9 +177,10 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				afs.get(i).setStatus(Asset.Status.Invalid);
 				fsIsInvalid = true;
 				break;
-			}
-
-			else if (!afs.get(i).getStatus().toString().equals("Valid")) {
+			} else if (afs.get(i).getResourceSubType() == null) {
+				fsIsInvalid = true;
+				break;
+			} else if (!afs.get(i).getStatus().toString().equals("Valid")) {
 				fsIsInvalid = true;
 				break;
 			}
@@ -183,6 +191,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 
 			if (!(atree.get(i).getNumberOwned() >= 0)) {
 				atree.get(i).setStatus(Asset.Status.Invalid);
+				treeIsInvalid = true;
+				break;
+			} else if (atree.get(i).getResourceSubType() == null) {
 				treeIsInvalid = true;
 				break;
 			} else if (atree.get(i).getNumberOwned() >= 0 && atree.get(i).getPricePerUnit() < 0) {
@@ -201,16 +212,20 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 		/* Cash Validation */;
 		for (i = 0; i < ac.size(); i++) {
 
-		
 			if (ac.get(i).getAmount().intValue() > 0 && ac.get(i).getExchangeRate().intValue() > 0) {
 				ac.get(i).setStatus(Asset.Status.Valid);
-				
-			} else {
+
+			} else if (ac.get(i).getResourceSubType() == null) {
+				cashIsInvalid = true;
+				break;
+			}
+
+			else {
 
 				System.out.println("Amount is not >0 " + ac.get(i).getAmount().intValue());
 				ac.get(i).setStatus(Asset.Status.Invalid);
 				cashIsInvalid = true;
-				
+
 			}
 		}
 
@@ -244,8 +259,11 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				System.out.println("cropsum invalid 444 = " + cropSum);
 				cropIsInvalid = true;
 				break;
+			} else if (crop.get(i).getResourceSubType() == null) {
+				System.out.println("crop rst invalid 444 = " + cropSum);
+				cropIsInvalid = true;
+				break;
 			}
-
 		}
 
 		/* Livestock Sales Validation */
@@ -257,6 +275,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 
 			if (lss.get(i).getUnitsSold() > 0 && lss.get(i).getPricePerUnit() < 0) {
 				lss.get(i).setStatus(Asset.Status.Invalid);
+				lssIsInvalid = true;
+				break;
+			} else if (lss.get(i).getResourceSubType() == null) {
 				lssIsInvalid = true;
 				break;
 			} else if (!(lss.get(i).getUnitsSold() >= 0) || !(lss.get(i).getPercentTradeMarket1() >= 0)
@@ -288,6 +309,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			if (lsp.get(i).getUnitsSold() > 0 && lsp.get(i).getPricePerUnit() < 0) {
 				System.out.println("LSP 111");
 				lsp.get(i).setStatus(Asset.Status.Invalid);
+				lspIsInvalid = true;
+				break;
+			} else if (lsp.get(i).getResourceSubType() == null) {
 				lspIsInvalid = true;
 				break;
 			} else if (!(lsp.get(i).getUnitsProduced() >= 0) || !(lsp.get(i).getUnitsSold() >= 0)
@@ -322,9 +346,10 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 					|| (emp.get(i).getCashPaymentAmount() < 0)) {
 				empIsInvalid = true;
 				break;
-			}
-
-			else if (!(emp.get(i).getStatus().toString().equals("Valid"))) {
+			} else if (emp.get(i).getResourceSubType() == null) {
+				empIsInvalid = true;
+				break;
+			} else if (!(emp.get(i).getStatus().toString().equals("Valid"))) {
 				empIsInvalid = true;
 				break;
 			}
@@ -340,6 +365,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 
 			if (tran.get(i).getUnitsSold() > 0 && tran.get(i).getPricePerUnit() < 0) {
 				tran.get(i).setStatus(Asset.Status.Invalid);
+				transIsInvalid = true;
+				break;
+			} else if (tran.get(i).getResourceSubType() == null) {
 				transIsInvalid = true;
 				break;
 			} else if (!(tran.get(i).getPeopleReceiving() >= 0) || !(tran.get(i).getTimesReceived() >= 0)
@@ -394,6 +422,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				wf.get(i).setStatus(Asset.Status.Invalid);
 				wfIsInvalid = true;
 				break;
+			} else if (wf.get(i).getResourceSubType() == null) {
+				wfIsInvalid = true;
+				break;
 			} else if (Double.compare(wfSum, 0.0) != 0 && Double.compare(wfSum, 100.0) != 0) {
 				wf.get(i).setStatus(Asset.Status.Invalid);
 				wfIsInvalid = true;
@@ -414,6 +445,9 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 
 			if (ins.get(i).getUnitsPurchased() > 0 && ins.get(i).getPricePerUnit() < 0) {
 				ins.get(i).setStatus(Asset.Status.Invalid);
+				inpIsInvalid = true;
+				break;
+			} else if (ins.get(i).getResourceSubType() == null) {
 				inpIsInvalid = true;
 				break;
 			} else if (!(ins.get(i).getPercentResource1() >= 0) || !(ins.get(i).getPercentResource2() >= 0)

@@ -19,7 +19,15 @@ public class AddLZ extends GoAddElementsToCollectionAction {
 
 		super.execute();
 
+		
+		
 		String cprojectid = getView().getValue("projectid").toString();
+
+		if(cprojectid.isEmpty())
+		{
+			System.out.println("proj not saved");
+		}
+		
 		Query query = XPersistence.getManager().createQuery("select lz.lzid from LivelihoodZone lz join lz.project pr "
 				+ " where pr.projectid = '" + cprojectid + "'");
 		List<LivelihoodZone> lzs = query.getResultList();
@@ -43,8 +51,8 @@ public class AddLZ extends GoAddElementsToCollectionAction {
 			getTab().setBaseCondition("${lzid} not in (" + inlist + ")");
 	
 	
-	mustRefreshCollection();
-	getParentView().refresh();
+	//mustRefreshCollection();
+	//getParentView().refresh();
 	
 	
 	}

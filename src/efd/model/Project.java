@@ -38,6 +38,7 @@ import org.openxava.tab.*;
 		@View(name = "Proj", members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
 		@View(name = "NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate"),
+		@View(name = "StudyProject", members = "Project[#projecttitle,pdate;altCurrency,altExchangeRate;donor,funder,notes]"),
 		@View(name = "NewlineProject", members = "projecttitle;pdate") })
 
 // model is OHEA or OIHM
@@ -112,7 +113,7 @@ public class Project {
 	// })
 	
 	
-	@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */
+	//@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */
 	
 	
 	@NewAction("ManyToMany.new")
