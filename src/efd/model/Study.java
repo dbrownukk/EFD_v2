@@ -9,6 +9,7 @@ import javax.validation.constraints.*;
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
+import org.openxava.filters.*;
 import org.openxava.util.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
@@ -30,12 +31,9 @@ import org.openxava.util.*;
 		@View(name = "households", members = "household"),
 		@View(name = "FromQuestionUse", members = "Study[#studyName,topic,referenceYear,startDate,endDate;description]") })
 
-
-@Tab(
-		 rowStyles=@RowStyle(style="row-highlight", property="type", value="steady"),
-		  defaultOrder="${studyName} asc"
-		)
-
+@Tabs({ @Tab(rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), defaultOrder = "${studyName} asc"),
+		@Tab(name = "hhValidated", baseCondition = "${household.status}='Validated") 
+})
 
 @Entity
 
@@ -80,46 +78,46 @@ public class Study extends EFDIdentifiable {
 	private java.util.Date endDate;
 	/*************************************************************************************************/
 	@Required
-	@Range(min=1960,max=2050)
-	
+	@Range(min = 1960, max = 2050)
+
 	private Integer referenceYear;
 	/*************************************************************************************************/
 	@Column(length = 45)
 	private String description;
 	/*************************************************************************************************/
-	
-	//@Hidden // 16/8/2019 - see issue #352
-	//@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
-	//		optional = true)
-	//@NoModify
-	//@NoCreate
-	//@DescriptionsList(descriptionProperties = "currency")
-	//private Country altCurrency;
+
+	// @Hidden // 16/8/2019 - see issue #352
+	// @ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
+	// optional = true)
+	// @NoModify
+	// @NoCreate
+	// @DescriptionsList(descriptionProperties = "currency")
+	// private Country altCurrency;
 	/*************************************************************************************************/
-	//@Hidden // 16/8/2019 - see issue #352
-	//@Column(precision = 10, scale = 5)
-	//@Digits(integer = 10, fraction = 5)
-	//@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
-	//private BigDecimal altExchangeRate;
+	// @Hidden // 16/8/2019 - see issue #352
+	// @Column(precision = 10, scale = 5)
+	// @Digits(integer = 10, fraction = 5)
+	// @DefaultValueCalculator(ZeroBigDecimalCalculator.class)
+	// private BigDecimal altExchangeRate;
 	/*************************************************************************************************/
-	@ManyToOne (fetch = FetchType.LAZY,optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	// @Required NOT required in OIHM a Study can just be part of a Project without
 	// LZ and Site, but may have an LZ and Site
-	@DescriptionsList(descriptionProperties = "projecttitle,pdate") //,  showReferenceView=true)
+	@DescriptionsList(descriptionProperties = "projecttitle,pdate") // , showReferenceView=true)
 	@JoinColumn(name = "CProject")
 	// @OnChange(OnChangeClearCommunity.class)
 	@Required
-	//@ReferenceView("SimpleProject")
-	//@NoCreate
-	//@NoModify
+	// @ReferenceView("SimpleProject")
+	// @NoCreate
+	// @NoModify
 	private Project projectlz;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,amount,cost,level")
 	@EditAction("StdOfLivingElement.edit")
 	private Collection<StdOfLivingElement> stdOfLivingElement;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study",  cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,percentage+,unitPrice")
 	private Collection<DefaultDietItem> defaultDietItem;
 
@@ -129,20 +127,19 @@ public class Study extends EFDIdentifiable {
 	// @NoFrame(forViews = "FromWGCommunity")
 	@ReferenceView("FromStudy")
 	@JoinColumn(name = "CLocation")
-	
+
 	private Site site;
 
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
-	//@SearchListCondition(value="${status} = 4", forViews="households") 
-	// does not work
-	@OnSelectElementAction(value="Study.HHActionSelect",forViews="households")  
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	@SearchListCondition(value="${status} = 'Validated'", forViews = "households")
+	@OnSelectElementAction(value = "Study.HHActionSelect", forViews = "households")
 	private Collection<Household> household;
 	/*************************************************************************************************/
 	// Assets
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	// @ElementCollection // Not usable with EditAction
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Land')"
 			+ "AND ${this.id} = ${study.id}")
@@ -154,9 +151,10 @@ public class Study extends EFDIdentifiable {
 	private Collection<WGCharacteristicsResource> characteristicsResourceLand;
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
-	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
-	//		+ "AND ${this.id} = ${study.id}")
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	// @Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT
+	// r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock')"
+	// + "AND ${this.id} = ${study.id}")
 	@Condition("${type} = 'Livestock' AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@NewAction("CharacteristicsResource.new")
@@ -165,7 +163,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestock;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Other Tradeable Goods')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -175,20 +173,24 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTradeable;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
-	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename in ('Crops','Wild Foods','Livestock Products') ${this.id} = ${study.id}")
-	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Food Stocks')"  
-	//		+ "AND ${this.id} = ${study.id}")
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	// @Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT
+	// r.idresourcetype from ResourceType r where r.resourcetypename in
+	// ('Crops','Wild Foods','Livestock Products') ${this.id} = ${study.id}")
+	// @Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT
+	// r.idresourcetype from ResourceType r where r.resourcetypename = 'Food
+	// Stocks')"
+	// + "AND ${this.id} = ${study.id}")
 	@Condition("${type} = 'Food Stocks' AND ${this.id} = ${study.id}")
 	@EditAction("CharacteristicsResource.edit")
 	@AddAction("")
 	@NewAction("CharacteristicsResource.new")
 	@SaveAction("CharacteristicsResource.save")
-	
+
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	private Collection<WGCharacteristicsResource> characteristicsResourceFoodstock;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Trees')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -198,7 +200,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTree;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Cash')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -208,12 +210,11 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceCash;
 
-	
 	/*************************************************************************************************/
 	// Non Assets
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	// @ElementCollection //- will not work with SearchListCondition
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Crops')"
 			+ "AND ${this.id} = ${study.id}")
@@ -224,9 +225,11 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceCrop;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
-	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Sales')"
-	//		+ "AND ${this.id} = ${study.id}")
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	// @Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT
+	// r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock
+	// Sales')"
+	// + "AND ${this.id} = ${study.id}")
 	@Condition("${type} = 'Livestock Sales' AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
@@ -235,7 +238,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockSales;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Livestock Products')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -245,7 +248,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceLivestockProducts;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Employment')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -255,7 +258,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceEmployment;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Transfers')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -265,7 +268,7 @@ public class Study extends EFDIdentifiable {
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceTransfers;
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Wild Foods')"
 			+ "AND ${this.id} = ${study.id}")
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
@@ -274,15 +277,17 @@ public class Study extends EFDIdentifiable {
 	@NewAction("CharacteristicsResource.new")
 	@SaveAction("CharacteristicsResource.save")
 	private Collection<WGCharacteristicsResource> characteristicsResourceWildFoods;
-	
+
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study" , cascade=CascadeType.REMOVE)
-	//@Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT r.idresourcetype from ResourceType r where r.resourcetypename = 'Non Food Purchase')"
-	//		+ "AND ${this.id} = ${study.id}")
-	
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	// @Condition("${resourcesubtype.resourcetype.idresourcetype} = (SELECT
+	// r.idresourcetype from ResourceType r where r.resourcetypename = 'Non Food
+	// Purchase')"
+	// + "AND ${this.id} = ${study.id}")
+
 	@Condition("${type} = 'Inputs' AND ${this.id} = ${study.id}")
-	
+
 	@ListProperties("resourcesubtype.resourcetypename,wgresourceunit")
 	@EditAction("CharacteristicsResource.edit")
 	@AddAction("")
@@ -291,7 +296,7 @@ public class Study extends EFDIdentifiable {
 	private Collection<WGCharacteristicsResource> characteristicsResourceInputs;
 	/*************************************************************************************************/
 
-	@OneToMany(mappedBy = "study" ,cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
 	@XOrderBy("configQuestion.level asc")
 	@NewAction("ConfigQuestionUse.new")
 	@EditAction("ConfigQuestionUse.edit")
@@ -306,7 +311,6 @@ public class Study extends EFDIdentifiable {
 	 * Copy from a Topic a list of Questions to use - fails if Questions already
 	 * exist
 	 */
-
 
 	public Integer totalDietPercentage() {
 		Integer result = new Integer("0");
@@ -340,43 +344,28 @@ public class Study extends EFDIdentifiable {
 		return null;
 	}
 
-
 	/*************************************************************************************************/
-	@OneToMany(mappedBy = "study", cascade=CascadeType.REMOVE)
-	//@NoCreate
-	//@AddAction("")
+	@OneToMany(mappedBy = "study", cascade = CascadeType.REMOVE)
+	// @NoCreate
+	// @AddAction("")
 	@EditAction("ConfigAnswer.edit")
 	@ListProperties("configQuestionUse.configQuestion.prompt,configQuestionUse.configQuestion.answerType,displayAnswer")
-	@Condition("${configQuestionUse.configQuestion.level} = 'Study' AND ${study.id} =${this.id}")   // Note use of JPA syntax not sql
-	
+	@Condition("${configQuestionUse.configQuestion.level} = 'Study' AND ${study.id} =${this.id}") // Note use of JPA
+																									// syntax not sql
+
 	@SaveAction("ConfigAnswer.save")
 	@EditOnly
 	private Collection<ConfigAnswer> configAnswer;
 	/*************************************************************************************************/
 
-	//@OneToMany(mappedBy="study")
-	//private Collection <ReportSpecUse> reportSpecUse;
-	
-	
+	// @OneToMany(mappedBy="study")
+	// private Collection <ReportSpecUse> reportSpecUse;
+
 	/*************************************************************************************************/
 
-	
-	
-	
-	
-	
-	
-	
-	
 	public String getStudyName() {
 		return studyName;
 	}
-
-
-
-
-
-	
 
 	public Collection<ConfigAnswer> getConfigAnswer() {
 		return configAnswer;
@@ -582,11 +571,6 @@ public class Study extends EFDIdentifiable {
 		this.characteristicsResourceInputs = characteristicsResourceInputs;
 	}
 
-
-
-	
-	
-	
 	/*************************************************************************************************/
 
 }

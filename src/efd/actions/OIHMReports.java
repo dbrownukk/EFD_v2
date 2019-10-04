@@ -55,7 +55,8 @@ import efd.model.WealthGroupInterview.*;
 
 public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsConstants {
 
-	static Double RC = 2200.0 * 365;
+	static Double RC = 2200.0 * 365; // NOTE that this is from OHEA. In OIHM we can be more accurate as we know age
+										// and sex of HH Members
 	private static DecimalFormat df2 = new DecimalFormat("#.00");
 	static final int NUMBER_OF_REPORTS = 15;
 	private Study study = null;
@@ -127,7 +128,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		Map[] selectedOnes = targetTab.getSelectedKeys();
 
 		System.out.println("selected keys a = " + selectedOnes.length);
-
+		Boolean isValid = false; // Has at least one Valid HH been selected
 		if (selectedOnes.length != 0) {
 			isSelectedHouseholds = true; // One or more HH selected in dialog
 			for (int i = 0; i < selectedOnes.length; i++) {
@@ -143,7 +144,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				// Map househ = MapFacade.getValues("Household", sub, membersNames);
 
 				Household singleHHSelected = XPersistence.getManager().find(Household.class, subKey);
-
+				if(singleHHSelected.getStatus() == Status.Validated)
+				{
+					isValid = true;
+				}
 				// System.out.println("single hh selected = " + singleHHSelected);
 
 				HH e = new HH();
@@ -157,9 +161,15 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		}
 
-		System.out.println("isselected = " + isSelectedHouseholds);
-		System.out.println("In Run OIHM Reports specid, studyid = " + specID + " " + studyId.toString());
-
+		
+		if (isValid == false) {
+			System.out.println("no validated households selected");
+			addError("No Validated Households selected in this Study");
+			//closeDialog();
+			return;
+		}
+		
+		
 		CustomReportSpec customReportSpec = XPersistence.getManager().find(CustomReportSpec.class, specID);
 
 		study = XPersistence.getManager().find(Study.class, studyId);
@@ -177,9 +187,10 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		/******************************************************************************************************************************************/
 		/* Pre Report Run Validations */
 
-		for (Household household : households) {
-			System.out.println("hh to use = " + household.getHouseholdNumber() + household.getHouseholdName());
-		}
+		// for (Household household : households) {
+		// System.out.println("hh to use = " + household.getHouseholdNumber() +
+		// household.getHouseholdName());
+		// }
 
 		if (households.size() == 0) {
 			System.out.println("no validated households in the is study");
@@ -223,8 +234,6 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		if (isQuantile && households.size() < 20)
 			addWarning("Quantiles being used on Study with less than 20 Households");
-
-		/******************************************************************************************************************************************/
 
 		errno = 50;
 
@@ -277,6 +286,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	}
 
+	/******************************************************************************************************************************************/
+
 	private void calculateAE() {
 		System.out.println("in calculateAE, no of hh = " + hh.size());
 		// for (HH hh2 : hh) {
@@ -289,20 +300,18 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	}
 
+	/******************************************************************************************************************************************/
+
 	private void calculateDI() {
-
-		for (HH hh2 : hh) {
-
-			hh2.hhDI = householdDI(hh2.household);
-		}
 
 		uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
 				.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
 
-		// uniqueHousehold.forEach(u -> {
-		// System.out.println("hh in createdireport = " + u.hhNumber + " " +
-		// u.getHhDI());
-		// });
+		// for (HH hh2 : hh) {
+		for (HH hh2 : uniqueHousehold) {
+
+			hh2.hhDI = householdDI(hh2.household);
+		}
 
 		// If QUantile then need to calc which quantile each unique HH is in
 		final int[] qpoint = new int[200];
@@ -554,7 +563,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		 * they can then be filtered
 		 * 
 		 */
-		System.out.println("in populateArray");
+		System.out.println("drb in populateArray begin size = " + households.size());
 
 		ConfigAnswer answer = null;
 
@@ -571,7 +580,12 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				 * assets
 				 */
 
-				populateHHfromHousehold(household, configAnswer);
+				// *************************
+				// populateHHfromHousehold(household, configAnswer);
+
+				// Was duplicating results
+				// *************************
+
 				System.out.println("hh in populate hh from configAnswer hh size =" + household.getHouseholdName() + " "
 						+ hh.size());
 			}
@@ -603,6 +617,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		System.out.println("assetland size = " + household.getAssetLand().size());
 		System.out.println("assetfs size = " + household.getAssetFoodStock().size());
+		System.out.println("transfer ass size = " + household.getTransfer().size());
 
 		for (AssetLand asset : household.getAssetLand()) {
 
@@ -877,6 +892,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 		}
 	}
+
+	/******************************************************************************************************************************************/
 
 	private Double fillDouble(Double val) {
 		if (val == null || val.isNaN())
@@ -1730,6 +1747,29 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	/******************************************************************************************************************************************/
 
+	// handle if Synonym is used and return base Kcal value
+	private int findRSTKcal(ResourceSubType rst) {
+
+		if (rst.getResourcesubtypesynonym() != null) {
+			System.out.println("its a synonym");
+			try {
+				System.out.println("syn kcal = " + rst.getResourcesubtypesynonym().getResourcesubtypekcal());
+				return (rst.getResourcesubtypesynonym().getResourcesubtypekcal());
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				addMessage("Cannot get Synonym KCal value");
+				return (0);
+			}
+
+		}
+		System.out.println("its not a synonym");
+		return (rst.getResourcesubtypekcal());
+	}
+
+	/******************************************************************************************************************************************/
+
 	private Double calcWFIncome(HH hh2, String type) {
 		Double wfTot = 0.0;
 
@@ -1740,7 +1780,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			if (type == "cash") {
 				wfTot += wf.getUnitsSold() * wf.getPricePerUnit();
 			} else if (type == "food") {
-				wfTot += wf.getUnitsConsumed() * wf.getResourceSubType().getResourcesubtypekcal();
+				// wfTot += wf.getUnitsConsumed() *
+				// wf.getResourceSubType().getResourcesubtypekcal();
+				wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType());
 			}
 		}
 
@@ -1764,8 +1806,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				}
 			} else if (type == "food" && tr.getTransferType().equals(TransferType.Food)
 					&& tr.getFoodResourceSubType() != null) {
-				trTot += tr.getUnitsConsumed() * tr.getFoodResourceSubType().getResourcesubtypekcal()
-						* tr.getPeopleReceiving() * tr.getTimesReceived();
+				trTot += tr.getUnitsConsumed() * findRSTKcal(tr.getFoodResourceSubType()) * tr.getPeopleReceiving()
+						* tr.getTimesReceived();
 
 			}
 
@@ -1787,7 +1829,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 		} else if (type == "food") {
 			for (LivestockProducts lsp : hh2.getHousehold().getLivestockProducts()) {
-				lsTot += lsp.getUnitsConsumed() * lsp.getResourceSubType().getResourcesubtypekcal();
+				lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType());
 			}
 		}
 
@@ -1815,8 +1857,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 				} else if (type == "food" && emp.getFoodResourceSubType() != null) {
 
-					empTot += emp.getPeopleCount() * emp.getUnitsWorked()
-							* emp.getFoodResourceSubType().getResourcesubtypekcal();
+					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * findRSTKcal(emp.getFoodResourceSubType());
 				} else
 					empTot = 0.0;
 			}
@@ -1835,12 +1876,22 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		Double cropTot = 0.0;
 
+		System.out.println("in calcCropIncome type =" + type);
 		for (Crop crop : hh2.getHousehold().getCrop()) {
 			if (type == "cash") {
 
 				cropTot += crop.getUnitsSold() * crop.getPricePerUnit();
+				System.out.println("in crop cash tot");
 			} else if (type == "food") {
-				cropTot += crop.getUnitsConsumed() * crop.getResourceSubType().getResourcesubtypekcal();
+				System.out.println("get rst syn kcal");
+				cropTot += crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType());
+				System.out.println(
+						"crop new calc tot  = " + crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType()));
+				System.out.println("crop total = " + cropTot);
+				System.out.println("rst = " + crop.getCropType());
+				System.out.println("rst consumed = " + crop.getUnitsConsumed());
+				System.out.println("rst name = " + crop.getResourceSubType().getResourcetypename());
+				System.out.println("rst KCAL = " + findRSTKcal(crop.getResourceSubType()));
 			}
 		}
 
@@ -1890,8 +1941,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		 * Disposable Income (DI) = Total Income (TI) - Cost of covering Shortfall (SF)
 		 * in Required Calories (RC) from Own Production (OP).
 		 * 
-		 * TI = Sum (Units Sold * Price per Unit) for all Crops, Wild Foods and
-		 * Livestock Products
+		 * TI (Total Income) = Sum (Units Sold * Price per Unit) for all Crops, Wild
+		 * Foods and Livestock Products
 		 * 
 		 * Sum (Units Worked No. of People Working Cash Payment) for all Employments Sum
 		 * (Transfer Amount No. of People Receiving No. of Times Received) for all Cash
@@ -1904,7 +1955,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		 * in Food Sum (KCal per Unit of Food Type Transferred * No. of Units Consumed)
 		 * for all Food Transfers
 		 * 
-		 * RC = 2100 365 No. of People in Household
+		 * Required KCalaries = 2100 x 365 No. of People in Household (that was from
+		 * OHEA - can be more accurate in OIHM
 		 * 
 		 * 
 		 * 
@@ -1922,7 +1974,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		Double employmentOP = 0.0;
 		Double transfersOP = 0.0;
 
-		Double requiredCalories = 0.0;
+		int requiredCalories = 0;
+
+		System.out.println("In HH DI calc ");
 
 		List<HH> thisHH = hh.stream().filter(d -> d.household == household).collect(Collectors.toList());
 
@@ -1998,7 +2052,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						transfersTI += (itransfer.getTransfer().getCashTransferAmount()
 								* itransfer.getTransfer().getPeopleReceiving()
 								* itransfer.getTransfer().getTimesReceived());
-
+					System.out.println("in DI transfer calc " + transfersTI);
 					Double transresourcekcal = 0.0;
 					ResourceSubType resourcesubtypekcal = itransfer.getTransfer().getFoodResourceSubType();
 					if (resourcesubtypekcal == null)
@@ -2011,18 +2065,54 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						transfersOP += (transresourcekcal * itransfer.getTransfer().getUnitsConsumed());
 				}
 			}
+			System.out.println("done DI transfer calc " + transfersTI);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			addError("Error in DI Calculation " + e);
 		}
 
 		// FIX for members
-		requiredCalories = household.getHouseholdMember().size() * RC; // Unique Households after filter
+		// requiredCalories = household.getHouseholdMember().size() * RC; // Unique
+		// Households after filter
+
+		int age;
+		Sex gender;
+		int monthsAway = 0;
+		int energyNeed = 0;
+
+		WHOEnergyRequirements whoEnergy;
+		for (HouseholdMember hm : household.getHouseholdMember()) {
+			age = hm.getAge();
+			gender = hm.getGender();
+			monthsAway = hm.getMonthsAway();
+			whoEnergy = WHOEnergyRequirements.findByAge(age);
+
+			if (gender == Sex.Female) {
+				energyNeed = whoEnergy.getFemale();
+			} else if (gender == Sex.Male) {
+				energyNeed = whoEnergy.getMale();
+			}
+
+			requiredCalories += energyNeed * 365 * (12 - monthsAway) / 12;
+
+		}
+
+		System.out.println("requiredCalories = " + requiredCalories);
 
 		Double totalIncome = cropTI + wildfoodsTI + lspTI + employmentTI + transfersTI;
+
+		System.out.println("cropTI = " + cropTI);
+		System.out.println("wfTI = " + wildfoodsTI);
+		System.out.println("lspTI = " + lspTI);
+		System.out.println("empTI = " + employmentTI);
+		System.out.println("transfTI = " + transfersTI);
+
 		Double output = cropOP + wildfoodsOP + lspOP + employmentOP + transfersOP;
 
 		Double shortFall = requiredCalories - output;
+
+		System.out.println("totalIncome = " + totalIncome);
+		System.out.println("output = " + output);
 
 		// Now it gets more complex , but not difficult
 
@@ -2076,14 +2166,14 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			age = hhm.getAge();
 			gender = hhm.getGender();
 
-			WHOEnergyRequirements whoEnergey = WHOEnergyRequirements.findByAge(age);
+			WHOEnergyRequirements whoEnergy = WHOEnergyRequirements.findByAge(age);
 
 			// System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " +
 			// whoEnergey.getMale() + " " + gender);
 			if (gender == Sex.Female) {
-				totAE += whoEnergey.getFemale();
+				totAE += whoEnergy.getFemale();
 			} else if (gender == Sex.Male) {
-				totAE += whoEnergey.getMale();
+				totAE += whoEnergy.getMale();
 			}
 
 		}

@@ -115,9 +115,11 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			} else if (al.get(i).getResourceSubType() == null) {
 				landIsInvalid = true;
+				al.get(i).setStatus(Asset.Status.Invalid);
 				break;
 			} else if (!al.get(i).getStatus().equals(Status.Valid)) {
 				landIsInvalid = true;
+				al.get(i).setStatus(Asset.Status.Invalid);
 				System.out.println("Land Units set Invalid ");
 				break;
 			}
@@ -134,6 +136,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			} else if (als.get(i).getResourceSubType() == null) {
 				livestockIsInvalid = true;
+				als.get(i).setStatus(Asset.Status.Invalid);
 				break;
 			} else if (als.get(i).getNumberOwnedAtStart() >= 0 && als.get(i).getPricePerUnit() < 0) {
 				als.get(i).setStatus(Asset.Status.Invalid);
@@ -157,6 +160,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			} else if (at.get(i).getResourceSubType() == null) {
 				tradeIsInvalid = true;
+				at.get(i).setStatus(Asset.Status.Invalid);
 				break;
 			} else if (at.get(i).getNumberOwned() >= 0 && at.get(i).getPricePerUnit() < 0) {
 				at.get(i).setStatus(Asset.Status.Invalid);
@@ -179,6 +183,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				break;
 			} else if (afs.get(i).getResourceSubType() == null) {
 				fsIsInvalid = true;
+				afs.get(i).setStatus(Asset.Status.Invalid);
 				break;
 			} else if (!afs.get(i).getStatus().toString().equals("Valid")) {
 				fsIsInvalid = true;
@@ -194,6 +199,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				treeIsInvalid = true;
 				break;
 			} else if (atree.get(i).getResourceSubType() == null) {
+				atree.get(i).setStatus(Asset.Status.Invalid);
 				treeIsInvalid = true;
 				break;
 			} else if (atree.get(i).getNumberOwned() >= 0 && atree.get(i).getPricePerUnit() < 0) {
@@ -216,6 +222,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				ac.get(i).setStatus(Asset.Status.Valid);
 
 			} else if (ac.get(i).getResourceSubType() == null) {
+				ac.get(i).setStatus(Asset.Status.Invalid);
 				cashIsInvalid = true;
 				break;
 			}
@@ -237,7 +244,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 					+ crop.get(i).getPercentTradeMarket3();
 
 			if (crop.get(i).getUnitsSold() > 0 && crop.get(i).getPricePerUnit() < 0) {
-				System.out.println("cropsum invalid 111 = ");
+
 				crop.get(i).setStatus(Asset.Status.Invalid);
 				cropIsInvalid = true;
 				break;
@@ -245,7 +252,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 					|| !(crop.get(i).getUnitsOtherUse() >= 0) || !(crop.get(i).getUnitsConsumed() >= 0)
 					|| !(crop.get(i).getPercentTradeMarket1() >= 0) || !(crop.get(i).getPercentTradeMarket2() >= 0)
 					|| !(crop.get(i).getPercentTradeMarket3() >= 0)) {
-				System.out.println("cropsum invalid 222 = ");
+
 				crop.get(i).setStatus(Asset.Status.Invalid);
 				cropIsInvalid = true;
 				break;
@@ -256,11 +263,11 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 
 			else if (!crop.get(i).getStatus().toString().equals("Valid")) {
-				System.out.println("cropsum invalid 444 = " + cropSum);
+
 				cropIsInvalid = true;
 				break;
 			} else if (crop.get(i).getResourceSubType() == null) {
-				System.out.println("crop rst invalid 444 = " + cropSum);
+				crop.get(i).setStatus(Asset.Status.Invalid);
 				cropIsInvalid = true;
 				break;
 			}
@@ -278,6 +285,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				lssIsInvalid = true;
 				break;
 			} else if (lss.get(i).getResourceSubType() == null) {
+				lss.get(i).setStatus(Asset.Status.Invalid);
 				lssIsInvalid = true;
 				break;
 			} else if (!(lss.get(i).getUnitsSold() >= 0) || !(lss.get(i).getPercentTradeMarket1() >= 0)
@@ -312,6 +320,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				lspIsInvalid = true;
 				break;
 			} else if (lsp.get(i).getResourceSubType() == null) {
+				lsp.get(i).setStatus(Asset.Status.Invalid);
 				lspIsInvalid = true;
 				break;
 			} else if (!(lsp.get(i).getUnitsProduced() >= 0) || !(lsp.get(i).getUnitsSold() >= 0)
@@ -336,7 +345,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 
 		}
-		System.out.println("done lsp validation");
+	
 		/* Employment Validation */
 
 		// TODO Why is Food Payment Units Paid Work a string not a Double ??
@@ -347,6 +356,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				empIsInvalid = true;
 				break;
 			} else if (emp.get(i).getResourceSubType() == null) {
+				emp.get(i).setStatus(Asset.Status.Invalid);
 				empIsInvalid = true;
 				break;
 			} else if (!(emp.get(i).getStatus().toString().equals("Valid"))) {
@@ -355,7 +365,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 
 		}
-		System.out.println("done emp validation");
+	
 		/* Transfers Validation */
 
 		for (i = 0; i < tran.size(); i++) {
@@ -368,6 +378,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				transIsInvalid = true;
 				break;
 			} else if (tran.get(i).getResourceSubType() == null) {
+				tran.get(i).setStatus(Asset.Status.Invalid);
 				transIsInvalid = true;
 				break;
 			} else if (!(tran.get(i).getPeopleReceiving() >= 0) || !(tran.get(i).getTimesReceived() >= 0)
@@ -423,6 +434,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				wfIsInvalid = true;
 				break;
 			} else if (wf.get(i).getResourceSubType() == null) {
+				wf.get(i).setStatus(Asset.Status.Invalid);
 				wfIsInvalid = true;
 				break;
 			} else if (Double.compare(wfSum, 0.0) != 0 && Double.compare(wfSum, 100.0) != 0) {
@@ -437,7 +449,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 			}
 
 		}
-		System.out.println("done wf validation");
+		
 		/* Inputs Validation */
 		for (i = 0; i < ins.size(); i++) {
 			inpSum = ins.get(i).getPercentResource1() + ins.get(i).getPercentResource2()
@@ -448,6 +460,7 @@ public class ValidateHH extends CollectionBaseAction implements IForwardAction {
 				inpIsInvalid = true;
 				break;
 			} else if (ins.get(i).getResourceSubType() == null) {
+				ins.get(i).setStatus(Asset.Status.Invalid);
 				inpIsInvalid = true;
 				break;
 			} else if (!(ins.get(i).getPercentResource1() >= 0) || !(ins.get(i).getPercentResource2() >= 0)

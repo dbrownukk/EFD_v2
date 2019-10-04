@@ -11,10 +11,10 @@ import efd.validations.*;
 
 @View(members = "customReportSpec,study")
 
-//@Tab(
-//properties="household.householdNumber",
-//baseCondition="${household.status} = 1"
-//)
+@Tab(
+properties="household.householdNumber,household.status",
+baseCondition="${household.status} = 'Validated'"
+)
 
 public class CustomReportSpecList {
 
@@ -29,8 +29,10 @@ public class CustomReportSpecList {
 	@NoCreate
 	@NoModify
 	@NoFrame
-	@SearchAction("")
 	
+	
+	@SearchAction("")
+	//@SearchListCondition("${household.status}='Validated'")  ONLY for search list action
 	@ReferenceView("households")
 	
 	private Study study;
