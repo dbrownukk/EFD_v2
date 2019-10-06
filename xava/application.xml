@@ -41,6 +41,12 @@
 		<controller name="GoOIHMReports" />
 	</module>
 
+	<module name="ResourceSubType">
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
+		<model name="ResourceSubType" />
+		<controller name="TypicalNotResetOnSave" />
+	</module>
 
 <!--  
 

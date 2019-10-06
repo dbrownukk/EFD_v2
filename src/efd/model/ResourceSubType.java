@@ -29,9 +29,9 @@ import org.openxava.util.*;
 		"ResourceTypeName" }))
 public class ResourceSubType {
 
-	@PrePersist
-	@PreUpdate
-
+//	@PrePersist
+//	@PreUpdate
+/*
 	
 	
 	private void calcKcal() {
@@ -59,6 +59,7 @@ public class ResourceSubType {
 		}
 
 	}
+	*/
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -68,6 +69,8 @@ public class ResourceSubType {
 
 	@ManyToOne
 	@Required
+	@NoModify
+	@NoCreate
 	@JoinColumn(name = "ReourceType")
 	@DescriptionsList(descriptionProperties = "resourcetypename")
 	private ResourceType resourcetype;
@@ -81,6 +84,7 @@ public class ResourceSubType {
 
 	@DescriptionsList(descriptionProperties = "resourcetypename",
 	condition="resourcesubtypesynonym is null")
+	@OnChange(OnChangeRSTSyn.class)
 	private ResourceSubType resourcesubtypesynonym;
 
 	@Column(name = "ResourceSubTypeUnit", length = 20)
@@ -88,7 +92,7 @@ public class ResourceSubType {
 	private String resourcesubtypeunit;
 
 	@DefaultValueCalculator(IntegerCalculator.class)
-	@OnChange(value = OnChangeRSTkcal.class)
+	//@OnChange(value = OnChangeRSTkcal.class)
 	@Column(name = "ResourceSubTypeKCal")
 	private int resourcesubtypekcal;
 
