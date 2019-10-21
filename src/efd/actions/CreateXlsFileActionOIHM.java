@@ -26,7 +26,7 @@ import org.openxava.web.servlets.*;
 import efd.model.*;
 import efd.model.ConfigQuestion.*;
 
-public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardAction, JxlsConstants {
+public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardAction, JxlsConstants, IChainAction {
 
 	JxlsStyle boldRStyle = null;
 	JxlsStyle boldTopStyle = null;
@@ -64,6 +64,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	Site site;
 	static LivelihoodZone livelihoodZone;
 
+	private String nextAction = "ParseSpreadsheet.Validate";  // Automatically call Validate after the Parse
+	
 	// Sheet sheet = null;
 
 	public void execute() throws Exception {
@@ -129,32 +131,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		livelihoodZone = site.getLivelihoodZone();
 
-		/*
-		 * Check if Study Interview Results header exists and if so is still at
-		 * Generated status, otherwise do not allow
-		 *
-		 * 
-		 * site = null;
-		 * 
-		 * System.out.println(" on gen temp ss site = "+getView().getValueString(
-		 * "site.locationdistrict"));
-		 * 
-		 * if (getView().getValueString("site.locationdistrict").isEmpty()) {
-		 * addError("Enter Site details before creating Template Spreadsheet");
-		 * return(null); } else { site = XPersistence.getManager().find(Site.class,
-		 * study.getSite().getLocationid()); livelihoodZone = site.getLivelihoodZone();
-		 * project = study.getProjectlz();
-		 * 
-		 * }
-		 * 
-		 * //Project project = XPersistence.getManager().find(Project.class,
-		 * study.getProjectlz().getProjectid());
-		 * 
-		 * /****************** Need to get charresource and types using getmanager and
-		 * iterate
-		 ********************/
 
-		// List wgcharacteristicsresource =
 
 		Query query = XPersistence.getManager()
 				.createQuery("select idwgresource from WGCharacteristicsResource where study_id = '" + studyID + "'");
@@ -544,8 +521,9 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		addLOV(sheet, empSheet, 3, numRows - 1, 6, 6, "FoodStocks");
 		addLOV(sheet, empSheet, 3, numRows - 1, 7, 7, "Unit");
-		addLOV(sheet, empSheet, 3, numRows - 1, 8, 8, "EmpUnit");
+		//addLOV(sheet, empSheet, 3, numRows - 1, 8, 8, "EmpUnit");
 
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 8, 8, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 10, 10, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 12, 12, style);
 		addNumberValidation(workbook, sheet, empSheet, 3, 30, 14, 14, style);
@@ -1273,7 +1251,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		em("about to do lu loop ");
 		for (int k = 0; k < rst.size(); k++) {
 			try {
-				localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
+				localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst.get(k));
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1320,19 +1298,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 		// Get any localunits for RST and livelihoodZone
 
-		/*
-		 * em("get any local units"); for (int k = 0; k < rst.size(); k++) {
-		 * 
-		 * localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
-		 * 
-		 * if (localUnit != null &&
-		 * !rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
-		 * localUnits.add(localUnit.getName().trim());
-		 * 
-		 * }
-		 * 
-		 * }
-		 */
+
 		List<String> localus = localUnits.stream().distinct().collect(Collectors.toList());
 		em("have lus");
 		for (String lu : localus) {
@@ -2626,5 +2592,11 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 
 	public void setForwardURI(String forwardURI) {
 		this.forwardURI = forwardURI;
+	}
+
+	@Override
+	public String getNextAction() throws Exception {
+		// TODO Auto-generated method stub
+		return nextAction;
 	}
 }

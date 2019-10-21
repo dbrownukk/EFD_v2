@@ -1,6 +1,9 @@
-/* Check that all WGI resource types are set to Valid */
-
 package efd.actions;
+
+/*
+ * 
+ * Set HH to editable to re-edit a Validated HH
+ */
 
 import org.openxava.actions.*;
 import org.openxava.model.*;
@@ -11,20 +14,20 @@ import com.openxava.naviox.model.*;
 import efd.model.*;
 import efd.model.Asset.*;
 
-/* Read XLS Community Interview  spreadsheet */
+
 
 public class SetHHEditable extends ViewBaseAction implements IAvailableAction {
 
 	public void execute() throws Exception {
 
 		
-		Household wgint = (Household) getView().getEntity();
+		Household hhint = (Household) getView().getEntity();
 		View view = getView();
-		if(wgint.getStatus() == (efd.model.WealthGroupInterview.Status.Validated))
+		if(hhint.getStatus() == (efd.model.WealthGroupInterview.Status.Validated))
 		{
 		
 			
-			wgint.setStatus(efd.model.WealthGroupInterview.Status.FullyParsed);
+			hhint.setStatus(efd.model.WealthGroupInterview.Status.FullyParsed);
 			view.refresh();
 			view.setEditable(true);
 			removeActions("SetEditable.SetEditableHH");		

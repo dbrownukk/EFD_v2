@@ -49,7 +49,7 @@ public class Employment extends Asset {
 	private String foodPaymentUnit;
 	
 	@Column(name = "FoodPaymentUnitsPaidWork", length=50)
-	private String foodPaymentUnitsPaidWork;
+	private Double foodPaymentUnitsPaidWork;
 	
 	@Column(name = "WorkLocation1", length = 50)
 	private String workLocation1;
@@ -116,10 +116,11 @@ public class Employment extends Asset {
 	public void setFoodPaymentUnit(String foodPaymentUnit) {
 		this.foodPaymentUnit = foodPaymentUnit;
 	}
-	public String getFoodPaymentUnitsPaidWork() {
+
+	public Double getFoodPaymentUnitsPaidWork() {
 		return foodPaymentUnitsPaidWork;
 	}
-	public void setFoodPaymentUnitsPaidWork(String foodPaymentUnitsPaidWork) {
+	public void setFoodPaymentUnitsPaidWork(Double foodPaymentUnitsPaidWork) {
 		this.foodPaymentUnitsPaidWork = foodPaymentUnitsPaidWork;
 	}
 	public String getWorkLocation1() {

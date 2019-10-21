@@ -41,7 +41,7 @@ import org.apache.poi.util.*;
 import org.directwebremoting.hibernate.*;
 
 public class ParseHHSpreadsheet extends CollectionBaseAction
-		implements IForwardAction, JxlsConstants, IFilePersistor, IJDBCAction {
+		implements IForwardAction, JxlsConstants, IFilePersistor, IJDBCAction, IChainAction {
 
 	@Inject // Since v4m2
 	private String defaultSchema;
@@ -67,6 +67,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	public static final int EMPLOYMENT = 12;
 	public static final int TRANSFER = 13;
 	public static final int WILDFOOD = 14;
+	
+	
+	private String nextAction = "ParseSpreadsheet.Validate";  // Automatically call Validate after the Parse
 
 	public static final int INPUTS = 15;
 	// public static final int FOODPURCHASE = 16;
@@ -176,11 +179,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			if (hhId.isEmpty()) {
 				addError("Select or Create a Household before trying to parse a spreadsheet");
+				nextAction = null;
 				return;
 			}
 
 			if (spreadsheetFile.isEmpty()) {
 				addError("No Spreadsheet file available");
+				nextAction = null;
 				return;
 			}
 
@@ -193,6 +198,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		hhi = XPersistence.getManager().find(Household.class, hhId);
 		if (hhi.getSpreadsheet().isEmpty()) {
 			addWarning("Upload completed Interview Spreadsheet before parsing");
+			nextAction = null;
 			return;
 		}
 
@@ -203,9 +209,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		else if ((hhi.getStatus().equals(efd.model.WealthGroupInterview.Status.PartParsed)
 				|| hhi.getStatus().equals(efd.model.WealthGroupInterview.Status.FullyParsed))) {
 			addWarning("Cannot Parse Interview Spreadsheet - Already Parsed");
+			nextAction = null;
 			return;
 		} else if (hhi.getStatus().equals(efd.model.WealthGroupInterview.Status.Validated)) {
 			addWarning("Cannot Parse Interview Spreadsheet - Already Validated");
+			nextAction = null;
 			return;
 		}
 		em("done get hhi");
@@ -257,6 +265,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		} catch (Exception ex) {
 			addError("Incomplete Spreadsheet data, correct spreadsheet and upload again", ex);
+			nextAction = null;
 			// You can throw any runtime exception here
 			throw new SystemException(ex);
 		} finally {
@@ -313,6 +322,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		/* Get the WS details */
 		if (!getInterviewDetails(wb, hhi)) {
 			addError("Failed to parse spreadsheet");
+			nextAction = null;
 			return;
 		}
 
@@ -329,11 +339,14 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		hhi.setStatus(Status.FullyParsed);
 
-		getView().refresh();
-		getView().refreshCollections();
-		getView().refreshDescriptionsLists();
+	//	getView().refresh();
+	//	getView().refreshCollections();
+	//	getView().refreshDescriptionsLists();
 		addMessage("Spreadsheet Parsed");
+		
+		
 
+		
 	}
 
 	private void em(String em) {
@@ -640,10 +653,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				// hhm.setHouseholdMemberName(
 				// sheet.getRow(3).getCell(hhmcol).toString());
-				em("hhm  18 ");
+			
 				gender = sheet.getRow(4).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
 						.getStringCellValue();
-				em("hhm 19 ");
+				
 				age = (int) sheet.getRow(5).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
 						.getNumericCellValue();
 				yob = ((int) (sheet.getRow(6).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
@@ -651,13 +664,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				// Improve check for no more HH
 				if (gender == "" && age == 0 && yob == 0) {
-					em("no more members");
 					hhmcol = 23;
 					break;
 				}
 
 				if (yob == 0 && age == 0) {
-					em("age and yob not entered");
 					addError("Parse Failed - Age and Year of Birth entered in spreadsheet for Household Member "
 							+ (hhmcol - 1));
 					return 23001;
@@ -665,7 +676,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				gender = StringUtils.capitalize(gender); // now handles male/female as well as LOV Male/Female
 
-				em("hhm 20 ");
+			
 				if (gender.equals("Male")) {
 					hhm.setGender(Sex.Male);
 				} else if (gender.equals("Female")) {
@@ -675,8 +686,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				}
 
 				int thisYear = hhm.getHousehold().getStudy().getReferenceYear();
-				em("age in read ss = " + age);
-				em("yob in read ss = " + yob);
+	
 				hhm.setAge(age);
 
 				// calculated
@@ -1050,7 +1060,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do LAND  localunit");
-						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst);
 						// em("Land localunit =" + localUnit.getName());
 						if (localUnit != null) {
 
@@ -1395,7 +1405,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do crops localunit");
-						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst);
 
 						if (localUnit != null) {
 
@@ -1520,7 +1530,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this RST LZ combination?
 						em("about to do LSP localunit");
-						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst);
 						em("back from getLocalunit");
 
 						if (localUnit != null) {
@@ -1569,8 +1579,10 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						em("emp = 4");
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
 						em("emp = 5");
-						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
-
+						aemp.setFoodPaymentUnitsPaidWork(getCellDouble(cell[i][j][l++]));
+						
+						em("food pay units = "+aemp.getFoodPaymentUnitsPaidWork());
+						
 						em(" empppp = 1");
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
 						em("1");
@@ -1626,7 +1638,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this FoodPayment RST LZ combination?
 
-						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, aemp.getFoodResourceSubType());
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, aemp.getFoodResourceSubType());
 
 						if (localUnit != null) {
 
@@ -1763,7 +1775,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this RST LZ combination?
 
-						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst);
 
 						if (localUnit != null) {
 
@@ -1830,7 +1842,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this RST LZ combination?
 
-						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst);
 
 						if (localUnit != null) {
 
@@ -1947,7 +1959,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this RST LZ combination?
 
-						LocalUnit localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst);
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst);
 
 						if (localUnit != null) {
 
@@ -2323,6 +2335,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		// TODO Auto-generated method stub
 		this.provider = provider;
 
+	}
+
+	@Override
+	public String getNextAction() throws Exception {
+		
+		System.out.println("ready to do validation "+nextAction);
+		return nextAction;
 	}
 
 }

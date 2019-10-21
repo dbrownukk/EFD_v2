@@ -1,4 +1,7 @@
-/* Check that all WGI resource types are set to Valid */
+/*
+ * 
+ * Set WGI to editable to re-edit a Validated WGI
+ */
 
 package efd.actions;
 
@@ -11,7 +14,7 @@ import com.openxava.naviox.model.*;
 import efd.model.*;
 import efd.model.Asset.*;
 
-/* Read XLS Community Interview  spreadsheet */
+
 
 public class SetWGIEditable extends ViewBaseAction implements IAvailableAction {
 

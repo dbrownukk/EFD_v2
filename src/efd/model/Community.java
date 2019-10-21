@@ -59,7 +59,7 @@ public class Community {
 	
 
 
-	@OneToMany(mappedBy = "community")//, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "community",cascade = CascadeType.ALL)
 	@RowAction("Spreadsheet.Template Spreadsheet")
 	@CollectionView("FromCommunity")
 	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
@@ -67,7 +67,7 @@ public class Community {
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy = "community")//, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
 	@AddAction("")
 	private Collection<CommunityYearNotes> communityyearnotes;
 	// ----------------------------------------------------------------------------------------------//

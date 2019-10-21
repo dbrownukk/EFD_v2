@@ -34,15 +34,6 @@ import org.apache.poi.ss.format.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DataValidationConstraint.*;
 import org.apache.poi.ss.util.*;
-
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFDataValidation;
-import org.apache.poi.hssf.usermodel.HSSFName;
-import org.apache.poi.hssf.usermodel.DVConstraint;
-
 import org.apache.poi.ss.util.CellRangeAddress;
 
 //public class CreateXlsFileAction2 extends CollectionElementViewBaseAction implements IForwardAction, JxlsConstants { // 1
@@ -328,6 +319,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		style.setBorderTop(CellStyle.BORDER_THIN);
 		style.setBorderRight(CellStyle.BORDER_THIN);
 		style.setBorderLeft(CellStyle.BORDER_THIN);
+		style.setAlignment(RIGHT);
 
 		/*
 		 * see
@@ -436,12 +428,26 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		addLOV(sheet, empSheet, 3, numRows - 1, 1, 1, "Employment");
 		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 2, 2, style);
 		addLOV(sheet, empSheet, 3, numRows - 1, 3, 3, "EmpUnit");
-		// addNumberValidation(workbook, sheet, empSheet, 3, numRows, 3, 3, style);
-		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 4, 4, style);
-		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 5, 5, style);
-		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 10, 10, style);
-		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 12, 12, style);
-		addNumberValidation(workbook, sheet, empSheet, 3, numRows, 14, 14, style);
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 4, 4, style);
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 5, 5, style);// cash payment
+		addLOV(sheet, empSheet, 3, numRows - 1, 6, 6, "FoodStocks");
+		addLOV(sheet, empSheet, 3, numRows - 1, 7, 7, "Unit");
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 8, 8, style);
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 10, 10, style);
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 12, 12, style);
+		addNumberValidation(workbook, sheet, empSheet, 3, 30, 14, 14, style);
+
+		/*
+		 * addLOV(sheet, empSheet, 3, numRows - 1, 1, 1, "Employment");
+		 * addNumberValidation(workbook, sheet, empSheet, 3, numRows, 2, 2, style);
+		 * addLOV(sheet, empSheet, 3, numRows - 1, 3, 3, "EmpUnit"); //
+		 * addNumberValidation(workbook, sheet, empSheet, 3, numRows, 3, 3, style);
+		 * addNumberValidation(workbook, sheet, empSheet, 3, numRows, 4, 4, style);
+		 * addNumberValidation(workbook, sheet, empSheet, 3, numRows, 5, 5, style);
+		 * addNumberValidation(workbook, sheet, empSheet, 3, numRows, 10, 10, style);
+		 * addNumberValidation(workbook, sheet, empSheet, 3, numRows, 12, 12, style);
+		 * addNumberValidation(workbook, sheet, empSheet, 3, numRows, 14, 14, style);
+		 */
 
 		/* Transfers */
 
@@ -505,24 +511,25 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		Cell cell;
 
-		//System.out.println("in number validation");
+		// System.out.println("in number validation");
 		CellRangeAddressList addressList = null;
 		int i = 0;
-		//System.out.println("in number validation 0000 " + firstRow + " " + numRows + " " + firstCol + " " + lastCol);
+		// System.out.println("in number validation 0000 " + firstRow + " " + numRows +
+		// " " + firstCol + " " + lastCol);
 		addressList = new CellRangeAddressList(firstRow, numRows, firstCol, lastCol);
-		//System.out.println("in number validation 00 ");
+		// System.out.println("in number validation 00 ");
 		DataValidationHelper dvHelper = vsheet.getDataValidationHelper();
-		//System.out.println("in number validation 11 ");
+		// System.out.println("in number validation 11 ");
 		DataValidationConstraint dvConstraint = DVConstraint.createNumericConstraint(
 				DVConstraint.ValidationType.DECIMAL, DVConstraint.OperatorType.BETWEEN, "0", "1000000");
-		//System.out.println("in number validation 44");
+		// System.out.println("in number validation 44");
 		DataValidation validation = dvHelper.createValidation(dvConstraint, addressList);
 		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
 		validation.createErrorBox("", "Enter a Number only");
 		validation.setEmptyCellAllowed(true);
 		validation.setShowErrorBox(true);
 		iSheet.addValidationData(validation);
-	
+
 		/*
 		 * the above sets the validation but need to set the cell format to be Number
 		 */
@@ -541,7 +548,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		for (i = firstRow; i < lastRow - 1; i++) {
 
 			Row row = iSheet.getRow(i);
-			//System.out.println("formated cell = " + i);
+			// System.out.println("formated cell = " + i);
 
 			cell = row.getCell(firstCol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 
@@ -550,7 +557,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		}
 
-		//System.out.println("done  number validation");
+		// System.out.println("done number validation");
 
 	}
 
@@ -622,7 +629,8 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		int empUnitRowNum = 16;
 
 		/* Land Types */
-		List<ResourceSubType> rst = XPersistence.getManager().createQuery("from ResourceSubType").getResultList();
+		List<ResourceSubType> rst = XPersistence.getManager()
+				.createQuery("from ResourceSubType order by ResourceTypeName").getResultList();
 
 		Row interviewRow = dataSheet.createRow(interviewRowNum);
 		Row laRow = dataSheet.createRow(landRowNum);
@@ -692,7 +700,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			}
 			/* Asset Food Stocks */
-			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Food Stocks".toString())) {
+			if (rst.get(k).getResourcetype().getResourcetypename().toString().equals("Crops".toString())
+					|| rst.get(k).getResourcetype().getResourcetypename().toString().equals("Wild Foods".toString())
+					|| rst.get(k).getResourcetype().getResourcetypename().toString()
+							.equals("Livestock Products".toString())) {
 				cell = fsRow.createCell(fs);
 				cell.setCellValue(rst.get(k).getResourcetypename());
 				fs++;
@@ -861,13 +872,13 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			area++;
 
 		}
-		
+
 		// Get any localunits for RST and livelihoodZone
 
 		System.out.println("get any local Land units_");
 		for (int k = 0; k < rst.size(); k++) {
 			localArea = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
- 
+
 			if (localArea != null && rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
 				localAreas.add(localArea.getName().trim());
 
@@ -884,8 +895,6 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 			area++;
 		}
 		area--;
-		
-		
 
 		String areacol = getCharForNumber(area); // Convert for drop list creation
 		name = dataSheet.getWorkbook().createName();
@@ -917,7 +926,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		}
 
-		List<String>  localus = localUnits.stream().distinct().collect(Collectors.toList());
+		List<String> localus = localUnits.stream().distinct().collect(Collectors.toList());
 
 		for (String lu : localus) {
 			System.out.println("in lus loop lunit = " + lu);

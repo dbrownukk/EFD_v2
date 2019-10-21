@@ -1,26 +1,36 @@
 package efd.validations;
 
 /*
- * if this record is a synonym for a parent RST then show parent RST KCal and set to read only
+ * If an RST Syn is used then the KCal is set to parent KCal value
  * 
  */
 
+
 import java.math.*;
 
-import org.apache.commons.lang.*;
+import javax.persistence.*;
+
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
+import org.openxava.tab.*;
+import org.openxava.view.*;
+
+import com.openxava.naviox.*;
+import com.openxava.naviox.model.*;
+import com.openxava.naviox.util.*;
+
+import com.openxava.phone.web.*;
 
 import efd.model.*;
+import efd.model.WealthGroupInterview.*;
 
-public class OnChangeRSTSyn extends OnChangePropertyBaseAction {
+public class InitRST extends ViewBaseAction {
 	public void execute() throws Exception {
 
-		System.out.println("in rstparentid xx");
-		System.out.println("all vals = " + getView().getAllValues().toString());
-
+		//System.out.println("in init RST ");
 		String parentRSTid = getView().getValueString("resourcesubtypesynonym.idresourcesubtype");
-
+		//System.out.println("in init RST 2 "+parentRSTid);
+		
 		if (!parentRSTid.isEmpty()) {
 			ResourceSubType parentRST = XPersistence.getManager().find(ResourceSubType.class, parentRSTid);
 
@@ -33,6 +43,6 @@ public class OnChangeRSTSyn extends OnChangePropertyBaseAction {
 			getView().setEditable("resourcesubtypekcal", true);
 			getView().setEditable("resourcesubtypeunit", true);
 		}
-
+		
 	}
 }

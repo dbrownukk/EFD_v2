@@ -27,7 +27,7 @@ import org.apache.poi.ss.usermodel.*;
 //import org.apache.poi.hssf.record.formula.functions.*;
 //import org.apache.poi.ss.usermodel.*;
 
-public class ParseXLSFile2 extends CollectionBaseAction implements IForwardAction, JxlsConstants, IFilePersistor {
+public class ParseWGISpreadsheet extends CollectionBaseAction implements IForwardAction, JxlsConstants, IFilePersistor {
 
 	@Inject // Since v4m2
 	private String defaultSchema;
@@ -1146,7 +1146,7 @@ public class ParseXLSFile2 extends CollectionBaseAction implements IForwardActio
 						aemp.setCashPaymentAmount(getCellDouble(cell[i][j][l++]));
 						aemp.setFoodPaymentFoodType((cell[i][j][l++].getStringCellValue()));
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
-						aemp.setFoodPaymentUnitsPaidWork((cell[i][j][l++].getStringCellValue()));
+						aemp.setFoodPaymentUnitsPaidWork(getCellDouble(cell[i][j][l++]));
 
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
 						aemp.setPercentWorkLocation1(getCellDouble(cell[i][j][l++]));
