@@ -1,19 +1,18 @@
 package efd.model;
+/* List of available reports runnable from OHEA or OIHM */
+
+
+
 import java.util.*;
 
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
-import org.openxava.calculators.*;
 import org.openxava.model.*;
 
-import efd.actions.*;
-import efd.validations.*;
+@View(members = "name, code, method")
 
 
-
-
-@View(members = "name")
 @Table(name = "Report")
 @Entity
 
@@ -22,6 +21,7 @@ public class Report extends Identifiable{
 
 	@Required
 	@Column(length=100, nullable=false, unique = true)
+	@DisplaySize(value = 40)
 	private String name;
 
 	@Required
@@ -32,8 +32,23 @@ public class Report extends Identifiable{
 	@JoinTable(name="ReportInclusion")
 	private Collection<CustomReportSpec> customReportSpec;
 	
+	@Column(name = "Method")
+	private Method method;
+
+	public enum Method {
+		OHEA,OIHM
+	}
+
+	
 	
 
+	public Method getMethod() {
+		return method;
+	}
+
+	public void setMethod(Method method) {
+		this.method = method;
+	}
 
 	public String getName() {
 		return name;

@@ -67,9 +67,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 	public static final int EMPLOYMENT = 12;
 	public static final int TRANSFER = 13;
 	public static final int WILDFOOD = 14;
-	
-	
-	private String nextAction = "ParseSpreadsheet.Validate";  // Automatically call Validate after the Parse
+
+	private String nextAction = "ParseSpreadsheet.Validate"; // Automatically call Validate after the Parse
 
 	public static final int INPUTS = 15;
 	// public static final int FOODPURCHASE = 16;
@@ -163,7 +162,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		ws.add(new Wsheet(NONFOODPURCHASE, "Non Food Purchase", 4, 0)); // used for INPUTS
 
-
 		em("in xls parse ");
 
 		/*
@@ -221,7 +219,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		em("in xls parse 2 ");
 
-		livelihoodZone = hhi.getStudy().getSite().getLivelihoodZone();
+		try {
+			livelihoodZone = hhi.getStudy().getSite().getLivelihoodZone();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+			addWarning("Cannot Parse Interview Spreadsheet - No Site for Study");
+		}
 
 		String spreadsheetId = hhi.getSpreadsheet();
 
@@ -339,19 +343,16 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 		hhi.setStatus(Status.FullyParsed);
 
-	//	getView().refresh();
-	//	getView().refreshCollections();
-	//	getView().refreshDescriptionsLists();
+		// getView().refresh();
+		// getView().refreshCollections();
+		// getView().refreshDescriptionsLists();
 		addMessage("Spreadsheet Parsed");
-		
-		
 
-		
 	}
 
 	private void em(String em) {
 		//System.out.println(em);
-		 return;
+		return;
 
 	}
 
@@ -627,13 +628,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 		DataFormatter objDefaultFormat = new DataFormatter();
 
 		for (int hhmcol = 2; hhmcol < 22; hhmcol++) {
-
+			aa: em("hhm loop hhmcol = " + hhmcol);
 			hhm = new HouseholdMember();
 
 			hhm.setHousehold(hhi);
 
 			try {
-				em("hh members try");
+				em("hh members try ");
 
 				/*
 				 * Name / ID could be text or numeric
@@ -651,12 +652,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				hhm.setHouseholdMemberName(
 						objDefaultFormat.formatCellValue(sheet.getRow(3).getCell(hhmcol), objFormulaEvaluator));
 
-				// hhm.setHouseholdMemberName(
-				// sheet.getRow(3).getCell(hhmcol).toString());
-			
+				// hhm.setHouseholdMemberName(sheet.getRow(3).getCell(hhmcol).toString());
+
 				gender = sheet.getRow(4).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
 						.getStringCellValue();
-				
+
 				age = (int) sheet.getRow(5).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
 						.getNumericCellValue();
 				yob = ((int) (sheet.getRow(6).getCell(hhmcol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)
@@ -676,7 +676,6 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 				gender = StringUtils.capitalize(gender); // now handles male/female as well as LOV Male/Female
 
-			
 				if (gender.equals("Male")) {
 					hhm.setGender(Sex.Male);
 				} else if (gender.equals("Female")) {
@@ -686,12 +685,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 				}
 
 				int thisYear = hhm.getHousehold().getStudy().getReferenceYear();
-	
+
 				hhm.setAge(age);
 
 				// calculated
 
-				hhm.setYearOfBirth(yob);
+				// hhm.setYearOfBirth(yob);
 				// hhm.setYearOfBirth(thisYear - hhm.getAge()); // ignore entered YOB unless it
 				// is 0 or age is 0
 
@@ -705,13 +704,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 					em("Age is 0, this year - yob" + thisYear + " " + hhm.getYearOfBirth());
 					hhm.setAge(thisYear - hhm.getYearOfBirth());
 				}
+				hhm.setYearOfBirth(thisYear - age);
 
-				if (yob == 0) {
-					em("YOB is 0, this year - yob" + thisYear + " " + hhm.getYearOfBirth());
-					hhm.setYearOfBirth(thisYear - age);
-				}
-
-				em("hh 23 ");
 				head = sheet.getRow(7).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK).getStringCellValue();
 				if (head.equals("Yes")) {
 					hhm.setHeadofHousehold(YN.Yes);
@@ -764,118 +758,118 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 			int qsize = hhi.getStudy().getConfigQuestionUse().size(); // Number of questions in this study for HH
 
-			if (qsize == 0)
-				return (0); // no HH Questions
+			if (qsize > 0) {
 
-			/*
-			 * Only want HouseholdMember questions
-			 */
-			Iterator<ConfigQuestionUse> iterator = hhi.getStudy().getConfigQuestionUse().iterator();
-			while (iterator.hasNext()) {
+				/*
+				 * Only want HouseholdMember questions
+				 */
+				Iterator<ConfigQuestionUse> iterator = hhi.getStudy().getConfigQuestionUse().iterator();
+				while (iterator.hasNext()) {
 
-				ConfigQuestionUse nextq = iterator.next();
-				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember) {
-					k++;
+					ConfigQuestionUse nextq = iterator.next();
+					if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember) {
+						k++;
+					}
 				}
-			}
-			qsize = k;
+				qsize = k;
 
-			em("No of HHM questions = " + qsize);
+				/*
+				 * get spreadsheet HH Q and A
+				 */
 
-			/*
-			 * get spreadsheet HH Q and A
-			 */
+				ArrayList<QandA> qand = new ArrayList<QandA>();
 
-			ArrayList<QandA> qand = new ArrayList<QandA>();
+				QandA qa = null;
 
-			QandA qa = null;
+				for (int i = 0; i < qsize; i++) {
 
-			for (int i = 0; i < qsize; i++) {
+					try {
+						em("9999 ---");
+						qcell = sheet.getRow(firstRow + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
 
-				try {
-					qcell = sheet.getRow(firstRow + i).getCell(1, Row.CREATE_NULL_AS_BLANK);
+					} catch (Exception ex) {
+						em("11111 ---");
+						break;
+					}
 
-				} catch (Exception ex) {
-					break;
+					if (qcell.getStringCellValue().isEmpty())
+						break; // no more questions - but should be caught by number of questions
+
+					// What celltype is answer?
+
+					qa = new QandA();
+
+					/* 11 is first row of extra questions */
+
+					acell = sheet.getRow(firstRow + i).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK);
+
+					if (acell.getCellType() == Cell.CELL_TYPE_STRING) {
+
+						qa.setAnswer(acell.getStringCellValue());
+
+					} else if (acell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+
+						answerDouble = acell.getNumericCellValue();
+
+						answerString = Double.toString(answerDouble);
+
+						qa.setAnswer(answerString.toString());
+
+					}
+
+					qa.setQuestion(qcell.getStringCellValue());
+
+					if (qa.getAnswer() == null) {
+						em("getanswer is empty");
+						qa.setAnswer("-");
+					}
+					em("save in array  qand = " + qa.getQuestion() + " " + qa.getAnswer());
+					qand.add(qa);
+
 				}
 
-				if (qcell.getStringCellValue().isEmpty())
-					break; // no more questions - but should be caught by number of questions
+				em("no of qanda size = " + qand.size());
 
-				// What celltype is answer?
+				/*
+				 * Number of HH Questions in this study
+				 */
 
-				qa = new QandA();
+				iterator = hhi.getStudy().getConfigQuestionUse().iterator();
+				while (iterator.hasNext()) {
 
-				/* 11 is first row of extra questions */
+					ConfigQuestionUse nextq = iterator.next();
+					em("hhm level = " + nextq.getConfigQuestion().getLevel().toString());
+					if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember) {
+						em("prompt = " + nextq.getConfigQuestion().getPrompt().toString());
+						// Find answer for this question
+						for (k = 0; k < qand.size(); k++) {
 
-				acell = sheet.getRow(firstRow + i).getCell(hhmcol, Row.CREATE_NULL_AS_BLANK);
+							em("qand = " + qand.get(k).getQuestion());
+							em("cq = " + nextq.getConfigQuestion().getPrompt());
 
-				if (acell.getCellType() == Cell.CELL_TYPE_STRING) {
+							if (qand.get(k).getQuestion().equals(nextq.getConfigQuestion().getPrompt())) {
 
-					qa.setAnswer(acell.getStringCellValue());
+								em("qand a MATCH");
 
-				} else if (acell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+								qanswer = new ConfigAnswer();
+								qanswer.setConfigQuestionUse(nextq);
 
-					answerDouble = acell.getNumericCellValue();
+								qanswer.setAnswer(qand.get(k).getAnswer());
 
-					answerString = Double.toString(answerDouble);
+								// qanswer.setHousehold(hhi);
+								// not needed - it will appear in HH answer list
 
-					qa.setAnswer(answerString.toString());
+								// qanswer.setStudy(hhi.getStudy());
 
-				}
+								qanswer.setHouseholdMember(hhm);
 
-				qa.setQuestion(qcell.getStringCellValue());
+								XPersistence.getManager().persist(qanswer);
 
-				if (qa.getAnswer() == null) {
-					em("getanswer is empty");
-					qa.setAnswer("-");
-				}
-				em("save in array  qand = " + qa.getQuestion() + " " + qa.getAnswer());
-				qand.add(qa);
-
-			}
-
-			em("no of qanda size = " + qand.size());
-
-			/*
-			 * Number of HH Questions in this study
-			 */
-
-			iterator = hhi.getStudy().getConfigQuestionUse().iterator();
-			while (iterator.hasNext()) {
-
-				ConfigQuestionUse nextq = iterator.next();
-				em("hhm level = " + nextq.getConfigQuestion().getLevel().toString());
-				if (nextq.getConfigQuestion().getLevel() == Level.HouseholdMember) {
-					em("prompt = " + nextq.getConfigQuestion().getPrompt().toString());
-					// Find answer for this question
-					for (k = 0; k < qand.size(); k++) {
-
-						em("qand = " + qand.get(k).getQuestion());
-						em("cq = " + nextq.getConfigQuestion().getPrompt());
-
-						if (qand.get(k).getQuestion().equals(nextq.getConfigQuestion().getPrompt())) {
-
-							em("qand a MATCH");
-
-							qanswer = new ConfigAnswer();
-							qanswer.setConfigQuestionUse(nextq);
-
-							qanswer.setAnswer(qand.get(k).getAnswer());
-
-							// qanswer.setHousehold(hhi);
-							// not needed - it will appear in HH answer list
-
-							// qanswer.setStudy(hhi.getStudy());
-
-							qanswer.setHouseholdMember(hhm);
-
-							XPersistence.getManager().persist(qanswer);
+							}
 
 						}
 
 					}
-
 				}
 			}
 		}
@@ -1301,52 +1295,42 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						// LZ must have country
 						lzCurrency = livelihoodZone.getCountry().getCurrency();
 						// GETS TO HERE
-					
-	
-						
+
 						String projectAltCurrency;
 						try {
 							projectAltCurrency = hhi.getStudy().getProjectlz().getAltCurrency().getCurrency();
 						} catch (Exception e) {
-							
+
 							projectAltCurrency = "";
 						}
-
 
 						String enteredCashCurrency;
 						try {
 							enteredCashCurrency = acash.getResourceSubType().getResourcetypename();
 						} catch (Exception e) {
-							
+
 							enteredCashCurrency = "";
 						}
 
-				
-					
-						if(enteredCashCurrency.equals(lzCurrency)) {
-							System.out.println("entered currency == lz currency"); 
+						if (enteredCashCurrency.equals(lzCurrency)) {
+							System.out.println("entered currency == lz currency");
 							acash.setExchangeRate(BigDecimal.valueOf(1.00));
 						}
 						if (enteredCashCurrency.equals(projectAltCurrency)) {
 							System.out.println("entered currency == proj alt currency");
 							acash.setExchangeRate(hhi.getStudy().getProjectlz().getAltExchangeRate());
-						
 
-						} 
-						else {
+						} else {
 							System.out.println("use entered exchange rate ");
 							acash.setExchangeRate(acash.getExchangeRate());
 						}
-						
-						if(acash.getExchangeRate().compareTo(BigDecimal.valueOf(0.0))!=1)
-						{
-							
+
+						if (acash.getExchangeRate().compareTo(BigDecimal.valueOf(0.0)) != 1) {
+
 							acash.setStatus(efd.model.Asset.Status.Invalid);
 						}
-						
 
 						hhi.getAssetCash().add(acash);
-						
 
 						k = 100;
 						break;
@@ -1580,9 +1564,9 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 						aemp.setFoodPaymentUnit((cell[i][j][l++].getStringCellValue()));
 						em("emp = 5");
 						aemp.setFoodPaymentUnitsPaidWork(getCellDouble(cell[i][j][l++]));
-						
-						em("food pay units = "+aemp.getFoodPaymentUnitsPaidWork());
-						
+
+						em("food pay units = " + aemp.getFoodPaymentUnitsPaidWork());
+
 						em(" empppp = 1");
 						aemp.setWorkLocation1(cell[i][j][l++].getStringCellValue());
 						em("1");
@@ -1616,18 +1600,20 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if (!aemp.getFoodPaymentFoodType().isEmpty()) {
 							/* check Food as payment entered is valid */
-							em("check resource food type == "+aemp.getFoodPaymentFoodType());
-							if ((rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[CROPS].getIdresourcetype())) != null //Crops
-							||	(rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[LIVESTOCKPRODUCT].getIdresourcetype())) != null
-								||	(rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[WILDFOOD].getIdresourcetype())) != null
-									||	(rst = checkSubType(aemp.getFoodPaymentFoodType(), rtype[ASSETFOOD].getIdresourcetype())) != null){
-									aemp.setFoodResourceSubType(rst);
-									aemp.setStatus(efd.model.Asset.Status.Valid);
+							em("check resource food type == " + aemp.getFoodPaymentFoodType());
+							if ((rst = checkSubType(aemp.getFoodPaymentFoodType(),
+									rtype[CROPS].getIdresourcetype())) != null // Crops
+									|| (rst = checkSubType(aemp.getFoodPaymentFoodType(),
+											rtype[LIVESTOCKPRODUCT].getIdresourcetype())) != null
+									|| (rst = checkSubType(aemp.getFoodPaymentFoodType(),
+											rtype[WILDFOOD].getIdresourcetype())) != null
+									|| (rst = checkSubType(aemp.getFoodPaymentFoodType(),
+											rtype[ASSETFOOD].getIdresourcetype())) != null) {
+								aemp.setFoodResourceSubType(rst);
+								aemp.setStatus(efd.model.Asset.Status.Valid);
 								isCorrectRST = true;
-							}
-							else
-							{
-								isCorrectRST=false;
+							} else {
+								isCorrectRST = false;
 								aemp.setStatus(efd.model.Asset.Status.Invalid);
 							}
 							// Now need to check food unit is valid
@@ -1638,7 +1624,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						// Was a Local Unit entered for this FoodPayment RST LZ combination?
 
-						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, aemp.getFoodResourceSubType());
+						LocalUnit localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone,
+								aemp.getFoodResourceSubType());
 
 						if (localUnit != null) {
 
@@ -2339,8 +2326,8 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 	@Override
 	public String getNextAction() throws Exception {
-		
-		System.out.println("ready to do validation "+nextAction);
+
+		System.out.println("ready to do validation " + nextAction);
 		return nextAction;
 	}
 

@@ -41,8 +41,8 @@ public class CustomReportSpec extends Identifiable {
 	@JoinTable(name = "ReportInclusion")
 	@NewAction("")
 	@Column(unique=true)
-	
 	@NoModify
+	@SearchListCondition("${method} = 1") // OIHM
 	private Collection<Report> report;
 
 	@ManyToMany

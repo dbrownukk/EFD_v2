@@ -23,7 +23,7 @@ import efd.validations.*;
 
 		@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
 				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," + "notes;wgpercenttotal,warningMessage]"
-				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
+				+ "Wealth_group{wealthgroup}" +"DefaultDietItem{defaultDietItem}"+ "Community_year_notes{communityyearnotes},"),
 		@View(name = "Communitynoproject", members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;"
 				+ "interviewers;" + "]," + "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
@@ -166,12 +166,25 @@ public class Community {
 	@Column(length = 32, name = "Notes")
 	private String notes;
 	// ----------------------------------------------------------------------------------------------//
+	@OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
+	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,percentage+,unitPrice")
+	private Collection<DefaultDietItem> defaultDietItem;
+	// ----------------------------------------------------------------------------------------------//
 
+	
 
 	/* Dont autogen getters and setters as civparticipants is calulated */
 
 	public String getCommunityid() {
 		return communityid;
+	}
+
+	public Collection<DefaultDietItem> getDefaultDietItem() {
+		return defaultDietItem;
+	}
+
+	public void setDefaultDietItem(Collection<DefaultDietItem> defaultDietItem) {
+		this.defaultDietItem = defaultDietItem;
 	}
 
 	public String getNotes() {
