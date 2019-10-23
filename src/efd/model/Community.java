@@ -30,7 +30,7 @@ import efd.validations.*;
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 		@View(name = "FromWGCommunity", members = "projectlz, site"),
-
+		@View(name = "FromReport", members = "wealthgroup"),
 		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,interviewers") })
 
 /* Note the use of underscore in labels - mapped in i18n file */
@@ -60,9 +60,10 @@ public class Community {
 
 
 	@OneToMany(mappedBy = "community",cascade = CascadeType.ALL)
-	@RowAction("Spreadsheet.Template Spreadsheet")
+	@RowAction(forViews="default", value="Spreadsheet.Template Spreadsheet")   // not needed in the call to Reports
 	@CollectionView("FromCommunity")
-	@ListProperties("wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
+	@ListProperties(forViews="default",value="wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
+	@ListProperties(forViews="FromReport",value="wgnameeng,wgnamelocal")
 	@AddAction("")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//

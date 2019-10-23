@@ -22,7 +22,8 @@ import efd.validations.*;
 	@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
 	@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
 	@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
-	@View(name = "SimpleWG", members = ";cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")
+	@View(name = "SimpleWG", members = ";cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
+	@View(name = "ReportWG", members = "wealthGroupInterview")
 	 })
 
 

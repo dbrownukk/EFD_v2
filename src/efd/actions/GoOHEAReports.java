@@ -25,8 +25,11 @@ public class GoOHEAReports extends ViewBaseAction {
 
 	public void execute() throws Exception {
 
-		String communityid = getView().getValueString("id");
-
+		String communityid = getView().getValueString("communityid");
+		//Map values = getView().getAllValues();
+		//System.out.println("allvals= "+values.toString());
+		System.out.println("coomunityid = "+communityid);
+		
 		showDialog();
 		getView().setTitle("Enter Custom Report Spec name to Run");
 
@@ -34,7 +37,7 @@ public class GoOHEAReports extends ViewBaseAction {
 
 		setControllers("OHEAReports", "Dialog");
 
-		//getView().setValue("community.id", communityid);
+		//getView().setValue("community.communityid", communityid);
 
 		// Tab tab = getView().getSubview("community.wealthgroup").getCollectionTab();
 

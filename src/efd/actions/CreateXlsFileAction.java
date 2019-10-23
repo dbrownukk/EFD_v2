@@ -877,7 +877,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		System.out.println("get any local Land units_");
 		for (int k = 0; k < rst.size(); k++) {
-			localArea = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
+			localArea = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst.get(k));
 
 			if (localArea != null && rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
 				localAreas.add(localArea.getName().trim());
@@ -917,7 +917,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		System.out.println("get any local units");
 		for (int k = 0; k < rst.size(); k++) {
-			localUnit = ParseXLSFile2.getLocalUnit(livelihoodZone, rst.get(k));
+			localUnit = ParseWGISpreadsheet.getLocalUnit(livelihoodZone, rst.get(k));
 
 			if (localUnit != null && !rst.get(k).getResourcetype().getResourcetypename().trim().equals("Land")) {
 				localUnits.add(localUnit.getName().trim());
