@@ -144,8 +144,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				// Map househ = MapFacade.getValues("Household", sub, membersNames);
 
 				Household singleHHSelected = XPersistence.getManager().find(Household.class, subKey);
-				if(singleHHSelected.getStatus() == Status.Validated)
-				{
+				if (singleHHSelected.getStatus() == Status.Validated) {
 					isValid = true;
 				}
 				// System.out.println("single hh selected = " + singleHHSelected);
@@ -161,15 +160,13 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		}
 
-		
 		if (isValid == false) {
 			System.out.println("no validated households selected");
 			addError("No Validated Households selected in this Study");
-			//closeDialog();
+			// closeDialog();
 			return;
 		}
-		
-		
+
 		CustomReportSpec customReportSpec = XPersistence.getManager().find(CustomReportSpec.class, specID);
 
 		study = XPersistence.getManager().find(Study.class, studyId);
@@ -222,13 +219,11 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			quantiles = quantiles.stream().sorted(Comparator.comparing(Quantile::getSequence))
 					.collect(Collectors.toList());
-
-			for (Quantile q : quantiles)
-				System.out.println("q = " + q.getSequence() + " " + q.getName());
-
+			// PUT Back 31/10 DRB
 			uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
 					.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
-
+			
+			
 			numberOfQuantiles = customReportSpec.getQuantile().size();
 		}
 
@@ -240,19 +235,35 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		// Populate HH array hh - use dialog selected list if entered
 
 		if (!isSelectedHouseholds) {
-			System.out.println("no hh selection befor epopulate hh array , households size = " + households.size());
+
 			populateHHArray(households);
 		} else if (isSelectedHouseholds) {
-			System.out.println("made a  hh selection");
+
 			populateHHArray(selectedHouseholds);
 		}
 
+		System.out.println("done populateArray = selectHouseholds hh = "+hh.size());
+		//try {
+		//	uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHhNumber()))
+		//			.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
+		//	em("about to do unq hh");
+		//	uniqueHousehold = hh.stream().filter(distinctByKey(HH::getHhNumber))
+		//			.collect(Collectors.toList());
+		//	em("done unq hh");
+		//	em("unique = "+uniqueHousehold.toString());
+		//} catch (Exception e1) {
+			// TODO Auto-generated catch block
+		//	e1.printStackTrace();
+		//}
+
+	
 		errno = 51;
 		// Filter according to Catalog/RT/RST/HH
 		filterHH(customReportSpec);
+		System.out.println("done unique filter");
 		errno = 52;
 		// Calculate DI
-
+		em("about to do calc DI unique hh = " );
 		calculateDI(); // uses hh filtered array based on CRS definition
 		System.out.println("done calc DI");
 		calculateAE(); // Calculate the Adult equivalent
@@ -304,18 +315,26 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	private void calculateDI() {
 
-		uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
-				.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
-
+		em("in calc DI 6767 ");
+		// Put back drb 31/10/19
+		uniqueHousehold = hh.stream().filter(distinctByKey(p ->  p.getHousehold().getHouseholdNumber()))   // Cannot sort by DI at this point, but need unique list of HH
+				.collect(Collectors.toList());
+		em("in calc DI 111");
 		// for (HH hh2 : hh) {
 		for (HH hh2 : uniqueHousehold) {
-
+			em("doing di calc");
 			hh2.hhDI = householdDI(hh2.household);
+			em("done di calc");
 		}
-
+		uniqueHousehold = hh.stream().filter(distinctByKey(p ->  p.getHousehold().getHouseholdNumber()))   // Now sort
+				.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
+		
+		
+		em("in calc DI 222");
 		// If QUantile then need to calc which quantile each unique HH is in
 		final int[] qpoint = new int[200];
 		if (isQuantile) {
+			em("in calc DI 444");
 			// unique HH are in order of DI set in order of Disposable Income
 			int numberInQuantileDataset = uniqueHousehold.size();
 			System.out.println("number quants = " + numberInQuantileDataset);
@@ -540,7 +559,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			hh.removeIf(n -> n.getDelete() == true);
 		} catch (Exception e) {
 			System.out.println("nothing filtered to remove");
-			// e.printStackTrace();
+			e.printStackTrace();
+			return;
 		}
 		/*
 		 * System.out.println("size of hh after all filter = " + hh.size()); for (HH hh2
@@ -568,11 +588,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		ConfigAnswer answer = null;
 
 		for (Household household : households) {
-			System.out.println("hh in populate hh and hh size = " + household.getHouseholdName() + " " + hh.size());
 			populateHHfromHousehold(household, answer);
 
 			for (ConfigAnswer configAnswer : household.getConfigAnswer()) {
-				System.out.println("answer = " + configAnswer.getAnswer());
 				addTohhArray(household, null, null, null, configAnswer, "Answer", null, null, null, null, null, null,
 						null, null, null, null, null, null, null);
 				/*
@@ -603,7 +621,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		// }
 
-		System.out.println("end populateArray" + hh.size());
+		System.out.println("end populateArray drb = " + hh.size());
 
 	}
 
@@ -2013,7 +2031,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 					wildfoodsTI += (iwildfood.getWildfood().getUnitsSold().doubleValue()
 							* iwildfood.getWildfood().getPricePerUnit().doubleValue());
 
-					cropOP += (iwildfood.getWildfood().getUnitsConsumed().doubleValue()
+					wildfoodsOP += (iwildfood.getWildfood().getUnitsConsumed().doubleValue()
 							* Double.valueOf(iwildfood.getWildfood().getResourceSubType().getResourcesubtypekcal()));
 				}
 			}
@@ -2122,10 +2140,20 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		Double dietValue = 0.0;
 
 		for (DefaultDietItem defaultDietItem : defaultDietItems) {
-			dietValue += (defaultDietItem.getResourcesubtype().getResourcesubtypekcal()
-					* defaultDietItem.getPercentage() / 100);
-		}
+			em("ddi kcal = " + defaultDietItem.getResourcesubtype().getResourcesubtypekcal());
 
+			// CUrrently there is a chance that KCAL = 0 which throws calc. Get Synonym
+			// parent KCAL if = 0
+			if (defaultDietItem.getResourcesubtype().getResourcesubtypekcal() == 0) {
+				dietValue += (defaultDietItem.getResourcesubtype().getResourcesubtypesynonym().getResourcesubtypekcal()
+						* defaultDietItem.getPercentage() / 100);
+			} else {
+
+				dietValue += (defaultDietItem.getResourcesubtype().getResourcesubtypekcal()
+						* defaultDietItem.getPercentage() / 100);
+			}
+		}
+		em("11111");
 		// Diet Amount Purchased DA = Shortfall / Diet Value in KGs
 		Double dietAmountPurchased = 0.0;
 
@@ -2141,14 +2169,19 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			costOfShortfall += ((dietAmountPurchased * defaultDietItem.getPercentage() / 100)
 					* defaultDietItem.getUnitPrice().doubleValue());
 		}
-
+		em("22222 ddi = totalIncome = " + costOfShortfall + " " + totalIncome);
 		// Disposable Income = Total Income - Cost of Shortfall
 		Double disposableIncome = 0.0;
 
 		disposableIncome = totalIncome - costOfShortfall;
+		em("33333_dr di = " + disposableIncome);
 
 		return Double.parseDouble(df2.format(disposableIncome));
+	}
 
+	private void em(String message) {
+		System.out.println(message);
+		return;
 	}
 
 	/******************************************************************************************************************************************/

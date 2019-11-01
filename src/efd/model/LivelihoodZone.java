@@ -13,6 +13,7 @@ import org.openxava.annotations.*;
 		@View(name = "CreateLZ", members = "LivelihoodZone[lzname;country;lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname,country;lzzonemap"),
 		@View(name = "SimpleLZnomap", members = "lzname,country") ,
+		@View(name = "FromReport", members = "site") ,
 		@View(name = "FromLocalUnit", members = "LivelihoodZone[lzname,project]")
 })
 
@@ -72,6 +73,8 @@ public class LivelihoodZone  {
 	@NewAction("")
 	@NoCreate
 	@ListProperties("locationdistrict,subdistrict,gpslocation")
+	@XOrderBy("livelihoodZone.lzname desc")
+	@ListProperties(forViews="FromReport",value= "livelihoodZone.lzname, locationdistrict,subdistrict")
 	@CollectionView("LZSite")
 	private Collection<Site> site;
 

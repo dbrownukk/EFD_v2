@@ -122,6 +122,7 @@ public class Project {
 			"Project", "LZ" }))
 	@ListProperties("lzname,country.description,country.currency,lzzonemap")
 	@CollectionView("SimpleLZ")
+	@RowAction("LivelihoodZone.Report")
 	private Collection<LivelihoodZone> livelihoodZone;
 	/***********************************************************************************************/
 

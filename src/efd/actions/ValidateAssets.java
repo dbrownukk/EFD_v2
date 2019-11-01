@@ -387,6 +387,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 				lspIsInvalid = true;
 
 			} else if (lsp.get(i).getResourceSubType() == null) {
+				System.out.println("LSP 101010");
 				lsp.get(i).setStatus(Asset.Status.Invalid);
 				lspIsInvalid = true;
 
@@ -406,6 +407,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 			}
 
 			else {
+				System.out.println("LSP 44444");
 				lsp.get(i).setStatus(Asset.Status.Valid);
 
 			}
@@ -416,8 +418,16 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 
 		// TODO Why is Food Payment Units Paid Work a string not a Double ??
 		// FIXED Oct 2019
-
+		System.out.println("Emp 111");
 		for (i = 0; i < emp.size(); i++) {
+			
+			// legacy null check 
+			if(emp.get(i).getFoodPaymentUnitsPaidWork() == null)
+			{
+				emp.get(i).setFoodPaymentUnitsPaidWork(0.00);
+			}
+			
+			
 			if ((emp.get(i).getPeopleCount() < 0) || (emp.get(i).getUnitsWorked() < 0)
 					|| (emp.get(i).getCashPaymentAmount() < 0) || (emp.get(i).getFoodPaymentUnitsPaidWork() < 0)) {
 				empIsInvalid = true;

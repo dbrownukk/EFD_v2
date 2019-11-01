@@ -22,15 +22,16 @@ import efd.validations.*;
 @Views({
 
 		@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "]," + "notes;wgpercenttotal,warningMessage]"
-				+ "Wealth_group{wealthgroup}" +"DefaultDietItem{defaultDietItem}"+ "Community_year_notes{communityyearnotes},"),
+				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
+				+ "notes;wgpercenttotal,warningMessage;ddipercenttotal,warningDDIMessage]" + "Wealth_group{wealthgroup}"
+				+ "DefaultDietItem{defaultDietItem}" + "Community_year_notes{communityyearnotes},"),
 		@View(name = "Communitynoproject", members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;"
 				+ "interviewers;" + "]," + "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
 				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 		@View(name = "FromWGCommunity", members = "projectlz, site"),
-		@View(name = "FromReport", members = "wealthgroup"),
+		@View(name = "FromReport", members = "site"),
 		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,interviewers") })
 
 /* Note the use of underscore in labels - mapped in i18n file */
@@ -50,20 +51,18 @@ public class Community {
 	@Column(name = "CID", length = 32, unique = true)
 	private String communityid;
 	// ----------------------------------------------------------------------------------------------//
-	
+
 	@Stereotype("DATE")
 	@Column(name = "CInterviewDate")
-	
+
 	private java.util.Date cinterviewdate;
 	// ----------------------------------------------------------------------------------------------//
-	
 
-
-	@OneToMany(mappedBy = "community",cascade = CascadeType.ALL)
-	@RowAction(forViews="default", value="Spreadsheet.Template Spreadsheet")   // not needed in the call to Reports
+	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
+	@RowAction(forViews = "default", value = "Spreadsheet.Template Spreadsheet") // not needed in the call to Reports
 	@CollectionView("FromCommunity")
-	@ListProperties(forViews="default",value="wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
-	@ListProperties(forViews="FromReport",value="wgnameeng,wgnamelocal")
+	@ListProperties(forViews = "default", value = "wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
+	@ListProperties(forViews = "FromReport", value = "wgnameeng,wgnamelocal")
 	@AddAction("")
 	private Collection<WealthGroup> wealthgroup;
 	// ----------------------------------------------------------------------------------------------//
@@ -74,10 +73,9 @@ public class Community {
 	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "CInterviewSequence")
-	
+
 	private Integer cinterviewsequence;
 	// ----------------------------------------------------------------------------------------------//
-	
 
 	@Column(name = "CIVM")
 	private Integer civm;
@@ -85,15 +83,13 @@ public class Community {
 
 	@Column(name = "CIVF")
 	private Integer civf;
-	// ----------------------------------------------------------------------------------------------//	
-
+	// ----------------------------------------------------------------------------------------------//
 
 	@Column(name = "Interviewers", length = 255)
 	private String interviewers;
-	
+
 	// ----------------------------------------------------------------------------------------------//
 
-	
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = false)
 	@Required
@@ -102,28 +98,26 @@ public class Community {
 	@OnChange(OnChangeClearCommunity.class)
 	@ReferenceView("SimpleProject")
 	@NoCreate
-	//@NoModify
-	
-	private Project projectlz;	
+	// @NoModify
+
+	private Project projectlz;
 	// ----------------------------------------------------------------------------------------------//
-	
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@SearchAction("Community.filteredSitesearch")
 	// need a new LZ create check @AddAction("LivelihoodZone.add LZ")
 	@NoFrame(forViews = "FromWGCommunity")
-	//@ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "SimpleSite"),
-		//	@ReferenceView(forViews = "FromWGCommunity", value = "FromWealthGroup") })
-	
+	// @ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "SimpleSite"),
+	// @ReferenceView(forViews = "FromWGCommunity", value = "FromWealthGroup") })
+
 	@ReferenceView("SimpleSite")
 	@JoinColumn(name = "CLocation")
 	private Site site;
 
 	// ----------------------------------------------------------------------------------------------//
-	
 
 	// ----------------------------------------------------------------------------------------------//
-	// Is total above 100%
+	// Is Wealthgroup % total != 100%
 	// ----------------------------------------------------------------------------------------------//
 
 	@Transient
@@ -139,16 +133,16 @@ public class Community {
 	}
 
 	@Depends("wgpercenttotal")
-	@Stereotype("LABEL") // @Stereotype("HTML_TEXT") 
+	@Stereotype("LABEL") // @Stereotype("HTML_TEXT")
 	@Transient
 	@ReadOnly
 	public String getWarningMessage() {
 		if (getWgpercenttotal() > 100) {
-			//System.out.println("in stereotype" + getWgpercenttotal());
+			// System.out.println("in stereotype" + getWgpercenttotal());
 			return "<font color=" + "red" + ">Total Wealthgroup Percent is greater than 100</font>";
 
 		} else if (getWgpercenttotal() < 100) {
-			//System.out.println("in stereotype" + getWgpercenttotal());
+			// System.out.println("in stereotype" + getWgpercenttotal());
 			return "<font color=" + "orange" + ">Total Wealthgroup Percent is less than 100</font>";
 		} else if (getWgpercenttotal() == 100) {
 			return "<font color=" + "green" + ">Total Wealthgroup Percent is 100</font>";
@@ -156,13 +150,47 @@ public class Community {
 		return null;
 	}
 
+	// ----------------------------------------------------------------------------------------------//
+	// Is DDI % total != 100%
+	// ----------------------------------------------------------------------------------------------//
+
+	@Transient
+	@ReadOnly
+	@Column(length = 3)
+
+	public int getDdipercenttotal() {
+		int result = 0;
+		for (DefaultDietItem defaultDietItems : getDefaultDietItem()) {
+			result += defaultDietItems.getPercentage();
+		}
+		return result;
+	}
+
+	@Depends("ddipercenttotal")
+	@Stereotype("LABEL") // @Stereotype("HTML_TEXT")
+	@Transient
+	@ReadOnly
+	public String getWarningDDIMessage() {
+		if (getDdipercenttotal() > 100) {
+			// System.out.println("in stereotype" + getWgpercenttotal());
+			return "<font color=" + "red" + ">Total Default Diet Items Percent is greater than 100</font>";
+
+		} else if (getDdipercenttotal() < 100) {
+			// System.out.println("in stereotype" + getWgpercenttotal());
+			return "<font color=" + "orange" + ">Total Default Diet Items Percent is less than 100</font>";
+		} else if (getDdipercenttotal() == 100) {
+			return "<font color=" + "green" + ">Total Default Diet Items Percent is 100</font>";
+		}
+		return null;
+	}
+	// ----------------------------------------------------------------------------------------------//
 
 	@ReadOnly
 	@Column(name = "CIVparticipants")
 	@Calculation("civm+civf")
 	private Integer civparticipants;
 	// ----------------------------------------------------------------------------------------------//
-	
+
 	@Stereotype("FILES")
 	@Column(length = 32, name = "Notes")
 	private String notes;
@@ -172,9 +200,7 @@ public class Community {
 	private Collection<DefaultDietItem> defaultDietItem;
 	// ----------------------------------------------------------------------------------------------//
 
-	
-
-	/* Dont autogen getters and setters as civparticipants is calulated */
+	/* Dont autogen getters and setters as civparticipants is calculated */
 
 	public String getCommunityid() {
 		return communityid;

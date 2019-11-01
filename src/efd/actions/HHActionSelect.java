@@ -20,6 +20,7 @@ public class HHActionSelect extends OnSelectElementBaseAction {
 		System.out.println("crsid = " + crsid);
 		System.out.println("studyid = " + studyid);
 
+		
 		if (crsid.isEmpty()) {
 			System.out.println("no crsid");
 			
@@ -33,7 +34,7 @@ public class HHActionSelect extends OnSelectElementBaseAction {
 		
 			return;
 		}
-
+		
 		CustomReportSpec crs = XPersistence.getManager().find(CustomReportSpec.class, crsid);
 
 		System.out.println("crs =  = " + crs.getSpecName());

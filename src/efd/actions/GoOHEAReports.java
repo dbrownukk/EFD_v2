@@ -1,35 +1,36 @@
 
-/* IOX Dialog to enter new name of Study  */
+/* 
+ * Call Dialog to run reports. Show customerreport pick list and list of Sites/Communities
+ */
 
 package efd.actions;
 
 import java.util.*;
 
-import javax.inject.*;
-import javax.persistence.*;
-
-import org.hibernate.loader.*;
 import org.openxava.actions.*;
-import org.openxava.jpa.*;
-import org.openxava.tab.*;
-import org.openxava.util.*;
-import org.openxava.view.*;
+
 import efd.model.*;
-import efd.model.WealthGroupInterview.*;
 
-public class GoOHEAReports extends ViewBaseAction {
-//	public class GoOIHMReports extends ViewBaseAction {
-
-	@Inject
-	private Tab tab;
+public class GoOHEAReports extends CollectionBaseAction {
 
 	public void execute() throws Exception {
+		System.out.println("in go ohea");
+		LivelihoodZone livelihoodZone = null;
+		Iterator it = getSelectedObjects().iterator(); // Only reads one row but possible in future to run report for
+														// many lzs
+		while (it.hasNext()) {
+			livelihoodZone = (LivelihoodZone) it.next();
+			// System.out.println("selected lz = " + livelihoodZone.getLzname());
+			// for (Site site : livelihoodZone.getSite()) {
+			// {
+			// System.out.println("site = "+site.getLocationdistrict());
+			// }
 
-		String communityid = getView().getValueString("communityid");
-		//Map values = getView().getAllValues();
-		//System.out.println("allvals= "+values.toString());
-		System.out.println("coomunityid = "+communityid);
-		
+			// }
+		}
+
+		System.out.println("in go ohea done get selected");
+
 		showDialog();
 		getView().setTitle("Enter Custom Report Spec name to Run");
 
@@ -37,8 +38,7 @@ public class GoOHEAReports extends ViewBaseAction {
 
 		setControllers("OHEAReports", "Dialog");
 
-		//getView().setValue("community.communityid", communityid);
-
+		getView().setValue("livelihoodZone.lzid", livelihoodZone.getLzid());
 		// Tab tab = getView().getSubview("community.wealthgroup").getCollectionTab();
 
 		// tab.setBaseCondition(tab.getBaseCondition() + " and ${status} = '4'"); //

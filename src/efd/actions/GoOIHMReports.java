@@ -1,5 +1,6 @@
-
-/* IOX Dialog to enter new name of Study  */
+/* 
+ * Call Dialog to run reports. Show customerreport pick list and list of Validated Households
+ */
 
 package efd.actions;
 

@@ -48,7 +48,8 @@ public class Employment extends Asset {
 	@Column(name = "FoodPaymentUnit", length=50)
 	private String foodPaymentUnit;
 	
-	@Column(name = "FoodPaymentUnitsPaidWork", length=50)
+	@Column(name = "FoodPaymentUnitsPaidWork", precision = 10, scale = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double foodPaymentUnitsPaidWork;
 	
 	@Column(name = "WorkLocation1", length = 50)

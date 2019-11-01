@@ -8,7 +8,7 @@ import org.openxava.annotations.*;
 
 import efd.validations.*;
 
-@View(members = "customReportSpec;;")
+@View(members = "customReportSpec;livelihoodZone;")
 
 //@Tab(
 //properties="household.householdNumber,household.status",
@@ -20,33 +20,30 @@ public class CustomReportSpecListOHEA {
 	@ManyToOne
 	@NoCreate
 	@NoModify
-	
+
 	@DescriptionsList(descriptionProperties = "specName")
 	private CustomReportSpecOHEA customReportSpec;
 
-	
-	/*
 	@ManyToOne
 	@NoCreate
 	@NoModify
 	@NoFrame
 
-	
 	@SearchAction("")
-	// @SearchListCondition("${household.status}='Validated'") ONLY for search list
-	// action
 	@ReferenceView("FromReport")
+	
+	private LivelihoodZone livelihoodZone ;
 
-	private Community community;
 
-	public Community getCommunity() {
-		return community;
+
+	public LivelihoodZone getLivelihoodZone() {
+		return livelihoodZone;
 	}
 
-	public void setCommunity(Community community) {
-		this.community = community;
+	public void setLivelihoodZone(LivelihoodZone livelihoodZone) {
+		this.livelihoodZone = livelihoodZone;
 	}
-*/
+
 	public CustomReportSpecOHEA getCustomReportSpec() {
 		return customReportSpec;
 	}
