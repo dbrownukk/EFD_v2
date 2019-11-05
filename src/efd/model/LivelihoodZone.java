@@ -76,8 +76,9 @@ public class LivelihoodZone  {
 	@XOrderBy("livelihoodZone.lzname desc")
 	@ListProperties(forViews="FromReport",value= "livelihoodZone.lzname, locationdistrict,subdistrict")
 	@CollectionView("LZSite")
+	//@SearchListCondition(value="${project} = ${this.project}", forViews = "FromReport")
 	private Collection<Site> site;
-
+	
 	@ManyToMany(mappedBy = "livelihoodZone")
 	//@ListProperties(forViews="FromLocalUnit",value="projecttitle,pdate")
 	private Collection<Project> project;

@@ -65,6 +65,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	static final int NUMBER_OF_REPORTS = 15;
 	private Community community = null;
 	private LivelihoodZone livelihoodZone = null;
+	private Project project = null;
 	// private CustomReportSpec customReportSpec = null;
 
 	private List<Report> reportList;
@@ -90,6 +91,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	JxlsStyle boldTopStyle = null;
 	JxlsStyle borderStyle = null;
 	JxlsStyle textStyle = null;
+	JxlsStyle textStyleLeft = null;
 	JxlsStyle dateStyle = null;
 	JxlsStyle numberStyle = null;
 	JxlsStyle f1Style = null;
@@ -118,14 +120,19 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			return;
 		}
 		System.out.println("done get specid");
-		//Map allValues = getView().getAllValues();
-		//System.out.println("all vals prev = "+allValues.toString());
-		
-		
+		Map allValues = getPreviousView().getAllValues();
+		System.out.println("all vals prev = "+allValues.toString());
+
 		String lzid = getView().getValueString("livelihoodZone.lzid");
 		livelihoodZone = XPersistence.getManager().find(LivelihoodZone.class, lzid);
-		System.out.println("lzname = "+livelihoodZone.getLzname());
 		
+	    String projectid = getPreviousView().getValueString("projectid");
+	    project = XPersistence.getManager().find(Project.class, projectid);
+		
+		
+		System.out.println("lzname = " + livelihoodZone.getLzname());
+		System.out.println("project = " + project.getProjecttitle());
+
 		Object communityId = null; // getPreviousView().getValue("communityid");
 
 		Tab targetTab = getView().getSubview("livelihoodZone.site").getCollectionTab();
@@ -160,21 +167,35 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 					for (Community community2 : site.getCommunity()) {
 						for (WealthGroup wealthGroup : community2.getWealthgroup()) {
 
+							
+							
+							
 							System.out.println("wgid = " + wealthGroup.getWgid());
-
+							// SHould only be one WGI per WG - in future might have more than one with a revisit to gather data in another year
 							try {
 								wealthGroupInterview = (WealthGroupInterview) XPersistence.getManager()
 										.createQuery("from WealthGroupInterview where wgid = :wgid")
-										.setParameter("wgid", wealthGroup.getWgid()).getSingleResult();
+										.setParameter("wgid", wealthGroup.getWgid())
+										.getSingleResult();
 							} catch (Exception e1) {
 								// TODO Auto-generated catch block
-
+								System.out.println("No WGIs found for Site");	
 								// e1.printStackTrace();
 								break;
 							}
+							
+							
 							System.out.println("wgi = " + wealthGroupInterview.getWgAverageNumberInHH());
+							System.out.println("wgi status = " + wealthGroupInterview.getStatus());
 							System.out.println("wgi interviewers " + wealthGroupInterview.getWgInterviewers());
 
+							if(!wealthGroupInterview.getStatus().equals(Status.Validated))
+							{
+								//Not a Validated WGI 
+								break;
+							}
+							
+							
 							WGI e = new WGI();
 							e.wealthgroupInterview = wealthGroupInterview;
 							e.site = wealthGroup.getCommunity().getSite();
@@ -193,6 +214,12 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 
 		}
+		
+		// wgiSelected populates wgis array 
+		for (WGI wgi : wgiSelected) {
+			System.out.println("wgiselected  = "+wgi.site.getLocationdistrict()+" "+wgi.site.getSubdistrict());
+		}
+		
 
 		System.out.println("no of wgi = " + wgiSelected.size());
 		System.out.println("specid = " + specID);
@@ -1694,14 +1721,15 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		sheet[0] = reportWB.addSheet("Custom Report Spec");
 		setSheetStyle(sheet[0]);
-		sheet[0].setColumnWidths(1, 40, 50, 50, 50, 50, 50, 25, 25, 50, 50);
+		sheet[0].setColumnWidths(1, 40, 80, 50, 50, 50, 50, 25, 25, 50, 50);
 
 		sheet[0].setValue(1, 1, "Date:", textStyle);
-		sheet[0].setValue(2, 1, new Date());
+		sheet[0].setValue(2, 1, new Date(),textStyleLeft);
 		sheet[0].setValue(1, 2, "Spec Name:", textStyle);
-		sheet[0].setValue(2, 2, customReportSpec.getSpecName(), textStyle);
+		sheet[0].setValue(2, 2, customReportSpec.getSpecName(),textStyleLeft);
 		sheet[0].setValue(1, 3, "Livelihood Zone:", textStyle);
-		sheet[0].setValue(2, 3,  livelihoodZone.getLzname()+ " " +livelihoodZone.getCountry().getIsocountrycode());
+		sheet[0].setValue(2, 3, project.getProjecttitle()+" / "+livelihoodZone.getLzname()
+				,textStyleLeft);
 		// study.getReferenceYear(), textStyle);
 		sheet[0].setValue(2, STARTROW, "Reports", boldTopStyle);
 		/* get list of reports and create tabbed bsheets for each */
@@ -1714,7 +1742,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			reportList = XPersistence.getManager().createQuery("from Report").getResultList();
 
 		for (Report report : reportList) {
-			sheet[0].setValue(2, i, report.getName(), textStyle);
+			sheet[0].setValue(2, i, report.getName(), textStyleLeft);
 			sheet[i - 3] = reportWB.addSheet(report.getName());
 
 			setSheetStyle(sheet[i - 3]);
@@ -1730,20 +1758,21 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		String wgName;
 
 		if (isSelectedSites) {
-			sheet[0].setValue(col, i, "Selected Sites in Report = " + sites.size(), boldTopStyle);
-			sheet[0].setValue(col+1, i, "Wealthgroups in Report = ", boldTopStyle);
+			sheet[0].setValue(col, i, "Selected Communities in Report = " + sites.size(), boldTopStyle);
+			// sheet[0].setValue(col + 1, i, "Wealthgroups in Report = ", boldTopStyle);
 			i++;
 
 			for (Site site : sites) {
 				siteName = site.getLocationdistrict() + " " + site.getSubdistrict();
 				sheet[0].setValue(col, i, siteName, textStyle);
-				for (Community community2 : site.getCommunity()) {
-					for (WealthGroup wealthGroup : community2.getWealthgroup()) {
-						wgName = wealthGroup.getWgnameeng() + " " + wealthGroup.getWgnamelocal();
-						sheet[0].setValue(col + 1, i, wgName, textStyle);
-						i++;
-					}
-				}
+				// for (Community community2 : site.getCommunity()) { // WGs not needed on
+				// header page
+				// for (WealthGroup wealthGroup : community2.getWealthgroup()) {
+				// wgName = wealthGroup.getWgnameeng() + " " + wealthGroup.getWgnamelocal();
+				// sheet[0].setValue(col + 1, i, wgName, textStyle);
+				// i++;
+				// }
+				// }
 
 				i++;
 
@@ -1751,7 +1780,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 		i = STARTROW;
-		col++;
+
 		col++;
 		errno = 1102;
 
@@ -1785,58 +1814,28 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			i++;
 		}
 
-		i = STARTROW;
-		col++;
-		errno = 1105;
-
-		sheet[0].setValue(col, i, "Quantiles Included", boldTopStyle);
-		sheet[0].setValue(col + 1, i, "Quantile Percent", boldTopStyle);
+		String currency = livelihoodZone.getCountry().getCurrency();
 
 		/*
-		 * Q & A
-		 */
-
-		i = STARTROW;
-		col++;
-		col++;
-		errno = 1105;
-
-		sheet[0].setValue(col, i, "Household Questions Included", boldTopStyle);
-		sheet[0].setValue(col + 1, i, "Answer", boldTopStyle);
-		/*
-		 * try { i++; for (ConfigAnswer ans : customReportSpec.getConfigAnswer()) {
-		 * 
-		 * String prompt = ans.getConfigQuestionUse().getConfigQuestion().getPrompt();
-		 * String answer = ans.getAnswer();
-		 * 
-		 * sheet[0].setValue(col, i, prompt, textStyle); sheet[0].setValue(col + 1, i,
-		 * answer, textStyle); i++; } } catch (Exception e) { // TODO Auto-generated
-		 * catch block // e.printStackTrace(); System.out.println("No config answer"); }
+		 * Cross Projects so unsure what currency should be set to - assume Project
+		 * country currency
 		 */
 		/*
-		 * 
-		 * get Currency
+		 * TODO
 		 */
-
-		String currency = "UNKNOWN";
-
-		System.out.println("about to get currency 2 ");
 		/*
-		 * try { if
-		 * (StringUtils.isEmpty(study.getProjectlz().getAltCurrency().getCurrency())) {
-		 * currency = study.getSite().getLivelihoodZone().getCountry().getCurrency(); }
-		 * else { currency = study.getProjectlz().getAltCurrency().getCurrency(); } }
+		 * try { if (StringUtils.isEmpty(getProjectlz().getAltCurrency().getCurrency()))
+		 * { currency = study.getSite().getLivelihoodZone().getCountry().getCurrency();
+		 * } else { currency = study.getProjectlz().getAltCurrency().getCurrency(); } }
 		 * catch (Exception e1) { // TODO Auto-generated catch block //
-		 * e1.printStackTrace();
+		 * e1.printStackTrace(); }
 		 * 
-		 * }
-		 */
-		errno = 1107;
-
-		errno = 1107_3;
-		sheet[0].setValue(1, 4, "Reporting Currency:", boldTopStyle);
-		sheet[0].setValue(2, 4, currency, textStyle);
-
+		 * errno = 1107;
+		 * 
+		 */ 
+		  sheet[0].setValue(1, 4, "Reporting Currency:", boldTopStyle);
+		  sheet[0].setValue(2, 4, currency,textStyleLeft);
+		 
 		errno = 1108;
 	}
 
@@ -1863,6 +1862,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		borderStyle = reportWB.addStyle(TEXT).setAlign(RIGHT).setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN,
 				BORDER_THIN);
 		textStyle = reportWB.addStyle(TEXT).setAlign(RIGHT);
+		textStyleLeft = reportWB.addStyle(TEXT).setAlign(LEFT);
 		textStyleBlue = reportWB.addStyle(TEXT).setAlign(LEFT).setTextColor(BLUE);
 
 		reportWB.setDateFormat("dd/MM/yyyy");
