@@ -11,6 +11,7 @@ import javax.validation.constraints.*;
 import org.apache.commons.lang.time.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.*;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.*;
 import org.openxava.annotations.*;
 import org.openxava.annotations.NewAction;
 import org.openxava.annotations.Tab;

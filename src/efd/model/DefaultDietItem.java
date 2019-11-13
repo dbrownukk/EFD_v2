@@ -25,12 +25,24 @@ public class DefaultDietItem extends EFDIdentifiable {
 	// @PrePersist
 	@PreUpdate
 	private void validate() throws Exception {
-		System.out.println("tot = " + study.getTotalDietPercentage());
-		if (study.getTotalDietPercentage() > 100) {
-			throw new IllegalStateException(
+		
+		if (study != null) {
+			System.out.println("tot = " + study.getTotalDietPercentage());
+			if (study.getTotalDietPercentage() > 100) {
+				throw new IllegalStateException(
 
-					XavaResources.getString("diet_greater_100"));
+						XavaResources.getString("diet_greater_100"));
 
+			}
+		}
+		else if (community != null) {
+			System.out.println("tot = "+ community.getDdipercenttotal());
+			if (community.getDdipercenttotal() > 100) {
+				throw new IllegalStateException(
+
+						XavaResources.getString("diet_greater_100"));
+
+			}
 		}
 		if ((study == null && community == null) || (study != null && community != null)) {
 			throw new IllegalStateException(
@@ -71,7 +83,7 @@ public class DefaultDietItem extends EFDIdentifiable {
 	@Required
 	@DefaultValueCalculator(value = ZeroBigDecimalCalculator.class)
 	@Digits(integer = 10, fraction = 2)
-	@Min(0)
+	@Positive
 	private BigDecimal unitPrice;
 
 	public ResourceSubType getResourcesubtype() {

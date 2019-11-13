@@ -21,6 +21,8 @@ public class OnChangeSOLLevel extends OnChangePropertyBaseAction {
 		System.out.println("in SOL level onchange");
 		String level = null;
 
+		
+		
 		if (getNewValue() == null) {
 
 			// New - set defaults

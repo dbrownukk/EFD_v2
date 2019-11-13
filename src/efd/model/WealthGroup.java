@@ -181,6 +181,14 @@ public class WealthGroup {
 		this.wgpercent = wgpercent;
 	}
 
+	public List<WealthGroupInterview> getWealthGroupInterview() {
+		return wealthGroupInterview;
+	}
+
+	public void setWealthGroupInterview(List<WealthGroupInterview> wealthGroupInterview) {
+		this.wealthGroupInterview = wealthGroupInterview;
+	}
+
 
 
 	

@@ -24,6 +24,7 @@ import efd.validations.*;
 		@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
 				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
 				+ "notes;wgpercenttotal,warningMessage;ddipercenttotal,warningDDIMessage]" + "Wealth_group{wealthgroup}"
+				+  "StandardOfLivingElement{stdOfLivingElement};"
 				+ "DefaultDietItem{defaultDietItem}" + "Community_year_notes{communityyearnotes},"),
 		@View(name = "Communitynoproject", members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;"
 				+ "interviewers;" + "]," + "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
@@ -32,6 +33,7 @@ import efd.validations.*;
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
 		@View(name = "FromWGCommunity", members = "projectlz, site"),
 		@View(name = "FromReport", members = "site"),
+		@View(name = "FromStdOfLiving", members = "site"),
 		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,interviewers") })
 
 /* Note the use of underscore in labels - mapped in i18n file */
@@ -199,7 +201,12 @@ public class Community {
 	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,percentage+,unitPrice")
 	private Collection<DefaultDietItem> defaultDietItem;
 	// ----------------------------------------------------------------------------------------------//
-
+	@OneToMany(mappedBy = "community", cascade = CascadeType.REMOVE)
+	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,amount,cost,level,survival")
+	@EditAction("StdOfLivingElement.edit")
+	@CollectionView("fromCommunity")
+	private Collection<StdOfLivingElement> stdOfLivingElement;
+	// ----------------------------------------------------------------------------------------------//
 	/* Dont autogen getters and setters as civparticipants is calculated */
 
 	public String getCommunityid() {
@@ -305,6 +312,16 @@ public class Community {
 	public void setCivparticipants(Integer civparticipants) {
 		this.civparticipants = civparticipants;
 	}
+
+	public Collection<StdOfLivingElement> getStdOfLivingElement() {
+		return stdOfLivingElement;
+	}
+
+	public void setStdOfLivingElement(Collection<StdOfLivingElement> stdOfLivingElement) {
+		this.stdOfLivingElement = stdOfLivingElement;
+	}
+	
+	
 
 	/* get / set */
 

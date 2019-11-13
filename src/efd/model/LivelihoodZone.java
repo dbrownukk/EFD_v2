@@ -69,7 +69,7 @@ public class LivelihoodZone  {
 	@Stereotype("IMAGE")
 	private byte[] lzzonemap;
 
-	@OneToMany(mappedBy = "livelihoodZone")
+	@OneToMany(mappedBy = "livelihoodZone",cascade = CascadeType.REMOVE)
 	@NewAction("")
 	@NoCreate
 	@ListProperties("locationdistrict,subdistrict,gpslocation")

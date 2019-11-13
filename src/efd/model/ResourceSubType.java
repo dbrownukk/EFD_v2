@@ -34,6 +34,8 @@ public class ResourceSubType {
 /*
 	
 	
+	
+	
 	private void calcKcal() {
 		if (resourcesubtypesynonym != null) {
 			resourcesubtypekcal = 0;
