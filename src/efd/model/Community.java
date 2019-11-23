@@ -61,7 +61,7 @@ public class Community {
 	// ----------------------------------------------------------------------------------------------//
 
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
-	@RowAction(forViews = "default", value = "Spreadsheet.Template Spreadsheet") // not needed in the call to Reports
+	@RowAction(notForViews = "FromReport", value = "Spreadsheet.Template Spreadsheet") // not needed in the call to Reports
 	@CollectionView("FromCommunity")
 	@ListProperties(forViews = "default", value = "wgnameeng,wgnamelocal,wgorder,wgwives,wghhsize,wgpercent+")
 	@ListProperties(forViews = "FromReport", value = "wgnameeng,wgnamelocal")

@@ -118,9 +118,6 @@ public class WealthGroup {
 
 
 
-
-
-
 	public List<WGCharacteristicsResource> getWgcharacteristicsresource() {
 		return wgcharacteristicsresource;
 	}

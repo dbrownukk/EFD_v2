@@ -32,10 +32,13 @@ public class GoOHEAReports extends CollectionBaseAction {
 		System.out.println("in go ohea 2");
 
 		String projectid = getView().getValueString("projectid");
-		System.out.println("in go ohea 3");
+		System.out.println("in go ohea 3 projid = "+projectid);
 		project = XPersistence.getManager().find(Project.class, projectid);
-		System.out.println("in go ohea 4");
+		System.out.println("in go ohea 4 project title = "+project.getProjecttitle());
 		Iterator it = getSelectedObjects().iterator();
+		
+		it.getClass();
+		
 		livelihoodZone = (LivelihoodZone) it.next();
 
 		// List of Sites for this LZ

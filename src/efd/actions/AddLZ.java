@@ -32,13 +32,9 @@ public class AddLZ extends GoAddElementsToCollectionAction {
 				+ " where pr.projectid = '" + cprojectid + "'");
 		List<LivelihoodZone> lzs = query.getResultList();
 
-		System.out.println("lz size = "+lzs.size());
-
-		
-		String lzs1 = lzs.toString().replace("[]", " ");
 
 		String inlist = "";
-		;
+		
 		for (int k = 0; k < lzs.size(); k++) {
 
 			inlist += "'" + lzs.get(k) + "'";
@@ -49,12 +45,7 @@ public class AddLZ extends GoAddElementsToCollectionAction {
 		}
 		if (lzs.size() > 0)
 			getTab().setBaseCondition("${lzid} not in (" + inlist + ")");
-	
-	
-	//mustRefreshCollection();
-	//getParentView().refresh();
-	
-	
+
 	}
 	
 	
