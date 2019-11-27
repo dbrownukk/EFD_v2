@@ -356,12 +356,12 @@ public class ParseWGISpreadsheet extends CollectionBaseAction implements IForwar
 			System.out.println("in Numeric ");
 			Double intervieweesD = icell.getNumericCellValue();
 			Integer interviewees = intervieweesD.intValue();
-			wgi.setWgIntervieweesCount(interviewees);
+		//	wgi.setWgIntervieweesCount(interviewees);
 		} else {
 			System.out.println("in String ");
 			String interviewees = icell.getStringCellValue();
 			// System.out.println("done cell get ");
-			wgi.setWgIntervieweesCount(Integer.parseInt(interviewees));
+		//	wgi.setWgIntervieweesCount(Integer.parseInt(interviewees));
 			// System.out.println("wgi set throw in participants ");
 
 		}

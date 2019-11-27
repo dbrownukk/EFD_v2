@@ -3,6 +3,8 @@ package efd.model;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
+
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.*;
 
@@ -94,17 +96,24 @@ public class WealthGroupInterview {
 	@Required
 	private String wgInterviewers;
 
-	@Column(name = "WGIntervieweesCount", nullable = false)
-	@Required
-	private Integer wgIntervieweesCount;
+	
+	
+
+	@Depends("wgFemaleIVees, wgMaleIVees")
+	public Integer getWgIntervieweesCount() {
+		return(wgFemaleIVees+wgMaleIVees);
+	}
 
 	@Column(name = "WGFemaleIVees")
+	@PositiveOrZero
 	private Integer wgFemaleIVees;
 
 	@Column(name = "WGMaleIVees")
+	@PositiveOrZero
 	private Integer wgMaleIVees;
 
 	@Column(name = "WGAverageNumberInHH")
+	@Positive
 	private Integer wgAverageNumberInHH;
 
 	@Column(name = "WGYearType")
@@ -249,13 +258,7 @@ public class WealthGroupInterview {
 		this.wgInterviewers = wgInterviewers;
 	}
 
-	public Integer getWgIntervieweesCount() {
-		return wgIntervieweesCount;
-	}
 
-	public void setWgIntervieweesCount(Integer wgIntervieweesCount) {
-		this.wgIntervieweesCount = wgIntervieweesCount;
-	}
 
 	public Integer getWgFemaleIVees() {
 		return wgFemaleIVees;

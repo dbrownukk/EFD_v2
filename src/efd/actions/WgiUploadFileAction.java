@@ -53,7 +53,7 @@ public class WgiUploadFileAction extends UploadFileAction implements IChainActio
 
 	@Override
 	public String getNextAction() throws Exception {
-		// TODO Auto-generated method stub
+		
 		System.out.println("In Save of ichain for file upload" );
 		if(getView().getModelName().equals("WealthGroupInterview")
 				|| getView().getModelName().equals("Household"))

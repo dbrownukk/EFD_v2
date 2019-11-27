@@ -3,9 +3,9 @@
 <!DOCTYPE controllers SYSTEM "dtds/controllers.dtd">
 
 <controllers>
-	<!-- <env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange" 
-		/> -->
-	<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchByViewKey" />
+	<env-var name="XAVA_SEARCH_ACTION"
+		value="CRUD.searchExecutingOnChange" />
+	<!-- <env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchByViewKey" /> -->
 	<object name="activesectionchar" class="java.lang.String"
 		value="Crops" scope="global" />
 	<object name="sessionTab" class="java.lang.String"
@@ -23,6 +23,7 @@
 
 	<controller name="EFD_HM">
 		<extends controller="TypicalNotResetOnSave" />
+		<extends controller="CollectionCopyPaste" />
 	</controller>
 
 	<controller name="GoCopyStudy">
@@ -38,11 +39,16 @@
 
 
 	<controller name="GoOIHMReports">
-		<object name="status" class="java.lang.String"
-			value="Validated" />
 		<action name="Reports" class="efd.actions.GoOIHMReports"
-			mode="detail" icon="file-excel" />
+			mode="list" icon="file-excel" />
 	</controller>
+
+
+
+
+
+
+
 
 	<controller name="CopyStudy">
 		<action name="copy" class="efd.actions.CopyStudy" />
@@ -54,6 +60,10 @@
 
 	</controller>
 
+	<controller name="OHEAReports">
+		<action name="Run" class="efd.actions.OHEAReports"
+			takes-long="true" />
+	</controller>
 
 	<controller name="GoCopyinTopicQuestions">
 		<action name="CopyinTopicQuestions" mode="detail"
@@ -101,15 +111,12 @@
 	<controller name="ParseSpreadsheet">
 		<action name="Parse Spreadsheet"
 			label="Parse Interview Spreadsheet" icon="file-excel" mode="detail"
-			in-each-row="false" class="efd.actions.ParseXLSFile2" />
+			in-each-row="false" class="efd.actions.ParseWGISpreadsheet" />
 		<action name="Validate" label="Validate" icon="marker-check"
-			mode="detail" in-each-row="false" class="efd.actions.ValidateWGI" />
+			takes-long="true" mode="detail" in-each-row="false"
+			class="efd.actions.ValidateAssets" />
 	</controller>
-	<!-- <controller name="ParseHHSpreadsheet"> <extends controller="EFD_HM" 
-		/> <action name="Parse Spreadsheet" label="Parse Interview Spreadsheet" icon="file-excel" 
-		takes-long="true" mode="detail" in-each-row="false" class="efd.actions.ParseHHSpreadsheet" 
-		/> <action name="Validate" label="Validate" icon="marker-check" mode="detail" 
-		in-each-row="false" class="efd.actions.ValidateHH" /> </controller> -->
+
 
 
 	<controller name="ChartList">
@@ -136,8 +143,8 @@
 			label="Non-Food Expenditure(Normalised)" mode="detail"
 			icon="view-list"
 			class="efd.reports.NonFoodExpenditureChartNormalised" />
-		<action name="Food Consumed" label="Food Income"
-			mode="detail" icon="view-list" class="efd.reports.FoodConsumedChart" />
+		<action name="Food Consumed" label="Food Income" mode="detail"
+			icon="view-list" class="efd.reports.FoodConsumedChart" />
 		<action name="Food Consumed(Normalised)"
 			label="Food Income(Normalised)" mode="detail" icon="view-list"
 			class="efd.reports.FoodConsumedChartNormalised" />
@@ -164,7 +171,7 @@
 
 
 	<controller name="ProjectReports">
-	<!-- 	<extends controller="EFD_HM" />  -->
+		<!-- <extends controller="EFD_HM" /> -->
 		<action name="ProjectExcel" label="ProjectExcel" icon="excel"
 			class="efd.reports.ProjectExcel" image="excel.gif" mode="detail" />
 	</controller>
@@ -188,14 +195,12 @@
 
 	<controller name="Household">
 		<extends controller="EFD_HM" />
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchByViewKey" />
 		<action name="Parse Spreadsheet"
 			label="Parse Interview Spreadsheet" icon="file-excel"
 			takes-long="true" mode="detail" in-each-row="false"
 			class="efd.actions.ParseHHSpreadsheet" />
 		<action name="Validate" label="Validate" icon="marker-check"
-			mode="detail" in-each-row="false" class="efd.actions.ValidateHH" />
+			mode="detail" in-each-row="false" class="efd.actions.ValidateAssets" />
 
 
 	</controller>
@@ -210,6 +215,9 @@
 			class="efd.actions.FilteredLZ" />
 		<action name="add" hidden="true" icon="table-row-plus-after"
 			class="efd.actions.AddLZ">
+		<action name="Report" hidden="false" icon="file-chart"
+				mode="NONE" in-each-row="true" class="efd.actions.GoOHEAReports">
+			</action>
 			<!-- <set property="resetAfter" value="false"/> -->
 		</action>
 	</controller>
@@ -270,7 +278,14 @@
 
 	</controller>
 
+	<controller name="ResourceSubType">
+		<extends controller="EFD_HM" />
 
+		<action name="init" on-init="true" hidden="true" mode="detail"
+			after-each-request="true" class="efd.validations.InitRST" />
+
+
+	</controller>
 
 	<controller name="Sections">
 		<action name="change" hidden="true"
@@ -427,8 +442,6 @@
 
 	<controller name="CustomReportSpec">
 		<extends controller="TypicalNotResetOnSave" />
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchExecutingOnChange" />
 	</controller>
 
 
@@ -443,8 +456,6 @@
 
 
 	<controller name="WealthGroupInterview">
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchExecutingOnChange" />
 		<extends controller="TypicalNotResetOnSave"
 			excluded-actions="new" />
 		<extends controller="ParseSpreadsheet" />

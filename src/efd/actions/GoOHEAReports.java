@@ -29,28 +29,26 @@ public class GoOHEAReports extends CollectionBaseAction {
 		Site site = null;
 		Boolean isCorrectProject = false;
 		String correctLZ = "";
-		System.out.println("in go ohea 2");
 
 		String projectid = getView().getValueString("projectid");
-		System.out.println("in go ohea 3 projid = "+projectid);
+
 		project = XPersistence.getManager().find(Project.class, projectid);
-		System.out.println("in go ohea 4 project title = "+project.getProjecttitle());
+
 		Iterator it = getSelectedObjects().iterator();
-		
+
 		it.getClass();
-		
+
 		livelihoodZone = (LivelihoodZone) it.next();
 
 		// List of Sites for this LZ
 		List<Site> sites = new ArrayList<Site>();
 		sites = (List<Site>) livelihoodZone.getSite();
-		System.out.println("sites count = "+sites.size());
-		if(sites.size() == 0)
-		{
+		System.out.println("sites count = " + sites.size());
+		if (sites.size() == 0) {
 			addError("No Valid Communities for LivelihoodZone and Project");
 			return;
 		}
-		
+
 		System.out.println("in go ohea 5");
 		Boolean isValidated = false;
 		// For each site - is it in this Project?
@@ -79,23 +77,20 @@ public class GoOHEAReports extends CollectionBaseAction {
 
 					if (isValidated) {
 						correctLZ += "'" + community.getSite().getLocationid() + "',";
-						System.out.println("in loop corrected LZ "+correctLZ);
+
 					}
 				}
 			}
 
 		}
 
-		System.out.println("in go ohea 6");
 		correctLZ = StringUtils.chop(correctLZ);
-		if(correctLZ.isEmpty())
-		{
+		if (correctLZ.isEmpty()) {
 			addError("No Valid Communities for LivelihoodZone and Project");
 			return;
-			
+
 		}
-		
-		
+
 		showDialog();
 		getView().setTitle("Enter Custom Report Spec name to Run");
 
@@ -104,14 +99,14 @@ public class GoOHEAReports extends CollectionBaseAction {
 		setControllers("OHEAReports", "Dialog");
 
 		getView().setValue("livelihoodZone.lzid", livelihoodZone.getLzid());
-		System.out.println("in go ohea 7");
+
 		Tab tab = getView().getSubview("livelihoodZone.site").getCollectionTab();
-		System.out.println("in go ohea 8 " + correctLZ);
+
 		String condition = tab.getBaseCondition() + " and ${locationid} in (" + correctLZ + ")";
-		System.out.println("condition = " + condition);
+
 		tab.setBaseCondition(condition);
 		// Validated WGIs
-		System.out.println("in go ohea 9");
+
 		getView().getRoot().refreshCollections();
 	}
 

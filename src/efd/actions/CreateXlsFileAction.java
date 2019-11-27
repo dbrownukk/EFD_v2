@@ -152,7 +152,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 			}
 
-			wginew.setWgIntervieweesCount(1);
+			//wginew.setWgIntervieweesCount(1);
 
 			System.out.println("Generating WGI interviewers " + community.getInterviewers());
 			if (StringUtils.isBlank(community.getInterviewers())) {

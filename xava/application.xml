@@ -5,19 +5,11 @@
 		<controller name="EFD_HM" />
 	</default-module>	<!-- <module name="Reports"> </module> -->
 
-<!--  
-	<module name="WealthGroupInterview">
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchExecutingOnChange" />
-		<model name="WealthGroupInterview" />
-		<controller name="TypicalNotResetOnSave"
-			excluded-actions="new" />
-		<controller name="ParseSpreadsheet" />
-		<controller name="ChartList" />
-		<controller name="ReportList" />
-	
-	</module>
--->
+	<!-- <module name="WealthGroupInterview"> <env-var name="XAVA_SEARCH_ACTION" 
+		value="CRUD.searchExecutingOnChange" /> <model name="WealthGroupInterview" 
+		/> <controller name="TypicalNotResetOnSave" excluded-actions="new" /> <controller 
+		name="ParseSpreadsheet" /> <controller name="ChartList" /> <controller name="ReportList" 
+		/> </module> -->
 	<!-- <module name="Household"> <env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchByViewKey" 
 		/> <model name="Household" /> <controller name="ParseHHSpreadsheet" /> </module> -->
 
@@ -41,44 +33,14 @@
 		<controller name="GoOIHMReports" />
 	</module>
 
-	<module name="ResourceSubType">
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchExecutingOnChange" />
-		<model name="ResourceSubType" />
-		<controller name="TypicalNotResetOnSave" />
-	</module>
-
 <!--  
-
-	<module name="ConfigQuestionUse">
-
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchExecutingOnChange" />
-		<controller name="ConfigQuestionUse" />
-	</module>
-
-	<module name="ConfigQuestion">
-
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchExecutingOnChange" />
-		<controller name="ConfigQuestion" />
-	</module>
-
-
-	<module name="StdOfLivingElement">
-
-		<env-var name="XAVA_SEARCH_ACTION"
-			value="CRUD.searchExecutingOnChange" />
-		<model name="StdOfLivingElement" />
+	<module name="LivelihoodZone">
+		<model name="LivelihoodZone" />
 		<controller name="TypicalNotResetOnSave" />
+		<controller name="GoOHEAReports" />
 	</module>
 
 -->
 
-
-
-	<!-- <module name="StudyInterview"> <model name="Study" /> <view name="StudyInterview"/> 
-		<tab name="StudyInterview"/> <env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange" 
-		/> </module> -->
 
 </application>

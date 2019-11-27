@@ -13,6 +13,7 @@ import javax.validation.constraints.*;
 import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 import efd.actions.*;
 import efd.validations.*;
@@ -159,6 +160,7 @@ public class Community {
 	@Transient
 	@ReadOnly
 	@Column(length = 3)
+	@DefaultValueCalculator(value = ZeroIntegerCalculator.class)
 
 	public int getDdipercenttotal() {
 		int result = 0;

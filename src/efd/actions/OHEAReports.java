@@ -28,6 +28,7 @@
 package efd.actions;
 
 import java.text.*;
+
 import java.util.*;
 import java.util.Date;
 import java.util.concurrent.*;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.*;
+import org.apache.poi.hssf.record.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.*;
 import org.openxava.actions.*;
@@ -66,7 +68,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	static Double RC = 2200.0 * 365; // NOTE that this is from OHEA. In OIHM we can be more accurate as we know age
 										// and sex of HH Members
-	private static DecimalFormat df2 = new DecimalFormat("#.00");
+
 	static final int NUMBER_OF_REPORTS = 15;
 	private Community community = null;
 	private LivelihoodZone livelihoodZone = null;
@@ -92,6 +94,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	List<WGI> orderedQuantSeq = null;
 	List<WealthGroup> orderedWealthgroups;
+	List<WealthGroup> allOrderedWealthgroups;
 
 	Map<Integer, Double> quantAvg = null;
 
@@ -119,8 +122,30 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	Boolean isDisplayWealthgroupDone = false;
 	Boolean isSelectedSites = false;
 	String currency2;
+	
+	private static DecimalFormat df2 = new DecimalFormat("#.##");
 
 	int numCommunities = 0;
+	
+	
+
+	List<Double> averageTotal = new ArrayList<Double>() {
+		{
+			add(0.0);
+			add(0.0);
+			add(0.0);
+
+		}
+	};
+
+	List<Double> averageTotal2 = new ArrayList<Double>() {
+		{
+			add(0.0);
+			add(0.0);
+			add(0.0);
+
+		}
+	};
 
 	/******************************************************************************************************************************************/
 	@Override
@@ -236,30 +261,14 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 		for (WealthGroupInterview wgiList2 : wgiList) {
-			System.out.println("wgiList2 = " + wgiList2.getWealthgroup().getWgnameeng());
+			System.out.println("wgiList2 = " + wgiList2.getWealthgroup().getCommunity().getSite().getSubdistrict() + " "
+					+ wgiList2.getWealthgroup().getWgnameeng());
 		}
 
 		System.out.println("no of wgi = " + wgiSelected.size());
 		System.out.println("specid = " + specID);
 		CustomReportSpecOHEA customReportSpecOHEA = XPersistence.getManager().find(CustomReportSpecOHEA.class, specID);
 		System.out.println("specname = " + customReportSpecOHEA.getSpecName());
-
-		// community = XPersistence.getManager().find(Community.class, communityId);
-
-		// defaultDietItems = (List<DefaultDietItem>) community.getDefaultDietItem();
-
-		/* Populate WHO table */
-
-		// int ddiTotPercent = 0;
-
-		// for (DefaultDietItem defaultDietItem : defaultDietItems) {
-		// ddiTotPercent += defaultDietItem.getPercentage();
-		// }
-		// if (ddiTotPercent != 100 || ddiTotPercent != 0) {
-		// addError("Default Diet Total Percentage for this Study is not 100%");
-		// closeDialog();
-		// return;
-		// }
 
 		errno = 50;
 
@@ -268,13 +277,11 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		populateWGIArray(wgiList);
 		System.out.println("wgi size 1 = " + wgi.size());
 		uniqueCommunity = wgi.stream().filter(distinctByKey(WGI::getCommunity)).collect(Collectors.toList());
+
 		System.out.println("wgi size 2= " + wgi.size());
 		// uniqueWealthgroupInterview = wgi.stream().filter(distinctByKey(p ->
 		// p.getWealthgroupInterview().getWgiid()))
 		// .sorted(Comparator.comparing(WGI::getWgiDI)).collect(Collectors.toList());
-
-		errno = 51;
-		// Filter according to Catalog/RT/RST/HH
 
 		if (filterWGI(customReportSpecOHEA) == 0) {
 			addError("No Wealthgroups meet criteria, change Report Spec");
@@ -282,11 +289,33 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			return;
 		}
 
+		errno = 51;
+		// Filter according to Catalog/RT/RST/HH
+
+		// Any Communities with DDI not adding up to 100 or stil at 0?
+
+		int ddipercent = 0;
+		Iterator<WealthGroupInterview> wgiIter = wgiList.iterator();
+
+		while (wgiIter.hasNext()) {
+
+			WealthGroupInterview wgiNext = wgiIter.next();
+
+			System.out.println("dditotal = " + (wgiNext.getWealthgroup().getCommunity().getDdipercenttotal()));
+			if (wgiNext.getWealthgroup().getCommunity().getDdipercenttotal() != 100
+					&& wgiNext.getWealthgroup().getCommunity().getDdipercenttotal() != 0) {
+				addError("Default Diet Total Percentage for a chosen Community is not 100% or 0%");
+				closeDialog();
+				return;
+			}
+
+		}
+
 		System.out.println("wgi size 3= " + wgi.size());
 		errno = 52;
 		// Calculate DI
 
-		// calculateDI(); // uses hh filtered array based on CRS definition
+		calculateDI(); // uses wgi filtered array based on CRS definition
 		System.out.println("done calc DI");
 		// calculateAE(); // Calculate the Adult equivalent
 		System.out.println("done calc AE");
@@ -337,17 +366,25 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	private void calculateDI() {
 
+		// Need to calculate DI for each WG
+
 		// uniqueWealthgroup = wg.stream().filter(distinctByKey(p ->
 		// p.getWealthgroup().getWgorder()))
 		// .sorted(Comparator.comparing(WGI::getWgDI)).collect(Collectors.toList());
 
 		// for (HH hh2 : hh) {
-		for (WGI wg2 : uniqueWealthgroupInterview) {
 
-			// wg2.wgiDI = wealthgroupInterviewDI(wg2.wealthgroupInterview);
+		// for (WGI wgi2 : uniqueCommunity) {
+
+		double wgiDI = 0.0;
+		for (WealthGroupInterview wgi2 : wgiList) {
+			wgiDI = wealthgroupInterviewDI(wgi2);
+			System.out.println("DI = " + wgi2.getWealthgroup().getCommunity().getSite().getSubdistrict() + " " + wgiDI);
+			System.out.println("DI WG = " + wgi2.getWealthgroup().getWgnameeng());
+
+			wgi2.getWealthgroup().setDefaultDI(wgiDI);
+
 		}
-
-		// If QUantile then need to calc which quantile each unique HH is in
 
 	}
 
@@ -678,7 +715,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 				break;
 			case 367:
 				System.out.println("report 367");
-				// createDIAfterSOLreport(ireportNumber, report);
+				createDIAfterSOLreport(ireportNumber, report);
 				break;
 			case 368:
 				System.out.println("report 368");
@@ -712,34 +749,77 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	private void createDIreport(int isheet, Report report) {
 
-		int row = 1;
+		int row = 7;
+		int i = 0;
+		double hhSize = 0;
 
 		System.out.println("in 366 report ");
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20);
+		/*
+		 * Will need to revisit average total array if WGs per community increase
+		 */
+
+		averageReset();
+
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 15, 15, 20);
 
 		populateFirstThreeColumns(isheet, 1);
 
-		// wgi is array of all data
-		// need an array of valid WGI now left
-		// ordered by DI
+		reportWB.getSheet(isheet).setValue(4, 1, "Family Group Size", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(5, 1, "Disposable Income", boldTopStyle);
 
 		// NOTE OHEA ordered by wg Number order not DI
 
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20);
-		System.out.println("DI non quantile ");
-		// reportWB.getSheet(isheet).setValue(1, row, "Wealthgroup Number", textStyle);
-		// reportWB.getSheet(isheet).setValue(2, row, "Disposable Income", textStyle);
-		row++;
-		errno = 3665;
-		/*
-		 * for (WGI wgi2 : uniqueWealthgroupInterview) {
-		 * 
-		 * reportWB.getSheet(isheet).setValue(1, row, wgi2.wgiNumber, textStyle);
-		 * reportWB.getSheet(isheet).setValue(2, row, wgi2.wgiDI, textStyle); row++;
-		 * 
-		 * }
-		 */
+		for (WGI wgi2 : uniqueCommunity) {
+
+			orderedWealthgroups = wgi2.getCommunity().getWealthgroup().stream()
+					.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
+					.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
+			
+			for (i = 0; i < orderedWealthgroups.size(); i++) {
+
+				WealthGroup thisWealthGroup = orderedWealthgroups.get(i);
+
+				// Handle null hhsize
+
+				List<WealthGroupInterview> wealthGroupInterview3 = orderedWealthgroups.get(i).getWealthGroupInterview();
+
+				for (int k = 0; k < wealthGroupInterview3.size(); k++) {
+					if (wealthGroupInterview3.get(k).getWgAverageNumberInHH() == null) {
+
+						hhSize = 0;
+					} else {
+						hhSize = wealthGroupInterview3.get(k).getWgAverageNumberInHH();
+					}
+
+				}
+
+				reportWB.getSheet(isheet).setValue(4, row, hhSize, textStyle);
+				averageTotal2.set(i, (int) hhSize + averageTotal2.get(i));
+
+				reportWB.getSheet(isheet).setValue(5, row, orderedWealthgroups.get(i).getDefaultDI(), textStyle);
+				averageTotal.set(i, orderedWealthgroups.get(i).getDefaultDI() + averageTotal.get(i));
+
+				row++;
+			}
+
+		}
 		errno = 3666;
+		row = 3;
+		for (i = 0; i < orderedWealthgroups.size(); i++) {
+			reportWB.getSheet(isheet).setValue(4, row,    df2.format(averageTotal2.get(i) / uniqueCommunity.size()), textStyle);
+			reportWB.getSheet(isheet).setValue(5, row, df2.format(averageTotal.get(i) / uniqueCommunity.size()), textStyle);
+			row++;
+		}
+	}
+
+	private void averageReset() {
+		averageTotal.set(0, 0.0); // DI average
+		averageTotal.set(1, 0.0);
+		averageTotal.set(2, 0.0);
+
+		averageTotal2.set(0, 0.0); // HH Size average
+		averageTotal2.set(1, 0.0);
+		averageTotal2.set(2, 0.0);
 	}
 
 	/******************************************************************************************************************************************/
@@ -755,50 +835,58 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	private void createDIAfterSOLreport(int isheet, Report report) {
 		int row = 1;
+		int i = 0;
 		Double hhSOLC = 0.0;
+		double hhSize=0.0;
 
-		// NOTE No STOL yet
-		// DRB TODO
+		
+		averageReset();
+		System.out.println("in 367 report ");
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 15, 20, 20, 15, 22, 20);
 
-		System.out.println("In SOL Report 267");
+		populateFirstThreeColumns(isheet, 1);
 
-		// uniqeHousehold = number of households in array that are relevant
-		/*
-		 * for (WGI wgi3 : uniqueWealthgroupInterview ) { errno = 101; hhSOLC = 0.0;
-		 * 
-		 * for (StdOfLivingElement stdOfLivingElement :
-		 * wgi3.getHousehold().getStudy().getStdOfLivingElement()) { errno = 102;
-		 * 
-		 * if (stdOfLivingElement.getLevel().equals(StdLevel.Household)) { errno = 103;
-		 * hhSOLC += (stdOfLivingElement.getCost() * stdOfLivingElement.getAmount()); }
-		 * else if (stdOfLivingElement.getLevel().equals(StdLevel.HouseholdMember)) {
-		 * errno = 104; for (HouseholdMember householdMember :
-		 * hh3.getHousehold().getHouseholdMember()) {
-		 * System.out.println("hhmember in SOLC = " + hh3.getHhNumber()); hhSOLC +=
-		 * calcHhmSolc(hh3, stdOfLivingElement); errno = 105; }
-		 * 
-		 * }
-		 * 
-		 * }
-		 * 
-		 * errno = 106; hh3.setHhSOLC(hhSOLC);
-		 * 
-		 * }
-		 * 
-		 * 
-		 * 
-		 * errno = 108; reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30);
-		 * reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
-		 * reportWB.getSheet(isheet).setValue(2, row, "Standard of Living Requirement",
-		 * textStyle); reportWB.getSheet(isheet).setValue(3, row, "Disposable Income",
-		 * textStyle); row++; for (HH hh2 : uniqueHousehold) {
-		 * 
-		 * reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
-		 * reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
-		 * reportWB.getSheet(isheet).setValue(3, row, hh2.getHhDI(), textStyle);
-		 * 
-		 * row++; }
-		 */
+		reportWB.getSheet(isheet).setValue(4, row, "Disposable Income", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(5, row, "Family Group Size", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(6, row, "KCal Requirement", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(7, row, "Social Inclusion SToL", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(8, row, "Survival SToL", boldTopStyle);
+
+		row = 7;
+		for (WGI wgi2 : uniqueCommunity) {
+
+			orderedWealthgroups = wgi2.getCommunity().getWealthgroup().stream()
+					.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
+					.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
+
+			WealthGroup thisWealthGroup = orderedWealthgroups.get(i);
+
+			// Handle null hhsize
+
+			List<WealthGroupInterview> wealthGroupInterview3 = orderedWealthgroups.get(i).getWealthGroupInterview();
+
+			for (int k = 0; k < wealthGroupInterview3.size(); k++) {
+				
+				if (wealthGroupInterview3.get(k).getWgAverageNumberInHH() == null) {
+
+					hhSize = 0;
+				} else {
+					hhSize = wealthGroupInterview3.get(k).getWgAverageNumberInHH();
+				}
+
+			}
+
+				reportWB.getSheet(isheet).setValue(5, row, hhSize, textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, orderedWealthgroups.get(i).getDefaultDI(), textStyle);
+				row++;
+			}
+
+		
+
+		// reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
+		// reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
+		// reportWB.getSheet(isheet).setValue(3, row, hh2.getHhDI(), textStyle);
+
 		errno = 109;
 	}
 
@@ -855,12 +943,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int avgrow = 6;
 		double totalLand = 0.0;
 
-		Map<ResourceSubType, Double> landTot = new HashMap<>();
-
-		System.out.println("In SOL Report 370 dr - Land Assets");
-
-		ArrayList<WGISub> wgil = new ArrayList<>();
-
+		averageReset();
+		
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 20, 20, 20, 20, 20, 20);
 		errno = 2271;
 
@@ -868,26 +952,14 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int startRow = 4;
 		populateFirstThreeColumns(isheet, startRow);
 
-		errno = 2272;
-		/* need to create matrix of wgi id against land assets */
-
-		/* How many land assets for this set of filtered community / wealthgroups */
+		reportWB.getSheet(isheet).setValue(1, 2, "Unit of Measure", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(2, 2, "Acre (hard coded)", textStyle);
 
 		errno = 2273;
 
 		// Populate hhLand array for matrix
-		Double total = 0.0;
-		String comm;
 
 		numCommunities = uniqueCommunity.size(); // Used for averages
-		List<Double> averageTotal = new ArrayList<Double>() {
-			{
-				add(0.0);
-				add(0.0);
-				add(0.0);
-
-			}
-		};
 
 		double thisAverageTotal = 0.0;
 
@@ -897,12 +969,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		List<WGI> wgiLandRST = wgi.stream().filter(p -> p.getLand() != null)
 				.filter(distinctByKey(p -> p.getLand().getResourceSubType())).collect(Collectors.toList());
 
-		System.out.println("wgiLandRST drb = " + wgiLandRST.size());
-		/***************************************************************************************************************************/
-
-		/***************************************************************************************************************************/
-
-		/***************************************************************************************************************************/
 		List<WealthGroup> orderedWealthgroups2;
 
 		for (WGI wgi3 : wgiLandRST) {
@@ -915,12 +981,11 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			/* Now work through Communities and Wealthgroups for this Land RST */
 
-			System.out.println("unique community count = " + uniqueCommunity.size());
-
 			for (WGI wgi2 : uniqueCommunity) {
 
-				System.out.println("this community  = " + wgi2.getSite().getLocationdistrict() + " "
-						+ wgi2.getSite().getSubdistrict());
+				// System.out.println("this community = " + wgi2.getSite().getLocationdistrict()
+				// + " "
+				// + wgi2.getSite().getSubdistrict());
 
 				orderedWealthgroups2 = wgi2.getCommunity().getWealthgroup().stream()
 						.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
@@ -934,15 +999,14 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 					List<WealthGroupInterview> wealthGroupInterview = owgit.getWealthGroupInterview();
 					for (int i = 0; i < wealthGroupInterview.size(); i++) {
 						for (AssetLand assetLand : wealthGroupInterview.get(i).getAssetLand()) {
-							System.out.println("test assetLand " + assetLand.getResourceSubType().getResourcetypename()
-									+ " " + wgi3.getResourceSubType().getResourcetypename());
+							// System.out.println("test assetLand " +
+							// assetLand.getResourceSubType().getResourcetypename()
+							// + " " + wgi3.getResourceSubType().getResourcetypename());
 
 							if (assetLand.getResourceSubType() == wgi3.getResourceSubType()) {
-								System.out.println(
-										"match - add to total " + wgi3.getResourceSubType().getResourcetypename() + " "
-												+ owgit.getWgnameeng() + " " + assetLand.getNumberOfUnits());
+
 								totalLand += assetLand.getNumberOfUnits();
-								
+
 							}
 
 						}
@@ -951,10 +1015,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 						Double at1 = averageTotal.get(wgcount);
 						at1 += totalLand;
-						System.out.println("avgtot i = " + at1 + " " + wgcount);
 
 						averageTotal.set(wgcount, at1); // keep running total for average calc
-						System.out.println("average total = " + averageTotal.get(i));
 
 						wgcount++;
 
@@ -969,11 +1031,9 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			// print averages
 
-			System.out.println("uc size = "+uniqueCommunity.size());
 			for (int j = 0; j < 3; j++) {
-				System.out.println("at get i "+averageTotal.get(j)+" "+j);
-				System.out.println("avg = " +averageTotal.get(j) / uniqueCommunity.size());
-				reportWB.getSheet(isheet).setValue(col, avgrow + j, averageTotal.get(j) / uniqueCommunity.size(),
+
+				reportWB.getSheet(isheet).setValue(col, avgrow + j,  df2.format(averageTotal.get(j) / uniqueCommunity.size()),
 						textStyle);
 
 			}
@@ -1034,7 +1094,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 					.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
 
 			wgrow = row;
-			System.out.println("no of wgs  = " + orderedWealthgroups.size());
+
 			for (WealthGroup wealthGroup : orderedWealthgroups) {
 
 				for (WealthGroupInterview wealthGroupInterview : wealthGroup.getWealthGroupInterview()) {
@@ -1053,13 +1113,13 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 						if (wealthGroupInterview.getStatus() == Status.Validated) {
 							displayWealthgroup.add(wealthGroup);
 
-							System.out.println("set display wg " + wealthGroup.getWgnameeng());
 							countWGs++;
 						}
 					}
 				}
 			}
-			System.out.println("done populate displayWGs size = " + displayWealthgroup.size());
+			// System.out.println("done populate displayWGs size = " +
+			// displayWealthgroup.size());
 			isDisplayWealthgroupDone = true;
 
 			row = wgrow;
@@ -1067,10 +1127,11 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		// Display WG details
 
-		for (int l = 0; l < displayWealthgroup.size(); l++) {
-			System.out.println("display wg = " + displayWealthgroup.get(l).getWealthGroupInterview().size());
+		// for (int l = 0; l < displayWealthgroup.size(); l++) {
+		// System.out.println("display wg = " +
+		// displayWealthgroup.get(l).getWealthGroupInterview().size());
 
-		}
+		// }
 
 	}
 
@@ -1591,23 +1652,23 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		Double employmentOP = 0.0;
 		Double transfersOP = 0.0;
 
-		int requiredCalories = 0;
+		Double requiredCalories = 0.0;
 
-		System.out.println("In HH DI calc ");
+		System.out.println("In WGI DI calc ");
 
-		List<WGI> thisHH = wgi.stream().filter(d -> d.wealthgroupInterview == wealthGroupInterview)
+		List<WGI> thisWGI = wgi.stream().filter(d -> d.wealthgroupInterview == wealthGroupInterview)
 				.collect(Collectors.toList());
 
-		List<WGI> cropList = thisHH.stream().filter(d -> d.type == "Crop").collect(Collectors.toList());
+		List<WGI> cropList = thisWGI.stream().filter(d -> d.type == "Crop").collect(Collectors.toList());
 
-		List<WGI> wildfoodList = thisHH.stream().filter(d -> d.type == "Wildfood").collect(Collectors.toList());
+		List<WGI> wildfoodList = thisWGI.stream().filter(d -> d.type == "Wildfood").collect(Collectors.toList());
 
-		List<WGI> livestockproductList = thisHH.stream().filter(d -> d.type == "LivestockProduct")
+		List<WGI> livestockproductList = thisWGI.stream().filter(d -> d.type == "LivestockProduct")
 				.collect(Collectors.toList());
 
-		List<WGI> employmentList = thisHH.stream().filter(d -> d.type == "Employment").collect(Collectors.toList());
+		List<WGI> employmentList = thisWGI.stream().filter(d -> d.type == "Employment").collect(Collectors.toList());
 
-		List<WGI> transferList = thisHH.stream().filter(d -> d.type == "Transfer").collect(Collectors.toList());
+		List<WGI> transferList = thisWGI.stream().filter(d -> d.type == "Transfer").collect(Collectors.toList());
 
 		try {
 			if (cropList.size() > 0) {
@@ -1684,7 +1745,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 						transfersOP += (transresourcekcal * itransfer.getTransfer().getUnitsConsumed());
 				}
 			}
-			System.out.println("done DI transfer calc " + transfersTI);
+			System.out.println("done DI transfer calculation " + transfersTI);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			addError("Error in DI Calculation " + e);
@@ -1694,81 +1755,93 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		// requiredCalories = household.getHouseholdMember().size() * RC; // Unique
 		// Households after filter
 
-		int age;
-		Sex gender;
-		int monthsAway = 0;
-		int energyNeed = 0;
+		Double energyNeed = 2100.0;
 
-		WHOEnergyRequirements whoEnergy;
-		return 0.0;
+		// For OHEA Required Calories is Number of people in wealthgroup * 2100
 
-		// TODO
+		Double wghhsize = 0.0;
+		Integer wghhsizeBD = 0;
+		try {
+			wghhsizeBD = wealthGroupInterview.getWgAverageNumberInHH();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("nos of wgs = " + wghhsizeBD);
+
+		if (wghhsizeBD != null) {
+			wghhsize = wghhsize.doubleValue();
+		} else {
+			wghhsize = 0.0;
+		}
+
+		// wealthGroupInterview.getWealthgroup().getWghhsize().intValue();
+
+		requiredCalories = wghhsize * energyNeed * 365.0;
+		System.out.println("required Calories = " + requiredCalories);
+
+		System.out.println("requiredCalories = " + requiredCalories);
+
+		Double totalIncome = cropTI + wildfoodsTI + lspTI + employmentTI + transfersTI;
+
+		System.out.println("cropTI = " + cropTI);
+		System.out.println("wfTI = " + wildfoodsTI);
+		System.out.println("lspTI = " + lspTI);
+		System.out.println("empTI = " + employmentTI);
+		System.out.println("transfTI = " + transfersTI);
+
+		Double output = cropOP + wildfoodsOP + lspOP + employmentOP + transfersOP;
+
+		Double shortFall = requiredCalories - output;
+
+		System.out.println("totalIncome = " + totalIncome);
+		System.out.println("output = " + output);
+
+		// Now it gets more complex , but not difficult
+
+		// Diet // Diet Value = Sum (KCal per KG * Percentage of the Food type in
+		// default diet
+
+		Double dietValue = 0.0;
+
+		defaultDietItems = (List<DefaultDietItem>) wealthGroupInterview.getWealthgroup().getCommunity()
+				.getDefaultDietItem();
+
+		System.out.println("ddi list = " + defaultDietItems.size());
+
+		// Any DDI?
+
+		for (DefaultDietItem defaultDietItem : defaultDietItems) {
+			dietValue += (defaultDietItem.getResourcesubtype().getResourcesubtypekcal()
+					* defaultDietItem.getPercentage() / 100);
+		}
+
+		// Diet Amount Purchased DA = Shortfall / Diet Value in KGs
+		Double dietAmountPurchased = 0.0;
+
+		dietAmountPurchased = shortFall / dietValue;
+
+		// Cost of Shortfall = Unit Price * Diet Amount Purchased // How many KGs in %
+		// of diet is needed
+		// i.e. 20% of KGs in Diet item 1 +80% diet item 2
+
+		Double costOfShortfall = 0.0;
+
+		for (DefaultDietItem defaultDietItem : defaultDietItems) {
+			costOfShortfall += ((dietAmountPurchased * defaultDietItem.getPercentage() / 100)
+					* defaultDietItem.getUnitPrice().doubleValue());
+		}
+
+		// Disposable Income = Total Income - Cost of Shortfall
+		Double disposableIncome = 0.0;
+
+		disposableIncome = totalIncome - costOfShortfall;
+
+		return Double.parseDouble(df2.format(disposableIncome));
+
 	}
-	/*
-	 * for (HouseholdMember hm : household.getHouseholdMember()) { age =
-	 * hm.getAge(); gender = hm.getGender(); monthsAway = hm.getMonthsAway();
-	 * whoEnergy = WHOEnergyRequirements.findByAge(age);
-	 * 
-	 * if (gender == Sex.Female) { energyNeed = whoEnergy.getFemale(); } else if
-	 * (gender == Sex.Male) { energyNeed = whoEnergy.getMale(); }
-	 * 
-	 * requiredCalories += energyNeed * 365 * (12 - monthsAway) / 12;
-	 * 
-	 * }
-	 * 
-	 * System.out.println("requiredCalories = " + requiredCalories);
-	 * 
-	 * Double totalIncome = cropTI + wildfoodsTI + lspTI + employmentTI +
-	 * transfersTI;
-	 * 
-	 * System.out.println("cropTI = " + cropTI); System.out.println("wfTI = " +
-	 * wildfoodsTI); System.out.println("lspTI = " + lspTI);
-	 * System.out.println("empTI = " + employmentTI);
-	 * System.out.println("transfTI = " + transfersTI);
-	 * 
-	 * Double output = cropOP + wildfoodsOP + lspOP + employmentOP + transfersOP;
-	 * 
-	 * Double shortFall = requiredCalories - output;
-	 * 
-	 * System.out.println("totalIncome = " + totalIncome);
-	 * System.out.println("output = " + output);
-	 * 
-	 * // Now it gets more complex , but not difficult
-	 * 
-	 * // Diet // Diet Value = Sum (KCal per KG * Percentage of the Food type in
-	 * default diet
-	 * 
-	 * Double dietValue = 0.0;
-	 * 
-	 * for (DefaultDietItem defaultDietItem : defaultDietItems) { dietValue +=
-	 * (defaultDietItem.getResourcesubtype().getResourcesubtypekcal()
-	 * defaultDietItem.getPercentage() / 100); }
-	 * 
-	 * // Diet Amount Purchased DA = Shortfall / Diet Value in KGs Double
-	 * dietAmountPurchased = 0.0;
-	 * 
-	 * dietAmountPurchased = shortFall / dietValue;
-	 * 
-	 * // Cost of Shortfall = Unit Price * Diet Amount Purchased // How many KGs in
-	 * % of diet is needed // i.e. 20% of KGs in Diet item 1 +80% diet item 2
-	 * 
-	 * Double costOfShortfall = 0.0;
-	 * 
-	 * for (DefaultDietItem defaultDietItem : defaultDietItems) { costOfShortfall +=
-	 * ((dietAmountPurchased * defaultDietItem.getPercentage() / 100)
-	 * defaultDietItem.getUnitPrice().doubleValue()); }
-	 * 
-	 * // Disposable Income = Total Income - Cost of Shortfall Double
-	 * disposableIncome = 0.0;
-	 * 
-	 * disposableIncome = totalIncome - costOfShortfall;
-	 * 
-	 * return Double.parseDouble(df2.format(disposableIncome));
-	 * 
-	 * }
-	 * 
-	 * /
-	 ******************************************************************************************************************************************/
+
+	/******************************************************************************************************************************************/
 
 	private Double wealthgroupInterviewAE(WealthGroupInterview wealthGroupInterview) {
 
@@ -1834,7 +1907,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		for (Report report : reportList) {
 			sheet[0].setValue(2, i, report.getName(), textStyleLeft);
-			sheet[i - 3] = reportWB.addSheet(report.getName());
+			sheet[i - 3] = reportWB.addSheet(report.getCode() + " " + report.getName());
 
 			setSheetStyle(sheet[i - 3]);
 
