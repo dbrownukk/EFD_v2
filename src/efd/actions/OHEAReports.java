@@ -52,12 +52,14 @@ import org.openxava.tab.*;
 import org.openxava.tab.Tab;
 import org.openxava.util.jxls.*;
 import org.openxava.web.servlets.*;
+import org.openxava.util.*;
 
 import com.sun.xml.internal.bind.v2.*;
 
 import efd.actions.OHEAReports.*;
 import efd.actions.OIHMReports.*;
 import efd.model.*;
+import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
 import efd.model.StdOfLivingElement.*;
 import efd.model.Transfer.*;
@@ -66,10 +68,11 @@ import net.sf.jasperreports.charts.type.*;
 
 public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsConstants {
 
-	static Double RC = 2200.0 * 365; // NOTE that this is from OHEA. In OIHM we can be more accurate as we know age
+	static Double RC = 2100.0 * 365; // NOTE that this is from OHEA. In OIHM we can be more accurate as we know age
 										// and sex of HH Members
 
 	static final int NUMBER_OF_REPORTS = 15;
+	static final int NUMBEROFAVERAGES = 10;
 	private Community community = null;
 	private LivelihoodZone livelihoodZone = null;
 	private Project project = null;
@@ -110,6 +113,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	JxlsStyle numberStyle = null;
 	JxlsStyle f1Style = null;
 	JxlsStyle textStyleBlue = null;
+	JxlsStyle numberd2 = null;
 
 	CellStyle style = null;
 	CellStyle vstyle = null;
@@ -122,30 +126,18 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	Boolean isDisplayWealthgroupDone = false;
 	Boolean isSelectedSites = false;
 	String currency2;
-	
+
 	private static DecimalFormat df2 = new DecimalFormat("#.##");
 
 	int numCommunities = 0;
+
+	// ArrayList<ArrayList<Double>> averageTotal = new
+	// ArrayList<>(NUMBEROFAVERAGES);
+
+	Double[][] averageTotal = new Double[3][NUMBEROFAVERAGES];
 	
 	
-
-	List<Double> averageTotal = new ArrayList<Double>() {
-		{
-			add(0.0);
-			add(0.0);
-			add(0.0);
-
-		}
-	};
-
-	List<Double> averageTotal2 = new ArrayList<Double>() {
-		{
-			add(0.0);
-			add(0.0);
-			add(0.0);
-
-		}
-	};
+	private String floatFormat = "##########0.00";
 
 	/******************************************************************************************************************************************/
 	@Override
@@ -252,6 +244,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 
 		}
+		
+		
 
 		// wgiSelected populates wgis array
 		for (WGI wgi : wgiSelected) {
@@ -733,7 +727,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			case 371:
 				System.out.println("report 371");
-				// createLivestockAssetreport(ireportNumber, report);
+				createLivestockAssetreport(ireportNumber, report);
 				break;
 			case 372:
 				System.out.println("report 372");
@@ -746,7 +740,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	}
 
 	/******************************************************************************************************************************************/
-
 	private void createDIreport(int isheet, Report report) {
 
 		int row = 7;
@@ -774,7 +767,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			orderedWealthgroups = wgi2.getCommunity().getWealthgroup().stream()
 					.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
 					.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
-			
+
 			for (i = 0; i < orderedWealthgroups.size(); i++) {
 
 				WealthGroup thisWealthGroup = orderedWealthgroups.get(i);
@@ -794,10 +787,12 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 				}
 
 				reportWB.getSheet(isheet).setValue(4, row, hhSize, textStyle);
-				averageTotal2.set(i, (int) hhSize + averageTotal2.get(i));
+
+				averageTotal[i][0] = hhSize + averageTotal[i][0];
 
 				reportWB.getSheet(isheet).setValue(5, row, orderedWealthgroups.get(i).getDefaultDI(), textStyle);
-				averageTotal.set(i, orderedWealthgroups.get(i).getDefaultDI() + averageTotal.get(i));
+
+				averageTotal[i][1] = orderedWealthgroups.get(i).getDefaultDI() + averageTotal[i][1];
 
 				row++;
 			}
@@ -806,20 +801,23 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		errno = 3666;
 		row = 3;
 		for (i = 0; i < orderedWealthgroups.size(); i++) {
-			reportWB.getSheet(isheet).setValue(4, row,    df2.format(averageTotal2.get(i) / uniqueCommunity.size()), textStyle);
-			reportWB.getSheet(isheet).setValue(5, row, df2.format(averageTotal.get(i) / uniqueCommunity.size()), textStyle);
+			reportWB.getSheet(isheet).setValue(4, row, averageTotal[i][0] / uniqueCommunity.size(),numberStyle );
+			reportWB.getSheet(isheet).setValue(5, row, averageTotal[i][1] / uniqueCommunity.size(),numberStyle );
 			row++;
 		}
 	}
 
+	/******************************************************************************************************************************************/
 	private void averageReset() {
-		averageTotal.set(0, 0.0); // DI average
-		averageTotal.set(1, 0.0);
-		averageTotal.set(2, 0.0);
 
-		averageTotal2.set(0, 0.0); // HH Size average
-		averageTotal2.set(1, 0.0);
-		averageTotal2.set(2, 0.0);
+		int l = 0;
+		for (int i = 0; i < 3; i++) {
+
+			for (l = 0; l < NUMBEROFAVERAGES; l++) {
+				averageTotal[i][l] = 0.0;
+			}
+
+		}
 	}
 
 	/******************************************************************************************************************************************/
@@ -836,12 +834,13 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	private void createDIAfterSOLreport(int isheet, Report report) {
 		int row = 1;
 		int i = 0;
-		Double hhSOLC = 0.0;
-		double hhSize=0.0;
+		double hhSOLC = 0.0;
+		double hhSize = 0.0;
+		double wgSOLInclusion = 0.0;
+		double wgSOLSurvival = 0.0;
 
-		
 		averageReset();
-		System.out.println("in 367 report ");
+		System.out.println("in 367 report drb");
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 15, 20, 20, 15, 22, 20);
 
 		populateFirstThreeColumns(isheet, 1);
@@ -855,38 +854,78 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		row = 7;
 		for (WGI wgi2 : uniqueCommunity) {
 
+			System.out.println("in DI STOL uc loop ");
 			orderedWealthgroups = wgi2.getCommunity().getWealthgroup().stream()
 					.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
 					.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
 
-			WealthGroup thisWealthGroup = orderedWealthgroups.get(i);
+			for (i = 0; i < orderedWealthgroups.size(); i++) {
 
-			// Handle null hhsize
+				WealthGroup thisWealthGroup = orderedWealthgroups.get(i);
 
-			List<WealthGroupInterview> wealthGroupInterview3 = orderedWealthgroups.get(i).getWealthGroupInterview();
+				List<WealthGroupInterview> wealthGroupInterview3 = orderedWealthgroups.get(i).getWealthGroupInterview();
 
-			for (int k = 0; k < wealthGroupInterview3.size(); k++) {
-				
-				if (wealthGroupInterview3.get(k).getWgAverageNumberInHH() == null) {
+				hhSOLC = 0.0;
+				hhSize = 0.0;
+				wgSOLInclusion = 0.0;
+				wgSOLSurvival = 0.0;
 
-					hhSize = 0;
-				} else {
-					hhSize = wealthGroupInterview3.get(k).getWgAverageNumberInHH();
+				for (int k = 0; k < wealthGroupInterview3.size(); k++) {
+
+					if (wealthGroupInterview3.get(k).getWgAverageNumberInHH() == null) {
+
+						hhSize = 0;
+					} else {
+						hhSize = wealthGroupInterview3.get(k).getWgAverageNumberInHH();
+					}
 				}
+				// Standard of Living
+
+				for (StdOfLivingElement stdOfLivingElement : thisWealthGroup.getCommunity().getStdOfLivingElement()) {
+					if (stdOfLivingElement.getLevel() == StdLevel.Household) {
+						wgSOLInclusion += stdOfLivingElement.getCost() * stdOfLivingElement.getAmount();
+						wgSOLSurvival += stdOfLivingElement.getCost() * stdOfLivingElement.getAmount()
+								* stdOfLivingElement.getSurvival() / 100;
+					} else if (stdOfLivingElement.getLevel() == StdLevel.HouseholdMember) {
+						wgSOLInclusion += stdOfLivingElement.getCost() * stdOfLivingElement.getAmount() * hhSize;
+						wgSOLSurvival += stdOfLivingElement.getCost() * stdOfLivingElement.getAmount()
+								* (stdOfLivingElement.getSurvival() / 100) * hhSize;
+
+					}
+
+				}
+				System.out.println("in DI STOL uc loop Output ");
+				reportWB.getSheet(isheet).setValue(4, row, orderedWealthgroups.get(i).getDefaultDI(), textStyle);
+				reportWB.getSheet(isheet).setValue(5, row, hhSize, textStyle);
+				reportWB.getSheet(isheet).setValue(6, row, hhSize * RC, textStyle);
+				reportWB.getSheet(isheet).setValue(7, row, wgSOLInclusion, textStyle);
+				reportWB.getSheet(isheet).setValue(8, row, wgSOLSurvival, textStyle);
+				row++;
+				System.out.println("in DI STOL uc loop  done OUTPUT");
+
+				// Averages
+
+				// averageTotal.get(i).set(0, hhSize+averageTotal.get(i).get(0));
+
+				averageTotal[i][0] = orderedWealthgroups.get(i).getDefaultDI() + averageTotal[i][0];
+				averageTotal[i][1] = hhSize + averageTotal[i][1];
+				averageTotal[i][2] = (hhSize * RC) + averageTotal[i][2];
+				averageTotal[i][3] = wgSOLInclusion + averageTotal[i][3];
+				averageTotal[i][4] = wgSOLSurvival + averageTotal[i][4];
+
+				System.out.println("");
 
 			}
+		}
+		// Print Averages
 
-				reportWB.getSheet(isheet).setValue(5, row, hhSize, textStyle);
-				reportWB.getSheet(isheet).setValue(4, row, orderedWealthgroups.get(i).getDefaultDI(), textStyle);
+		for (int col = 0; col < 5; col++) {
+			row = 3;
+			for (i = 0; i < 3; i++) {
+				reportWB.getSheet(isheet).setValue(4 + col, row, averageTotal[i][col] / uniqueCommunity.size(),numberStyle);
 				row++;
 			}
-
-		
-
-		// reportWB.getSheet(isheet).setValue(1, row, hh2.hhNumber, textStyle);
-		// reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
-		// reportWB.getSheet(isheet).setValue(3, row, hh2.getHhDI(), textStyle);
-
+		}
 		errno = 109;
 	}
 
@@ -942,9 +981,10 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int datarow = 10;
 		int avgrow = 6;
 		double totalLand = 0.0;
+		int assetTypeCounter = 0;
 
 		averageReset();
-		
+
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 20, 20, 20, 20, 20, 20);
 		errno = 2271;
 
@@ -972,6 +1012,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		List<WealthGroup> orderedWealthgroups2;
 
 		for (WGI wgi3 : wgiLandRST) {
+			
 			String communityID = wgi3.getCommunity().getCommunityid();
 			reportWB.getSheet(isheet).setValue(col, 1, "Asset Category", boldTopStyle);
 			reportWB.getSheet(isheet).setValue(col, 2, "Land", textStyle);
@@ -1013,10 +1054,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 						reportWB.getSheet(isheet).setValue(col, datarow, totalLand, textStyle);
 
-						Double at1 = averageTotal.get(wgcount);
-						at1 += totalLand;
-
-						averageTotal.set(wgcount, at1); // keep running total for average calc
+						averageTotal[wgcount][assetTypeCounter] = totalLand + averageTotal[wgcount][assetTypeCounter];
 
 						wgcount++;
 
@@ -1033,21 +1071,15 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			for (int j = 0; j < 3; j++) {
 
-				reportWB.getSheet(isheet).setValue(col, avgrow + j,  df2.format(averageTotal.get(j) / uniqueCommunity.size()),
-						textStyle);
+				reportWB.getSheet(isheet).setValue(col, avgrow + j, averageTotal[j][assetTypeCounter] / uniqueCommunity.size(),
+						numberStyle);
 
 			}
 
 			datarow = 10;
 			col++;
-			averageTotal.set(0, 0.0);
-			averageTotal.set(1, 0.0);
-			averageTotal.set(2, 0.0);
-
+			assetTypeCounter++;
 		}
-		/***************************************************************************************************************************/
-
-		/***************************************************************************************************************************/
 
 	}
 
@@ -1058,6 +1090,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int wgrow;
 		int averagesRow = startRow + 2;
 		int countWGs = 0;
+		
 
 		/* Print Communities */
 		String comm;
@@ -1123,6 +1156,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			isDisplayWealthgroupDone = true;
 
 			row = wgrow;
+		
 		}
 
 		// Display WG details
@@ -1138,253 +1172,111 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	/******************************************************************************************************************************************/
 
 	private void createLivestockAssetreport(int isheet, Report report) {
-		int row = 5;
-		int col = 3;
-		Double hhSOLC = 0.0;
-		Map<ResourceSubType, Double> lsTot = new HashMap<>();
+		int col = 4;
+		int datarow = 10;
+		int avgrow = 6;
+		double totalLS = 0.0;
+		int assetTypeCounter = 0;
 
-		System.out.println("In SOL Report 228 - Livestock Assets");
+		averageReset();
 
-		ArrayList<WGISub> wgil = new ArrayList<>();
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 20, 20, 20, 20, 20, 20);
 
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20);
-		errno = 2281;
 
-		if (isQuantile) {
-			reportWB.getSheet(isheet).setValue(1, 4, "Quantile", textStyle);
-			reportWB.getSheet(isheet).setValue(2, 4, "Quantile %", textStyle);
-		} else {
-			reportWB.getSheet(isheet).setValue(1, 4, "Household Number", textStyle);
-		}
+		System.out.println("uc = " + uniqueCommunity.size());
+		int startRow = 4;
+		populateFirstThreeColumns(isheet, startRow);
 
-		errno = 2282;
-		/* need to create matrix of hh id against land assets */
 
-		/* How many land assets for this set of filtered households */
-
-		errno = 2283;
 
 		// Populate hhLand array for matrix
-		for (WGI wgi3 : uniqueWealthgroupInterview) {
-			// for (AssetLiveStock assetLS :
-			// wgi3.getWealthgroupInterview().getAssetLiveStock()) {
-			// WGISub wgiLS = new WGISub();
-//
-//				wgiLS.setAssetLivestock(assetLS);
-//				wgiLS.setWgiid(wgi3.getWgiNumber());
-//				wgiLS.setAssetRST(assetLS.getResourceSubType());
-//				wgiLS.setAssetValue(assetLS.getNumberOwnedAtStart());
-//				wgiLS.setAssetName(assetLS.getResourceSubType().getResourcetypename());
-//
-//				wgiLS.setWgiDI(wgi3.getWgiDI());
-//
-//				wgil.add(wgiLS);
-//
-//				if (lsTot.containsKey(assetLS.getResourceSubType())) {
-//					Double total = lsTot.get(assetLS.getResourceSubType());
-//					total += assetLS.getNumberOwnedAtStart();
-//					lsTot.remove(assetLS.getResourceSubType());
-//					lsTot.put(assetLS.getResourceSubType(), total);
-//
-//				} else // create new
-//				{
-//					lsTot.put(assetLS.getResourceSubType(), assetLS.getNumberOwnedAtStart());
-//				}
-//
-//			}
+
+		numCommunities = uniqueCommunity.size(); // Used for averages
+
+		double thisAverageTotal = 0.0;
+
+		// Need all Livestock RST types that remain in wgi array
+		// wgiLSRST has array of unique LAND RST
+
+		List<WGI> wgiLSRST = wgi.stream()
+				.filter(p -> p.getLivestock() != null)
+				.filter(distinctByKey(p -> p.getLivestock().getResourceSubType()))
+				.collect(Collectors.toList());
+
+		List<WealthGroup> orderedWealthgroups2;
+
+		for (WGI wgi3 : wgiLSRST) {
+			String communityID = wgi3.getCommunity().getCommunityid();
+			reportWB.getSheet(isheet).setValue(col, 1, "Asset Category", boldTopStyle);
+			reportWB.getSheet(isheet).setValue(col, 2, "Livestock", textStyle);
+			reportWB.getSheet(isheet).setValue(col, 3, "Asset Type", boldTopStyle);
+			reportWB.getSheet(isheet).setValue(col, 4, wgi3.getLivestock().getResourceSubType().getResourcetypename(),
+					textStyle);
+
+			/* Now work through Communities and Wealthgroups for this Land RST */
+
+			for (WGI wgi2 : uniqueCommunity) {
+
+				// System.out.println("this community = " + wgi2.getSite().getLocationdistrict()
+				// + " "
+				// + wgi2.getSite().getSubdistrict());
+
+				orderedWealthgroups2 = wgi2.getCommunity().getWealthgroup().stream()
+						.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
+						.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
+
+				Iterator<WealthGroup> owgiter = orderedWealthgroups2.iterator();
+
+				int wgcount = 0;
+				while (owgiter.hasNext()) {
+					WealthGroup owgit = owgiter.next();
+					List<WealthGroupInterview> wealthGroupInterview = owgit.getWealthGroupInterview();
+					for (int i = 0; i < wealthGroupInterview.size(); i++) {
+						for (AssetLiveStock assetLivestock : wealthGroupInterview.get(i).getAssetLiveStock()) {
+							
+
+							if (assetLivestock.getResourceSubType() == wgi3.getResourceSubType()) {
+
+								totalLS += assetLivestock.getNumberOwnedAtStart();
+
+							}
+
+						}
+
+						reportWB.getSheet(isheet).setValue(col, datarow, totalLS, textStyle);
+
+						averageTotal[wgcount][assetTypeCounter] = totalLS + averageTotal[wgcount][assetTypeCounter];
+
+						wgcount++;
+
+						totalLS = 0.0;
+						i++;
+						datarow++;
+					}
+
+				}
+
+			}
+
+			// print averages
+
+			for (int j = 0; j < 3; j++) {
+
+				reportWB.getSheet(isheet).setValue(col, avgrow + j, averageTotal[j][assetTypeCounter] / uniqueCommunity.size(),
+						numberStyle);
+
+			}
+
+			datarow = 10;
+			col++;
+			assetTypeCounter++;
+
 		}
-		/*
-		 * for (HHSub ls : hhl) { System.out.println("ls" +
-		 * ls.getAssetRST().getResourcetypename());
-		 * 
-		 * }
-		 * 
-		 * List<HHSub> uniqueLS = hhl.stream().filter(distinctByKey(l ->
-		 * l.getAssetRST())).collect(Collectors.toList());
-		 * 
-		 * // Populate the relevant column value for the RST for (HHSub ls : uniqueLS) {
-		 * 
-		 * ls.setColumn(col);
-		 * 
-		 * Iterator<HHSub> hhlIterator = hhl.iterator(); while (hhlIterator.hasNext()) {
-		 * 
-		 * HHSub currentHHLS = hhlIterator.next(); if (currentHHLS.getAssetRST() ==
-		 * ls.getAssetRST()) { currentHHLS.setColumn(ls.getColumn()); } }
-		 * 
-		 * col++;
-		 * 
-		 * }
-		 * 
-		 * errno = 2284;
-		 * 
-		 * for (HHSub hhl2 : uniqueLS) {
-		 * 
-		 * // Heading reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 1,
-		 * "Asset Category", textStyle);
-		 * reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 2, "Livestock",
-		 * textStyle); reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 3,
-		 * "Asset Type", textStyle);
-		 * reportWB.getSheet(isheet).setValue(hhl2.getColumn(), 4,
-		 * hhl2.getAssetRST().getResourcetypename(), textStyle);
-		 * 
-		 * // HH data
-		 * 
-		 * }
-		 * 
-		 * errno = 2285; // sort into DI order hhl = (ArrayList<HHSub>)
-		 * hhl.stream().sorted(Comparator.comparing(HHSub::getHhDI)).collect(Collectors.
-		 * toList()); int i; int currentHHid = 0; errno = 2286; for (HHSub hhl3 : hhl) {
-		 * i = 0; if (currentHHid != hhl3.getHhid() && currentHHid != 0) { row++; } if
-		 * (!isQuantile) {
-		 * 
-		 * currentHHid = hhl3.getHhid(); reportWB.getSheet(isheet).setValue(1, row,
-		 * hhl3.getHhid(), textStyle);
-		 * reportWB.getSheet(isheet).setColumnWidths(hhl3.getColumn(), 20);
-		 * reportWB.getSheet(isheet).setValue(hhl3.getColumn(), row,
-		 * fillDouble(hhl3.getAssetValue()), textStyle); } }
-		 */
-		errno = 2287;
-		/*
-		 * if (isQuantile) { System.out.println("number quant = " + numberOfQuantiles);
-		 * 
-		 * Comparator<HHSub> sortByQuantSeq = Comparator.comparing(HHSub::getQuantSeq);
-		 * Comparator<HHSub> sortByRST = Comparator.comparing(HHSub::getAssetName);
-		 * 
-		 * System.out.println("done sort 1");
-		 * 
-		 * for (HHSub hhsr : hhl) System.out.println("fdilter params = " +
-		 * hhsr.getAssetName() + " " + hhsr.getQuantSeq());
-		 * 
-		 * List<HHSub> hhllist =
-		 * hhl.stream().sorted(sortByQuantSeq.thenComparing(sortByRST))
-		 * .collect(Collectors.toList());
-		 * 
-		 * System.out.println("done sort 2");
-		 * 
-		 * // print Quant name, seq/% row = 5; errno = 2288; for (Quantile qqpr :
-		 * quantiles) { reportWB.getSheet(isheet).setValue(1, row, qqpr.getName(),
-		 * textStyle); reportWB.getSheet(isheet).setValue(2, row, qqpr.getPercentage(),
-		 * textStyle); row++; } errno = 2289;
-		 * 
-		 * row = 5;
-		 */
-		// for (HHSub hh : hhllist) {
-		// System.out.println("hhllist = " + hh.getQuantSeq() + " " +
-		// hh.getAssetRST().getResourcetypename() + " "
-		// + hh.getColumn());
-		// }
 
-		// Quantile check with many RSTs
-		/*
-		 * errno = 22810;
-		 * 
-		 * for (Quantile q : quantiles) {
-		 * 
-		 * List<HHSub> q1 = hhllist.stream().filter(p -> p.quantSeq == q.getSequence())
-		 * .collect(Collectors.toList());
-		 * 
-		 * for (i = 0; i < uniqueLS.size(); i++) { ResourceSubType rst =
-		 * uniqueLS.get(i).assetRST; List<HHSub> q2 = q1.stream().filter(p ->
-		 * p.getAssetRST() == rst).collect(Collectors.toList());
-		 * 
-		 * for (HHSub hhs : q2) {
-		 * 
-		 * Map<ResourceSubType, Double> collect = q2.stream().collect(Collectors
-		 * .groupingBy(HHSub::getAssetRST,
-		 * Collectors.averagingDouble(HHSub::getAssetValue)));
-		 * 
-		 * // System.out.println("q2 = " + hhs.getQuantSeq() + " " + " " + //
-		 * hhs.getAssetName() + " " // + hhs.getAssetValue() +
-		 * " double from group by = " + // collect.get(hhs.getAssetRST())); Double val =
-		 * fillDouble(collect.get(hhs.getAssetRST()));
-		 * reportWB.getSheet(isheet).setColumnWidths(hhs.getColumn(), 20);
-		 * reportWB.getSheet(isheet).setValue(hhs.getColumn(), hhs.getQuantSeq() + 5,
-		 * val, textStyle);
-		 * 
-		 * }
-		 * 
-		 * }
-		 * 
-		 * }
-		 * 
-		 * errno = 22811;
-		 * 
-		 * }
-		 * 
-		 * errno = 22812;
-		 */
 	}
-
 	/******************************************************************************************************************************************/
 
-	private void createPopulationreport(int isheet, Report report) {
-		/*
-		 * int row = 1; System.out.println("Population Report");
-		 * 
-		 * int ageMaleGroup[] = new int[20]; int ageFemaleGroup[] = new int[20]; int
-		 * numMales = 0; int numFemales = 0;
-		 * 
-		 * for (HH hh2 : uniqueHousehold) { for (HouseholdMember hhm :
-		 * hh2.getHousehold().getHouseholdMember()) {
-		 * 
-		 * if (hhm.getGender().equals(Sex.Male)) { ageMaleGroup[(int)
-		 * Math.ceil(hhm.getAge() / 5)]++; hh2.setNumMales(++numMales);
-		 * 
-		 * } else if (hhm.getGender().equals(Sex.Female)) { ageFemaleGroup[(int)
-		 * Math.ceil(hhm.getAge() / 5)]++; hh2.setNumFemales(++numFemales); } } numMales
-		 * = 0; numFemales = 0; }
-		 * 
-		 * if (!isQuantile) { reportWB.getSheet(isheet).setColumnWidths(1, 10, 20, 20);
-		 * reportWB.getSheet(isheet).setValue(1, row, "Age Range", textStyle);
-		 * reportWB.getSheet(isheet).setValue(2, row, "Total Males", textStyle);
-		 * reportWB.getSheet(isheet).setValue(3, row, "Total Females", textStyle);
-		 * reportWB.getSheet(isheet).setValue(1, row + 1, "0 - 4", textStyle);
-		 * 
-		 * int lower = 5; int upper = 9; row = 3; // Print 5 - 9, 10 - 14 groups for
-		 * (int i = 2; i < 21; i++) { reportWB.getSheet(isheet).setValue(1, row, lower +
-		 * " - " + upper, textStyle); lower += 5; upper += 5; row++; }
-		 * 
-		 * int i = 0; row = 2; for (int j : ageMaleGroup) {
-		 * reportWB.getSheet(isheet).setValue(2, row, j, textStyle); row++; } row = 2;
-		 * for (int j : ageFemaleGroup) { reportWB.getSheet(isheet).setValue(3, row, j,
-		 * textStyle); row++; } } else { // Quantile
-		 * 
-		 * orderedQuantSeq =
-		 * uniqueHousehold.stream().sorted(Comparator.comparing(HH::getQuantSeq))
-		 * .collect(Collectors.toList());
-		 * 
-		 * Map<Integer, Double> quantAvgMales = orderedQuantSeq.stream().collect(
-		 * Collectors.groupingBy(HH::getQuantSeq, TreeMap::new,
-		 * Collectors.averagingDouble(HH::getNumMales))); Map<Integer, Double>
-		 * quantAvgFemales = orderedQuantSeq.stream().collect(Collectors
-		 * .groupingBy(HH::getQuantSeq, TreeMap::new,
-		 * Collectors.averagingDouble(HH::getNumFemales)));
-		 * 
-		 * int numberOfObs = 21 + 1; // age groups - add 1 for approximation calc
-		 * 
-		 * reportWB.getSheet(isheet).setColumnWidths(1, 10, 20, 20, 20);
-		 * reportWB.getSheet(isheet).setValue(1, 1, "Quantile", textStyle);
-		 * reportWB.getSheet(isheet).setValue(2, 1, "Quantile %", textStyle);
-		 * reportWB.getSheet(isheet).setValue(3, row, "Avg Male", textStyle);
-		 * reportWB.getSheet(isheet).setValue(4, row, "Avg Female", textStyle);
-		 * 
-		 * row = 2;
-		 * 
-		 * for (Quantile q : quantiles) {
-		 * 
-		 * reportWB.getSheet(isheet).setValue(1, row, q.getName(), textStyle);
-		 * reportWB.getSheet(isheet).setValue(2, row, q.getPercentage(), textStyle);
-		 * reportWB.getSheet(isheet).setValue(3, row,
-		 * fillDouble(quantAvgMales.get(q.getSequence())), textStyle);
-		 * reportWB.getSheet(isheet).setValue(4, row,
-		 * fillDouble(quantAvgFemales.get(q.getSequence())), textStyle); row++;
-		 * 
-		 * }
-		 * 
-		 * }
-		 */
-	}
-
+	
 	/******************************************************************************************************************************************/
 
 	private void createAdultEquivalentreport(int isheet, Report report) {
@@ -2021,6 +1913,10 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	/******************************************************************************************************************************************/
 
 	private void setStyles() {
+		
+		
+		
+		reportWB.setFloatFormat(floatFormat);
 		reportWB.setDateFormat("dd/MM/yyyy");
 		boldRStyle = reportWB.addStyle(TEXT).setBold().setAlign(RIGHT);
 		boldLStyle = reportWB.addStyle(TEXT).setBold().setAlign(LEFT);
@@ -2036,9 +1932,11 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		dateStyle = reportWB.addStyle(reportWB.getDateFormat())
 				.setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN, BORDER_THIN).setAlign(LEFT);
 
-		numberStyle = reportWB.addStyle(FLOAT).setAlign(RIGHT)
-				.setBorders(BORDER_THIN, BORDER_THIN, BORDER_THIN, BORDER_THIN).setCellColor(BLUE);
+		numberStyle = reportWB.addStyle(FLOAT).setAlign(RIGHT);
+
+		numberd2 = reportWB.addStyle(INTEGER);
 		f1Style = reportWB.addStyle("0.0");
+
 	}
 
 	/******************************************************************************************************************************************/
