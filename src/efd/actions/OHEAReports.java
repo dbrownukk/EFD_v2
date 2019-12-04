@@ -61,6 +61,7 @@ import efd.actions.OIHMReports.*;
 import efd.model.*;
 import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
+import efd.model.Project.*;
 import efd.model.StdOfLivingElement.*;
 import efd.model.Transfer.*;
 import efd.model.WealthGroupInterview.*;
@@ -135,8 +136,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	// ArrayList<>(NUMBEROFAVERAGES);
 
 	Double[][] averageTotal = new Double[3][NUMBEROFAVERAGES];
-	
-	
+
 	private String floatFormat = "##########0.00";
 
 	/******************************************************************************************************************************************/
@@ -244,8 +244,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 
 		}
-		
-		
 
 		// wgiSelected populates wgis array
 		for (WGI wgi : wgiSelected) {
@@ -713,11 +711,11 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 				break;
 			case 368:
 				System.out.println("report 368");
-				// createIncomereport(ireportNumber, report, "cash");
+				createIncomereport(ireportNumber, report, "cash");
 				break;
 			case 369:
 				System.out.println("report 369");
-				// createIncomereport(ireportNumber, report, "food");
+				createIncomereport(ireportNumber, report, "food");
 				break;
 
 			case 370:
@@ -728,10 +726,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			case 371:
 				System.out.println("report 371");
 				createLivestockAssetreport(ireportNumber, report);
-				break;
-			case 372:
-				System.out.println("report 372");
-				// TODO ???
 				break;
 			}
 		}
@@ -801,8 +795,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		errno = 3666;
 		row = 3;
 		for (i = 0; i < orderedWealthgroups.size(); i++) {
-			reportWB.getSheet(isheet).setValue(4, row, averageTotal[i][0] / uniqueCommunity.size(),numberStyle );
-			reportWB.getSheet(isheet).setValue(5, row, averageTotal[i][1] / uniqueCommunity.size(),numberStyle );
+			reportWB.getSheet(isheet).setValue(4, row, averageTotal[i][0] / uniqueCommunity.size(), numberStyle);
+			reportWB.getSheet(isheet).setValue(5, row, averageTotal[i][1] / uniqueCommunity.size(), numberStyle);
 			row++;
 		}
 	}
@@ -922,7 +916,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		for (int col = 0; col < 5; col++) {
 			row = 3;
 			for (i = 0; i < 3; i++) {
-				reportWB.getSheet(isheet).setValue(4 + col, row, averageTotal[i][col] / uniqueCommunity.size(),numberStyle);
+				reportWB.getSheet(isheet).setValue(4 + col, row, averageTotal[i][col] / uniqueCommunity.size(),
+						numberStyle);
 				row++;
 			}
 		}
@@ -932,46 +927,87 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	/******************************************************************************************************************************************/
 
 	private void createIncomereport(int isheet, Report report, String type) {
-		/*
-		 * int row = 1; // String type = "food" or "cash" errno = 2261;
-		 * System.out.println("in income report 226/7"); Double cropIncome = 0.0; Double
-		 * empIncome = 0.0; Double lsIncome = 0.0; Double trIncome = 0.0; Double
-		 * wfIncome = 0.0; int col = 0;
-		 * 
-		 * String initType = StringUtils.capitalize(type);
-		 * 
-		 * System.out.println("in  income report");
-		 * reportWB.getSheet(isheet).setColumnWidths(1, 25, 25, 25, 25, 25, 25, 25);
-		 * errno = 2262;
-		 * 
-		 * reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
-		 * 
-		 * reportWB.getSheet(isheet).setValue(col++, row, "Crop " + initType +
-		 * " Income", textStyle); reportWB.getSheet(isheet).setValue(col++, row,
-		 * "Employment " + initType + " Income", textStyle);
-		 * reportWB.getSheet(isheet).setValue(col++, row, "Livestock " + initType +
-		 * " Income", textStyle); reportWB.getSheet(isheet).setValue(col++, row,
-		 * "Transfer " + initType + " Income", textStyle);
-		 * reportWB.getSheet(isheet).setValue(col++, row, "Wildfood " + initType +
-		 * " Income", textStyle); errno = 2263; row = 2; System.out.println("in " + type
-		 * + " income report done heading");
-		 * 
-		 * errno = 2265; for (WGI wgi2 : uniqueWealthgroupInterview) {
-		 * 
-		 * cropIncome = calcCropIncome(wgi2, type); empIncome = calcEmpIncome(wgi2,
-		 * type); lsIncome = calcLSIncome(wgi2, type); trIncome = calcTransIncome(wgi2,
-		 * type); wfIncome = calcWFIncome(wgi2, type);
-		 * 
-		 * reportWB.getSheet(isheet).setValue(1, row, wgi2.wgiNumber, textStyle);
-		 * reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);
-		 * reportWB.getSheet(isheet).setValue(3, row, empIncome, textStyle);
-		 * reportWB.getSheet(isheet).setValue(4, row, lsIncome, textStyle);
-		 * reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
-		 * reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle); row++;
-		 * 
-		 * }
-		 * 
-		 */
+
+		int col = 4;
+		int datarow = 10;
+		int avgrow = 6;
+		double totalLand = 0.0;
+		int assetTypeCounter = 0;
+		int startRow = 1;
+
+		Double cropIncome = 0.0;
+		Double empIncome = 0.0;
+		Double lsIncome = 0.0;
+		Double trIncome = 0.0;
+		Double wfIncome = 0.0;
+		int row = 7;
+
+		// String type = "food" or "cash"
+		System.out.println("in income report 368/369");
+
+		averageReset();
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 30, 30, 30, 30, 30);
+		populateFirstThreeColumns(isheet, startRow);
+
+		String initType = StringUtils.capitalize(type);
+
+		System.out.println("in  income report " + initType);
+
+		reportWB.getSheet(isheet).setValue(col++, startRow, "Crop " + initType + " Income", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(col++, startRow, "Employment " + initType + " Income", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(col++, startRow, "Livestock " + initType + " Income", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(col++, startRow, "Transfer " + initType + " Income", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(col++, startRow, "Wildfood " + initType + " Income", boldTopStyle);
+
+		row = 7;
+		System.out.println("in " + type + " income report done heading");
+
+		errno = 2265;
+
+		for (WGI wgi2 : uniqueCommunity) {
+
+			orderedWealthgroups = wgi2.getCommunity().getWealthgroup().stream()
+					.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
+					.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
+
+			for (int i = 0; i < orderedWealthgroups.size(); i++) {
+
+				List<WealthGroupInterview> wealthGroupInterview = orderedWealthgroups.get(i).getWealthGroupInterview();
+
+				cropIncome = calcCropIncome(wealthGroupInterview, type);
+				empIncome = calcEmpIncome(wealthGroupInterview, type);
+				lsIncome = calcLSIncome(wealthGroupInterview, type);
+				trIncome = calcTransIncome(wealthGroupInterview, type);
+				wfIncome = calcWFIncome(wealthGroupInterview, type);
+				
+				// Averages
+				
+				averageTotal[i][0] += cropIncome;
+				averageTotal[i][1] += empIncome;
+				averageTotal[i][2] += lsIncome;
+				averageTotal[i][3] += trIncome;
+				averageTotal[i][4] += wfIncome;
+				
+				
+
+				// reportWB.getSheet(isheet).setValue(1, row, wgi2.wgiNumber, textStyle);
+				reportWB.getSheet(isheet).setValue(4, row, cropIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(5, row, empIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(6, row, lsIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(7, row, trIncome, textStyle);
+				reportWB.getSheet(isheet).setValue(8, row, wfIncome, textStyle);
+				row++;
+
+			}
+		}
+		for (col = 0; col < 5; col++) {
+			row = 3;
+			for (int i = 0; i < 3; i++) {
+				reportWB.getSheet(isheet).setValue(4 + col, row, averageTotal[i][col] / uniqueCommunity.size(),
+						numberStyle);
+				row++;
+			}
+		}
 	}
 
 	/******************************************************************************************************************************************/
@@ -982,18 +1018,24 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int avgrow = 6;
 		double totalLand = 0.0;
 		int assetTypeCounter = 0;
+		int startRow = 4;
 
 		averageReset();
-
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 20, 20, 20, 20, 20, 20);
-		errno = 2271;
-
-		System.out.println("uc = " + uniqueCommunity.size());
-		int startRow = 4;
 		populateFirstThreeColumns(isheet, startRow);
 
 		reportWB.getSheet(isheet).setValue(1, 2, "Unit of Measure", boldTopStyle);
-		reportWB.getSheet(isheet).setValue(2, 2, "Acre (hard coded)", textStyle);
+
+		// get Default Area in use
+		
+		Area areaMeasurement = project.getAreaMeasurement();
+		
+		if(areaMeasurement==null)
+		{
+			areaMeasurement=Area.Acre;
+		}
+		
+		reportWB.getSheet(isheet).setValue(2, 2, areaMeasurement.toString(), textStyle);
 
 		errno = 2273;
 
@@ -1012,7 +1054,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		List<WealthGroup> orderedWealthgroups2;
 
 		for (WGI wgi3 : wgiLandRST) {
-			
+
 			String communityID = wgi3.getCommunity().getCommunityid();
 			reportWB.getSheet(isheet).setValue(col, 1, "Asset Category", boldTopStyle);
 			reportWB.getSheet(isheet).setValue(col, 2, "Land", textStyle);
@@ -1071,8 +1113,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			for (int j = 0; j < 3; j++) {
 
-				reportWB.getSheet(isheet).setValue(col, avgrow + j, averageTotal[j][assetTypeCounter] / uniqueCommunity.size(),
-						numberStyle);
+				reportWB.getSheet(isheet).setValue(col, avgrow + j,
+						averageTotal[j][assetTypeCounter] / uniqueCommunity.size(), numberStyle);
 
 			}
 
@@ -1090,7 +1132,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		int wgrow;
 		int averagesRow = startRow + 2;
 		int countWGs = 0;
-		
 
 		/* Print Communities */
 		String comm;
@@ -1156,7 +1197,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			isDisplayWealthgroupDone = true;
 
 			row = wgrow;
-		
+
 		}
 
 		// Display WG details
@@ -1182,12 +1223,9 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 20, 20, 20, 20, 20, 20);
 
-
 		System.out.println("uc = " + uniqueCommunity.size());
 		int startRow = 4;
 		populateFirstThreeColumns(isheet, startRow);
-
-
 
 		// Populate hhLand array for matrix
 
@@ -1198,10 +1236,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		// Need all Livestock RST types that remain in wgi array
 		// wgiLSRST has array of unique LAND RST
 
-		List<WGI> wgiLSRST = wgi.stream()
-				.filter(p -> p.getLivestock() != null)
-				.filter(distinctByKey(p -> p.getLivestock().getResourceSubType()))
-				.collect(Collectors.toList());
+		List<WGI> wgiLSRST = wgi.stream().filter(p -> p.getLivestock() != null)
+				.filter(distinctByKey(p -> p.getLivestock().getResourceSubType())).collect(Collectors.toList());
 
 		List<WealthGroup> orderedWealthgroups2;
 
@@ -1233,7 +1269,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 					List<WealthGroupInterview> wealthGroupInterview = owgit.getWealthGroupInterview();
 					for (int i = 0; i < wealthGroupInterview.size(); i++) {
 						for (AssetLiveStock assetLivestock : wealthGroupInterview.get(i).getAssetLiveStock()) {
-							
 
 							if (assetLivestock.getResourceSubType() == wgi3.getResourceSubType()) {
 
@@ -1262,8 +1297,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			for (int j = 0; j < 3; j++) {
 
-				reportWB.getSheet(isheet).setValue(col, avgrow + j, averageTotal[j][assetTypeCounter] / uniqueCommunity.size(),
-						numberStyle);
+				reportWB.getSheet(isheet).setValue(col, avgrow + j,
+						averageTotal[j][assetTypeCounter] / uniqueCommunity.size(), numberStyle);
 
 			}
 
@@ -1274,9 +1309,9 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 	}
+
 	/******************************************************************************************************************************************/
 
-	
 	/******************************************************************************************************************************************/
 
 	private void createAdultEquivalentreport(int isheet, Report report) {
@@ -1345,134 +1380,135 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	/******************************************************************************************************************************************/
 
-	private Double calcWFIncome(WGI wgi2, String type) {
+	private Double calcWFIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
 		Double wfTot = 0.0;
 
 		/* What about food payments? */
 
-		// for (WildFood wf : wgi2.getWealthgroupInterview().getWildFood()) {
+		for (int i = 0; i < wealthGroupInterview.size(); i++) {
+			for (WildFood wf : wealthGroupInterview.get(i).getWildFood()) {
+				if (type == "cash") {
+					wfTot += wf.getUnitsSold() * wf.getPricePerUnit();
 
-		// if (type == "cash") {
-		// wfTot += wf.getUnitsSold() * wf.getPricePerUnit();
-		// } else if (type == "food") {
-		// // wfTot += wf.getUnitsConsumed() *
-		// // wf.getResourceSubType().getResourcesubtypekcal();
-		// wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType());
-		// }
-		// }
+				} else if (type == "food") {
+
+					wfTot += wf.getUnitsConsumed() * wf.getResourceSubType().getResourcesubtypekcal();
+					wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType());
+
+				}
+			}
+
+		}
+
 
 		return wfTot;
 	}
 
 	/******************************************************************************************************************************************/
 
-	private Double calcTransIncome(WGI wgi2, String type) {
+	private Double calcTransIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
 		Double trTot = 0.0;
 
-		/* Handle transfer types food/cash/other */
+		for (int i = 0; i < wealthGroupInterview.size(); i++) {
+			for (Transfer tr : wealthGroupInterview.get(i).getTransfer()) {
+				if (type == "cash") {
+					if (tr.getTransferType().equals(TransferType.Food)) {
+						trTot += tr.getUnitsSold() * tr.getPricePerUnit() * tr.getPeopleReceiving()
+								* tr.getTimesReceived();
+					} else {
+						trTot += tr.getPeopleReceiving() * tr.getTimesReceived() * tr.getCashTransferAmount();
+					}
 
-		// for (Transfer tr : wgi2.getWealthgroupInterview().getTransfer()) {
-		// if (type == "cash") {
-		// if (tr.getTransferType().equals(TransferType.Food)) {
-		// trTot += tr.getUnitsSold() * tr.getPricePerUnit() * tr.getPeopleReceiving() *
-		// tr.getTimesReceived();
-		// } else // Cash or Other
-		// {
-		// trTot += tr.getPeopleReceiving() * tr.getTimesReceived() *
-		// tr.getCashTransferAmount();
-		// }
-		// } else if (type == "food" && tr.getTransferType().equals(TransferType.Food)
-		// && tr.getFoodResourceSubType() != null) {
-		// trTot += tr.getUnitsConsumed() * findRSTKcal(tr.getFoodResourceSubType()) *
-		// tr.getPeopleReceiving()
-		// * tr.getTimesReceived();
-//
-//			}
-//
-//		}
+				} else if (type == "food" && tr.getTransferType().equals(TransferType.Food)
+						&& tr.getFoodResourceSubType() != null) {
+
+					trTot += tr.getUnitsConsumed() * findRSTKcal(tr.getFoodResourceSubType()) * tr.getPeopleReceiving()
+							* tr.getTimesReceived();
+
+				}
+			}
+
+		}
+
 		return trTot;
 	}
 
 	/******************************************************************************************************************************************/
 
-	private Double calcLSIncome(WGI wgi2, String type) { // LSS and LSP sales
+	private Double calcLSIncome(List<WealthGroupInterview> wealthGroupInterview, String type) { // LSS and LSP sales
 		Double lsTot = 0.0;
-		// if (type == "cash") {
-		// for (LivestockSales ls : wgi2.getWealthgroupInterview().getLivestockSales())
-		// {
-		// lsTot += ls.getUnitsSold() * ls.getPricePerUnit();
-		// }
-//
-//			for (LivestockProducts lsp : wgi2.getWealthgroupInterview().getLivestockProducts()) {
-//				lsTot += lsp.getUnitsSold() * lsp.getPricePerUnit();
-//			}
-//		} else if (type == "food") {
-//			for (LivestockProducts lsp : wgi2.getWealthgroupInterview().getLivestockProducts()) {
-//				lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType());
-//			}
-//		}
-//
+
+		System.out.println("in calcIncome type =" + type);
+
+		for (int i = 0; i < wealthGroupInterview.size(); i++)
+
+			if (type == "cash") {
+
+				for (LivestockSales ls : wealthGroupInterview.get(i).getLivestockSales()) {
+
+					lsTot += ls.getUnitsSold() * ls.getPricePerUnit();
+				}
+				for (LivestockProducts lsp : wealthGroupInterview.get(i).getLivestockProducts()) {
+					lsTot += lsp.getUnitsSold() * lsp.getPricePerUnit();
+				}
+			}
+
+			else if (type == "food") {
+				for (LivestockProducts lsp : wealthGroupInterview.get(i).getLivestockProducts()) {
+					lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType());
+				}
+			} else {
+				lsTot = 0.0;
+			}
+
 		return lsTot;
 
 	}
 
 	/******************************************************************************************************************************************/
 
-	private Double calcEmpIncome(WGI wgi2, String type) {
+	private Double calcEmpIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
 		Double empTot = 0.0;
+		System.out.println("in calcEmpIncome type =" + type);
 
-		/* What about food payments? for cash */
-		// if (wgi2.getWealthgroupInterview().getEmployment().size() == 0) {
-//
-//			return (0.0);
-//		}
-//		try {
-//			System.out.println("type = " + type);
-//
-//			for (Employment emp : wgi2.getWealthgroupInterview().getEmployment()) {
-//				if (type == "cash") {
-//
-//					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * emp.getCashPaymentAmount();
-//
-//				} else if (type == "food" && emp.getFoodResourceSubType() != null) {
-//
-//					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * findRSTKcal(emp.getFoodResourceSubType());
-//				} else
-//					empTot = 0.0;
-//			}
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			errno = 991;
-//		}
+		for (int i = 0; i < wealthGroupInterview.size(); i++) {
+			for (Employment emp : wealthGroupInterview.get(i).getEmployment()) {
+				if (type == "cash") {
+
+					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * emp.getCashPaymentAmount();
+
+				} else if (type == "food" && emp.getFoodResourceSubType() != null) {
+
+					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * findRSTKcal(emp.getFoodResourceSubType());
+				} else {
+					empTot = 0.0;
+				}
+			}
+		}
 
 		return empTot;
 
 	}
 
 	/******************************************************************************************************************************************/
-	private Double calcCropIncome(WGI wgi2, String type) {
+	private Double calcCropIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
 
 		Double cropTot = 0.0;
 
 		System.out.println("in calcCropIncome type =" + type);
-		// for (Crop crop : wgi2.getWealthgroupInterview().getCrop()) {
-		// if (type == "cash") {
-//
-//				cropTot += crop.getUnitsSold() * crop.getPricePerUnit();
-//				System.out.println("in crop cash tot");
-//			} else if (type == "food") {
-//				System.out.println("get rst syn kcal");
-//				cropTot += crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType());
-//				System.out.println(
-//						"crop new calc tot  = " + crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType()));
-//				System.out.println("crop total = " + cropTot);
-//				System.out.println("rst = " + crop.getCropType());
-//				System.out.println("rst consumed = " + crop.getUnitsConsumed());
-//				System.out.println("rst name = " + crop.getResourceSubType().getResourcetypename());
-//				System.out.println("rst KCAL = " + findRSTKcal(crop.getResourceSubType()));
-//			}
-//		}
+
+		for (int i = 0; i < wealthGroupInterview.size(); i++) {
+			for (Crop crop : wealthGroupInterview.get(i).getCrop()) {
+				if (type == "cash") {
+
+					cropTot += crop.getUnitsSold() * crop.getPricePerUnit();
+					System.out.println("in crop cash tot");
+				} else if (type == "food") {
+					System.out.println("get rst syn kcal");
+					cropTot += crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType());
+				}
+			}
+		}
 
 		return cropTot;
 	}
@@ -1913,9 +1949,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	/******************************************************************************************************************************************/
 
 	private void setStyles() {
-		
-		
-		
+
 		reportWB.setFloatFormat(floatFormat);
 		reportWB.setDateFormat("dd/MM/yyyy");
 		boldRStyle = reportWB.addStyle(TEXT).setBold().setAlign(RIGHT);

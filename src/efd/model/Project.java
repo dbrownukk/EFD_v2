@@ -29,13 +29,14 @@ import com.openxava.naviox.model.*;
 
 import efd.actions.*;
 import efd.model.Asset.*;
+import efd.validations.*;
 
 import org.openxava.tab.*;
 
 @Entity
 
 @Views({ @View(members = "Project[#projecttitle,pdate;"
-		+ "altCurrency,altExchangeRate;donor,funder,notes];livelihoodZone;"),
+		+ "altCurrency,altExchangeRate,areaMeasurement;donor,funder,notes];livelihoodZone;"),
 		@View(name = "Proj", members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
 		@View(name = "NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate"),
@@ -173,12 +174,31 @@ public class Project {
 	}
 
 	/***********************************************************************************************/
+	@Column(name = "Area", nullable = true)
+	@Required
+	private Area areaMeasurement;
 
-	
+	public enum Area {
+		Acre, Hectare
+	}
+	/***********************************************************************************************/
+
 	
 	
 	public String getProjectid() {
 		return projectid;
+	}
+
+
+
+	public Area getAreaMeasurement() {
+		return areaMeasurement;
+	}
+
+
+
+	public void setAreaMeasurement(Area areaMeasurement) {
+		this.areaMeasurement = areaMeasurement;
 	}
 
 

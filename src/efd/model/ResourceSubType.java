@@ -13,15 +13,15 @@ import javax.persistence.Table;
 import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
+import org.openxava.jpa.*;
 import org.openxava.util.*;
 
 @Entity
 
 @Views({ @View(members = "resourcetype;resourcetypename;resourcesubtypeunit;resourcesubtypekcal;resourcesubtypesynonym,category"),
-	@View(name = "FromCategory", members = "resourcetype,resourcetypename,resourcesubtypeunit;resourcesubtypekcal,resourcesubtypesynonym"),
+		@View(name = "FromCategory", members = "resourcetype,resourcetypename,resourcesubtypeunit;resourcesubtypekcal,resourcesubtypesynonym"),
 		@View(name = "SimpleSubtype", members = "resourcetypename"),
 		@View(name = "FromLocalUnit", members = "resourcetype;resourcetypename,resourcesubtypeunit") })
-
 
 @Tab(properties = "resourcetype.resourcetypename,resourcetypename,resourcesubtypeunit,resourcesubtypekcal,resourcesubtypesynonym.resourcetypename")
 
@@ -29,39 +29,24 @@ import org.openxava.util.*;
 		"ResourceTypeName" }))
 public class ResourceSubType {
 
-//	@PrePersist
-//	@PreUpdate
-/*
+	@PreUpdate
 	
-	
-	
-	
-	private void calcKcal() {
-		if (resourcesubtypesynonym != null) {
-			resourcesubtypekcal = 0;
-		}
-		//System.out.println("About to get Roles  = ");
 
-		String userName = Users.getCurrent();
-		User user = User.find(userName);
-
-		System.out.println("Roles done = ");
-
-		// if Role is efd_remote then this is standalone and user can create an RST but
-		// must be a synonym for some other RST
-		// This assumes XavaPro is used
-
-		System.out.println("Role = " + user.hasRole("efd_remote"));
-		System.out.println("Synonym = " + getResourcesubtypesynonym());
-
-		if (user.hasRole("efd_remote") && resourcesubtypesynonym == null) {
+	private void stopRTupdate() {
+		System.out.println("in stopRTupdate");
+		ResourceSubType rst = XPersistence.getManager().find(ResourceSubType.class, this.idresourcesubtype);
+		
+		System.out.println("found rst "+rst.resourcetype.getResourcetypename());
+		
+		System.out.println("rst 1 222  = "+getResourcetype().getResourcetypename()+" "+rst.getResourcetype().getResourcetypename());
+		
+		if (this.resourcetype != rst.resourcetype) {
 			System.out.println("Need to stop update");
 			throw new javax.validation.ValidationException(
-					XavaResources.getString("Field Users must enter a SubType Synonym"));
+					XavaResources.getString("Cannot change Resource Type once Resource Sub Tyes exist"));
 		}
 
 	}
-	*/
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -74,18 +59,17 @@ public class ResourceSubType {
 	@NoModify
 	@NoCreate
 	@JoinColumn(name = "ReourceType")
+	@OnChange(OnChangeRT.class)
 	@DescriptionsList(descriptionProperties = "resourcetypename")
 	private ResourceType resourcetype;
 
-	
 	@Column(name = "ResourceTypeName", length = 255)
 	@Required
 	private String resourcetypename;
 
 	@ManyToOne
 
-	@DescriptionsList(descriptionProperties = "resourcetypename",
-	condition="resourcesubtypesynonym is null")
+	@DescriptionsList(descriptionProperties = "resourcetypename", condition = "resourcesubtypesynonym is null")
 	@OnChange(OnChangeRSTSyn.class)
 	private ResourceSubType resourcesubtypesynonym;
 
@@ -94,25 +78,20 @@ public class ResourceSubType {
 	private String resourcesubtypeunit;
 
 	@DefaultValueCalculator(IntegerCalculator.class)
-	//@OnChange(value = OnChangeRSTkcal.class)
+	// @OnChange(value = OnChangeRSTkcal.class)
 	@Column(name = "ResourceSubTypeKCal")
 	private int resourcesubtypekcal;
 
 	@ManyToMany(mappedBy = "resourceSubType")
 	private Collection<Category> category;
-	
+
 	@ManyToMany
 	@NewAction("")
 	private Collection<CustomReportSpec> customReportSpecs;
-	
-	
-	@OneToMany(mappedBy="resourceSubType") 
+
+	@OneToMany(mappedBy = "resourceSubType")
 	private Collection<LocalUnit> localUnits;
-	
-	
-	
-	
-	
+
 	public Collection<LocalUnit> getLocalUnits() {
 		return localUnits;
 	}

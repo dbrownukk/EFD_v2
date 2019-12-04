@@ -143,6 +143,9 @@ public class WealthGroupInterview {
 	@ReadOnly
 	@NoCreate
 	@SearchKey
+	
+
+	
 	@DescriptionsList(descriptionProperties = "community.site.livelihoodZone.lzname,community.site.locationdistrict,community.site.subdistrict,wgnameeng")
 	private WealthGroup wealthgroup;
 
@@ -171,6 +174,7 @@ public class WealthGroupInterview {
 	
 
 	@ElementCollection 
+	
 	@ListProperties("status,resourceSubType.resourcetypename, landTypeEnteredName,unit,numberOfUnits")
 	private Collection<AssetLand> assetLand;
 

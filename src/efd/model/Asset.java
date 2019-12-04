@@ -13,7 +13,7 @@ import efd.model.*;
 
 @MappedSuperclass
 
-// abstract public class Asset {
+
 public class Asset {
 
 
@@ -28,11 +28,12 @@ public class Asset {
 
 	/* Unit should be set to Nullable in Cash asset database table */
 	@DefaultValueCalculator(
-			value=org.openxava.calculators.StringCalculator.class,
+			value=efd.validations.UnitCalculator.class,
 			properties={ @PropertyValue(name="string", value="?") }
 			)
 	@Column(name = "Unit", length = 50, nullable = false)
 	@Required
+	//@OnChange(OnChangeUnit.class)
 	private String unit;
 	
 	
