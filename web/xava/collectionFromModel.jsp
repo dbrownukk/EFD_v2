@@ -40,7 +40,7 @@ boolean sortable = subview.isCollectionSortable();
 		onSelectCollectionElementAction, idCollection, propertyPrefix, 
 		selectedRowStyle, rowStyle, tabObject);
 	%>
-	<INPUT type="CHECKBOX" name="<xava:id name='xava_selected_all'/>" value="<%=propertyPrefix%>selected_all" <%=actionOnClickAll%> />
+	<input type="checkbox" name="<xava:id name='xava_selected_all'/>" value="<%=propertyPrefix%>selected_all" <%=actionOnClickAll%> />
 	</th>
 <%
 	// Heading
@@ -111,7 +111,7 @@ for (int f=0; itAggregates.hasNext(); f++) {
 		onSelectCollectionElementMetaAction, tabObject);
 %>
 <td class="<%=cssCellClass%>" width="5" style="<%=style.getListCellStyle()%>">
-<input type="CHECKBOX" name="<xava:id name='xava_selected'/>" value="<%=propertyPrefix%>__SELECTED__:<%=f%>" <%=actionOnClick%>/>
+<input type="checkbox" name="<xava:id name='xava_selected'/>" value="<%=propertyPrefix%>__SELECTED__:<%=f%>" <%=actionOnClick%>/>
 </td>
 <%
 	it = subview.getMetaPropertiesList().iterator();	

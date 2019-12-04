@@ -16,7 +16,6 @@
 <jsp:useBean id="errors" class="org.openxava.util.Messages" scope="request"/>
 <jsp:useBean id="context" class="org.openxava.controller.ModuleContext" scope="session"/>
 <jsp:useBean id="style" class="org.openxava.web.style.Style" scope="request"/>
-<jsp:useBean id="layoutPainterManager" class="org.openxava.web.layout.LayoutPainterManager" scope="session"/>
 
 <%!
 private boolean hasFrame(MetaMember m, View view) { 
@@ -64,12 +63,7 @@ boolean onlySections = view.hasSections() && view.getMetaMembers().isEmpty();
 %>
 
 <%
-boolean renderedView = isSection ? layoutPainterManager.renderSection(view, pageContext)		
-	: layoutPainterManager.renderView(view, pageContext);
-
-if (!renderedView) {
-	// Only performed if no layout painter is in effect.
-	if (!onlySections) {	// IF Not Only Sections
+if (!onlySections) {	// IF Not Only Sections
 %>	
 		<%=openDiv(view)%>	
 <%
@@ -227,11 +221,11 @@ if (!renderedView) {
 				boolean withFrame = !view.isSection() || view.getMetaMembers().size() > 1;
 				boolean variousCollectionInLine = view.isVariousCollectionsInSameLine((MetaMember) m);
 %>
-			<%=closeDivForFrame(view)%> 
-<%					
+			<%=closeDivForFrame(view)%>
+<%	
 				if (withFrame) { // IF MetaCollection With Frame
 %>	
-				<%=style.getFrameHeaderStartDecoration(variousCollectionInLine?50:frameWidth)%>
+				<%=style.getCollectionFrameHeaderStartDecoration(variousCollectionInLine?50:frameWidth)%>
 				<%=style.getFrameTitleStartDecoration()%>
 				<%=collection.getLabel(request) %>
 <% 
@@ -318,8 +312,7 @@ if (!renderedView) {
 <%=closeDiv(view)%>
 
 <% 
-	} // END if (!onlySections) {
-} // END if (!renderedView) {
+} // END if (!onlySections) {
 %>
 
 <%

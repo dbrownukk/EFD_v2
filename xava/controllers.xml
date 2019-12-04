@@ -215,7 +215,7 @@
 			class="efd.actions.FilteredLZ" />
 		<action name="add" hidden="true" icon="table-row-plus-after"
 			class="efd.actions.AddLZ">
-		<action name="Report" hidden="false" icon="file-chart"
+			<action name="Report" hidden="false" icon="file-chart"
 				mode="NONE" in-each-row="true" class="efd.actions.GoOHEAReports">
 			</action>
 			<!-- <set property="resetAfter" value="false"/> -->
@@ -461,9 +461,11 @@
 		<extends controller="ParseSpreadsheet" />
 		<extends controller="ChartList" />
 		<extends controller="ReportList" />
+		
+			<action name="init" hidden="true" mode="detail"
+			after-each-request="true" class="efd.actions.LandUnitAction" />
 
 	</controller>
-
 
 
 

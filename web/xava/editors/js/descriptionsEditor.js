@@ -44,7 +44,10 @@ openxava.addEditorInitFunction(function() {
 			},
 			appendTo: "body"
 		}); 	
+		
+		$(this).attr("autocomplete", "nope");
 	});
+	
 	
 });
 

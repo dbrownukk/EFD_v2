@@ -43,7 +43,7 @@ for (Card card: new CardIterator(tab, view, request, errors)) {
 if (loadMore) {
 %>
 <div id="xava_loading_more_elements" class="<%=style.getCard()%>">
-	<img src="<%=request.getContextPath()%>/naviox/images/loading.gif"/>
+	<i class="mdi mdi-autorenew spin"></i>
 	<xava:message key="loading"/>...
 </div>
 <script>

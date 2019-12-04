@@ -373,7 +373,7 @@ input[type="text"], input[type="password"], input[type="file"], select, textarea
 	border-style: solid;	
 	border-width: 1px;
 	box-shadow: rgba(0, 0, 0, 0.046875) 0px 1px 3px 0px inset, rgba(255, 255, 255, 0.0742188) 0px 1px 0px 0px;
-	font-size: 13px; 
+	font-size: 14px;  
 	outline-color: black;
 	outline-style: none;
 	outline-width: 0px;
@@ -448,9 +448,7 @@ input[type="text"]:focus, input[type="password"]:focus, input[type="file"]:focus
 	margin-right: -1px;
 	min-height: 15px;
 	border-top: 1px solid #CCCCCC;
-	box-shadow: 0px 2px 7px #CCCCCC; 
-	-moz-box-shadow: 0px 2px 7px #CCCCCC; 
-	-webkit-box-shadow: 0px 2px 7px #CCCCCC;	
+	border-bottom: 1px solid #CCCCCC;
 }
 
 .ox-button-bar {
@@ -548,6 +546,16 @@ i {
 .ox-list-odd .mdi-border-color, .ox-list-pair .mdi-border-color {
 	vertical-align: -9px;
 
+}
+
+.ox-list-pair div, .ox-list-odd div, .ox-total-cell {  
+	font-size: 14px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+.ox-cut-row {
+	opacity: 0.3;
 }
 
 .ox-module i, .ui-dialog i { 
@@ -726,8 +734,11 @@ A#show_modules  {
 	background: -webkit-gradient(linear, left bottom, left top, from(#F5F5F5), to(#F5F5F5));
 }
 
-input[type="button"]:hover, .ox-card:hover { 
+input[type="button"]:hover, .ox-card:hover, .ox-card:hover i { 
 	color: #191919;
+}
+
+input[type="button"]:hover, .ox-card:hover { 
 	box-shadow: 2px 2px 5px #CCCCCC; 
 	-moz-box-shadow: 2px 2px 5px #CCCCCC; 
 	-webkit-box-shadow: 2px 2px 5px #CCCCCC;
@@ -740,7 +751,7 @@ input[type="button"]:active, A#show_modules.show-modules-selected {
 }
 
 .ox-bottom-buttons input:nth-of-type(2), .ipad .ox-bottom-buttons input:nth-of-type(2):hover,
-.ox-discussion-post-button input[type="button"] { 
+.ox-discussion-post-button input[type="button"]:nth-of-type(1) {  
 	background: #3777D7;
 	border-color: #096EB3;
 	color: white;
@@ -754,7 +765,7 @@ input[type="button"]:active, A#show_modules.show-modules-selected {
 }
 
 .ox-bottom-buttons input:nth-of-type(2):hover, 
-.ox-discussion-post-button input:hover { 
+.ox-discussion-post-button input:nth-of-type(1):hover {  
 	color: white; 
 	background: blue;
 	border-color: blue;
@@ -803,6 +814,10 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 	-webkit-box-shadow: 0px 0px 0px red;	
 }
 
+.ox-button-bar a[id*="delete"]:hover i {
+  color: red;
+}
+
 .ox-button-bar-mode-button {
 	position: relative;
 	top: -4px; 
@@ -818,7 +833,6 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 	border-top-left-radius: 2px;
 	border-top-right-radius: 2px;	
 	border-style: none;
-	height: 28px;
 	background: white;
 	color: #191919;	
 	box-shadow: 0px -3px 4px #CCCCCC; 
@@ -877,6 +891,10 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 
 .ox-list-pair:hover, .ox-list-odd:hover {
 	background: #FFFFD6;
+}
+
+.ui-dialog .ox-element-collection > div {
+	width: 100% !important; /* To avoid horizontal scroll bar in element collection inside dialog, such as Import dialog */
 }
 
 .ox-element-collection .ox-list-pair:hover, .ox-element-collection .ox-list-odd:hover {
@@ -981,7 +999,7 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 	display: none;   
 }
 
-.ox-frame, #sign_in_box {
+.ox-frame, #sign_in_box { 
 	margin-top: 2px; 
 	margin-bottom: 5px;
 	margin-right: 7px; 
@@ -1043,12 +1061,13 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 }
 
 .ox-section { 
-	padding: 0px 10px 0px 17px; 
-	height: 30px; 
+	padding: 0px 10px 0px 17px;  
 	margin: 0px -10px 10px -11px;  
-	box-shadow: 0px 3px 4px #CCCCCC;  
-	-moz-box-shadow: 0px 3px 4px #CCCCCC; 
-	-webkit-box-shadow: 0px 3px 4px #CCCCCC;
+	box-shadow: 0px 0px 5px #CCCCCC;  
+}
+
+.ie .ox-section { 
+	line-height: 210%; 
 }
 
 .ox-flow-layout .ox-section {
@@ -1073,17 +1092,12 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 }
 
 
-.ox-collection-list-actions {
-	border-left: 1px solid #CCCCCC;
-	border-right: 1px solid #CCCCCC;
-}
-
 .ox-total-capable-cell { 
 	text-align: right;
 }
 
 .ox-total-row td { 
-	vertical-align: top;
+	vertical-align: baseline; 
 	padding-top: 5px;	
 }
 
@@ -1146,27 +1160,58 @@ input[type="button"], .ipad input[type="button"]:hover, A#show_modules,
 	background: white !important;
 }
 
+.ui-dialog {
+	overflow: visible !important; /* For messages visible from dialogs in Chrome */	
+}
+
+.ox-messages-wrapper, .ox-errors-wrapper {
+	position: fixed;
+	top: 32px;
+	z-index: 9999999;
+}
+
+.ox-messages-wrapper {
+	left: 32px;
+}
+
+.ox-errors-wrapper {
+	right: 32px;
+}
+
 .ox-message-box {
-	margin-top: 9px;
-	margin-left: 3px;
 	font-weight: bold;
-	padding: 3px 0px 3px 3px; 
+	color: white;
+	padding: 15px;
+	border: 0px;
+	margin-bottom: 12px;
+	border-radius: 2px;	
+	box-shadow: 0px 0px 7px #000; 
 }
 
-.ox-errors .ox-message-box, .ox-errors .ox-message-box i {	
-	color: #DC4A38;
+.ox-message-box .mdi-close {
+	color: lightgray;
+	float: right;
+	margin-left: 10px;
 }
 
-.ox-messages .ox-message-box, .ox-messages .ox-message-box i {	
-	color: #6fc664;
+.ox-message-box .mdi-close:hover {
+	color: white;
 }
 
-.ox-infos .ox-message-box, .ox-infos .ox-message-box i {	
-	color: #a1a4a5;
+.ox-errors .ox-message-box {	
+	background: #DC4A38;
 }
 
-.ox-warnings .ox-message-box, .ox-warnings .ox-message-box i {	
-	color: #f6dc5c;
+.ox-messages .ox-message-box {	
+	background: #6fc664;
+}
+
+.ox-infos .ox-message-box {	
+	background: #a1a4a5;
+}
+
+.ox-warnings .ox-message-box {	
+	background: #f6dc5c;
 }
 
 .ox-action-link {
@@ -1228,23 +1273,43 @@ div.ox-subcontroller table{
 }
  
 #welcome {
-	margin: 20px;	
-	padding-left: 20px; 
-	padding-top: 5px; 	
-	font-size: 16px; 
+	background-image: url("../images/background.jpg"); 
+	background-position: left top;
+    background-size: auto 100vw;
+    background-repeat: no-repeat;
+	margin: 20px;
+	font-size: 25px; 
+	color: white; 
+	text-align: center; 
+}
+
+#welcome.mobile {
+	background-size:  auto 200vw;
 }
 
 #welcome h1 {
-	font-weight: normal; 
-	font-size: 25px; 
-	color: #DD4B39; 
-	margin-bottom: 5px;
+	font-weight: normal;  
+	font-size: 40px; 
+}
+
+#signin_tip {
+	margin-top: 20px;
+	font-size: 16px;	
 }
 
 #welcome h2 {
 	font-weight: normal; 
-	font-size: 16px; 
-	margin-top: 5px;
+	font-size: 25px; 
+}
+
+#welcome .ox-bottom-buttons {
+	text-align: center;
+}
+
+#welcome .ox-bottom-buttons input {
+	min-width: 240px;
+	font-size: 16px;
+	margin-left: 5px;
 }
 
 .feature-image {
@@ -1253,10 +1318,28 @@ div.ox-subcontroller table{
 }
 
 #sign_in_box {
-	float: right; 
-	padding: 20px 0px 25px 22px;  
-	margin: 30px 60px 20px 20px; 
 	background: #F1F1F1; 
+	margin-top: 20px;
+	padding: 20px 5px 5px 28px;
+	margin-right: auto;
+	margin-left: auto;
+	width: 283px;
+	width: fit-content;
+	width: -moz-fit-content;
+	
+}
+
+#sign_in_box .ox-bottom-buttons {
+	display: grid;
+}
+
+#sign_in_box .ox-bottom-buttons input {
+	margin-bottom: 15px;
+	width: 226px;
+}
+
+.firefox #sign_in_box .ox-bottom-buttons input, .ie #sign_in_box .ox-bottom-buttons input {
+	margin-left: 3px;
 }
 
 #sign_in_box .small-label { 
@@ -1275,13 +1358,19 @@ div.ox-subcontroller table{
 	font-size: 18px;
 }
 
-.screenshot img {
+.screenshot img, .video iframe { 
 	box-shadow: 0 0 7px black;
 	-moz-box-shadow: 0 0 7px #000;
 	-webkit-box-shadow: 0 0 7px black;
 }
 
-.screenshot {
+.video iframe { 
+	width: 100%;
+	max-width: 840px;
+	height: 472px;
+}
+
+.screenshot, .video { 
 	text-align: center;
 }
 
@@ -1317,12 +1406,12 @@ div.ox-subcontroller table{
 	margin-left: 5px;
 }
 
-.ox-charts {
-	width: 0px;
-}
-
 .ct-chart {
 	margin-top: -5px;
+	margin-left: -5px;
+}
+
+.firefox .ct-chart {
 	margin-left: -25px;
 }
 
@@ -1344,11 +1433,15 @@ div.ox-subcontroller table{
 	-webkit-box-shadow: none; 
 }
 
+.ox-charts > .ox-layout-detail {
+	padding-top: 15px;
+	display: block;
+}
+
 .ox-chart-x-column select {
 	position: relative;
-	left: 758px;
-	top: -27px;
-	width: 180px; 
+	left: calc(50vw - 90px);
+	width: 270px; 
 }
 
 .ox-chart-type {
@@ -1385,6 +1478,10 @@ div.ox-subcontroller table{
 	display:none;
 }
 
+.ox-charts .ox-collection { 
+	margin-left: 15px;
+}
+
 .ox-charts .ox-element-collection {
 	width: 200px;
 	margin-left: -32px;
@@ -1399,23 +1496,29 @@ div.ox-subcontroller table{
 	width: 120px;
 }
 
+.ui-dialog.no-close {
+	border-radius: 4px !important;
+	-webkit-border-radius: 4px !important;	
+}
+
 .no-close .ui-dialog-titlebar-close { 
 	display: none; 
 }
 
-.no-close .ox-detail { 
-	margin-left: -15px;  
+.no-close .ox-detail input {
+	width: 100%;
 }
 
-.no-close .ox-detail input { 
-	width: calc(100% - 13px);  
+.firefox .no-close .ox-detail input { 
+	width: calc(100% - 10px);  
 }
 
-.firefox .no-close .ox-detail {
-    margin-left: -10px;
+.no-close .ox-bottom-buttons {
+	margin-right: 7px;	
 }
-.firefox .no-close .ox-detail input {
-    width: calc(100% - 23px);
+
+.firefox .no-close .ox-bottom-buttons {
+	margin-right: 10px;	
 }
 
 i.ox-sort-indicator, i.ox-sort-indicator2 {
@@ -1439,6 +1542,10 @@ i.ox-sort-indicator2 {
 .ui-autocomplete-input::-ms-clear, .ox-date-calendar ::-ms-clear, .ox-web-url ::-ms-clear {   
  	display: none; 
  }
+ 
+.ox-web-url { 
+	margin-right: -20px;
+}
  
 .ui-menu-item:hover, .ui-widget-content .ui-state-focus {
  	border-color: #DFF4FF !important; 
@@ -1587,6 +1694,15 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
     display: none;
 }
 
+.ox-list-title select:nth-of-type(2) {
+	float: right;
+	text-align-last: right;
+}
+
+.ox-list-title select:nth-of-type(2) option {
+	text-align-last: left;
+}
+
 .ox-list-title i { 
 	font-size: 17px;
 	margin-left: 5px;
@@ -1602,6 +1718,10 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
 	display: flex;
     justify-content: center;
     height: 0px;
+}
+
+div[id$="_Index__view"] .ox-list-title {
+	display: none;
 }
 
 .ox-money b {
@@ -1657,4 +1777,94 @@ a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:
 	margin: 10px;
 	font-size: larger;
 	font-weight: bold;
+}
+
+.ox-collection .ox-frame-content {
+	margin-left: -10px;
+	margin-right: -10px;
+}
+
+
+.ox-attachments, .ox-attachments-actions {
+	display: table-cell;	
+	height: 40px;
+	position: relative;	
+	vertical-align: middle;
+}
+
+.ox-upload-attachments {	
+	overflow: hidden;
+	position: relative;	
+}
+
+.ox-upload-attachments [type=file] {
+	cursor: pointer;
+	display: block;
+	filter: opacity(0);
+	max-width: 24px;
+	min-height: 100%;
+	min-width: 100%;
+	opacity: 0;
+	padding: 0;	
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+.ui-tooltip, .arrow:after {
+	background: black !important;
+	border: 1px solid white;
+}
+
+.ui-tooltip {
+	padding: 10px 20px;
+	color: white !important;
+	border-radius: 20px;
+	font-weight: bold;
+	font-size: 14px;
+	box-shadow: 0 0 7px black;
+}
+
+.arrow {
+	pointer-events: none;  
+	width: 23px;
+	height: 26px;
+	overflow: hidden;
+	position: absolute;
+	left: 0px;
+	margin-left: -33px;
+	bottom: calc(30% - 5px);
+}
+
+.arrow.top {
+	top: 16px;
+	bottom: auto;
+}
+
+.arrow.left {
+	left: 10px;
+}
+
+.arrow:after {
+	content: "";
+	position: absolute;
+	left: 20px;
+	top: -2px;
+	width: 25px;
+	height: 25px;
+	box-shadow: 6px 5px 9px -9px black;
+	transform: rotate(135deg);
+}
+
+.arrow.top:after {
+	bottom: 20px;
+	top: auto;
+}
+
+.ox-subscribed i {
+	color: blue; 
+}
+
+.ox-unsubscribed i {
+	color: lightgray; 
 }

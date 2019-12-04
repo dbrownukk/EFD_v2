@@ -43,7 +43,7 @@ else {
 }
 String propertyPrefix = propertyPrefixAccumulated == null?collectionName + ".":propertyPrefixAccumulated + collectionName + "."; 
 %>
-<table width="100%" class="<%=style.getList()%>" <%=style.getListCellSpacing()%>>
+<table width="100%" <%=style.getListCellSpacing()%>>
 <% if (XavaPreferences.getInstance().isDetailOnBottomInCollections()) { %>
 <tr><td>
 <% try { %>

@@ -13,7 +13,7 @@ openxava.addEditorInitFunction(function() {
 });
 
 elementCollectionEditor.onChangeRow = function(element, rowIndex) {
-	var currentRow = $(element).parent().parent(); 
+	var currentRow = $(element).parent().parent();
 	var nextRow = currentRow.next();
 	if (nextRow.is(':visible')) return;			
 	var newRow = nextRow.clone();
@@ -28,13 +28,14 @@ elementCollectionEditor.onChangeRow = function(element, rowIndex) {
 	token2 = ", this, " + (rowIndex + 2) + ", ";
 	newRowHtml = newRowHtml.replace(token1, token2);
 	newRow.html(newRowHtml);
+	newRow.css("display", "none"); 
 	var table = currentRow.parent().parent();	
 	elementCollectionEditor.setDefaultValues(table, rowIndex); 
 	nextRow.show();
 	$(nextRow).after(newRow);
 	currentRow.children().first().find("nobr").css('visibility', 'visible');
 	currentRow.addClass("xava_sortable_element_row"); 
-	openxava.initEditors(); 
+	openxava.initEditors();
 }
 
 elementCollectionEditor.setDefaultValues = function(table, rowIndex) {

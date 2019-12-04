@@ -7,7 +7,6 @@
 <%@page import="org.openxava.web.Ids"%>
 <%@page import="org.openxava.web.WebEditors"%>
 <%@page import="org.openxava.web.DescriptionsLists"%> 
-<%@page import="org.openxava.web.layout.LayoutFactory"%>
 <%@page import="org.openxava.util.XavaPreferences"%>
 <%@page import="org.openxava.util.Is"%>
 
@@ -58,9 +57,6 @@ String label = ref.getLabel(request);
 </span>
 <% } %>
 <%=postLabel%>
-<%=preIcons%>
-<%@ include file="referenceEditorIcons.jsp"%>
-<%=postIcons%>
 <%=preEditor%>
 <% 
 if (labelFormat == MetaPropertyView.SMALL_LABEL) { 
@@ -128,7 +124,8 @@ String script = throwChanged?
 %>
 
 <% if (!composite) { %>
-<span id="<xava:id name='<%="reference_editor_" + view.getPropertyPrefix() + ref.getName()%>'/>">
+<% String required = view.isEditable() && ref.isRequired() ? "class='" + style.getRequiredEditor() + "'":""; %>
+<span id="<xava:id name='<%="reference_editor_" + view.getPropertyPrefix() + ref.getName()%>'/>" <%=required%>>
 <% } %> 
 <% boolean notCompositeEditorClosed = false; %>
 <input type="hidden" name="<%=editableKey%>" value="<%=editable%>"/>

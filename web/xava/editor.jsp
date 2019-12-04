@@ -49,19 +49,17 @@ if (labelFormat == MetaPropertyView.NORMAL_LABEL) {
 </span>
 <% } %>
 <%=postLabel%>
-<%=preIcons%>
-<%@ include file="editorIcons.jsp"%>
-<%=postIcons%>
 <%=preEditor%>
 <% 
 if (labelFormat == MetaPropertyView.SMALL_LABEL) { 
 %>
 <span id="<xava:id name='<%="label_" + view.getPropertyPrefix() + p.getName()%>'/>" class="<%=style.getSmallLabel()%> <%=labelStyle%>"><%=label%></span><br/> 
 <% } %>
-<% } else { %>
-<%@ include file="editorIcons.jsp"%>
-<% } // if (!hasFrame) %>
-<span id="<xava:id name='<%="editor_" + view.getPropertyPrefix() + p.getName()%>'/>"> 
+<% } // if (!hasFrame)
+String placeholder = !Is.empty(p.getPlaceholder()) ? "data-placeholder='" + p.getPlaceholder() + "'" : "";
+String required = view.isEditable() && p.isRequired() ? style.getRequiredEditor():""; 
+%>
+<span id="<xava:id name='<%="editor_" + view.getPropertyPrefix() + p.getName()%>'/>" class="xava_editor <%=required%>" <%=placeholder%>>
 <xava:editor property="<%=p.getName()%>" editable="<%=editable%>" throwPropertyChanged="<%=throwPropertyChanged%>"/>
 </span>
 

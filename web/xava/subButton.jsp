@@ -22,7 +22,7 @@ if (Is.empty(image)) image = metaController.getImage();
 String icon = request.getParameter("icon"); 
 if (Is.empty(icon)) icon = metaController.getIcon();
 String mode = request.getParameter("xava_mode"); 
-if (mode == null) mode = manager.isSplitMode()?"detail":manager.getModeName();
+if (mode == null) mode = manager.getModeName();
 String argv = request.getParameter("argv");
 if (Is.empty(argv)) argv = "";
 // add the mode in the ids to fix problem on the split mode
