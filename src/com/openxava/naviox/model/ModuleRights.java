@@ -99,11 +99,12 @@ public class ModuleRights {
 		return result;
 	}
 	
-	public Collection<MetaMember> getExcludedMetaMembers() { 
+	
+	public Collection<MetaMember> getExcludedMetaMembers() {
 		return toMetaMembers(excludedMembers);
 	}
 	
-	public Collection<MetaMember> getReadOnlyMetaMembers() { 
+	public Collection<MetaMember> getReadOnlyMetaMembers() {
 		return toMetaMembers(readOnlyMembers);
 	}
 
@@ -117,6 +118,10 @@ public class ModuleRights {
 			} else {
 				try {
 					MetaMember metaMember = metaModel.getMetaMember(member);
+					if (member.contains(".") && metaMember instanceof MetaProperty) {
+						metaMember = ((MetaProperty) metaMember).cloneMetaProperty();
+						metaMember.setName(member);
+					}
 					result.add(metaMember);
 				} catch(ElementNotFoundException ex) {} // In the Role administration module, 
 														// a warning is printed in log				

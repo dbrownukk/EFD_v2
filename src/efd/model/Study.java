@@ -14,7 +14,8 @@ import org.openxava.util.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
-@Views({ @View(members = "Study[#studyName,projectlz,referenceYear;description,startDate,endDate;notes]"
+//@Views({ @View(members = "Study[#studyName,projectlz,referenceYear;description,startDate,endDate;notes]"
+@Views({ @View(members = "Study[#studyName,projectlz,referenceYear;description,startDate,endDate]"
 		+ ";warningMessage,"
 		+ ";Site{site};StandardOfLivingElement{stdOfLivingElement};DefaultDietItem{defaultDietItem};"
 		+ ";CharacteristicAssets/Resources{Land{characteristicsResourceLand}"

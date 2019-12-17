@@ -36,7 +36,7 @@ import org.openxava.tab.*;
 @Entity
 
 @Views({ @View(members = "Project[#projecttitle,pdate;"
-		+ "altCurrency,altExchangeRate,areaMeasurement;donor,funder,notes];livelihoodZone;"),
+		+ "altCurrency,altExchangeRate,areaMeasurement;donor,funder];Notes[notes];livelihoodZone;"),
 		@View(name = "Proj", members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
 		@View(name = "NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate"),

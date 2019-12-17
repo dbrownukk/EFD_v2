@@ -88,6 +88,11 @@ public class Folder extends Identifiable implements java.io.Serializable {
 		}
 	}
 	
+	@PostLoad
+	private void resetCreatingROOT() { 
+		creatingROOT = false;
+	}
+	
 	public static Folder find(String oid) {
 		return XPersistence.getManager().find(Folder.class, oid);
 	}

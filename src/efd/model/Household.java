@@ -14,7 +14,7 @@ import efd.actions.*;
 import efd.model.WealthGroupInterview.*;
 import efd.validations.*;
 
-@View(members = "Household[#study,householdName,householdNumber;interviewers, interviewDate,notes;spreadsheet,status];configAnswer;HouseholdMember{householdMember},"
+@View(members = "Household[#study,householdName,householdNumber;interviewers, interviewDate,status;spreadsheet];configAnswer;HouseholdMember{householdMember},"
 		+ "Assets{Land{assetLand};LiveStock{assetLiveStock};Tradeable{assetTradeable}" + ";FoodStock{assetFoodStock}"
 		+ ";Trees{assetTree};Cash{assetCash}};Crops{crop}"
 		+ ";LiveStockSales{livestockSales};LiveStockProducts{livestockProducts};Employment{employment}"

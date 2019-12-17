@@ -64,8 +64,8 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 	Site site;
 	static LivelihoodZone livelihoodZone;
 
-	private String nextAction = "ParseSpreadsheet.Validate";  // Automatically call Validate after the Parse
-	
+	//private String nextAction = "ParseSpreadsheet.Validate";  // Automatically call Validate after the Parse
+	private String nextAction = null;
 	// Sheet sheet = null;
 
 	public void execute() throws Exception {

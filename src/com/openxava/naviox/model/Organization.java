@@ -5,6 +5,7 @@ import java.util.*;
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.TrueCalculator;
 import org.openxava.filters.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
@@ -17,9 +18,9 @@ import org.openxava.util.*;
 
 @Entity
 @Table(name="OXORGANIZATIONS")
-@View(members="name, url")
-@Tabs({
-	@Tab(properties="name"),	
+@View(members="name, url; active") 
+@Tabs({	
+	@Tab(properties="name, active"), 
 	@Tab(name="OfCurrentUser", filter=UserFilter.class, 
 		properties="name", editors="Cards", 
 		baseCondition="from Organization e, in (e.users) u where u.name = ?") 
@@ -28,13 +29,19 @@ public class Organization implements java.io.Serializable {
 	
 	private static final long serialVersionUID = -5904310527593026919L;
 
-	private static HashMap<String, String> names;
+	private static Map<String, String> names; 
+	private static Set<String> deactivatedIds; 
 	
 	@Id @Hidden @Column(length=50) 
 	private String id;
 	
 	@Column(length=50) @Required
 	private String name;
+	
+	@org.hibernate.annotations.Type(type="org.hibernate.type.YesNoType")
+	@DefaultValueCalculator(TrueCalculator.class) 	
+	@Column(columnDefinition="varchar(1) default 'Y' not null") 
+	private boolean active; 
 	
 	@ManyToMany(mappedBy="organizations")
 	@ReadOnly
@@ -81,6 +88,18 @@ public class Organization implements java.io.Serializable {
 		return names.get(id);
 	}
 	
+	/** @since 6.2 */
+	public static boolean exists(String id) { 
+		if (names == null) setUp();
+		return names.containsKey(id);
+	}
+	
+	/** @since 6.2 */
+	public static boolean isActive(String id) { 
+		if (names == null) setUp();
+		return deactivatedIds == null || !deactivatedIds.contains(id);
+	}	
+	
 	/**
 	 * 
 	 * @since 5.3.2
@@ -97,6 +116,7 @@ public class Organization implements java.io.Serializable {
 	
 	public static void resetCache() {
 		names = null;
+		deactivatedIds = null; 
 	}
 
 	public static void setUp() { 
@@ -104,6 +124,10 @@ public class Organization implements java.io.Serializable {
 		names = new HashMap<String, String>();
 		for (Organization o: findAll()) {
 			names.put(o.getId(), o.getName());
+			if (!o.isActive()) {
+				if (deactivatedIds == null) deactivatedIds = new HashSet<>();
+				deactivatedIds.add(o.getId());
+			}
 		}		
 	}
 	
@@ -135,6 +159,16 @@ public class Organization implements java.io.Serializable {
 	@Override
 	public int hashCode() {
 		return getId().hashCode();
+	}
+
+	/** @since 6.2 */
+	public boolean isActive() {
+		return active;
+	}
+
+	/** @since 6.2 */
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

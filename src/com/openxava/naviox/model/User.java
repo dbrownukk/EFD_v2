@@ -68,6 +68,18 @@ public class User implements java.io.Serializable {
 	private static Properties properties;
 	private static Map<String, Boolean> actionsByModules; 
 
+	@Transient
+	private Map<MetaModule, Collection<MetaMember>> excludedMetaMembersForMetaModules; 
+
+	@Transient
+	private Map<MetaModule, Collection<MetaMember>> readOnlyMetaMembersForMetaModules; 
+	
+	@Transient
+	private Map<MetaModule, Collection<String>> excludedCollectionActionsForMetaModules; 
+	
+	@Transient
+	private Map<MetaModule, Collection<MetaAction>> excludedMetaActionsForMetaModules; 
+	
 	
 	public static User find(String name) {
 		User user = XPersistence.getManager().find(User.class, name);
@@ -82,8 +94,8 @@ public class User implements java.io.Serializable {
 	
 	public static User findByEmail(String email) { 
 		try {
-	 		Query query = XPersistence.getManager().createQuery("from User f where f.email = :email");
-	 		query.setParameter("email", email);
+			Query query = XPersistence.getManager().createQuery("from User f where lower(f.email) = :email"); 
+			query.setParameter("email", email.toLowerCase()); 
 	 		return (User) query.getSingleResult();
 		}
 		catch (NoResultException ex) {
@@ -209,6 +221,7 @@ public class User implements java.io.Serializable {
 	private Collection<SessionRecord> sessionsRecord; 
 	
 	@ReadOnly
+	@ListProperties("localizedName, unrestricted, hidden") 
 	public Collection<Module> getModules() {
 		if (roles == null) return Collections.<Module>emptyList();
 		Collection<Module> modules = new ArrayList<Module>();
@@ -426,7 +439,13 @@ public class User implements java.io.Serializable {
 		if (errors.contains()) throw new org.openxava.validators.ValidationException(errors);
 	}
 	
+	
 	@PostLoad
+	private void postLoad() {
+		updateForceChangePassword();
+		resetForMetaModulesCache();
+	}
+	
 	private void updateForceChangePassword() { 
 		if (getLastPasswordChangeDate() == null) {
 			setLastPasswordChangeDate(new Date());
@@ -437,7 +456,14 @@ public class User implements java.io.Serializable {
 		int days = Dates.daysInterval(getLastPasswordChangeDate(), new Date(), false);
 		if (days >= forceChangePasswordDays) {
 			forceChangePassword = true;
-		}
+		}		
+	}	
+	
+	private void resetForMetaModulesCache() {
+		excludedMetaMembersForMetaModules = null; 
+		readOnlyMetaMembersForMetaModules = null;
+		excludedCollectionActionsForMetaModules = null;
+		excludedMetaActionsForMetaModules = null;
 	}
 	
 	public boolean addOrganization(Organization organization) { 
@@ -596,48 +622,65 @@ public class User implements java.io.Serializable {
 	}
 	
 	public Collection<MetaAction> getExcludedMetaActionsForMetaModule(MetaModule metaModule) {
-		return collectFromRights(metaModule, new IRightsCollectionExtractor() {
-			
-			public Collection get(ModuleRights rights) {
-				return rights.getExcludedMetaActions();
-			}
-			
-		});
+		// We make cache in order refine and polish from View do not do a lot duplicated SQLs 
+		if (excludedMetaActionsForMetaModules == null) excludedMetaActionsForMetaModules = new HashMap<>();
+		Collection<MetaAction> result = excludedMetaActionsForMetaModules.get(metaModule);
+		if (result == null) {
+			result = collectFromRights(metaModule, new IRightsCollectionExtractor() {
+				public Collection get(ModuleRights rights) {
+					return rights.getExcludedMetaActions();
+				}
+			});
+			excludedMetaActionsForMetaModules.put(metaModule, result);
+		}
+		return result;		
 	}
 	
 	public Collection<String> getExcludedCollectionActionsForMetaModule(MetaModule metaModule) {
-		return collectFromRights(metaModule, new IRightsCollectionExtractor() {
-			
-			public Collection get(ModuleRights rights) {
-				return rights.getExcludedCollectionActions();
-			}
-		});
+		// We make cache in order refine and polish from View do not do a lot duplicated SQLs
+		if (excludedCollectionActionsForMetaModules == null) excludedCollectionActionsForMetaModules = new HashMap<>();
+		Collection<String> result = excludedCollectionActionsForMetaModules.get(metaModule);
+		if (result == null) {
+			result = collectFromRights(metaModule, new IRightsCollectionExtractor() {
+				public Collection get(ModuleRights rights) {
+					return rights.getExcludedCollectionActions();
+				}
+			});
+			excludedCollectionActionsForMetaModules.put(metaModule, result);
+		}
+		return result;
 	}
 	
 	public Collection<MetaMember> getExcludedMetaMembersForMetaModule(MetaModule metaModule) {
-		
-		return collectFromRights(metaModule, new IRightsCollectionExtractor() {
-			
-			public Collection get(ModuleRights rights) {
-				return rights.getExcludedMetaMembers();
-			}
-			
-		});
-
+		// We make cache in order refine and polish from View do not do a lot duplicated SQLs
+		if (excludedMetaMembersForMetaModules == null) excludedMetaMembersForMetaModules = new HashMap<>();
+		Collection<MetaMember> result = excludedMetaMembersForMetaModules.get(metaModule);
+		if (result == null) {
+			result = collectFromRights(metaModule, new IRightsCollectionExtractor() {			
+				public Collection get(ModuleRights rights) {
+					return rights.getExcludedMetaMembers();
+				}
+			});
+			excludedMetaMembersForMetaModules.put(metaModule, result);
+		}
+		return result;
 	}
 	
 	public Collection<MetaMember> getReadOnlyMetaMembersForMetaModule(MetaModule metaModule) {
-		
-		return collectFromRights(metaModule, new IRightsCollectionExtractor() {
-			
-			public Collection get(ModuleRights rights) {
-				return rights.getReadOnlyMetaMembers();
-			}
-			
-		});
-
+		// We make cache in order refine and polish from View do not do a lot duplicated SQLs
+		if (readOnlyMetaMembersForMetaModules == null) readOnlyMetaMembersForMetaModules = new HashMap<>();
+		Collection<MetaMember> result = readOnlyMetaMembersForMetaModules.get(metaModule);
+		if (result == null) {
+			result = collectFromRights(metaModule, new IRightsCollectionExtractor() {			
+				public Collection get(ModuleRights rights) {
+					return rights.getReadOnlyMetaMembers();
+				}
+			});
+			readOnlyMetaMembersForMetaModules.put(metaModule, result);
+		}
+		return result;
 	}
-	
+		
 	public Collection collectFromRights(MetaModule metaModule, IRightsCollectionExtractor extractor) { 
 		Collection result = null; 
 		for (Role role: roles) {

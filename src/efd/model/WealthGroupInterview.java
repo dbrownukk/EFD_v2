@@ -2,14 +2,21 @@ package efd.model;
 
 import java.util.*;
 
+import java.time.*;
+
+import org.apache.commons.fileupload.*;
+import org.openxava.actions.*;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.apache.commons.fileupload.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.*;
 
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 import org.openxava.filters.*;
 import org.openxava.util.*;
 
@@ -17,10 +24,11 @@ import com.openxava.naviox.model.*;
 
 import efd.validations.*;
 import efd.model.*;
+import efd.utils.*;
 
-@Views({ @View(members = "Wealth_Group_Interview[# wealthgroup" + ";wgInterviewNumber" + ",wgInterviewers"
+@Views({ @View(members = "Wealth_Group_Interview[#wealthgroup" + ";wgInterviewNumber" + ",wgInterviewers"
 		+ ",wgIntervieweesCount" + ";wgFemaleIVees" + ",wgMaleIVees" + ",wgAverageNumberInHH" + ";wgYearType"
-		+ ",wgInterviewDate," + "notes ;spreadsheet" + ",status]" + "Assets{" + ";Land{assetLand}"
+		+ ",wgInterviewDate, status ;spreadsheet]" + "Assets{" + ";Land{assetLand}"
 		+ ";LiveStock{assetLiveStock}" + ";Tradeable{assetTradeable}" + ";FoodStock{assetFoodStock}"
 		+ ";Trees{assetTree}" + ";Cash{assetCash}" + "}" + ";Crops{crop}" + ";LiveStockSales{livestockSales}"
 		+ ";LiveStockProducts{livestockProducts}" + ";Employment{employment}" + ";Transfer{transfer}"
@@ -80,6 +88,9 @@ public class WealthGroupInterview {
 
 	// ----------------------------------------------------------------------------------------------//
 
+	
+
+
 	@Id
 	@Hidden
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
@@ -90,6 +101,7 @@ public class WealthGroupInterview {
 
 	@Column(name = "WGInterviewNumber", nullable = false)
 	@Required
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgInterviewNumber;
 
 	@Column(name = "WGInterviewers", nullable = false)
@@ -106,14 +118,17 @@ public class WealthGroupInterview {
 
 	@Column(name = "WGFemaleIVees")
 	@PositiveOrZero
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgFemaleIVees;
 
 	@Column(name = "WGMaleIVees")
 	@PositiveOrZero
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgMaleIVees;
 
 	@Column(name = "WGAverageNumberInHH")
 	@Positive
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgAverageNumberInHH;
 
 	@Column(name = "WGYearType")
@@ -124,9 +139,8 @@ public class WealthGroupInterview {
 	@Stereotype("DATE")
 	private Date wgInterviewDate;
 
-	// @Editor("ValidValuesRadioButton")
-	// @ReadOnly
-	@OnChange(value = OnChangeSetWGIStatus.class)
+
+	//@OnChange(value = OnChangeSetWGIStatus.class)
 	@Column(name = "WGIStatus")
 	@Required // removes the blank
 	private Status status;
@@ -151,6 +165,7 @@ public class WealthGroupInterview {
 
 	@Stereotype("FILE")
 	@Column(length = 32, name = "WGISpreadsheet")
+	//@OnChange(OnChangeFileUpload.class)   // set status to uploaded after file upload and spreadsheet not null -- ONLY 1 OnChange per view..
 	private String spreadsheet;
 	
 	@Stereotype("FILES")

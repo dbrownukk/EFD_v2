@@ -7,6 +7,7 @@ import javax.persistence.*;
 import org.openxava.annotations.*;
 import org.openxava.application.meta.*;
 import org.openxava.jpa.*;
+import org.openxava.util.Labels;
 
 /**
  * 
@@ -128,7 +129,11 @@ public class Module implements java.io.Serializable {
 			return false;
 		return true;
 	}
-
+	
+	/** @since 6.2 */
+	public String getLocalizedName() {
+		return Labels.get(name);
+	}
 	
  	public String getApplication() {
 		return application;

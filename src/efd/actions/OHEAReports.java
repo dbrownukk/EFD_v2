@@ -537,10 +537,18 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 		for (AssetCash asset : wealthGroupInterview.getAssetCash()) {
 			ResourceSubType resourceSubType = asset.getResourceSubType();
-			Collection<Category> category = asset.getResourceSubType().getCategory();
-			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			Collection<Category> category = null;
+			ResourceType resourceType = null;
+			try {
+				category = asset.getResourceSubType().getCategory();
+				resourceType = asset.getResourceSubType().getResourcetype();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
+			
 			addToWGIArray(wealthGroupInterview, category, resourceType, resourceSubType, "Cash", null, null, asset,
-					null, null, null, null, null, null, null, null, null, null);
+ 					null, null, null, null, null, null, null, null, null, null);
 
 		}
 		for (AssetLiveStock asset : wealthGroupInterview.getAssetLiveStock()) {
@@ -569,7 +577,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			Collection<Category> category = asset.getResourceSubType().getCategory();
 			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
 			addToWGIArray(wealthGroupInterview, category, resourceType, resourceSubType, "Crop", null, null, null, null,
-					null, null, asset, null, null, null, null, null, null);
+ 					null, null, asset, null, null, null, null, null, null);
 		}
 		for (Employment asset : wealthGroupInterview.getEmployment()) {
 			ResourceSubType resourceSubType = asset.getResourceSubType();
@@ -580,9 +588,17 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 		for (LivestockProducts asset : wealthGroupInterview.getLivestockProducts()) {
-			ResourceSubType resourceSubType = asset.getResourceSubType();
-			Collection<Category> category = asset.getResourceSubType().getCategory();
-			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			ResourceSubType resourceSubType = null;
+			Collection<Category> category = null;
+			ResourceType resourceType = null ;
+			try {
+				resourceSubType = asset.getResourceSubType();
+				category = asset.getResourceSubType().getCategory();
+				resourceType = asset.getResourceSubType().getResourcetype();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			addToWGIArray(wealthGroupInterview, category, resourceType, resourceSubType, "LivestockProduct", null, null,
 					null, null, null, null, null, null, null, asset, null, null, null);
 		}
@@ -608,16 +624,16 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 					null, null, null, null, null, null, null, null, null, asset);
 		}
 
-		for (WGI wgi3 : wgi) {
+		//for (WGI wgi3 : wgi) {
 			// System.out.println(" wgi 3 Land =
 			// "+wgi3.getLand().getResourceSubType().getResourcetypename());
-			System.out.println(" wgi 3 RST = " + wgi3.getResourceSubType().getResourcetypename());
-			System.out.println(
-					" wgi 3 Site = " + wgi3.getSite().getLocationdistrict() + " " + wgi3.getSite().getSubdistrict());
-			System.out.println(" wgi 3 LZ = " + wgi3.getLivelihoodZone().getLzname());
-			System.out.println(" wgi 3 Proj = " + wgi3.getProject().getProjecttitle());
+		//	System.out.println(" wgi 3 RST = " + wgi3.getResourceSubType().getResourcetypename());
+		//	System.out.println(
+		//			" wgi 3 Site = " + wgi3.getSite().getLocationdistrict() + " " + wgi3.getSite().getSubdistrict());
+		//	System.out.println(" wgi 3 LZ = " + wgi3.getLivelihoodZone().getLzname());
+		//	System.out.println(" wgi 3 Proj = " + wgi3.getProject().getProjecttitle());
 
-		}
+		//}
 
 		System.out.println("return from array pop");
 	}
@@ -662,7 +678,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		e.cash = cash;
 
 		wgi.add(e);
-
+		System.out.println("done addtowgiarray " + wealthGroupInterview.toString());
+		//System.out.println("done addtowgiarray " + e.resourceType.getResourcetypename()+" "+e.resourceSubType.getResourcetypename());
 	}
 
 	/******************************************************************************************************************************************/
@@ -673,7 +690,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		String filename = customReportSpec.getSpecName() + Calendar.getInstance().getTime();
 		System.out.println("In Run OHEA Reports create xls 111");
 		reportWB = new JxlsWorkbook(filename);
-		System.out.println("In Run OHEA Reports create xls 222");
+		
 
 		setStyles();
 		System.out.println("In Run OHEA Reports create xls 333");
@@ -1411,7 +1428,11 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		for (int i = 0; i < wealthGroupInterview.size(); i++) {
 			for (Transfer tr : wealthGroupInterview.get(i).getTransfer()) {
+				if(tr.getTransferType()==null)
+					break;
+
 				if (type == "cash") {
+	
 					if (tr.getTransferType().equals(TransferType.Food)) {
 						trTot += tr.getUnitsSold() * tr.getPricePerUnit() * tr.getPeopleReceiving()
 								* tr.getTimesReceived();
@@ -1440,7 +1461,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		System.out.println("in calcIncome type =" + type);
 
-		for (int i = 0; i < wealthGroupInterview.size(); i++)
+		for (int i = 0; i < wealthGroupInterview.size(); i++) {
 
 			if (type == "cash") {
 
@@ -1460,7 +1481,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 			} else {
 				lsTot = 0.0;
 			}
-
+		}
 		return lsTot;
 
 	}

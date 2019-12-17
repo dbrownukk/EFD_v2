@@ -12,7 +12,9 @@ import org.openxava.annotations.*;
 public class SignIn {
 	
 	
-	@ManyToOne @DescriptionsList @LabelFormat(LabelFormatType.SMALL)
+	@ManyToOne 
+	@DescriptionsList(condition="${active} = true") 
+	@LabelFormat(LabelFormatType.SMALL)
 	@NoModify @NoCreate
 	@Required 
 	private Organization organization; 

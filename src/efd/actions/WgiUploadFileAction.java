@@ -19,10 +19,9 @@ import efd.model.WealthGroupInterview.*;
  * 
 */
 
-public class WgiUploadFileAction extends UploadFileAction implements IChainAction {
+public class WgiUploadFileAction extends LoadAttachedFileAction implements IChainAction {
+//public class WgiUploadFileAction extends UploadFileAction { // implements IChainAction {
 
-
-	
 	@SuppressWarnings("rawtypes")
 	private List fileItems;
 
@@ -30,35 +29,36 @@ public class WgiUploadFileAction extends UploadFileAction implements IChainActio
 	private String newFileProperty;
 
 	public void execute() throws Exception {
-		
+
+		System.out.println("in wgi upload");
 
 		super.execute();
-	
-		
-		
-		System.out.println("model = "+getView().getModelName());
-		if(getView().getModelName().equals("WealthGroupInterview"))
-			getView().setValue("status",efd.model.WealthGroupInterview.Status.Uploaded);
-		else if 	(getView().getModelName().equals("Household"))
-			getView().setValue("status",efd.model.WealthGroupInterview.Status.Uploaded);
-		
-		
-		
-		
-		// Remove confusion of whether or not file upload is in database or not - no longer requires a Save
-		//XPersistence.commit();
-		
-	}
 
+		System.out.println("model = " + getView().getModelName());
+		if (getView().getModelName().equals("WealthGroupInterview")) {
+			getView().setValue("status", efd.model.WealthGroupInterview.Status.Uploaded);
+			System.out.println("in wgi upload 11");
+			
+
+		} else if (getView().getModelName().equals("Household")) {
+			getView().setValue("status", efd.model.WealthGroupInterview.Status.Uploaded);
+			System.out.println("in wgi upload 22");
+			
+		}
+	}
 
 	@Override
 	public String getNextAction() throws Exception {
-		
-		System.out.println("In Save of ichain for file upload" );
-		if(getView().getModelName().equals("WealthGroupInterview")
-				|| getView().getModelName().equals("Household"))
-			return "TypicalNotResetOnSave.save";
-		return null;
-	}
+		// TODO Auto-generated method stub
+		return "TypicalNotResetOnSave.save";
+	} 
 
+	/*
+	 * @Override public String getNextAction() throws Exception {
+	 * 
+	 * System.out.println("In Save of ichain for file upload" );
+	 * if(getView().getModelName().equals("WealthGroupInterview") ||
+	 * getView().getModelName().equals("Household")) return
+	 * "TypicalNotResetOnSave.save"; return null; }
+	 */
 }

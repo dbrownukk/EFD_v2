@@ -25,7 +25,8 @@ public class Role implements java.io.Serializable {
 	private String description; 
 		
 	@OneToMany(mappedBy="role", cascade=CascadeType.REMOVE)
-	@ListProperties("module.name, excludedActions, excludedMembers, readOnlyMembers")  
+	@OrderBy("module.name asc")   
+	@ListProperties("module.localizedName, excludedActions, excludedMembers, readOnlyMembers") 
 	@NewAction("Role.addModulesRights")
 	private Collection<ModuleRights> modulesRights; 
 	

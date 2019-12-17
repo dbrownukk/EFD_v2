@@ -108,10 +108,10 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		/* Get EFD Project Details */
 
 		/* Get WealthGroup data */
-		System.out.println("before n");
+	
 		Map<?, ?> n = (Map<?, ?>) getCollectionElementView().getCollectionValues().get(row);
 
-		System.out.println("after n");
+	
 
 		String wgid = (String) n.get("wgid");
 
@@ -125,61 +125,67 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 		 * do not allow
 		 */
 
-		// Query querywgi = XPersistence.getManager().
-		// createQuery("select wi from WealthGroupInterview wi join
-		// wi.wealthgroup wg where wg.wgid = '" + wgid +"'");
+
 
 		Query querywgi = XPersistence.getManager().createQuery(
 				"select wi from WealthGroupInterview wi join wi.wealthgroup wg where wg.wgid = '" + wgid + "'");
 
 		List<WealthGroupInterview> wgi = querywgi.getResultList();
 
-		if (wgi.isEmpty()) { /* New WGInter */
-			// addMessage("Generating WGI Record");
-			System.out.println("Generating WGI 111");
+		try {
+			if (wgi.isEmpty()) { /* New WGInter */
+				// addMessage("Generating WGI Record");
+				
 
-			/* Now write the wealthgroup interview header data */
+				/* Now write the wealthgroup interview header data */
 
-			WealthGroupInterview wginew = new WealthGroupInterview();
+				WealthGroupInterview wginew = new WealthGroupInterview();
 
-			if (community.getCinterviewsequence() == null) {
+				if (community.getCinterviewsequence() == null) {
 
-				wginew.setWgInterviewNumber(interviewNumber);
+					wginew.setWgInterviewNumber(interviewNumber);
 
-			} else {
+				} else {
 
-				wginew.setWgInterviewNumber(community.getCinterviewsequence());
+					wginew.setWgInterviewNumber(community.getCinterviewsequence());
 
+				}
+
+				//wginew.setWgIntervieweesCount(1);
+
+				
+				if (StringUtils.isBlank(community.getInterviewers())) {
+
+					wginew.setWgInterviewers("-");
+
+				} else {
+
+					wginew.setWgInterviewers(community.getInterviewers());
+				}
+
+				wginew.setWgFemaleIVees(0);  // set defaults so that @depends on these works
+				wginew.setWgMaleIVees(0);
+				
+				wginew.setStatus(Status.Generated);
+				wginew.setWealthgroup(wealthgroup);
+				System.out.println("Generating Template done sets ");
+
+				XPersistence.getManager().persist(wginew);
+				// XPersistence.commit();
+
+				System.out.println("Generating Template done persist ");
+
+			} else if (wgi.size() == 1 && wgi.get(0).getStatus().equals("Generated")) {
+				System.out.println("ok to print again as status still generated in template gen " + wgi.get(0).getStatus());
+			} else if (wgi.size() == 1 && wgi.get(0).getStatus().toString() != "Generated") /* template already generated */
+			{
+
+				addError(".... Template cannot be regenerated once it has been uploaded, parsed or validated");
+				return null;
 			}
-
-			//wginew.setWgIntervieweesCount(1);
-
-			System.out.println("Generating WGI interviewers " + community.getInterviewers());
-			if (StringUtils.isBlank(community.getInterviewers())) {
-
-				wginew.setWgInterviewers("-");
-
-			} else {
-
-				wginew.setWgInterviewers(community.getInterviewers());
-			}
-
-			wginew.setStatus(Status.Generated);
-			wginew.setWealthgroup(wealthgroup);
-			System.out.println("Generating Template done sets ");
-
-			XPersistence.getManager().persist(wginew);
-			// XPersistence.commit();
-
-			System.out.println("Generating Template done persist ");
-
-		} else if (wgi.size() == 1 && wgi.get(0).getStatus().equals("Generated")) {
-			System.out.println("ok to print again as status still generated in template gen " + wgi.get(0).getStatus());
-		} else if (wgi.size() == 1 && wgi.get(0).getStatus().toString() != "Generated") /* template already generated */
-		{
-
-			addError(".... Template cannot be regenerated once it has been uploaded, parsed or validated");
-			return null;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		System.out.println("In careetscenario 22");

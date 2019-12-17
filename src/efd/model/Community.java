@@ -24,7 +24,7 @@ import efd.validations.*;
 
 		@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
 				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
-				+ "notes;wgpercenttotal,warningMessage;ddipercenttotal,warningDDIMessage]" + "Wealth_group{wealthgroup}"
+				+ "[wgpercenttotal,warningMessage;ddipercenttotal,warningDDIMessage]]" + "Wealth_group{wealthgroup}"
 				+  "StandardOfLivingElement{stdOfLivingElement};"
 				+ "DefaultDietItem{defaultDietItem}" + "Community_year_notes{communityyearnotes},"),
 		@View(name = "Communitynoproject", members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;"

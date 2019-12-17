@@ -14,7 +14,6 @@ import com.openxava.naviox.*;
 import com.openxava.naviox.model.*;
 import com.openxava.naviox.util.*;
 
-
 import com.openxava.phone.web.*;
 
 import efd.model.*;
@@ -26,61 +25,44 @@ import efd.model.WealthGroupInterview.*;
  * DRB 16/8/18
  */
 
-
 public class OnChangeSetWGIStatus extends OnChangePropertyBaseAction {
 	public void execute() throws Exception {
 
-		
 		removeActions("SetEditable.SetEditable");
 		System.out.println("In change for WGIstatus");
 
-		EntityManager em = XPersistence.createManager();
+		//EntityManager em = XPersistence.createManager();
 
 		WealthGroupInterview wgint = (WealthGroupInterview) getView().getEntity(); // Displayed WGI
 
 		/* need to get original status value from database */
 
-		String wgiid = wgint.getWgiid();
-		Query querywgi = em.createQuery("select status from WealthGroupInterview where wgiid = '" + wgiid + "'");
-		Object wgistatus = querywgi.getSingleResult();
+		// String wgiid = wgint.getWgiid();
+		// Query querywgi = em.createQuery("select status from WealthGroupInterview
+		// where wgiid = '" + wgiid + "'");
+		// Object wgistatus = querywgi.getSingleResult();
 
-	
-		/* If changed to Validated, disallow and reset to previous 
-		 * Need to use 'Validate Asset Data to set to Validate */
+		/*
+		 * If changed to Validated, disallow and reset to previous Need to use 'Validate
+		 * Asset Data to set to Validate
+		 */
 
-		if (getNewValue().toString().equals("Validated") && wgistatus.toString() != "Validated") {
+		if (getNewValue().toString().equals("Validated") && wgint.getStatus().toString() != "Validated") {
 			addError("To set Wealthgroup to Validated run Validate Asset Data");
-			wgint.setStatus((Status) wgistatus);
+			wgint.setStatus(wgint.getStatus());
 			getView().refresh();
 		}
-		
-		if(wgint.getStatus() == (efd.model.WealthGroupInterview.Status.Validated))
-		{
+
+		if (wgint.getStatus() == (efd.model.WealthGroupInterview.Status.Validated)) {
 			System.out.println("set to read only in On Change 3");
-			
+
 			getView().setEditable(false);
-			//getView().setViewName("ReadOnly");
-			//getView().displayAsDescriptionsListAndReferenceView();
-			addActions("SetEditable.SetEditable");			
+			// getView().setViewName("ReadOnly");
+			// getView().displayAsDescriptionsListAndReferenceView();
+			addActions("SetEditable.SetEditable");
 		}
-		
-			
-		
-		try {
-			// not working - still have hex value
-			System.out.println("sub in change section = "+getView().getActiveSection());
-			//getView().setHidden("resourceSubType", true);
-		}
-		catch			(Exception ex)
-		{
-			System.out.println("Exception thrown  :" + ex);
-		}
-		
-		//getView().getSectionView(3).getAllValues().
-	
-		
-		em.close(); 
-		
+
+		//em.close();
 
 	}
 
