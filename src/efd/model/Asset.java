@@ -1,25 +1,29 @@
 package efd.model;
 
+import javax.annotation.*;
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 import efd.actions.*;
 import efd.validations.*;
 
 import efd.model.*;
 
-
-
 @MappedSuperclass
 
-
 public class Asset {
-
 
 	@Column(name = "Status", nullable = false)
 	@OnChange(OnChangeAssetStatus.class)
 	@DisplaySize(15)
+	@Required
+	@Editor(value = "ValidValuesCombo")//ValidValuesHorizontalRadioButton
+
+	@DefaultValueCalculator(value = EnumCalculator.class, properties = {
+			@PropertyValue(name = "enumType", value = "efd.model.Asset$Status"),
+			@PropertyValue(name = "value", value = "Invalid") })
 	private Status status;
 
 	public enum Status {
@@ -27,27 +31,23 @@ public class Asset {
 	}
 
 	/* Unit should be set to Nullable in Cash asset database table */
-	@DefaultValueCalculator(
-			value=efd.validations.UnitCalculator.class,
-			properties={ @PropertyValue(name="string", value="?") }
-			)
+	@DefaultValueCalculator(value = efd.validations.UnitCalculator.class, properties = {
+			@PropertyValue(name = "string", value = "?") })
 	@Column(name = "Unit", length = 50, nullable = false)
-	@Required
-	//@OnChange(OnChangeUnit.class)
+	// @Required
+	// @OnChange(OnChangeUnit.class)
 	private String unit;
-	
-	
-	// Due to a Hibernate ddl generation bug am using localunit and localunit multiplier here instead of efd.model.LocalUnit
-	
+
+	// Due to a Hibernate ddl generation bug am using localunit and localunit
+	// multiplier here instead of efd.model.LocalUnit
+
 	@Hidden
 	@Column(name = "LocalUnit", length = 32, nullable = true)
 	private String localUnit;
-	
+
 	@Hidden
 	@Column(name = "LocalUnitMultiplier", nullable = true)
 	private Double localUnitMultiplier;
-	
-
 
 	public String getLocalUnit() {
 		return localUnit;
@@ -80,10 +80,5 @@ public class Asset {
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
-	
-
-
-	
-
 
 }

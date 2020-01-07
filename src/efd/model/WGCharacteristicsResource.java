@@ -8,6 +8,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
+import org.openxava.util.*;
 
 import efd.actions.*;
 
@@ -40,11 +41,22 @@ properties = "wealthgroup.community.projectlz.projecttitle,"
 
 
 public class WGCharacteristicsResource {
+	
+	@PrePersist
+	@PreUpdate
+	private void validate() throws Exception {
+		
+		if ((study == null && wealthgroup == null) || (study != null && wealthgroup != null)) {
+			throw new IllegalStateException(
 
+					XavaResources.getString("WG Characteristic must belong to a Study or a Community"));
 
+		}
+	}
+	
+	
 	@Id
-	@Hidden // The property is not shown to the user. It's an internal
-			// identifier
+	@Hidden 
 	@GeneratedValue(generator = "system-uuid") // Universally Unique Identifier
 												// (1)
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")

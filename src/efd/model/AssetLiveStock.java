@@ -23,8 +23,8 @@ import org.openxava.calculators.*;
 public class AssetLiveStock extends Asset{
 
 
-	@Column(name = "LiveStockTypeEnteredName", length = 50, nullable=false)
-	@Required
+	@Column(name = "LiveStockTypeEnteredName", length = 50, nullable=true)
+	//@Required
 	private String liveStockTypeEnteredName;
 	
 	@Column(name = "NumberOwnedAtStart", nullable=false )

@@ -2,25 +2,24 @@ package efd.tests;
 
 import java.text.*;
 import java.util.*;
-import com.gargoylesoftware.htmlunit.*;
-import com.gargoylesoftware.htmlunit.html.*;
-import com.gargoylesoftware.htmlunit.javascript.host.*;
 
+import org.openxava.test.tests.*;
 import org.openxava.tests.*;
 
 
-public class ProjectTest extends ModuleTestBase{
+public class ProjectTest extends CustomizeListTestBase{
 
+	
 	public ProjectTest(String testName) {
-		super(testName, "EFD_HM", "Project");
+		super(testName, "Project");
 		
 	}
 	
 	public void testCreateUpdateDeleteProject() throws Exception{
 		
-		Date date = new Date();
+	
 		
-		login("admin", "admin2018");
+		login("oihm", "oihm2019");
 		System.out.println("done login");
 		//Create
 		waitAJAX();

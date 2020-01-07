@@ -7,9 +7,9 @@ import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 
 
-@View(members = "PriceYieldVariation[#resource,;ield;price;modellingScenario]")
+@View(members = "PriceYieldVariation[#resource;yield;price]")
 
-@Tab(properties = "resource,yield,price,modellingScenario")
+@Tab(properties = "resource.resourcetype.resourcetypename,resource.resourcetypename,yield,price")
 
 @Entity
 
@@ -23,7 +23,7 @@ public class PriceYieldVariation extends EFDIdentifiable {
 	@NoCreate
 	@NoModify
 	@Required
-	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename, resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
 	private ResourceSubType resource;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)

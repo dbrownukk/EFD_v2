@@ -26,10 +26,6 @@ public class WildFood extends Asset{
 	@Column(name = "WildFoodName", length = 50)
 	private String wildFoodName;
 	
-	
-	//@Column(name = "WildfoodProduct", length = 50)
-	//@DisplaySize(20)
-	//private String wildfoodProduct;
 
 	@Column(name = "UnitsProduced", length = 6)
 	@NotNull

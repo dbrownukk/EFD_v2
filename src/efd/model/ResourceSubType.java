@@ -7,10 +7,12 @@ import efd.validations.*;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.*;
+
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.jpa.*;
@@ -29,6 +31,8 @@ import org.openxava.util.*;
 		"ResourceTypeName" }))
 public class ResourceSubType {
 
+	
+	
 	@PreUpdate
 	
 
@@ -47,6 +51,7 @@ public class ResourceSubType {
 		}
 
 	}
+	
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -59,8 +64,9 @@ public class ResourceSubType {
 	@NoModify
 	@NoCreate
 	@JoinColumn(name = "ReourceType")
-	@OnChange(OnChangeRT.class)
+	@OnChange(notForViews="FromLocalUnit",value=OnChangeRT.class)
 	@DescriptionsList(descriptionProperties = "resourcetypename")
+	
 	private ResourceType resourcetype;
 
 	@Column(name = "ResourceTypeName", length = 255)
@@ -89,7 +95,7 @@ public class ResourceSubType {
 	@NewAction("")
 	private Collection<CustomReportSpec> customReportSpecs;
 
-	@OneToMany(mappedBy = "resourceSubType")
+	@OneToMany(mappedBy = "resourceSubType",cascade=CascadeType.REMOVE)
 	private Collection<LocalUnit> localUnits;
 
 	public Collection<LocalUnit> getLocalUnits() {

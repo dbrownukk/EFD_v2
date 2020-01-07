@@ -23,16 +23,16 @@ public class Crop extends Asset {
 
 	
 	@Column(name = "UnitsProduced", nullable = false)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold")
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 
 	@Column(name = "PricePerUnit", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 	
 	
@@ -44,7 +44,7 @@ public class Crop extends Asset {
 
 	@Column(name = "UnitsOtherUse", length = 255)
 	@DisplaySize(10)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsOtherUse;
 
 	@Column(name = "Market1", length = 50)

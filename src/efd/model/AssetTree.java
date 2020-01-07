@@ -16,8 +16,7 @@ import org.openxava.calculators.*;
 public class AssetTree extends Asset{
 
 
-	@Column(name = "TreeTypeEnteredName", length = 50, nullable=false)
-	@Required
+	@Column(name = "TreeTypeEnteredName", length = 50, nullable=true)
 	private String treeTypeEnteredName;
 	
 	@Column(name = "NumberOwned", nullable=false )

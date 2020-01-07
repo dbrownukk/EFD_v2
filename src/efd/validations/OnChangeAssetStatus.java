@@ -16,13 +16,21 @@ public class OnChangeAssetStatus extends OnChangePropertyBaseAction {
 
 		Object status;
 		try { // wrongly fires on startup
+			
+			//System.out.println("In asset status onchange ");
+			
 			status = getView().getValue("status");
+			
 			
 			
 			String rst = getView().getValueString("resourceSubType.idresourcesubtype");
 			
 			
-			
+			if(status.toString().isEmpty())
+			{
+				System.out.println("status is empty");
+				getView().setValue("status", Status.Invalid);
+			}
 			
 			if ((status.equals(Asset.Status.Valid)) && (rst.isEmpty())) {
 				getView().setValue("status", Status.Invalid);

@@ -22,21 +22,20 @@ import efd.validations.*;
 
 @Views({
 
-		@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
-				+ "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
-				+ "[wgpercenttotal,warningMessage;ddipercenttotal,warningDDIMessage]]" + "Wealth_group{wealthgroup}"
-				+  "StandardOfLivingElement{stdOfLivingElement};"
-				+ "DefaultDietItem{defaultDietItem}" + "Community_year_notes{communityyearnotes},"),
-		@View(name = "Communitynoproject", members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;"
-				+ "interviewers;" + "]," + "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
-				+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
+	@View(members = "Community[Project[projectlz];site,Interview [cinterviewdate;cinterviewsequence;interviewers;],"
+			+ "Attendees[" + "civf;" + "civm;" + "civparticipants]"
+			+ ";wgpercenttotal,warningMessage;ddipercenttotal,warningDDIMessage]" + "Wealth_group{wealthgroup}"
+			+  "StandardOfLivingElement{stdOfLivingElement};"
+			+ "DefaultDietItem{defaultDietItem}" + "Community_year_notes{communityyearnotes},"),
+	@View(name = "Communitynoproject", members = "site," + "Interview [" + "cinterviewdate;" + "cinterviewsequence;"
+			+ "interviewers;" + "]," + "Attendees[" + "civf;" + "civm;" + "civparticipants;" + "],"
+			+ "Wealth_group{wealthgroup}" + "Community_year_notes{communityyearnotes},"),
 
-		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
-		@View(name = "FromWGCommunity", members = "projectlz, site"),
-		@View(name = "FromReport", members = "site"),
-		@View(name = "FromStdOfLiving", members = "site"),
-		@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,interviewers") })
-
+	@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm"),
+	@View(name = "FromWGCommunity", members = "projectlz, site"),
+	@View(name = "FromReport", members = "site"),
+	@View(name = "FromStdOfLiving", members = "site"),
+	@View(name = "OriginalCommunity", members = "site;livelihoodzone;cinterviewdate,cinterviewsequence,civf,civm,interviewers") })
 /* Note the use of underscore in labels - mapped in i18n file */
 
 @Tab(properties = "projectlz.projecttitle,site.livelihoodZone.lzname,cinterviewsequence,site.locationdistrict,site.subdistrict,cinterviewdate,interviewers,civm,civf")

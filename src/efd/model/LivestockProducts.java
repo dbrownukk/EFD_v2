@@ -25,11 +25,11 @@ public class LivestockProducts extends Asset {
 
 	
 	@Column(name = "UnitsProduced", nullable = false)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold")
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 
 	@Column(name = "PricePerUnit", precision = 10, scale = 2)
@@ -47,7 +47,7 @@ public class LivestockProducts extends Asset {
 	//@Column(name = "UnitsConsumed")
 	//private Double unitsConsumed;
 
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "UnitsOtherUse")
 	private Double unitsOtherUse;
 

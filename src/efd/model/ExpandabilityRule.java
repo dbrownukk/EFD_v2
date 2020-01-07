@@ -56,6 +56,7 @@ public class ExpandabilityRule extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@Required
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
+	@Positive
 	private int sequence;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -65,12 +66,13 @@ public class ExpandabilityRule extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename, resourcetypename")
 	private ResourceSubType appliedResourceSubType;
 	/*************************************************************************************************/
-	
+	@PositiveOrZero
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private int expandabilityIncreaseLimit;
 	/*************************************************************************************************/
 	@Required
-	@DefaultValueCalculator(ZeroIntegerCalculator.class)
+	@PositiveOrZero
+	@DefaultValueCalculator(value=IntegerCalculator.class, properties=@PropertyValue(name="value", value="100"))
 	private int expandabilityLimit;
 	/*************************************************************************************************/
 	public String getRuleName() {

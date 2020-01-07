@@ -16,18 +16,17 @@ import org.openxava.calculators.*;
 public class NonFoodPurchase extends Asset{
 
 
-	@Column(name = "ItemPurchased", length = 50, nullable=false)
-	@Required
+	@Column(name = "ItemPurchased", length = 50, nullable=true)
 	private String itemPurchased;
 	
 	@Column(name = "UnitsPurchased", nullable=false )
-	@Required
-	@NotNull
+	@Positive
 	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsPurchased;
 
 	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
+	@PositiveOrZero
 	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 

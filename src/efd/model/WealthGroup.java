@@ -13,9 +13,9 @@ import org.hibernate.annotations.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 
-@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;this.community;wgorder;wghhsize,wgpercent;wgpercenttotal];wgcharacteristicsresource"),
-		@View(name = "FromCommunity", members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder;wghhsize,wgpercent];wgcharacteristicsresource"),
-		@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder;wghhsize,wgpercent];wgcharacteristicsresource"),
+@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;this.community;wgorder;wgwives,wghhsize,wgpercent;wgpercenttotal];wgcharacteristicsresource"),
+		@View(name = "FromCommunity", members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder;wgwives,wghhsize,wgpercent];wgcharacteristicsresource"),
+		@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder;wgwives,wghhsize,wgpercent];wgcharacteristicsresource"),
 		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
 		@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
 		@View(name = "SimpleWG", members = ";cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
