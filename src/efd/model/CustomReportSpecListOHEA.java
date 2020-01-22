@@ -20,7 +20,7 @@ public class CustomReportSpecListOHEA {
 	@ManyToOne
 	@NoCreate
 	@NoModify
-
+    @Required
 	@DescriptionsList(descriptionProperties = "specName")
 	private CustomReportSpecOHEA customReportSpec;
 

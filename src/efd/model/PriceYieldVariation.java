@@ -23,7 +23,7 @@ public class PriceYieldVariation extends EFDIdentifiable {
 	@NoCreate
 	@NoModify
 	@Required
-	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename,resourcetypename", condition = "${resourcetype.resourcetypename} = 'Crops'")
 	private ResourceSubType resource;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)

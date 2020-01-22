@@ -11,35 +11,33 @@ import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.util.*;
 
+import efd.validations.*;
 
-@View(members = "ExpandabilityRule[#ruleName;sequence;expandabilityIncreaseLimit;expandabilityLimit;studyRuleSet;communityRuleSet;appliedResourceSubType]")
+@View(members = "ExpandabilityRule[#ruleName;ResourceSubType[appliedResourceSubType];Ruleset[studyRuleSet;communityRuleSet];sequence;expandabilityIncreaseLimit;expandabilityLimit]")
 
-@Tab(properties = "ruleName,sequence,expandabilityIncreaseLimit,expandabilityLimit,studyRuleSet,communityRuleSet,appliedResourceSubType")
+@Tab(properties = "ruleName,sequence,expandabilityIncreaseLimit,expandabilityLimit,studyRuleSet.studyName,communityRuleSet.site.locationdistrict,appliedResourceSubType.resourcetypename")
 
 @Entity
 
 @Table(name = "ExpandabilityRule")
 public class ExpandabilityRule extends EFDIdentifiable {
 
-	
 	@PrePersist
 	@PreUpdate
 	private void validate() throws Exception {
-	
 
-		if ((communityRuleSet  == null && studyRuleSet == null) || (communityRuleSet  != null && studyRuleSet != null)) {
+		if ((communityRuleSet == null && studyRuleSet == null) || (communityRuleSet != null && studyRuleSet != null)) {
 
-				throw new IllegalStateException(
+			throw new IllegalStateException(
 
-						XavaResources.getString("Expandability Rule must be associated with a Study or a Community"));
+					XavaResources.getString("Expandability Rule must be associated with a Study or a Community"));
 
-			}
 		}
+	}
 
-	
 	/*************************************************************************************************/
 	@Required
-	@Column(length=45, nullable=false, unique = true)
+	@Column(length = 45, nullable = false, unique = true)
 	private String ruleName;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -63,63 +61,73 @@ public class ExpandabilityRule extends EFDIdentifiable {
 	@NoCreate
 	@NoModify
 	@Required
-	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename, resourcetypename")
+	@DescriptionsList(descriptionProperties = "resourcetype.resourcetypename, resourcetypename", condition = "${resourcetype.resourcetypename} != 'Cash'")
+	@OnChange(OnChangeRSTExpandability.class)
 	private ResourceSubType appliedResourceSubType;
 	/*************************************************************************************************/
 	@PositiveOrZero
 	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private int expandabilityIncreaseLimit;
 	/*************************************************************************************************/
-	@Required
 	@PositiveOrZero
-	@DefaultValueCalculator(value=IntegerCalculator.class, properties=@PropertyValue(name="value", value="100"))
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
+	//@DefaultValueCalculator(value = IntegerCalculator.class, properties = @PropertyValue(name = "value", value = "100"))
 	private int expandabilityLimit;
 	/*************************************************************************************************/
 	public String getRuleName() {
 		return ruleName;
 	}
+
 	public void setRuleName(String ruleName) {
 		this.ruleName = ruleName;
 	}
+
 	public Study getStudyRuleSet() {
 		return studyRuleSet;
 	}
+
 	public void setStudyRuleSet(Study studyRuleSet) {
 		this.studyRuleSet = studyRuleSet;
 	}
+
 	public Community getCommunityRuleSet() {
 		return communityRuleSet;
 	}
+
 	public void setCommunityRuleSet(Community communityRuleSet) {
 		this.communityRuleSet = communityRuleSet;
 	}
+
 	public int getSequence() {
 		return sequence;
 	}
+
 	public void setSequence(int sequence) {
 		this.sequence = sequence;
 	}
+
 	public ResourceSubType getAppliedResourceSubType() {
 		return appliedResourceSubType;
 	}
+
 	public void setAppliedResourceSubType(ResourceSubType appliedResourceSubType) {
 		this.appliedResourceSubType = appliedResourceSubType;
 	}
+
 	public int getExpandabilityIncreaseLimit() {
 		return expandabilityIncreaseLimit;
 	}
+
 	public void setExpandabilityIncreaseLimit(int expandabilityIncreaseLimit) {
 		this.expandabilityIncreaseLimit = expandabilityIncreaseLimit;
 	}
+
 	public int getExpandabilityLimit() {
 		return expandabilityLimit;
 	}
+
 	public void setExpandabilityLimit(int expandabilityLimit) {
 		this.expandabilityLimit = expandabilityLimit;
 	}
 
-	
-	
-	
-	
 }

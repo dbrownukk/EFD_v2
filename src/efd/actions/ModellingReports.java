@@ -1,83 +1,52 @@
 
-/* Run OIHM Reports2 
+/* Run Modelling Reports 
  * 
  *
- * Current codes 20/5/19
+ * Current codes 13/1/20
  * DRB
  * 
- * Note that Issue 145 has DI calc
+ * No Custom report spec
+ * Assume runs all reports 
+ * #410-#425
  * 
-223 HH Disposable Income (DI): sorted by ascending DI 223
-224 HH DI with Standard of Living Costs: sorted by ascending DI 224
-225 HH Cash Income by source type: sorted by ascending DI 225
-226 HH Food Income by source type: sorted by ascending DI 226
-227 HH Land Assets: sorted by ascending DI 227
-228 HH Livestock Assets: sorted by ascending DI 228
-237 Report HH Members characteristics 237
-236 Calculate Adult Equivalent KCal requirement for a Household 236
-238 Report Population by Age and Sex 238
- *
- * Get all HH for this study into hh array
- * 
- * Filter hh on Custom Report filters 
- * 
- * Calculate DI etc.
+ * Works across OHEA Community/WGI and OIHM Study/HH
  * 
  * */
 
 package efd.actions;
 
 import java.text.*;
-
 import java.util.*;
-import java.util.Date;
 import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-import java.math.BigDecimal;
-import java.sql.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang.*;
-import org.apache.poi.hssf.record.*;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.util.*;
 import org.openxava.actions.*;
-import org.openxava.annotations.*;
 import org.openxava.jpa.*;
-import org.openxava.model.*;
 import org.openxava.tab.*;
-import org.openxava.tab.Tab;
 import org.openxava.util.jxls.*;
 import org.openxava.web.servlets.*;
-import org.openxava.util.*;
 
-import com.sun.xml.internal.bind.v2.*;
-
-import efd.actions.OHEAReports.*;
-import efd.actions.OIHMReports.*;
 import efd.model.*;
-import efd.model.ConfigQuestion.*;
 import efd.model.HouseholdMember.*;
 import efd.model.Project.*;
 import efd.model.StdOfLivingElement.*;
 import efd.model.Transfer.*;
 import efd.model.WealthGroupInterview.*;
 import efd.utils.*;
-import net.sf.jasperreports.charts.type.*;
 
-public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsConstants {
+public class ModellingReports extends TabBaseAction implements IForwardAction, JxlsConstants {
 
-	static Double RC = 2100.0 * 365; // NOTE that this is from OHEA. In OIHM we can be more accurate as we know age
-										// and sex of HH Members
+	static Double RC = 2100.0 * 365;
 
 	static final int NUMBER_OF_REPORTS = 15;
 	static final int NUMBEROFAVERAGES = 10;
 	private Community community = null;
 	private LivelihoodZone livelihoodZone = null;
 	private Project project = null;
+	private Study study = null;
 	// private CustomReportSpec customReportSpec = null;
 
 	private List<Report> reportList;
@@ -128,6 +97,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	Boolean isDisplayWealthgroupDone = false;
 	Boolean isSelectedSites = false;
 	String currency2;
+	Boolean isOHEA = false;
+	Boolean isOIHM = false;
 
 	private static DecimalFormat df2 = new DecimalFormat("#.##");
 
@@ -144,29 +115,50 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 	@Override
 	public void execute() throws Exception {
 
-		System.out.println("In Run OHEA Reports ");
+		System.out.println("In Run Modelling Reports ");
 		int countValidated = 0;
-		String specID = getView().getValueString("customReportSpec.id");
-		if (specID.equals("")) {
-			addError("Choose a Report Spec");
-			return;
+		String selectionView;
+
+		/* Need to determine if for OHEA or OIHM (LZ or HH) */
+
+		Map allValues = getView().getAllValues();
+
+		if (allValues.containsKey("study")) {
+			isOIHM = true; // OIHM Study and HH
+			Map studymap = (Map) allValues.get("study");
+			String studyId = (String) studymap.get("id");
+			Efdutils.em("studyId  = = " + studyId);
+			/*
+			 * TODO get study
+			 */
+			selectionView = "study.household";
+
+		} else {
+			isOHEA = true; // OHEA Community and LZ
+
+			/*
+			 * TODO
+			 * 
+			 * get Project
+			 */
+			selectionView = "livelihoodZone.lzid";
+
+			String lzid = getView().getValueString("livelihoodZone.lzid");
+			livelihoodZone = XPersistence.getManager().find(LivelihoodZone.class, lzid);
+
+			String projectid = getPreviousView().getValueString("projectid");
+			project = XPersistence.getManager().find(Project.class, projectid);
+
 		}
-
-		Map allValues = getPreviousView().getAllValues();
-
-		String lzid = getView().getValueString("livelihoodZone.lzid");
-		livelihoodZone = XPersistence.getManager().find(LivelihoodZone.class, lzid);
-
-		String projectid = getPreviousView().getValueString("projectid");
-		project = XPersistence.getManager().find(Project.class, projectid);
 
 		Object communityId = null; // getPreviousView().getValue("communityid");
 
-		Tab targetTab = getView().getSubview("livelihoodZone.site").getCollectionTab();
+		Tab targetTab = getView().getSubview(selectionView).getCollectionTab();
 
 		Map[] selectedOnes = targetTab.getSelectedKeys();
 
 		System.out.println("selected keys a = " + selectedOnes.length);
+
 		WealthGroupInterview wealthGroupInterview = null;
 		Site site = null;
 
@@ -181,7 +173,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 				String subKey = key.toString().substring(12, 44);
 				System.out.println("subkey = " + subKey.toString());
 				site = XPersistence.getManager().find(Site.class, subKey);
-				System.out.println("site = " + site.getLocationdistrict() + " " + site.getSubdistrict());
+				System.out.println("site = " + site.toString());
 
 				// add to array for Sites/Communities
 				Site s = new Site();
@@ -193,33 +185,10 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 				try {
 
 					for (Community community2 : site.getCommunity()) {
-
-						/*
-						 * Is this for current Project?
-						 */
-
-						Efdutils.em("getcurrent community2 Project = " + community2.getProjectlz().getProjecttitle());
-						Efdutils.em("Project context = " + project.getProjecttitle());
-
 						countValidated = 0;
 						System.out.println("community = " + community2.getSite().getLocationdistrict() + " "
 								+ community2.getSite().getSubdistrict());
 						System.out.println("nos of wgs = " + community2.getWealthgroup().size());
-
-						for (WealthGroup wealthGroup : community2.getWealthgroup()) {
-							Efdutils.em(
-									"in comm loop site = " + wealthGroup.getCommunity().getSite().getLocationdistrict()
-											+ " " + wealthGroup.getCommunity().getSite().getSubdistrict());
-							Efdutils.em("in comm loop proj  = "
-									+ wealthGroup.getCommunity().getProjectlz().getProjecttitle());
-							Efdutils.em("in comm loop wgid  = " + wealthGroup.getWgid());
-							Efdutils.em("in comm loop communityid  = " + wealthGroup.getCommunity().getCommunityid());
-
-						}
-						if (!community2.getProjectlz().equals(project)) {
-							Efdutils.em("Wrong Project");
-							break;
-						}
 
 						Iterator<WealthGroup> wgIterator = community2.getWealthgroup().iterator();
 						while (wgIterator.hasNext()) {
@@ -252,7 +221,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 						System.out.println("countValidated = " + countValidated);
 						if (countValidated < 3) // Community needs at least 3 Validated WGs
 						{
-							//addError("Number of Validated Wealthgroup Interviews is less than 3");
 							wgi.removeIf(p -> p.community == community2);
 							wgiList.removeIf(p -> p.getWealthgroup().getCommunity() == community2);
 							System.out.println("removed community " + community2.getSite().getLocationdistrict() + " "
@@ -282,10 +250,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 					+ wgiList2.getWealthgroup().getWgnameeng());
 		}
 
-		System.out.println("no of wgilist = " + wgiList.size());
-		System.out.println("specid = " + specID);
-		CustomReportSpecOHEA customReportSpecOHEA = XPersistence.getManager().find(CustomReportSpecOHEA.class, specID);
-		System.out.println("specname = " + customReportSpecOHEA.getSpecName());
+		System.out.println("no of wgi = " + wgiSelected.size());
 
 		errno = 50;
 
@@ -299,12 +264,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		// uniqueWealthgroupInterview = wgi.stream().filter(distinctByKey(p ->
 		// p.getWealthgroupInterview().getWgiid()))
 		// .sorted(Comparator.comparing(WGI::getWgiDI)).collect(Collectors.toList());
-
-		if (filterWGI(customReportSpecOHEA) == 0) {
-			addError("No Communities meet criteria of 3 Validated Wealthgroup Interviews, change Report Spec or Validate Wealthgroup Interviews.");
-			closeDialog();
-			return;
-		}
 
 		errno = 51;
 		// Filter according to Catalog/RT/RST/HH
@@ -346,8 +305,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		errno = 54;
 		// Run reports
 		try {
-			System.out.println("in try to run reports crs = " + customReportSpecOHEA.getSpecName());
-			JxlsWorkbook report = createReport(customReportSpecOHEA);
+
+			JxlsWorkbook report = createReport("ModellingReports");
 			errno = 55;
 			getRequest().getSession().setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, report);
 			errno = 56;
@@ -360,8 +319,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 		closeDialog();
-
-		addMessage("Created OHEA Report for Community using Spec " + customReportSpecOHEA.getSpecName());
 
 	}
 
@@ -412,8 +369,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		System.out.println("filter 000");
 
-		System.out.println("in filter start wgisize = " + wgi.size());
-
 		if (customReportSpec.getCategory().size() > 0) // Apply Category Filter
 		{
 			System.out.println("in Cat filter");
@@ -462,7 +417,7 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 		System.out.println("After RT wgi = " + wgi.size());
-		if (!customReportSpec.getResourceSubType().isEmpty()) // Apply RST Filter
+		if (customReportSpec.getResourceSubType().isEmpty()) // Apply RST Filter
 		{
 			System.out.println("in RST filter");
 			List<WGI> wgRST = wgi.stream().filter(p -> p.getResourceSubType() != null).collect(Collectors.toList());
@@ -715,17 +670,15 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	/******************************************************************************************************************************************/
 
-	private JxlsWorkbook createReport(CustomReportSpecOHEA customReportSpec) throws Exception {
-		System.out.println("In Run OHEA Reports create xls 000");
+	private JxlsWorkbook createReport(String reportTitle) throws Exception {
 
-		String filename = customReportSpec.getSpecName() + Calendar.getInstance().getTime();
-		System.out.println("In Run OHEA Reports create xls 111");
+		String filename = reportTitle + Calendar.getInstance().getTime();
 		reportWB = new JxlsWorkbook(filename);
 
 		setStyles();
-		System.out.println("In Run OHEA Reports create xls 333");
-		createHeaderPage(customReportSpec); // populates reportList
-		System.out.println("In Run OHEA Reports create xls  444");
+
+		createHeaderPage(); // populates reportList
+
 		int ireportNumber = 0; // should be equal to the sheet number in workbook
 
 		/*
@@ -1851,20 +1804,20 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 	/******************************************************************************************************************************************/
 
-	private void createHeaderPage(CustomReportSpecOHEA customReportSpec) {
+	private void createHeaderPage() {
 		final int STARTROW = 6;
 		int i = STARTROW; // used for row number
 
 		System.out.println("In Create Header Page 000");
 
-		sheet[0] = reportWB.addSheet("Custom Report Spec");
+		sheet[0] = reportWB.addSheet("Coping Strategy Summary");
 		setSheetStyle(sheet[0]);
 		sheet[0].setColumnWidths(1, 40, 80, 50, 50, 50, 50, 25, 25, 50, 50);
 
 		sheet[0].setValue(1, 1, "Date:", boldRStyle);
 		sheet[0].setValue(2, 1, new Date(), dateStyle);
 		sheet[0].setValue(1, 2, "Spec Name:", boldRStyle);
-		sheet[0].setValue(2, 2, customReportSpec.getSpecName(), textStyleLeft);
+		// sheet[0].setValue(2, 2, customReportSpec.getSpecName(), textStyleLeft);
 		sheet[0].setValue(1, 3, "Livelihood Zone:", boldRStyle);
 		sheet[0].setValue(2, 3, project.getProjecttitle() + " / " + livelihoodZone.getLzname(), textStyleLeft);
 		// study.getReferenceYear(), textStyle);
@@ -1873,10 +1826,6 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		/* If no reports in custom report spec then use all reports */
 		i++;
-		if (customReportSpec.getReport().size() > 0)
-			reportList = (List<Report>) customReportSpec.getReport();
-		else
-			reportList = XPersistence.getManager().createQuery("from Report").getResultList();
 
 		reportList.sort(Comparator.comparingInt(Report::getCode));
 
@@ -1926,10 +1875,10 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		sheet[0].setValue(col, i, "Categories Included", boldTopStyle);
 		i++;
-		for (Category category : customReportSpec.getCategory()) {
-			sheet[0].setValue(col, i, category.getCategoryName(), textStyle);
-			i++;
-		}
+		// for (Category category : customReportSpec.getCategory()) {
+		// sheet[0].setValue(col, i, category.getCategoryName(), textStyle);
+		// i++;
+		// }
 
 		i = STARTROW;
 		col++;
@@ -1937,10 +1886,10 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		sheet[0].setValue(col, i, "Resources Included", boldTopStyle);
 		i++;
-		for (ResourceType rt : customReportSpec.getResourceType()) {
-			sheet[0].setValue(col, i, rt.getResourcetypename(), textStyle);
-			i++;
-		}
+		// for (ResourceType rt : customReportSpec.getResourceType()) {
+		// sheet[0].setValue(col, i, rt.getResourcetypename(), textStyle);
+		// i++;
+		// }
 
 		i = STARTROW;
 		col++;
@@ -1949,10 +1898,10 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		sheet[0].setValue(col, i, "Resource Subtypes Included", boldTopStyle);
 		i++;
-		for (ResourceSubType rst : customReportSpec.getResourceSubType()) {
-			sheet[0].setValue(col, i, rst.getResourcetypename(), textStyle);
-			i++;
-		}
+		// for (ResourceSubType rst : customReportSpec.getResourceSubType()) {
+		// sheet[0].setValue(col, i, rst.getResourcetypename(), textStyle);
+		// i++;
+		// }
 
 		String currency = livelihoodZone.getCountry().getCurrency();
 

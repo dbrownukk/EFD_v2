@@ -11,7 +11,10 @@ import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.util.*;
 
-@View(members = "ModellingScenario[#title;author;date;study;project]PriceYieldVariations{priceYieldVariations},Description{description}")
+@View(members = "ModellingScenario[#title;author;date;study;project];PriceYieldVariations{priceYieldVariations},Description{description}")
+
+@View(name = "study", members = "study")
+@View(name = "livelihoodZone", members = "livelihoodZone")
 
 //@Tab(properties = "title,author,date,priceYieldVariations,study,project")
 
@@ -68,6 +71,16 @@ public class ModellingScenario extends EFDIdentifiable {
 	@DescriptionsList(descriptionProperties = "projecttitle")
 	private Project project;
 	/*************************************************************************************************/
+	
+	//@ManyToOne
+	//@NoCreate
+	//@NoModify
+	//@DescriptionsList(descriptionProperties = "lzname",depends="project", condition = "${project.projectid} = ?")
+	//private LivelihoodZone  livelihoodZone;
+	
+	/*************************************************************************************************/
+
+	
 	@OneToMany(mappedBy = "modellingScenario", cascade = CascadeType.REMOVE)
 	@ListProperties("resource.resourcetype.resourcetypename,resource.resourcetypename,yield,price")
 	//@Size(min = 1)
@@ -130,5 +143,9 @@ public class ModellingScenario extends EFDIdentifiable {
 	public void setProject(Project project) {
 		this.project = project;
 	}
+
+
+
+
 
 }

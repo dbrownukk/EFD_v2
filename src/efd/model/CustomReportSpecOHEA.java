@@ -11,7 +11,7 @@ import javax.validation.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.model.*;
 
-@Views({ @View(members = "specName,warningMessage,Report{report},Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType}"),
+@Views({ @View(members = "specName,Report{report},Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType}"),
 		@View(name = "rst", members = "specName,rType,report,resourceSubType"),
 		@View(name = "rt", members = "specName,rType,report,resourceSubType"),
 		@View(name = "cat", members = "specName,,Type,report,resourceSubType") })

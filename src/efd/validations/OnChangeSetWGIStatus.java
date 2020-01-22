@@ -28,8 +28,11 @@ import efd.model.WealthGroupInterview.*;
 public class OnChangeSetWGIStatus extends OnChangePropertyBaseAction {
 	public void execute() throws Exception {
 
-		removeActions("SetEditable.SetEditable");
+		
 		System.out.println("In change for WGIstatus");
+		
+		removeActions("SetEditable.SetEditable");
+		
 
 		//EntityManager em = XPersistence.createManager();
 

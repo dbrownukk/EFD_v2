@@ -30,6 +30,7 @@ import org.openxava.util.*;
 		@View(name = "FromStdOfLiving", members = "studyName,referenceYear"),
 		@View(name = "StudyInterview", members = "studyName,referenceYear,spreadsheets"),
 		@View(name = "households", members = "household"),
+		@View(name = "forModelling", members = "household"),
 		@View(name = "FromQuestionUse", members = "Study[#studyName,topic,referenceYear,startDate,endDate;description]") })
 
 @Tabs({ @Tab(rowStyles = @RowStyle(style = "row-highlight", property = "type", value = "steady"), defaultOrder = "${studyName} asc"),

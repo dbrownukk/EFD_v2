@@ -20,6 +20,7 @@ import org.openxava.util.jxls.*;
 import org.openxava.web.editors.*;
 import efd.model.*;
 import efd.model.WealthGroupInterview.*;
+import efd.utils.*;
 
 import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.text.*;
@@ -1596,8 +1597,6 @@ public class ParseWGISpreadsheet extends CollectionBaseAction implements IForwar
 
 	public static LocalUnit getLocalUnit(LivelihoodZone lz, ResourceSubType rst) {
 
-		// System.out.println("get local unit lz = " + lz.getLzid());
-		// System.out.println("get local unit rst =" + rst.getIdresourcesubtype());
 
 		LocalUnit localUnit = null;
 		try {
