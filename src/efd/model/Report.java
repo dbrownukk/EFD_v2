@@ -36,7 +36,7 @@ public class Report extends Identifiable{
 	private Method method;
 
 	public enum Method {
-		OHEA,OIHM, MODELLING
+		OHEA,OIHM, MODELLINGOIHM, MODELLINGOHEA
 	}
 
 	

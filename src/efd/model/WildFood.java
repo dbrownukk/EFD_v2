@@ -30,17 +30,19 @@ public class WildFood extends Asset{
 	@Column(name = "UnitsProduced", length = 6)
 	@NotNull
 	@Min(value = 0)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@Positive
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold", length = 6)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 	
 	
 	@Column(name = "PricePerUnit",precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@PositiveOrZero
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 
 	@Depends("unitsProduced,unitsSold,otherUse")
@@ -54,7 +56,7 @@ public class WildFood extends Asset{
 	//private Double unitsConsumed;
 	
 	@Column(name = "OtherUse", length = 255)
-	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double otherUse;
 
 	@Column(name = "Market1", length = 50)

@@ -30,8 +30,8 @@ public class OnChangeRSTExpandability extends OnChangePropertyBaseAction {
 		String rtName = rst.getResourcetype().getResourcetypename();
 		if (rtName.equals("Livestock Sales")) {
 			System.out.println("Livestock Sale ");
-			getView().setHidden("expandabilityLimit", false);
-			getView().setHidden("expandabilityIncreaseLimit", false);
+			//getView().setHidden("expandabilityLimit", false);
+			//getView().setHidden("expandabilityIncreaseLimit", false);
 			getView().setValue("expandabilityLimit", 25);
 			getView().setValue("expandabilityIncreaseLimit", 200);
 			getView().setEditable("expandabilityLimit", false);
@@ -39,13 +39,14 @@ public class OnChangeRSTExpandability extends OnChangePropertyBaseAction {
 
 		} else if (rtName.equals("Crops") || rtName.equals("Wild Foods") || rtName.equals("Employment") || rtName.equals("Transfers")) {
 			System.out.println("No need for expand values ");
-			getView().setHidden("expandabilityLimit", true);
-			getView().setHidden("expandabilityIncreaseLimit", true);
+			//getView().setHidden("expandabilityLimit", true);
+			//getView().setHidden("expandabilityIncreaseLimit", true);
 			getView().setValue("expandabilityLimit", 0);
 			getView().setValue("expandabilityIncreaseLimit", 0);
 		} else {
-			getView().setHidden("expandabilityLimit", false);
-			getView().setHidden("expandabilityIncreaseLimit", false);
+			System.out.println("Not  ");
+			//getView().setHidden("expandabilityLimit", false);
+			//getView().setHidden("expandabilityIncreaseLimit", false);
 			getView().setValue("expandabilityLimit", 0);
 			getView().setValue("expandabilityIncreaseLimit", 0);
 			getView().setEditable("expandabilityLimit", true);

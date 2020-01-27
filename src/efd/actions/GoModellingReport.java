@@ -50,12 +50,12 @@ public class GoModellingReport extends ViewBaseAction {
 			
 			project = XPersistence.getManager().find(Project.class, projectid);
 
-			//Iterator it = getSelectedObjects().iterator();
-
-		//	it.getClass();
-
-			//livelihoodZone = (LivelihoodZone) it.next();
-
+			Map allValues2 = getView().getAllValues();
+			
+			Efdutils.em("allvals "+allValues);
+			
+			project.getLivelihoodZone();
+			
 			// List of Sites for this LZ
 			List<Site> sites = new ArrayList<Site>();
 			sites = (List<Site>) livelihoodZone.getSite();
@@ -65,7 +65,7 @@ public class GoModellingReport extends ViewBaseAction {
 				return;
 			}
 
-			
+			System.out.println("in go ohea 5");
 			Boolean isValidated = false;
 			// For each site - is it in this Project?
 			for (Site site2 : sites) {

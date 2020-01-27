@@ -29,13 +29,17 @@ import org.openxava.tab.*;
 import org.openxava.util.jxls.*;
 import org.openxava.web.servlets.*;
 
+import efd.actions.OIHMReports.*;
 import efd.model.*;
 import efd.model.HouseholdMember.*;
 import efd.model.Project.*;
+import efd.model.Report.*;
 import efd.model.StdOfLivingElement.*;
 import efd.model.Transfer.*;
 import efd.model.WealthGroupInterview.*;
 import efd.utils.*;
+import efd.utils.HH;
+import efd.utils.QuantHousehold;
 
 public class ModellingReports extends TabBaseAction implements IForwardAction, JxlsConstants {
 
@@ -43,10 +47,18 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	static final int NUMBER_OF_REPORTS = 15;
 	static final int NUMBEROFAVERAGES = 10;
+
+	static final int PRICE = 0;
+	static final int YIELD = 1;
+
+	static final int OHEA = 0;
+	static final int OIHM = 1;
+
 	private Community community = null;
 	private LivelihoodZone livelihoodZone = null;
 	private Project project = null;
 	private Study study = null;
+	private ModellingScenario modellingScenario = null;
 	// private CustomReportSpec customReportSpec = null;
 
 	private List<Report> reportList;
@@ -55,16 +67,22 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 	private List<DefaultDietItem> defaultDietItems; // At Study not Household level
 	List<WGI> uniqueWealthgroupInterview;
 	List<WGI> uniqueCommunity;
+	List<HH> uniqueHousehold;
 
 	JxlsSheet[] sheet = new JxlsSheet[NUMBER_OF_REPORTS];
 	JxlsWorkbook reportWB;
 
 	ArrayList<WGI> wgi = new ArrayList<>();
+
 	ArrayList<Site> sites = new ArrayList<>();
 	ArrayList<WGI> wgiSelected = new ArrayList<>();
 	ArrayList<WealthGroupInterview> wgiList = new ArrayList<>();
 	ArrayList<QuantHousehold> quanthh = new ArrayList<>();
-	ArrayList<WealthGroup> displayWealthgroup = new ArrayList<>();; // Note that assuming 1:1 WG:WGI for the
+	ArrayList<WealthGroup> displayWealthgroup = new ArrayList<>();; // Note that assuming 1:1 WG:WGI
+	ArrayList<HH> hh = new ArrayList<>();
+	ArrayList<HH> hhSelected = new ArrayList<>();
+	private List<Household> selectedHouseholds = new ArrayList<Household>();
+	private List<PriceYieldVariation> priceYieldVariations = new ArrayList<PriceYieldVariation>();
 
 	List<WGI> orderedQuantSeq = null;
 	List<WealthGroup> orderedWealthgroups;
@@ -99,6 +117,9 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 	String currency2;
 	Boolean isOHEA = false;
 	Boolean isOIHM = false;
+	Boolean isSelectedHouseholds = false;
+	Boolean isValid = false;
+	Boolean isChangeScenario = false;
 
 	private static DecimalFormat df2 = new DecimalFormat("#.##");
 
@@ -118,36 +139,38 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		System.out.println("In Run Modelling Reports ");
 		int countValidated = 0;
 		String selectionView;
+		WealthGroupInterview wealthGroupInterview = null;
+		Site site = null;
+		int ddiTotPercent = 0;
+
+		/*
+		 * Get Change Scenario Details
+		 * 
+		 */
+		String modellingScenarioId = getPreviousView().getValueString("id");
+		modellingScenario = XPersistence.getManager().find(ModellingScenario.class, modellingScenarioId);
+
+		Efdutils.em("Mod scenario = " + modellingScenario.getTitle() + " " + modellingScenarioId);
 
 		/* Need to determine if for OHEA or OIHM (LZ or HH) */
 
 		Map allValues = getView().getAllValues();
 
-		if (allValues.containsKey("study")) {
+		if (modellingScenario.getStudy() != null) {
 			isOIHM = true; // OIHM Study and HH
-			Map studymap = (Map) allValues.get("study");
-			String studyId = (String) studymap.get("id");
-			Efdutils.em("studyId  = = " + studyId);
-			/*
-			 * TODO get study
-			 */
+
 			selectionView = "study.household";
+			study = modellingScenario.getStudy();
 
-		} else {
+		}
+
+		else {
 			isOHEA = true; // OHEA Community and LZ
+			addError("OHEA Project Report not implemented yet");
 
-			/*
-			 * TODO
-			 * 
-			 * get Project
-			 */
 			selectionView = "livelihoodZone.lzid";
 
-			String lzid = getView().getValueString("livelihoodZone.lzid");
-			livelihoodZone = XPersistence.getManager().find(LivelihoodZone.class, lzid);
-
-			String projectid = getPreviousView().getValueString("projectid");
-			project = XPersistence.getManager().find(Project.class, projectid);
+			project = modellingScenario.getProject();
 
 		}
 
@@ -159,13 +182,16 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		System.out.println("selected keys a = " + selectedOnes.length);
 
-		WealthGroupInterview wealthGroupInterview = null;
-		Site site = null;
+		/* Populate local price yield variation for this Study/Project */
+
+		for (PriceYieldVariation priceYieldVariation : modellingScenario.getPriceYieldVariations()) {
+			priceYieldVariations.add(priceYieldVariation);
+		}
 
 		if (selectedOnes.length == 0) {
-			addError("Choose at least one Community / Site");
+			addError("Select at least one Community/Site");
 			return;
-		} else if (selectedOnes.length != 0) {
+		} else if (selectedOnes.length != 0 && isOHEA) {
 			isSelectedSites = true; // One or more Site selected in dialog
 			for (int i = 0; i < selectedOnes.length; i++) {
 				Map<?, ?> key = selectedOnes[i];
@@ -179,128 +205,138 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 				Site s = new Site();
 				s = site;
 				sites.add(s);
-				System.out.println("no of sites = " + sites.size());
+
 				// From Site get Communities/Sites then get WG and WGI
 
-				try {
+				for (Community community2 : site.getCommunity()) {
+					countValidated = 0;
 
-					for (Community community2 : site.getCommunity()) {
-						countValidated = 0;
-						System.out.println("community = " + community2.getSite().getLocationdistrict() + " "
-								+ community2.getSite().getSubdistrict());
-						System.out.println("nos of wgs = " + community2.getWealthgroup().size());
+					Iterator<WealthGroup> wgIterator = community2.getWealthgroup().iterator();
+					while (wgIterator.hasNext()) {
 
-						Iterator<WealthGroup> wgIterator = community2.getWealthgroup().iterator();
-						while (wgIterator.hasNext()) {
-							System.out.println("wgIterator ");
-							WealthGroup wgNext = wgIterator.next();
-							System.out.println("wgNext " + wgNext.getWealthGroupInterview().size());
-							Iterator<WealthGroupInterview> wgiIterator = wgNext.getWealthGroupInterview().iterator();
-							while (wgiIterator.hasNext()) {
-								WealthGroupInterview wgiNext = wgiIterator.next();
-								System.out.println("wgiNext = " + wgiNext.getWgIntervieweesCount());
-								if (wgiNext.getStatus() == Status.Validated) {
-									WealthGroupInterview w = new WealthGroupInterview();
-									w = wgiNext;
+						WealthGroup wgNext = wgIterator.next();
 
-									wgiList.add(w);
+						Iterator<WealthGroupInterview> wgiIterator = wgNext.getWealthGroupInterview().iterator();
+						while (wgiIterator.hasNext()) {
+							WealthGroupInterview wgiNext = wgiIterator.next();
 
-									WGI e = new WGI();
-									e.wealthgroupInterview = wgiNext;
-									e.wealthgroup = wgNext;
-									e.site = community2.getSite();
-									e.community = community2;
-									isSelectedSites = true;
-									wgiSelected.add(e);
-									countValidated++;
+							if (wgiNext.getStatus() == Status.Validated) {
+								WealthGroupInterview w = new WealthGroupInterview();
+								w = wgiNext;
 
-								}
+								wgiList.add(w);
+
+								WGI e = new WGI();
+								e.setWealthgroupInterview(wgiNext);
+								e.setWealthgroup(wgNext);
+								e.setSite(community2.getSite());
+								e.setCommunity(community2);
+								isSelectedSites = true;
+								wgiSelected.add(e);
+								countValidated++;
+
 							}
+						}
 
-						}
-						System.out.println("countValidated = " + countValidated);
-						if (countValidated < 3) // Community needs at least 3 Validated WGs
-						{
-							wgi.removeIf(p -> p.community == community2);
-							wgiList.removeIf(p -> p.getWealthgroup().getCommunity() == community2);
-							System.out.println("removed community " + community2.getSite().getLocationdistrict() + " "
-									+ community2.getSite().getSubdistrict());
-						}
 					}
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					// e.printStackTrace();
-					break;
+					System.out.println("countValidated = " + countValidated);
+					if (countValidated < 3) // Community needs at least 3 Validated WGs
+					{
+						wgi.removeIf(p -> p.getCommunity() == community2);
+						wgiList.removeIf(p -> p.getWealthgroup().getCommunity() == community2);
+						System.out.println("removed community " + community2.getSite().getLocationdistrict() + " "
+								+ community2.getSite().getSubdistrict());
+					}
 				}
 
 			}
 
-		}
+			// Populate WGI array wgis - use dialog selected list if enter
 
-		// wgiSelected populates wgis array
-		for (WGI wgi : wgiSelected) {
-			System.out.println("wgiselected  = " + wgi.site.getLocationdistrict() + " " + wgi.site.getSubdistrict()
-					+ " " + wgi.getWealthgroup().getWgnameeng());
+			populateWGIArray(wgiList);
 
-		}
+			uniqueCommunity = wgi.stream().filter(distinctByKey(WGI::getCommunity)).collect(Collectors.toList());
 
-		for (WealthGroupInterview wgiList2 : wgiList) {
-			System.out.println("wgiList2 = " + wgiList2.getWealthgroup().getCommunity().getSite().getSubdistrict() + " "
-					+ wgiList2.getWealthgroup().getWgnameeng());
-		}
+			errno = 51;
 
-		System.out.println("no of wgi = " + wgiSelected.size());
+			int ddipercent = 0;
+			Iterator<WealthGroupInterview> wgiIter = wgiList.iterator();
 
-		errno = 50;
+			while (wgiIter.hasNext()) {
 
-		// Populate WGI array wgis - use dialog selected list if enter
+				WealthGroupInterview wgiNext = wgiIter.next();
 
-		populateWGIArray(wgiList);
-		System.out.println("wgi size 1 = " + wgi.size());
-		uniqueCommunity = wgi.stream().filter(distinctByKey(WGI::getCommunity)).collect(Collectors.toList());
+				System.out.println("dditotal = " + (wgiNext.getWealthgroup().getCommunity().getDdipercenttotal()));
+				if (wgiNext.getWealthgroup().getCommunity().getDdipercenttotal() != 100
+						&& wgiNext.getWealthgroup().getCommunity().getDdipercenttotal() != 0) {
+					addError("Default Diet Total Percentage for a chosen Community is not 100% or 0%");
+					closeDialog();
+					return;
+				}
 
-		System.out.println("wgi size 2= " + wgi.size());
-		// uniqueWealthgroupInterview = wgi.stream().filter(distinctByKey(p ->
-		// p.getWealthgroupInterview().getWgiid()))
-		// .sorted(Comparator.comparing(WGI::getWgiDI)).collect(Collectors.toList());
+			}
 
-		errno = 51;
-		// Filter according to Catalog/RT/RST/HH
+			errno = 52;
+			// Calculate DI
 
-		// Any Communities with DDI not adding up to 100 or stil at 0?
+			calculateDI(); // uses wgi filtered array based on CRS definition
+			System.out.println("done calc DI");
+			calculateAE(); // Calculate the Adult equivalent
+			System.out.println("done calc AE");
 
-		int ddipercent = 0;
-		Iterator<WealthGroupInterview> wgiIter = wgiList.iterator();
+		} else if (selectedOnes.length != 0 && isOIHM) { // OIHM
 
-		while (wgiIter.hasNext()) {
+			isSelectedHouseholds = true; // One or more HH selected in dialog
+			for (int i = 0; i < selectedOnes.length; i++) {
+				Map<?, ?> key = selectedOnes[i];
 
-			WealthGroupInterview wgiNext = wgiIter.next();
+				Map<?, ?> membersNames = getView().getSubview("study.household").getMembersNames();
 
-			System.out.println("dditotal = " + (wgiNext.getWealthgroup().getCommunity().getDdipercenttotal()));
-			if (wgiNext.getWealthgroup().getCommunity().getDdipercenttotal() != 100
-					&& wgiNext.getWealthgroup().getCommunity().getDdipercenttotal() != 0) {
-				addError("Default Diet Total Percentage for a chosen Community is not 100% or 0%");
+				String subKey = key.toString().substring(4, 36);
+
+				Household singleHHSelected = XPersistence.getManager().find(Household.class, subKey);
+				if (singleHHSelected.getStatus() == Status.Validated) {
+					isValid = true;
+				}
+
+				HH e = new HH();
+				e.household = singleHHSelected;
+				hhSelected.add(e);
+
+				selectedHouseholds.add(singleHHSelected);
+			}
+			defaultDietItems = (List<DefaultDietItem>) study.getDefaultDietItem();
+			List<Household> households = XPersistence.getManager()
+					.createQuery("from Household where study_id = :study and status = :status ")
+					.setParameter("study", study.getId()).setParameter("status", Status.Validated).getResultList();
+
+			if (households.size() == 0) {
+				addError("No Validated Households in this Study");
 				closeDialog();
 				return;
 			}
 
+			// Check DDI total percent
+
+			for (DefaultDietItem defaultDietItem : defaultDietItems) {
+				ddiTotPercent += defaultDietItem.getPercentage();
+			}
+			if (ddiTotPercent != 100) {
+				addError("Default Diet Total Percentage for this Study is not 100%");
+				closeDialog();
+				return;
+			}
+
+			populateHHArray(selectedHouseholds);
+			// No Filtering as CustomReportSpec not used in Modelling Reports
+
+			Efdutils.em("No in HH after populate = " + hh.size());
+
+			calculateDI(); // uniqueHH set in calculateDI
+
+			calculateAE(); // Calculate the Adult equivalent
+
 		}
-
-		System.out.println("wgi size 3= " + wgi.size());
-		errno = 52;
-		// Calculate DI
-
-		calculateDI(); // uses wgi filtered array based on CRS definition
-		System.out.println("done calc DI");
-		// calculateAE(); // Calculate the Adult equivalent
-		System.out.println("done calc AE");
-
-		// if (uniqueWealthgroupInterview.size() == 0) {
-		// addError("No Wealthgroups meet criteria, change Report Spec");
-		// closeDialog();
-		// return;
-		// }
 
 		errno = 54;
 		// Run reports
@@ -326,40 +362,337 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	private void calculateAE() {
 
-		// for (HH hh2 : hh) {
+		if (isOIHM) {
+			for (HH hh2 : uniqueHousehold) {
 
-		for (WGI wg2 : uniqueWealthgroupInterview) {
+				hh2.setHhAE(householdAE(hh2.household));
 
-			// wg2.wgiAE = wealthgroupInterviewAE(wg2.wealthgroupInterview);
+			}
+		} else if (isOHEA) {
 
+			for (WGI wg2 : uniqueWealthgroupInterview) {
+
+				wg2.setWgiAE(wealthgroupInterviewAE(wg2.getWealthgroupInterview()));
+
+			}
 		}
-
 	}
 
 	/******************************************************************************************************************************************/
 
 	private void calculateDI() {
 
-		// Need to calculate DI for each WG
-
-		// uniqueWealthgroup = wg.stream().filter(distinctByKey(p ->
-		// p.getWealthgroup().getWgorder()))
-		// .sorted(Comparator.comparing(WGI::getWgDI)).collect(Collectors.toList());
-
-		// for (HH hh2 : hh) {
-
-		// for (WGI wgi2 : uniqueCommunity) {
-
 		double wgiDI = 0.0;
-		for (WealthGroupInterview wgi2 : wgiList) {
-			wgiDI = wealthgroupInterviewDI(wgi2);
-			System.out.println("DI = " + wgi2.getWealthgroup().getCommunity().getSite().getSubdistrict() + " " + wgiDI);
-			System.out.println("DI WG = " + wgi2.getWealthgroup().getWgnameeng());
 
-			wgi2.getWealthgroup().setDefaultDI(wgiDI);
+		if (isOHEA) {
+
+			for (WealthGroupInterview wgi2 : wgiList) {
+				wgiDI = wealthgroupInterviewDI(wgi2);
+				System.out.println(
+						"DI = " + wgi2.getWealthgroup().getCommunity().getSite().getSubdistrict() + " " + wgiDI);
+				System.out.println("DI WG = " + wgi2.getWealthgroup().getWgnameeng());
+
+				wgi2.getWealthgroup().setDefaultDI(wgiDI);
+
+			}
+		} else if (isOIHM) {
+			uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
+					.collect(Collectors.toList());
+
+			for (HH hh2 : uniqueHousehold) {
+
+				isChangeScenario = false;
+				hh2.setHhDI(householdDI(hh2.household, isChangeScenario));
+				isChangeScenario = true;
+				hh2.setHhDIAfterChangeScenario(householdDI(hh2.household, isChangeScenario));
+
+				Efdutils.em("DI and DI after = " + hh2.getHhDI() + " " + hh2.getHhDIAfterChangeScenario());
+
+			}
+			uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber())) // Sort by
+																											// DI low -
+																											// high
+					.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
+		}
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private Double householdDI(Household household, Boolean isChangeScenario) {
+
+		/*
+		 * Disposable Income (DI) = Total Income (TI) - Cost of covering Shortfall (SF)
+		 * in Required Calories (RC) from Own Production (OP).
+		 * 
+		 * TI (Total Income) = Sum (Units Sold * Price per Unit) for all Crops, Wild
+		 * Foods and Livestock Products
+		 * 
+		 * Sum (Units Worked No. of People Working Cash Payment) for all Employments Sum
+		 * (Transfer Amount No. of People Receiving No. of Times Received) for all Cash
+		 * Transfers
+		 * 
+		 * OP = Sum (Units Consumed * KCal per Unit) for all Crops, Wild Foods and
+		 * Livestock Products
+		 * 
+		 * Sum (KCal per Unit of Food Type * No. of Units Paid) for all Employment paid
+		 * in Food Sum (KCal per Unit of Food Type Transferred * No. of Units Consumed)
+		 * for all Food Transfers
+		 * 
+		 * Required KCalaries = 2100 x 365 No. of People in Household (that was from
+		 * OHEA - can be more accurate in OIHM
+		 * 
+		 * 
+		 * if isChangeScenario is Truie then take into account Scenario Rules from
+		 * ModellingScenario where a Study is used
+		 * 
+		 */
+
+		Double cropTI = 0.0;
+		Double wildfoodsTI = 0.0;
+		Double lspTI = 0.0;
+		Double employmentTI = 0.0;
+		Double transfersTI = 0.0;
+
+		Double cropOP = 0.0;
+		Double wildfoodsOP = 0.0;
+		Double lspOP = 0.0;
+		Double employmentOP = 0.0;
+		Double transfersOP = 0.0;
+
+		int requiredCalories = 0;
+
+		System.out.println("In HH DI calc ");
+
+		List<HH> thisHH = hh.stream().filter(d -> d.household == household).collect(Collectors.toList());
+
+		List<HH> cropList = thisHH.stream().filter(d -> d.getType() == "Crop").collect(Collectors.toList());
+
+		List<HH> wildfoodList = thisHH.stream().filter(d -> d.getType() == "Wildfood").collect(Collectors.toList());
+
+		List<HH> livestockproductList = thisHH.stream().filter(d -> d.getType() == "LivestockProduct")
+				.collect(Collectors.toList());
+
+		List<HH> employmentList = thisHH.stream().filter(d -> d.getType() == "Employment").collect(Collectors.toList());
+
+		List<HH> transferList = thisHH.stream().filter(d -> d.getType() == "Transfer").collect(Collectors.toList());
+
+		int i = 0;
+		int yieldChange = 0;
+		int priceChange = 0;
+
+		try {
+			if (cropList.size() > 0) {
+
+				for (HH icrop : cropList) {
+
+					// Crop crop = icrop.getCrop();
+
+					if (isChangeScenario) {
+
+						priceChange = priceYieldVariation(modellingScenario, icrop.getResourceSubType(), PRICE);
+						yieldChange = priceYieldVariation(modellingScenario, icrop.getResourceSubType(), YIELD);
+
+					} else {
+						// Not in modelling scenario calc of DI
+						priceChange = 1;
+						yieldChange = 1;
+					}
+
+					cropTI += icrop.getCrop().getUnitsSold() * priceChange * icrop.getCrop().getPricePerUnit();
+
+					cropOP += icrop.getCrop().getUnitsConsumed() * yieldChange
+							* Double.valueOf(icrop.getCrop().getResourceSubType().getResourcesubtypekcal());
+
+				}
+			}
+
+			if (wildfoodList.size() > 0) {
+				for (HH iwildfood : wildfoodList) {
+
+					wildfoodsTI += (iwildfood.getWildfood().getUnitsSold().doubleValue()
+							* iwildfood.getWildfood().getPricePerUnit().doubleValue());
+
+					wildfoodsOP += (iwildfood.getWildfood().getUnitsConsumed().doubleValue()
+							* Double.valueOf(iwildfood.getWildfood().getResourceSubType().getResourcesubtypekcal()));
+				}
+			}
+			if (livestockproductList.size() > 0) {
+				for (HH ilivestockproduct : livestockproductList) {
+
+					lspTI += (ilivestockproduct.getLivestockproducts().getUnitsSold()
+							* ilivestockproduct.getLivestockproducts().getPricePerUnit());
+					lspOP += (ilivestockproduct.getLivestockproducts().getUnitsConsumed().doubleValue()
+							* Double.valueOf(ilivestockproduct.getLivestockproducts().getResourceSubType()
+									.getResourcesubtypekcal()));
+				}
+			}
+			if (employmentList.size() > 0) {
+				for (HH iemployment : employmentList) {
+
+					employmentTI += (iemployment.getEmployment().getUnitsWorked()
+							* iemployment.getEmployment().getCashPaymentAmount()
+							* iemployment.getEmployment().getPeopleCount());
+
+					/* handle null resource type */
+					int empresourcekcal = 0;
+					ResourceSubType resourcesubtypekcal = iemployment.getEmployment().getFoodResourceSubType();
+					if (resourcesubtypekcal == null)
+						empresourcekcal = 0;
+					else
+						empresourcekcal = iemployment.getEmployment().getFoodResourceSubType().getResourcesubtypekcal();
+
+					employmentOP += iemployment.getEmployment().getUnitsWorked() * empresourcekcal;
+				}
+			}
+			if (transferList.size() > 0) {
+				for (HH itransfer : transferList) {
+
+					if (itransfer.getTransfer().getTransferType().toString().equals("Cash"))
+						transfersTI += (itransfer.getTransfer().getCashTransferAmount()
+								* itransfer.getTransfer().getPeopleReceiving()
+								* itransfer.getTransfer().getTimesReceived());
+					System.out.println("in DI transfer calc " + transfersTI);
+					Double transresourcekcal = 0.0;
+					ResourceSubType resourcesubtypekcal = itransfer.getTransfer().getFoodResourceSubType();
+					if (resourcesubtypekcal == null)
+						transresourcekcal = 0.0;
+					else
+						transresourcekcal = (double) itransfer.getTransfer().getFoodResourceSubType()
+								.getResourcesubtypekcal();
+
+					if (itransfer.getTransfer().getTransferType().toString().equals("Food"))
+						transfersOP += (transresourcekcal * itransfer.getTransfer().getUnitsConsumed());
+				}
+			}
+			System.out.println("done DI transfer calc " + transfersTI);
+		} catch (
+
+		Exception e) {
+			// TODO Auto-generated catch block
+			addError("Error in DI Calculation " + e);
+		}
+
+		// FIX for members
+		// requiredCalories = household.getHouseholdMember().size() * RC; // Unique
+		// Households after filter
+
+		int age;
+		Sex gender;
+		int monthsAway = 0;
+		int energyNeed = 0;
+
+		WHOEnergyRequirements whoEnergy;
+		for (HouseholdMember hm : household.getHouseholdMember()) {
+			age = hm.getAge();
+			gender = hm.getGender();
+			monthsAway = hm.getMonthsAway();
+			whoEnergy = WHOEnergyRequirements.findByAge(age);
+
+			if (gender == Sex.Female) {
+				energyNeed = whoEnergy.getFemale();
+			} else if (gender == Sex.Male) {
+				energyNeed = whoEnergy.getMale();
+			}
+
+			requiredCalories += energyNeed * 365 * (12 - monthsAway) / 12;
 
 		}
 
+		System.out.println("requiredCalories = " + requiredCalories);
+
+		Double totalIncome = cropTI + wildfoodsTI + lspTI + employmentTI + transfersTI;
+
+		System.out.println("cropTI = " + cropTI);
+		System.out.println("wfTI = " + wildfoodsTI);
+		System.out.println("lspTI = " + lspTI);
+		System.out.println("empTI = " + employmentTI);
+		System.out.println("transfTI = " + transfersTI);
+
+		Double output = cropOP + wildfoodsOP + lspOP + employmentOP + transfersOP;
+
+		Double shortFall = requiredCalories - output;
+
+		System.out.println("totalIncome = " + totalIncome);
+		System.out.println("output = " + output);
+
+		// Now it gets more complex , but not difficult
+
+		// Diet
+		// Diet Value = Sum (KCal per KG * Percentage of the Food type in default diet
+
+		Double dietValue = 0.0;
+
+		for (DefaultDietItem defaultDietItem : defaultDietItems) {
+
+			// CUrrently there is a chance that KCAL = 0 which throws calc. Get Synonym
+			// parent KCAL if = 0
+			if (defaultDietItem.getResourcesubtype().getResourcesubtypekcal() == 0) {
+				dietValue += (defaultDietItem.getResourcesubtype().getResourcesubtypesynonym().getResourcesubtypekcal()
+						* defaultDietItem.getPercentage() / 100);
+			} else {
+
+				dietValue += (defaultDietItem.getResourcesubtype().getResourcesubtypekcal()
+						* defaultDietItem.getPercentage() / 100);
+			}
+		}
+
+		// Diet Amount Purchased DA = Shortfall / Diet Value in KGs
+		Double dietAmountPurchased = 0.0;
+
+		dietAmountPurchased = shortFall / dietValue;
+
+		// Cost of Shortfall = Unit Price * Diet Amount Purchased
+		// How many KGs in % of diet is needed
+		// i.e. 20% of KGs in Diet item 1 +80% diet item 2
+
+		Double costOfShortfall = 0.0;
+
+		for (DefaultDietItem defaultDietItem : defaultDietItems) {
+			costOfShortfall += ((dietAmountPurchased * defaultDietItem.getPercentage() / 100)
+					* defaultDietItem.getUnitPrice().doubleValue());
+		}
+
+		// Disposable Income = Total Income - Cost of Shortfall
+		Double disposableIncome = 0.0;
+
+		disposableIncome = totalIncome - costOfShortfall;
+
+		return Double.parseDouble(df2.format(disposableIncome));
+	}
+
+	/******************************************************************************************************************************************/
+	/*
+	 * Return price yield variation in this modelling scenario for current
+	 * Project/Study
+	 */
+
+	private int priceYieldVariation(ModellingScenario modellingScenario2, ResourceSubType resourceSubType,
+			int type) { /* Type PRICE or YIELD */
+
+		Optional<PriceYieldVariation> pyc;
+		pyc = priceYieldVariations.stream().filter(p -> p.getResource() == resourceSubType).findAny();
+
+		if (pyc.isPresent()) {
+
+			Efdutils.em("found a valid pyc = " + pyc.get().getResource().getResourcetypename());
+
+			if (type == PRICE) {
+				if (pyc.get().getPrice() == 0)
+					return 1;
+				else
+					return pyc.get().getPrice();
+
+			} else if (type == YIELD) {
+				if (pyc.get().getYield() == 0)
+					return 1;
+				else
+					return pyc.get().getYield();
+			}
+
+		}
+
+		return 1;
 	}
 
 	/******************************************************************************************************************************************/
@@ -482,6 +815,180 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		System.out.println(Arrays.toString(wgi.toArray()));
 		// System.out.println("WGI Array = " + wgi.toString());
+
+	}
+
+	/******************************************************************************************************************************************/
+	private void populateHHArray(List<Household> households) {
+		/*
+		 * create array of all Validated households for this study
+		 * 
+		 * they can then be filtered
+		 * 
+		 */
+		System.out.println("drb in populateArray begin size = " + households.size());
+
+		ConfigAnswer answer = null;
+
+		for (Household household : households) {
+			populateHHfromHousehold(household, answer);
+
+			for (ConfigAnswer configAnswer : household.getConfigAnswer()) {
+				addTohhArray(household, null, null, null, configAnswer, "Answer", null, null, null, null, null, null,
+						null, null, null, null, null, null, null);
+
+			}
+
+		}
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void addTohhArray(Household household, Collection<Category> category, ResourceType resourceType,
+			ResourceSubType resourceSubType, ConfigAnswer answer, String type, AssetLand land, AssetFoodStock foodstock,
+			AssetCash cash, AssetLiveStock livestock, AssetTradeable tradeable, AssetTree tree, Crop crop,
+			Employment employment, Inputs inputs, LivestockProducts livestockproducts, LivestockSales livestocksales,
+			Transfer transfer, WildFood wildfood) {
+
+		HH e = new HH();
+
+		// e.wgiNumber = 0;
+
+		e.setHousehold(household);
+		e.setHhNumber(household.getHouseholdNumber());
+		e.setCategory(category);
+		e.setResourceType(resourceType);
+		e.setResourceSubType(resourceSubType);
+
+		e.setAnswer(answer);
+
+		e.setType(type);
+		e.setLand(land);
+		e.setEmployment(employment);
+		e.setFoodstock(foodstock);
+		e.setInputs(inputs);
+		e.setLivestock(livestock);
+		e.setLivestockproducts(livestockproducts);
+		e.setLivestocksales(livestocksales);
+		e.setTradeable(tradeable);
+		e.setTransfer(transfer);
+		e.setTree(tree);
+		e.setWildfood(wildfood);
+		e.setCrop(crop);
+		e.setCash(cash);
+
+		hh.add(e);
+
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void populateHHfromHousehold(Household household, ConfigAnswer answer) {
+
+		// System.out.println("in populateHHfromHosuehold, hosuehold =
+		// "+household.getHouseholdName()+" answer =
+		// "+answer.getConfigQuestionUse().getConfigQuestion().getPrompt());;
+
+		System.out.println("assetland size = " + household.getAssetLand().size());
+		System.out.println("assetfs size = " + household.getAssetFoodStock().size());
+		System.out.println("transfer ass size = " + household.getTransfer().size());
+
+		for (AssetLand asset : household.getAssetLand()) {
+
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory(); // List of Categories that
+																						// include this RST
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Land", asset, null, null, null,
+					null, null, null, null, null, null, null, null, null);
+
+		}
+		for (AssetFoodStock asset : household.getAssetFoodStock()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Foodstock", null, asset, null,
+					null, null, null, null, null, null, null, null, null, null);
+		}
+		for (AssetCash asset : household.getAssetCash()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Cash", null, null, asset, null,
+					null, null, null, null, null, null, null, null, null);
+
+		}
+		for (AssetLiveStock asset : household.getAssetLiveStock()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Livestock", null, null, null,
+					asset, null, null, null, null, null, null, null, null, null);
+		}
+		for (AssetTradeable asset : household.getAssetTradeable()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Tradeable", null, null, null,
+					null, asset, null, null, null, null, null, null, null, null);
+		}
+		for (AssetTree asset : household.getAssetTree()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Tree", null, null, null, null,
+					null, asset, null, null, null, null, null, null, null);
+		}
+		for (Crop asset : household.getCrop()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Crop", null, null, null, null,
+					null, null, asset, null, null, null, null, null, null);
+		}
+		for (Employment asset : household.getEmployment()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Employment", null, null, null,
+					null, null, null, null, asset, null, null, null, null, null);
+		}
+		for (Inputs asset : household.getInputs()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Input", null, null, null, null,
+					null, null, null, null, asset, null, null, null, null);
+		}
+		for (LivestockProducts asset : household.getLivestockProducts()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "LivestockProduct", null, null,
+					null, null, null, null, null, null, null, asset, null, null, null);
+		}
+		for (LivestockSales asset : household.getLivestockSales()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "LivestockSale", null, null, null,
+					null, null, null, null, null, null, null, asset, null, null);
+		}
+		for (Transfer asset : household.getTransfer()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Transfer", null, null, null, null,
+					null, null, null, null, null, null, null, asset, null);
+		}
+		for (WildFood asset : household.getWildFood()) {
+			ResourceSubType resourceSubType = asset.getResourceSubType();
+			Collection<Category> category = asset.getResourceSubType().getCategory();
+			ResourceType resourceType = asset.getResourceSubType().getResourcetype();
+			addTohhArray(household, category, resourceType, resourceSubType, answer, "Wildfood", null, null, null, null,
+					null, null, null, null, null, null, null, null, asset);
+		}
 
 	}
 
@@ -634,38 +1141,35 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		System.out.println("in addtowgiarray " + wealthGroupInterview);
 
-		e.wealthgroupInterview = wealthGroupInterview;
-		e.site = wealthGroupInterview.getWealthgroup().getCommunity().getSite();
-		e.community = wealthGroupInterview.getWealthgroup().getCommunity();
-		e.wealthgroup = wealthGroupInterview.getWealthgroup();
-		e.project = project;
-		e.livelihoodZone = livelihoodZone;
+		e.setWealthgroupInterview(wealthGroupInterview);
+		e.setSite(wealthGroupInterview.getWealthgroup().getCommunity().getSite());
+		e.setCommunity(wealthGroupInterview.getWealthgroup().getCommunity());
+		e.setWealthgroup(wealthGroupInterview.getWealthgroup());
+		e.setProject(project);
+		e.setLivelihoodZone(livelihoodZone);
 
 		// e.wgiNumber = 0;
-		e.category = category;
-		e.resourceType = resourceType;
-		e.resourceSubType = resourceSubType;
+		e.setCategory(category);
+		e.setResourceType(resourceType);
+		e.setResourceSubType(resourceSubType);
 
-		e.type = type;
-		e.land = land;
-		e.employment = employment;
-		e.foodstock = foodstock;
-		e.inputs = inputs;
-		e.livestock = livestock;
-		e.livestockproducts = livestockproducts;
-		e.livestocksales = livestocksales;
-		e.tradeable = tradeable;
-		e.transfer = transfer;
-		e.tree = tree;
-		e.wildfood = wildfood;
-		e.crop = crop;
-		e.cash = cash;
+		e.setType(type);
+		e.setLand(land);
+		e.setEmployment(employment);
+		e.setFoodstock(foodstock);
+		e.setInputs(inputs);
+		e.setLivestock(livestock);
+		e.setLivestockproducts(livestockproducts);
+		e.setLivestocksales(livestocksales);
+		e.setTradeable(tradeable);
+		e.setTransfer(transfer);
+		e.setTree(tree);
+		e.setWildfood(wildfood);
+		e.setCrop(crop);
+		e.setCash(cash);
 
 		wgi.add(e);
-		System.out.println("done addtowgiarray " + wealthGroupInterview.toString());
-		// System.out.println("done addtowgiarray " +
-		// e.resourceType.getResourcetypename()+"
-		// "+e.resourceSubType.getResourcetypename());
+
 	}
 
 	/******************************************************************************************************************************************/
@@ -682,51 +1186,51 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		int ireportNumber = 0; // should be equal to the sheet number in workbook
 
 		/*
-		 * HH are included if they are Validated
-		 * 
-		 * If Custom Report Spec (CRS) has Config Answers then only HH with answers to
-		 * that question and answer are included
-		 * 
-		 * Order by HH DI size
-		 * 
-		 * Include all resources unless CRS has Category/RT or RST rows which then form
-		 * the filter
+		 * Modelling reports - run them all for OIHM or OHEA
 		 * 
 		 */
-		System.out.println("wgi before run rep = " + wgi.size());
+
 		for (Report report : reportList) {
-			System.out.println("code = " + report.getCode());
 			int reportCode = report.getCode();
-			System.out.println("pre switch 001");
 			ireportNumber++; // keep track of number of reports = sheet on output spreadsheet
 
 			switch (reportCode) {
-			case 366:
-				System.out.println("report 366");
-				createDIreport(ireportNumber, report);
+			case 410:
+
+				createOIHMDIreport(ireportNumber, report);
 				break;
-			case 367:
-				System.out.println("report 367");
-				createDIAfterSOLreport(ireportNumber, report);
+			case 411:
+
+				createOIHMDIAfterSOLreport(ireportNumber, report);
 				break;
-			case 368:
-				System.out.println("report 368");
-				createIncomereport(ireportNumber, report, "cash");
+			case 412:
+
+				 createIncomereport(ireportNumber, report, "cash", OIHM);
 				break;
-			case 369:
-				System.out.println("report 369");
-				createIncomereport(ireportNumber, report, "food");
+			case 413:
+
+				 createIncomereport(ireportNumber, report, "food", OIHM);
 				break;
 
-			case 370:
-				System.out.println("report 370");
-				createLandAssetreport(ireportNumber, report);
+			case 418:
+
+				// createLandAssetreport(ireportNumber, report);
 				break;
 
-			case 371:
-				System.out.println("report 371");
-				createLivestockAssetreport(ireportNumber, report);
+			case 419:
+
+				// createLivestockAssetreport(ireportNumber, report);
 				break;
+
+			case 420:
+
+				// createHHMemberreport(ireportNumber, report);
+				break;
+			case 421:
+
+				// createAdultEquivalentreport(ireportNumber, report);
+				break;
+
 			}
 		}
 
@@ -734,7 +1238,37 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 	}
 
 	/******************************************************************************************************************************************/
-	private void createDIreport(int isheet, Report report) {
+	private void createOIHMDIreport(int isheet, Report report) {
+
+		int row = 1;
+
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20);
+
+		// hh is array of all data
+		// need an array of valid HH now left
+		// ordered by DI
+
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20);
+
+		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "DI As Reported", textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, "DI After Change Scenario", textStyle);
+		row++;
+
+		Efdutils.em("uniqueHH = " + uniqueHousehold.size());
+		for (HH hh2 : uniqueHousehold) {
+
+			reportWB.getSheet(isheet).setValue(1, row, hh2.getHhNumber(), textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, hh2.getHhDI(), textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, hh2.getHhDIAfterChangeScenario(), textStyle);
+			row++;
+
+		}
+	}
+
+	/******************************************************************************************************************************************/
+
+	private void createOHEADIreport(int isheet, Report report) {
 
 		int row = 7;
 		int i = 0;
@@ -749,7 +1283,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 15, 15, 20);
 
-		populateFirstThreeColumns(isheet, 1);
+		// populateFirstThreeColumns(isheet, 1);
 
 		reportWB.getSheet(isheet).setValue(4, 1, "Family Group Size", boldTopStyle);
 		reportWB.getSheet(isheet).setValue(5, 1, "Disposable Income", boldTopStyle);
@@ -825,7 +1359,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	/******************************************************************************************************************************************/
 
-	private void createDIAfterSOLreport(int isheet, Report report) {
+	private void createOHEADIAfterSOLreport(int isheet, Report report) {
 		int row = 1;
 		int i = 0;
 		double hhSOLC = 0.0;
@@ -926,87 +1460,158 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	/******************************************************************************************************************************************/
 
-	private void createIncomereport(int isheet, Report report, String type) {
+	private void createOIHMDIAfterSOLreport(int isheet, Report report) {
+		int row = 1;
+		Double hhSOLC = 0.0;
 
-		int col = 4;
-		int datarow = 10;
-		int avgrow = 6;
-		double totalLand = 0.0;
-		int assetTypeCounter = 0;
-		int startRow = 1;
+		Efdutils.em("In OIHM DISOL report");
+
+		// uniqeHousehold = number of households in array that are relevant
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 30, 30);
+		for (HH hh3 : uniqueHousehold) {
+
+			hhSOLC = 0.0;
+			for (StdOfLivingElement stdOfLivingElement : hh3.getHousehold().getStudy().getStdOfLivingElement()) {
+
+				if (stdOfLivingElement.getLevel().equals(StdLevel.Household)) {
+
+					hhSOLC += (stdOfLivingElement.getCost() * stdOfLivingElement.getAmount());
+				} else if (stdOfLivingElement.getLevel().equals(StdLevel.HouseholdMember)) {
+					errno = 104;
+					for (HouseholdMember householdMember : hh3.getHousehold().getHouseholdMember()) {
+
+						hhSOLC += calcHhmSolc(hh3, stdOfLivingElement);
+						errno = 105;
+					}
+
+				}
+
+			}
+
+			hh3.setHhSOLC(hhSOLC);
+
+		}
+
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30);
+		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, "Std of Living Reqt", textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, "Std of Living Reqt After Change Scenario", textStyle);
+		reportWB.getSheet(isheet).setValue(4, row, "DI With StoL as Reported", textStyle);
+		reportWB.getSheet(isheet).setValue(5, row, "DI With StoL as Reported After Change Scenario", textStyle);
+
+		row++;
+		row++;
+		for (HH hh2 : uniqueHousehold) {
+
+			reportWB.getSheet(isheet).setValue(1, row, hh2.getHhNumber(), textStyle);
+			reportWB.getSheet(isheet).setValue(2, row, hh2.getHhSOLC(), textStyle);
+			reportWB.getSheet(isheet).setValue(3, row, hh2.getHhSOLCAfterChangeScenario(), textStyle);
+			/*
+			 * TODO
+			 */
+			reportWB.getSheet(isheet).setValue(4, row, 0, textStyle);
+			reportWB.getSheet(isheet).setValue(5, row, 0, textStyle);
+
+			row++;
+		}
+
+	}
+
+	/******************************************************************************************************************************************/
+	private void createIncomereport(int isheet, Report report, String type, int model) {
+		int row = 1;
+		// String type = "food" or "cash"
+		// Model OHEA or OIHM
 
 		Double cropIncome = 0.0;
 		Double empIncome = 0.0;
 		Double lsIncome = 0.0;
 		Double trIncome = 0.0;
 		Double wfIncome = 0.0;
-		int row = 7;
-
-		// String type = "food" or "cash"
-		System.out.println("in income report 368/369");
-
-		averageReset();
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 30, 30, 30, 30, 30);
-		populateFirstThreeColumns(isheet, startRow);
+		int col = 0;
 
 		String initType = StringUtils.capitalize(type);
 
-		System.out.println("in  income report " + initType);
+		System.out.println("in  income report");
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 30, 30, 30, 30, 30,30, 30, 30, 30, 30, 30);
+		errno = 2262;
 
-		reportWB.getSheet(isheet).setValue(col++, startRow, "Crop " + initType + " Income", boldTopStyle);
-		reportWB.getSheet(isheet).setValue(col++, startRow, "Employment " + initType + " Income", boldTopStyle);
-		reportWB.getSheet(isheet).setValue(col++, startRow, "Livestock " + initType + " Income", boldTopStyle);
-		reportWB.getSheet(isheet).setValue(col++, startRow, "Transfer " + initType + " Income", boldTopStyle);
-		reportWB.getSheet(isheet).setValue(col++, startRow, "Wildfood " + initType + " Income", boldTopStyle);
+		reportWB.getSheet(isheet).setValue(1, row, "Household Number", textStyle);
 
-		row = 7;
-		System.out.println("in " + type + " income report done heading");
+		col = 2;
 
-		errno = 2265;
+		reportWB.getSheet(isheet).setValue(col++, row, "Crop "+type+" Income " + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row, "Crop "+type+" Income After Change Scenario" + initType + " Income",
+				textStyle);
 
-		for (WGI wgi2 : uniqueCommunity) {
+		reportWB.getSheet(isheet).setValue(col++, row, "Employment "+type+" Income" + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row,
+				"Employment "+type+" Income After Change Scenario" + initType + " Income", textStyle);
 
-			orderedWealthgroups = wgi2.getCommunity().getWealthgroup().stream()
-					.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
-					.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
+		reportWB.getSheet(isheet).setValue(col++, row, "Livestock "+type+" Income" + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row,
+				"Livestock "+type+" Income After Change Scenario" + initType + " Income", textStyle);
 
-			for (int i = 0; i < orderedWealthgroups.size(); i++) {
+		reportWB.getSheet(isheet).setValue(col++, row, "Transfer "+type+" Income" + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row,
+				"Transfer "+type+" Income After Change Scenario" + initType + " Income", textStyle);
 
-				List<WealthGroupInterview> wealthGroupInterview = orderedWealthgroups.get(i).getWealthGroupInterview();
+		reportWB.getSheet(isheet).setValue(col++, row, "Wildfood "+type+" Income" + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row,
+				"Wildfood "+type+" Income After Change Scenario" + initType + " Income", textStyle);
 
-				cropIncome = calcCropIncome(wealthGroupInterview, type);
-				empIncome = calcEmpIncome(wealthGroupInterview, type);
-				lsIncome = calcLSIncome(wealthGroupInterview, type);
-				trIncome = calcTransIncome(wealthGroupInterview, type);
-				wfIncome = calcWFIncome(wealthGroupInterview, type);
+		reportWB.getSheet(isheet).setValue(col++, row, "Total "+type+" Income" + initType + " Income", textStyle);
+		reportWB.getSheet(isheet).setValue(col++, row, "Total "+type+" Income After Change Scenario" + initType + " Income",
+				textStyle);
 
-				// Averages
+		row = 2;
 
-				averageTotal[i][0] += cropIncome;
-				averageTotal[i][1] += empIncome;
-				averageTotal[i][2] += lsIncome;
-				averageTotal[i][3] += trIncome;
-				averageTotal[i][4] += wfIncome;
+		if (model == OIHM) {
 
-				// reportWB.getSheet(isheet).setValue(1, row, wgi2.wgiNumber, textStyle);
-				reportWB.getSheet(isheet).setValue(4, row, cropIncome, textStyle);
-				reportWB.getSheet(isheet).setValue(5, row, empIncome, textStyle);
-				reportWB.getSheet(isheet).setValue(6, row, lsIncome, textStyle);
-				reportWB.getSheet(isheet).setValue(7, row, trIncome, textStyle);
-				reportWB.getSheet(isheet).setValue(8, row, wfIncome, textStyle);
-				row++;
+			for (HH hh2 : uniqueHousehold) {
+
+				cropIncome = calcCropIncome(hh2, type);
+				empIncome = calcEmpIncome(hh2, type);
+				lsIncome = calcLSIncome(hh2, type);
+				trIncome = calcTransIncome(hh2, type);
+				wfIncome = calcWFIncome(hh2, type);
 
 			}
-		}
-		for (col = 0; col < 5; col++) {
-			row = 3;
-			for (int i = 0; i < 3; i++) {
-				reportWB.getSheet(isheet).setValue(4 + col, row, averageTotal[i][col] / uniqueCommunity.size(),
-						numberStyle);
-				row++;
+		} else if (model == OHEA) {
+			for (WGI wgi2 : uniqueCommunity) {
+
+				orderedWealthgroups = wgi2.getCommunity().getWealthgroup().stream()
+						.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
+						.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
+
+				for (int i = 0; i < orderedWealthgroups.size(); i++) {
+
+					List<WealthGroupInterview> wealthGroupInterview = orderedWealthgroups.get(i)
+							.getWealthGroupInterview();
+
+					cropIncome = calcCropIncome(wealthGroupInterview, type);
+					empIncome = calcEmpIncome(wealthGroupInterview, type);
+					lsIncome = calcLSIncome(wealthGroupInterview, type);
+					trIncome = calcTransIncome(wealthGroupInterview, type);
+					wfIncome = calcWFIncome(wealthGroupInterview, type);
+
+				}
 			}
 		}
+
+		/* TODO need a print loop */
+		// reportWB.getSheet(isheet).setValue(1, row, hh2.getHhNumber, textStyle);
+		reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);
+		reportWB.getSheet(isheet).setValue(3, row, empIncome, textStyle);
+		reportWB.getSheet(isheet).setValue(4, row, lsIncome, textStyle);
+		reportWB.getSheet(isheet).setValue(5, row, trIncome, textStyle);
+		reportWB.getSheet(isheet).setValue(6, row, wfIncome, textStyle);
+		row++;
+
 	}
+
+	/******************************************************************************************************************************************/
+
 
 	/******************************************************************************************************************************************/
 	private void createLandAssetreport(int isheet, Report report) {
@@ -1399,7 +2004,26 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		return wfTot;
 	}
+	/******************************************************************************************************************************************/
 
+	private Double calcWFIncome(HH hh2, String type) {
+		Double wfTot = 0.0;
+
+		/* What about food payments? */
+
+		for (WildFood wf : hh2.getHousehold().getWildFood()) {
+
+			if (type == "cash") {
+				wfTot += wf.getUnitsSold() * wf.getPricePerUnit();
+			} else if (type == "food") {
+				// wfTot += wf.getUnitsConsumed() *
+				// wf.getResourceSubType().getResourcesubtypekcal();
+				wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType());
+			}
+		}
+
+		return wfTot;
+	}
 	/******************************************************************************************************************************************/
 
 	private Double calcTransIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
@@ -1432,7 +2056,31 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		return trTot;
 	}
+	/******************************************************************************************************************************************/
 
+	private Double calcTransIncome(HH hh2, String type) {
+		Double trTot = 0.0;
+
+		/* Handle transfer types food/cash/other */
+
+		for (Transfer tr : hh2.getHousehold().getTransfer()) {
+			if (type == "cash") {
+				if (tr.getTransferType().equals(TransferType.Food)) {
+					trTot += tr.getUnitsSold() * tr.getPricePerUnit() * tr.getPeopleReceiving() * tr.getTimesReceived();
+				} else // Cash or Other
+				{
+					trTot += tr.getPeopleReceiving() * tr.getTimesReceived() * tr.getCashTransferAmount();
+				}
+			} else if (type == "food" && tr.getTransferType().equals(TransferType.Food)
+					&& tr.getFoodResourceSubType() != null) {
+				trTot += tr.getUnitsConsumed() * findRSTKcal(tr.getFoodResourceSubType()) * tr.getPeopleReceiving()
+						* tr.getTimesReceived();
+
+			}
+
+		}
+		return trTot;
+	}
 	/******************************************************************************************************************************************/
 
 	private Double calcLSIncome(List<WealthGroupInterview> wealthGroupInterview, String type) { // LSS and LSP sales
@@ -1464,7 +2112,27 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		return lsTot;
 
 	}
+	/******************************************************************************************************************************************/
 
+	private Double calcLSIncome(HH hh2, String type) { // LSS and LSP sales
+		Double lsTot = 0.0;
+		if (type == "cash") {
+			for (LivestockSales ls : hh2.getHousehold().getLivestockSales()) {
+				lsTot += ls.getUnitsSold() * ls.getPricePerUnit();
+			}
+
+			for (LivestockProducts lsp : hh2.getHousehold().getLivestockProducts()) {
+				lsTot += lsp.getUnitsSold() * lsp.getPricePerUnit();
+			}
+		} else if (type == "food") {
+			for (LivestockProducts lsp : hh2.getHousehold().getLivestockProducts()) {
+				lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType());
+			}
+		}
+
+		return lsTot;
+
+	}
 	/******************************************************************************************************************************************/
 
 	private Double calcEmpIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
@@ -1489,22 +2157,73 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		return empTot;
 
 	}
-
 	/******************************************************************************************************************************************/
-	private Double calcCropIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
+
+	private Double calcEmpIncome(HH hh2, String type) {
+		Double empTot = 0.0;
+
+		/* What about food payments? for cash */
+		if (hh2.getHousehold().getEmployment().size() == 0) {
+
+			return (0.0);
+		}
+		try {
+			System.out.println("type = " + type);
+
+			for (Employment emp : hh2.getHousehold().getEmployment()) {
+				if (type == "cash") {
+
+					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * emp.getCashPaymentAmount();
+
+				} else if (type == "food" && emp.getFoodResourceSubType() != null) {
+
+					empTot += emp.getPeopleCount() * emp.getUnitsWorked() * findRSTKcal(emp.getFoodResourceSubType());
+				} else
+					empTot = 0.0;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			errno = 991;
+		}
+
+		return empTot;
+
+	}
+	/******************************************************************************************************************************************/
+	private Double calcCropIncome(HH hh2, String type) {
 
 		Double cropTot = 0.0;
 
-		System.out.println("in calcCropIncome type =" + type);
+		for (Crop crop : hh2.getHousehold().getCrop()) {
+			if (type == "cash") {
+
+				cropTot += crop.getUnitsSold() * crop.getPricePerUnit();
+
+			} else if (type == "food") {
+
+				cropTot += crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType());
+
+			}
+		}
+
+		return cropTot;
+	}
+
+	/******************************************************************************************************************************************/
+
+	private Double calcCropIncome(List<WealthGroupInterview> wealthGroupInterview, String type) {
+
+		Double cropTot = 0.0;
 
 		for (int i = 0; i < wealthGroupInterview.size(); i++) {
 			for (Crop crop : wealthGroupInterview.get(i).getCrop()) {
 				if (type == "cash") {
 
 					cropTot += crop.getUnitsSold() * crop.getPricePerUnit();
-					System.out.println("in crop cash tot");
+					
 				} else if (type == "food") {
-					System.out.println("get rst syn kcal");
+					
 					cropTot += crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType());
 				}
 			}
@@ -1514,28 +2233,35 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 	}
 
 	/******************************************************************************************************************************************/
+	private Double calcHhmSolc(HH hh3, StdOfLivingElement stdL) {
 
-	private Double calcHhmSolc(WGI wgi3, StdOfLivingElement stdL) {
-		/*
-		 * int lowerAgeSOL = 0; int upperAgeSOL = 0; Gender genderSOL = null;
-		 * 
-		 * lowerAgeSOL = stdL.getAgeRangeLower(); upperAgeSOL = stdL.getAgeRangeUpper();
-		 * genderSOL = stdL.getGender();
-		 * 
-		 * errno = 1201; for (HouseholdMember hhm :
-		 * hh3.getHousehold().getHouseholdMember()) { if (genderSOL.equals(Gender.Both)
-		 * && (hhm.getAge() >= lowerAgeSOL) && (hhm.getAge() <= upperAgeSOL)) { return
-		 * (stdL.getCost() * stdL.getAmount()); } errno = 1202; if
-		 * (genderSOL.equals(Gender.Male) && hhm.getGender().equals(Sex.Male) &&
-		 * (hhm.getAge() >= lowerAgeSOL) && (hhm.getAge() <= upperAgeSOL)) { return
-		 * (stdL.getCost() * stdL.getAmount());
-		 * 
-		 * } errno = 1203; if (genderSOL.equals(Gender.Female) &&
-		 * hhm.getGender().equals(Sex.Female) && (hhm.getAge() >= lowerAgeSOL) &&
-		 * (hhm.getAge() <= upperAgeSOL)) { return (stdL.getCost() * stdL.getAmount());
-		 * 
-		 * } errno = 1204; } errno = 1205;
-		 */
+		int lowerAgeSOL = 0;
+		int upperAgeSOL = 0;
+		Gender genderSOL = null;
+
+		lowerAgeSOL = stdL.getAgeRangeLower();
+		upperAgeSOL = stdL.getAgeRangeUpper();
+		genderSOL = stdL.getGender();
+
+		for (HouseholdMember hhm : hh3.getHousehold().getHouseholdMember()) {
+			if (genderSOL.equals(Gender.Both) && (hhm.getAge() >= lowerAgeSOL) && (hhm.getAge() <= upperAgeSOL)) {
+				return (stdL.getCost() * stdL.getAmount());
+			}
+
+			if (genderSOL.equals(Gender.Male) && hhm.getGender().equals(Sex.Male) && (hhm.getAge() >= lowerAgeSOL)
+					&& (hhm.getAge() <= upperAgeSOL)) {
+				return (stdL.getCost() * stdL.getAmount());
+
+			}
+
+			if (genderSOL.equals(Gender.Female) && hhm.getGender().equals(Sex.Female) && (hhm.getAge() >= lowerAgeSOL)
+					&& (hhm.getAge() <= upperAgeSOL)) {
+				return (stdL.getCost() * stdL.getAmount());
+
+			}
+
+		}
+
 		return (0.0);
 	}
 
@@ -1584,19 +2310,20 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		System.out.println("In WGI DI calc ");
 
-		List<WGI> thisWGI = wgi.stream().filter(d -> d.wealthgroupInterview == wealthGroupInterview)
+		List<WGI> thisWGI = wgi.stream().filter(d -> d.getWealthgroupInterview() == wealthGroupInterview)
 				.collect(Collectors.toList());
 
-		List<WGI> cropList = thisWGI.stream().filter(d -> d.type == "Crop").collect(Collectors.toList());
+		List<WGI> cropList = thisWGI.stream().filter(d -> d.getType() == "Crop").collect(Collectors.toList());
 
-		List<WGI> wildfoodList = thisWGI.stream().filter(d -> d.type == "Wildfood").collect(Collectors.toList());
+		List<WGI> wildfoodList = thisWGI.stream().filter(d -> d.getType() == "Wildfood").collect(Collectors.toList());
 
-		List<WGI> livestockproductList = thisWGI.stream().filter(d -> d.type == "LivestockProduct")
+		List<WGI> livestockproductList = thisWGI.stream().filter(d -> d.getType() == "LivestockProduct")
 				.collect(Collectors.toList());
 
-		List<WGI> employmentList = thisWGI.stream().filter(d -> d.type == "Employment").collect(Collectors.toList());
+		List<WGI> employmentList = thisWGI.stream().filter(d -> d.getType() == "Employment")
+				.collect(Collectors.toList());
 
-		List<WGI> transferList = thisWGI.stream().filter(d -> d.type == "Transfer").collect(Collectors.toList());
+		List<WGI> transferList = thisWGI.stream().filter(d -> d.getType() == "Transfer").collect(Collectors.toList());
 
 		try {
 			if (cropList.size() > 0) {
@@ -1804,28 +2531,126 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	/******************************************************************************************************************************************/
 
+	private Double householdAE(Household household) {
+
+		System.out.println("in householdAE calc, household = " + household.getHouseholdName());
+
+		Double totAE = 0.0;
+		Double ageReq = 0.0;
+		int age = 0;
+		Sex gender;
+
+		for (HouseholdMember hhm : household.getHouseholdMember()) {
+			age = hhm.getAge();
+			gender = hhm.getGender();
+
+			WHOEnergyRequirements whoEnergy = WHOEnergyRequirements.findByAge(age);
+
+			// System.out.println("whoEnergy = " + whoEnergey.getFemale() + " " +
+			// whoEnergey.getMale() + " " + gender);
+			if (gender == Sex.Female) {
+				totAE += whoEnergy.getFemale();
+			} else if (gender == Sex.Male) {
+				totAE += whoEnergy.getMale();
+			}
+
+		}
+
+		/* AE = TE / 2600 */
+
+		totAE = totAE / 2600;
+		// System.out.println("done householdAE calc");
+		return Double.parseDouble(df2.format(totAE));
+
+	}
+
+	/******************************************************************************************************************************************/
+
 	private void createHeaderPage() {
 		final int STARTROW = 6;
 		int i = STARTROW; // used for row number
+		String currency = "";
+		int col = 3;
 
-		System.out.println("In Create Header Page 000");
+		Efdutils.em("In Create Header Page for Coping Strategy");
 
 		sheet[0] = reportWB.addSheet("Coping Strategy Summary");
 		setSheetStyle(sheet[0]);
-		sheet[0].setColumnWidths(1, 40, 80, 50, 50, 50, 50, 25, 25, 50, 50);
+		sheet[0].setColumnWidths(1, 40, 80, 50, 50, 50);
 
-		sheet[0].setValue(1, 1, "Date:", boldRStyle);
+		sheet[0].setValue(1, 1, "Date:", boldRStyle); // col,row
 		sheet[0].setValue(2, 1, new Date(), dateStyle);
 		sheet[0].setValue(1, 2, "Spec Name:", boldRStyle);
-		// sheet[0].setValue(2, 2, customReportSpec.getSpecName(), textStyleLeft);
-		sheet[0].setValue(1, 3, "Livelihood Zone:", boldRStyle);
-		sheet[0].setValue(2, 3, project.getProjecttitle() + " / " + livelihoodZone.getLzname(), textStyleLeft);
-		// study.getReferenceYear(), textStyle);
-		sheet[0].setValue(2, STARTROW, "Reports", boldLStyle);
-		/* get list of reports and create tabbed bsheets for each */
+		sheet[0].setValue(2, 2, "All Reports", textStyleLeft);
+		sheet[0].setValue(1, 4, "Reporting Currency:", boldRStyle);
 
-		/* If no reports in custom report spec then use all reports */
-		i++;
+		sheet[0].setValue(1, 25, "Chage Scenario Title:", boldRStyle);
+		sheet[0].setValue(1, 26, "Change Scenario Author:", boldRStyle);
+		sheet[0].setValue(1, 27, "Change Scenario Description:", boldRStyle);
+
+		sheet[0].setValue(2, 25, modellingScenario.getTitle(), textStyleLeft);
+		sheet[0].setValue(2, 26, modellingScenario.getAuthor(), textStyleLeft);
+		sheet[0].setValue(2, 27, modellingScenario.getDescription(), textStyleLeft);
+
+		if (isOIHM) {
+			sheet[0].setValue(1, 3, "Study:", boldRStyle);
+			sheet[0].setValue(2, 3, study.getStudyName() + " " + study.getReferenceYear(), textStyleLeft);
+
+			String hhName;
+			if (isSelectedHouseholds) {
+				sheet[0].setValue(col, i, "Selected Households in Report = " + hhSelected.size(), boldTopStyle);
+				i++;
+				for (HH hh2 : hhSelected) {
+					if ((hhName = hh2.getHousehold().getHouseholdName()) == null)
+						hhName = "-";
+					sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber() + " - " + hhName, textStyle);
+					i++;
+				}
+			} else {
+				sheet[0].setValue(col, i, "Report Spec Households in Report = " + uniqueHousehold.size(), boldTopStyle);
+				i++;
+				for (HH hh2 : uniqueHousehold) {
+					if ((hhName = hh2.getHousehold().getHouseholdName()) == null)
+						hhName = "-";
+					sheet[0].setValue(col, i, hh2.getHousehold().getHouseholdNumber() + " - " + hhName, textStyle);
+					i++;
+				}
+			}
+
+			// Default reporting currency based on Currency for an LZ within this Project
+			for (LivelihoodZone livelihoodZone3 : study.getProjectlz().getLivelihoodZone()) {
+				currency = livelihoodZone3.getCountry().getCurrencySymbol();
+				sheet[0].setValue(2, 4, currency, textStyleLeft);
+				break;
+			}
+
+			reportList = XPersistence.getManager().createQuery("from Report where method = :method")
+					.setParameter("method", Method.MODELLINGOIHM).getResultList();
+
+		} else if (isOHEA) {
+			sheet[0].setValue(1, 3, "Livelihood Zone:", boldRStyle);
+			sheet[0].setValue(2, 3, project.getProjecttitle() + " / " + livelihoodZone.getLzname(), textStyleLeft);
+			reportList = XPersistence.getManager().createQuery("from Report where method = :method")
+					.setParameter("method", Method.MODELLINGOHEA).getResultList();
+
+			// Default reporting currency based on Currency for an LZ within this Project
+			for (LivelihoodZone livelihoodZone3 : project.getLivelihoodZone()) {
+				currency = livelihoodZone3.getCountry().getCurrencySymbol();
+				sheet[0].setValue(2, 4, currency, textStyleLeft);
+				break;
+
+			}
+
+		}
+		sheet[0].setValue(2, STARTROW, "Reports", boldLStyle);
+		/* get list of reports for modelling data spreadsheet */
+
+		reportList = XPersistence.getManager().createQuery("from Report where method = :method")
+				.setParameter("method", Method.MODELLINGOIHM).getResultList();
+
+		Efdutils.em("No of reports = " + reportList.size());
+
+		i = STARTROW + 1;
 
 		reportList.sort(Comparator.comparingInt(Report::getCode));
 
@@ -1837,93 +2662,6 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 			i++;
 		}
-
-		i = STARTROW;
-
-		int col = 3;
-		// Selected HH
-		errno = 1101;
-		String siteName;
-		String wgName;
-
-		if (isSelectedSites) {
-			sheet[0].setValue(col, i, "Selected Communities in Report = " + sites.size(), boldTopStyle);
-			// sheet[0].setValue(col + 1, i, "Wealthgroups in Report = ", boldTopStyle);
-			i++;
-
-			for (Site site : sites) {
-				siteName = site.getLocationdistrict() + " " + site.getSubdistrict();
-				sheet[0].setValue(col, i, siteName, textStyle);
-				// for (Community community2 : site.getCommunity()) { // WGs not needed on
-				// header page
-				// for (WealthGroup wealthGroup : community2.getWealthgroup()) {
-				// wgName = wealthGroup.getWgnameeng() + " " + wealthGroup.getWgnamelocal();
-				// sheet[0].setValue(col + 1, i, wgName, textStyle);
-				// i++;
-				// }
-				// }
-
-				i++;
-
-			}
-		}
-
-		i = STARTROW;
-
-		col++;
-		errno = 1102;
-
-		sheet[0].setValue(col, i, "Categories Included", boldTopStyle);
-		i++;
-		// for (Category category : customReportSpec.getCategory()) {
-		// sheet[0].setValue(col, i, category.getCategoryName(), textStyle);
-		// i++;
-		// }
-
-		i = STARTROW;
-		col++;
-		errno = 1103;
-
-		sheet[0].setValue(col, i, "Resources Included", boldTopStyle);
-		i++;
-		// for (ResourceType rt : customReportSpec.getResourceType()) {
-		// sheet[0].setValue(col, i, rt.getResourcetypename(), textStyle);
-		// i++;
-		// }
-
-		i = STARTROW;
-		col++;
-
-		errno = 1104;
-
-		sheet[0].setValue(col, i, "Resource Subtypes Included", boldTopStyle);
-		i++;
-		// for (ResourceSubType rst : customReportSpec.getResourceSubType()) {
-		// sheet[0].setValue(col, i, rst.getResourcetypename(), textStyle);
-		// i++;
-		// }
-
-		String currency = livelihoodZone.getCountry().getCurrency();
-
-		/*
-		 * Cross Projects so unsure what currency should be set to - assume Project
-		 * country currency
-		 */
-		/*
-		 * TODO
-		 */
-		/*
-		 * try { if (StringUtils.isEmpty(getProjectlz().getAltCurrency().getCurrency()))
-		 * { currency = study.getSite().getLivelihoodZone().getCountry().getCurrency();
-		 * } else { currency = study.getProjectlz().getAltCurrency().getCurrency(); } }
-		 * catch (Exception e1) { // TODO Auto-generated catch block //
-		 * e1.printStackTrace(); }
-		 * 
-		 * errno = 1107;
-		 * 
-		 */
-		sheet[0].setValue(1, 4, "Reporting Currency:", boldTopStyle);
-		sheet[0].setValue(2, 4, currency, textStyleLeft);
 
 		errno = 1108;
 	}
@@ -1994,503 +2732,5 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 	/******************************************************************************************************************************************/
 
 	/******************************************************************************************************************************************/
-
-	/*
-	 * Using generic would be better instead of each asset class. Needs a revisit
-	 * sometime
-	 */
-	public static class WGI {
-
-		private Project project;
-		private LivelihoodZone livelihoodZone;
-		private Site site;
-		private Community community;
-		private WealthGroupInterview wealthgroupInterview;
-		private WealthGroup wealthgroup;
-		private int wgiNumber;
-		private Double wgiDI;
-		private Double wgiAE;
-		private Double wgiSOLC;
-		private Collection<Category> category;
-		private ResourceType resourceType;
-		private ResourceSubType resourceSubType;
-		private ConfigAnswer answer;
-		private Boolean delete;
-		private String type;
-		private AssetLand land;
-		private AssetFoodStock foodstock;
-		private AssetCash cash;
-		private AssetLiveStock livestock;
-		private AssetTradeable tradeable;
-		private AssetTree tree;
-		private Crop crop;
-		private Employment employment;
-		private Inputs inputs;
-		private LivestockProducts livestockproducts;
-		private LivestockSales livestocksales;
-		private Transfer transfer;
-		private WildFood wildfood;
-		private Quantile quantile;
-		private Double avgDI;
-		private int quantSeq;
-		private Double cropIncome;
-		private Double empIncome;
-		private Double lsIncome;
-		private Double transIncome;
-		private Double wfIncome;
-
-		public WealthGroupInterview getWealthgroupInterview() {
-			return wealthgroupInterview;
-		}
-
-		public void setWealthgroupInterview(WealthGroupInterview wealthgroupInterview) {
-			this.wealthgroupInterview = wealthgroupInterview;
-		}
-
-		public Project getProject() {
-			return project;
-		}
-
-		public void setProject(Project project) {
-			this.project = project;
-		}
-
-		public LivelihoodZone getLivelihoodZone() {
-			return livelihoodZone;
-		}
-
-		public void setLivelihoodZone(LivelihoodZone livelihoodZone) {
-			this.livelihoodZone = livelihoodZone;
-		}
-
-		public WealthGroup getWealthgroup() {
-			return wealthgroup;
-		}
-
-		public void setWealthgroup(WealthGroup wealthgroup) {
-			this.wealthgroup = wealthgroup;
-		}
-
-		public Community getCommunity() {
-			return community;
-		}
-
-		public void setCommunity(Community community) {
-			this.community = community;
-		}
-
-		public Site getSite() {
-			return site;
-		}
-
-		public void setSite(Site site) {
-			this.site = site;
-		}
-
-		private int numMales;
-		private int numFemales;
-
-		public int getNumMales() {
-			return numMales;
-		}
-
-		public void setNumMales(int numMales) {
-			this.numMales = numMales;
-		}
-
-		public int getNumFemales() {
-			return numFemales;
-		}
-
-		public void setNumFemales(int numFemales) {
-			this.numFemales = numFemales;
-		}
-
-		public Double getEmpIncome() {
-			return empIncome;
-		}
-
-		public void setEmpIncome(Double empIncome) {
-			this.empIncome = empIncome;
-		}
-
-		public Double getLsIncome() {
-			return lsIncome;
-		}
-
-		public void setLsIncome(Double lsIncome) {
-			this.lsIncome = lsIncome;
-		}
-
-		public Double getTransIncome() {
-			return transIncome;
-		}
-
-		public void setTransIncome(Double transIncome) {
-			this.transIncome = transIncome;
-		}
-
-		public Double getWfIncome() {
-			return wfIncome;
-		}
-
-		public void setWfIncome(Double wfIncome) {
-			this.wfIncome = wfIncome;
-		}
-
-		public Double getCropIncome() {
-			return cropIncome;
-		}
-
-		public void setCropIncome(Double cropIncome) {
-			this.cropIncome = cropIncome;
-		}
-
-		public int getQuantSeq() {
-			return quantSeq;
-		}
-
-		public void setQuantSeq(int quantSeq) {
-			this.quantSeq = quantSeq;
-		}
-
-		public Double getAvgDI() {
-			return avgDI;
-		}
-
-		public void setAvgDI(Double avgDI) {
-			this.avgDI = avgDI;
-		}
-
-		public Quantile getQuantile() {
-			return quantile;
-		}
-
-		public void setQuantile(Quantile quantile) {
-			this.quantile = quantile;
-		}
-
-		public int getWgiNumber() {
-			return wgiNumber;
-		}
-
-		public void setWgiNumber(int wgiNumber) {
-			this.wgiNumber = wgiNumber;
-		}
-
-		public Double getWgiDI() {
-			return wgiDI;
-		}
-
-		public void setWgiDI(Double wgiDI) {
-			this.wgiDI = wgiDI;
-		}
-
-		public Double getWgiAE() {
-			return wgiAE;
-		}
-
-		public void setWgiAE(Double wgiAE) {
-			this.wgiAE = wgiAE;
-		}
-
-		public Double getWgiSOLC() {
-			return wgiSOLC;
-		}
-
-		public void setWgiSOLC(Double wgiSOLC) {
-			this.wgiSOLC = wgiSOLC;
-		}
-
-		public AssetFoodStock getFoodstock() {
-			return foodstock;
-		}
-
-		public void setFoodstock(AssetFoodStock foodstock) {
-			this.foodstock = foodstock;
-		}
-
-		public AssetCash getCash() {
-			return cash;
-		}
-
-		public void setCash(AssetCash cash) {
-			this.cash = cash;
-		}
-
-		public AssetLiveStock getLivestock() {
-			return livestock;
-		}
-
-		public void setLivestock(AssetLiveStock livestock) {
-			this.livestock = livestock;
-		}
-
-		public AssetTradeable getTradeable() {
-			return tradeable;
-		}
-
-		public void setTradeable(AssetTradeable tradeable) {
-			this.tradeable = tradeable;
-		}
-
-		public AssetTree getTree() {
-			return tree;
-		}
-
-		public void setTree(AssetTree tree) {
-			this.tree = tree;
-		}
-
-		public Crop getCrop() {
-			return crop;
-		}
-
-		public void setCrop(Crop crop) {
-			this.crop = crop;
-		}
-
-		public Employment getEmployment() {
-			return employment;
-		}
-
-		public void setEmployment(Employment employment) {
-			this.employment = employment;
-		}
-
-		public Inputs getInputs() {
-			return inputs;
-		}
-
-		public void setInputs(Inputs inputs) {
-			this.inputs = inputs;
-		}
-
-		public LivestockProducts getLivestockproducts() {
-			return livestockproducts;
-		}
-
-		public void setLivestockproducts(LivestockProducts livestockproducts) {
-			this.livestockproducts = livestockproducts;
-		}
-
-		public LivestockSales getLivestocksales() {
-			return livestocksales;
-		}
-
-		public void setLivestocksales(LivestockSales livestocksales) {
-			this.livestocksales = livestocksales;
-		}
-
-		public Transfer getTransfer() {
-			return transfer;
-		}
-
-		public void setTransfer(Transfer transfer) {
-			this.transfer = transfer;
-		}
-
-		public WildFood getWildfood() {
-			return wildfood;
-		}
-
-		public void setWildfood(WildFood wildfood) {
-			this.wildfood = wildfood;
-		}
-
-		public Collection<Category> getCategory() {
-			return category;
-		}
-
-		public void setCategory(Collection<Category> category) {
-			this.category = category;
-		}
-
-		public ResourceType getResourceType() {
-			return resourceType;
-		}
-
-		public void setResourceType(ResourceType resourceType) {
-			this.resourceType = resourceType;
-		}
-
-		public ResourceSubType getResourceSubType() {
-			return resourceSubType;
-		}
-
-		public void setResourceSubType(ResourceSubType resourceSubType) {
-			this.resourceSubType = resourceSubType;
-		}
-
-		public ConfigAnswer getAnswer() {
-			return answer;
-		}
-
-		public void setAnswer(ConfigAnswer answer) {
-			this.answer = answer;
-		}
-
-		public Boolean getDelete() {
-			return delete;
-		}
-
-		public void setDelete(Boolean delete) {
-			this.delete = delete;
-		}
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-
-		public AssetLand getLand() {
-			return land;
-		}
-
-		public void setLand(AssetLand land) {
-			this.land = land;
-		}
-
-	}
-
-	public static class WGISub {
-		private int wgiid;
-		private Community community;
-		private WealthGroupInterview wealthGroupInterview;
-		private WealthGroup wealthGroup;
-		private AssetLand assetLand;
-		private AssetLiveStock assetLivestock;
-		private ResourceSubType assetRST;
-		private String assetName;
-		private Double assetValue;
-		private Double wgiDI;
-		private int column;
-
-		public Community getCommunity() {
-			return community;
-		}
-
-		public void setCommunity(Community community) {
-			this.community = community;
-		}
-
-		public WealthGroupInterview getWealthGroupInterview() {
-			return wealthGroupInterview;
-		}
-
-		public void setWealthGroupInterview(WealthGroupInterview wealthGroupInterview) {
-			this.wealthGroupInterview = wealthGroupInterview;
-		}
-
-		public WealthGroup getWealthGroup() {
-			return wealthGroup;
-		}
-
-		public void setWealthGroup(WealthGroup wealthGroup) {
-			this.wealthGroup = wealthGroup;
-		}
-
-		public String getAssetName() {
-			return assetName;
-		}
-
-		public void setAssetName(String assetName) {
-			this.assetName = assetName;
-		}
-
-		public int getWgiid() {
-			return wgiid;
-		}
-
-		public void setWgiid(int wgiid) {
-			this.wgiid = wgiid;
-		}
-
-		public AssetLand getAssetLand() {
-			return assetLand;
-		}
-
-		public void setAssetLand(AssetLand assetLand) {
-			this.assetLand = assetLand;
-		}
-
-		public AssetLiveStock getAssetLivestock() {
-			return assetLivestock;
-		}
-
-		public void setAssetLivestock(AssetLiveStock assetLivestock) {
-			this.assetLivestock = assetLivestock;
-		}
-
-		public ResourceSubType getAssetRST() {
-			return assetRST;
-		}
-
-		public void setAssetRST(ResourceSubType assetRST) {
-			this.assetRST = assetRST;
-		}
-
-		public Double getAssetValue() {
-			return assetValue;
-		}
-
-		public void setAssetValue(Double assetValue) {
-			this.assetValue = assetValue;
-		}
-
-		public Double getWgiDI() {
-			return wgiDI;
-		}
-
-		public void setWgiDI(Double wgiDI) {
-			this.wgiDI = wgiDI;
-		}
-
-		public int getColumn() {
-			return column;
-		}
-
-		public void setColumn(int column) {
-			this.column = column;
-		}
-
-	}
-
-	public class QuantHousehold {
-
-		private Quantile quantile;
-
-		private Household household;
-
-		private Double averageDI;
-
-		public Double getAverageDI() {
-			return averageDI;
-		}
-
-		public void setAverageDI(Double averageDI) {
-			this.averageDI = averageDI;
-		}
-
-		public Quantile getQuantile() {
-			return quantile;
-		}
-
-		public void setQuantile(Quantile quantile) {
-			this.quantile = quantile;
-		}
-
-		public Household getHousehold() {
-			return household;
-		}
-
-		public void setHousehold(Household household) {
-			this.household = household;
-		}
-
-	}
 
 }

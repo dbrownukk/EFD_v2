@@ -189,6 +189,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		// household.getHouseholdName());
 		// }
 
+		uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
+				.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
+		
 		if (households.size() == 0) {
 			System.out.println("no validated households in the is study");
 			addError("No Validated Households in this Study");
@@ -243,18 +246,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		}
 
 		System.out.println("done populateArray = selectHouseholds hh = "+hh.size());
-		//try {
-		//	uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHhNumber()))
-		//			.sorted(Comparator.comparing(HH::getHhDI)).collect(Collectors.toList());
-		//	em("about to do unq hh");
-		//	uniqueHousehold = hh.stream().filter(distinctByKey(HH::getHhNumber))
-		//			.collect(Collectors.toList());
-		//	em("done unq hh");
-		//	em("unique = "+uniqueHousehold.toString());
-		//} catch (Exception e1) {
-			// TODO Auto-generated catch block
-		//	e1.printStackTrace();
-		//}
+
 
 	
 		errno = 51;
@@ -593,35 +585,12 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			for (ConfigAnswer configAnswer : household.getConfigAnswer()) {
 				addTohhArray(household, null, null, null, configAnswer, "Answer", null, null, null, null, null, null,
 						null, null, null, null, null, null, null);
-				/*
-				 * Found a HH with required answer - now iterate back through hh to populate
-				 * assets
-				 */
 
-				// *************************
-				// populateHHfromHousehold(household, configAnswer);
-
-				// Was duplicating results
-				// *************************
-
-				System.out.println("hh in populate hh from configAnswer hh size =" + household.getHouseholdName() + " "
-						+ hh.size());
 			}
 
 		}
 
-		// for (HH hh2 : hh) {
-		// if (hh2.getResourceType() != null)
-		// System.out.println("hh in arraypop now equals = " + hh2.getHhNumber() + " "
-		// + hh2.getCategory().toArray().toString() + " " +
-		// (hh2.getResourceType().getResourcetypename()
-		// + " " + hh2.getResourceSubType().getResourcetypename()));
-		// else
-		// System.out.println("print an answer" + hh2.toString());
 
-		// }
-
-		System.out.println("end populateArray drb = " + hh.size());
 
 	}
 
@@ -1903,13 +1872,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			} else if (type == "food") {
 				System.out.println("get rst syn kcal");
 				cropTot += crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType());
-				System.out.println(
-						"crop new calc tot  = " + crop.getUnitsConsumed() * findRSTKcal(crop.getResourceSubType()));
-				System.out.println("crop total = " + cropTot);
-				System.out.println("rst = " + crop.getCropType());
-				System.out.println("rst consumed = " + crop.getUnitsConsumed());
-				System.out.println("rst name = " + crop.getResourceSubType().getResourcetypename());
-				System.out.println("rst KCAL = " + findRSTKcal(crop.getResourceSubType()));
+	
 			}
 		}
 
@@ -2461,7 +2424,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	 * sometime
 	 */
 	public static class HH {
-		private Household household;
+		Household household;
 		private int hhNumber;
 		private Double hhDI;
 		private Double hhAE;
