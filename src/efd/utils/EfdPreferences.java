@@ -9,7 +9,7 @@ import org.openxava.util.*;
  
 public class EfdPreferences {
  
-    private final static String FILE_PROPERTIES="efd.properties";
+    private static final String FILE_PROPERTIES="efd.properties";
     private static Log log = LogFactory.getLog(EfdPreferences.class);
     private static Properties properties; // We store the properties here
  

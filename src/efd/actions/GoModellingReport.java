@@ -1,5 +1,5 @@
 /* 
- * Call Dialog to run reports. 
+ * Call Dialog to run modelling reports reports. 
  * 
  *  For modelling need to determine if OHEA - Community/LZ or OIHM Study / HH  
  */
@@ -7,6 +7,7 @@
 package efd.actions;
 
 import java.util.*;
+import java.util.stream.*;
 
 import javax.inject.*;
 
@@ -33,6 +34,8 @@ public class GoModellingReport extends ViewBaseAction {
 
 	public void execute() throws Exception {
 
+		String lzid = "";
+
 		Map allValues = getView().getAllValues();
 		Efdutils.em("In Gomdellingreport all vals sss = " + allValues);
 
@@ -47,70 +50,22 @@ public class GoModellingReport extends ViewBaseAction {
 			isOHEA = true;
 			isOIHM = false;
 			Efdutils.em("OHEA");
-			
+
 			project = XPersistence.getManager().find(Project.class, projectid);
 
 			Map allValues2 = getView().getAllValues();
-			
-			Efdutils.em("allvals "+allValues);
-			
-			project.getLivelihoodZone();
-			
-			// List of Sites for this LZ
-			List<Site> sites = new ArrayList<Site>();
-			sites = (List<Site>) livelihoodZone.getSite();
-			System.out.println("sites count = " + sites.size());
-			if (sites.size() == 0) {
-				addError("No Valid Communities for LivelihoodZone and Project");
-				return;
-			}
 
-			System.out.println("in go ohea 5");
-			Boolean isValidated = false;
-			// For each site - is it in this Project?
-			for (Site site2 : sites) {
+			Efdutils.em("allvals " + allValues);
 
-				for (Community community : site2.getCommunity()) {
-					if (community.getProjectlz() == project) {
-						/*
-						 * Is there a Valid WGI in this site?
-						 * 
-						 */
-						System.out.println("community = ");
-						isValidated = false;
-						for (Community community2 : community.getSite().getCommunity()) {
-							isValidated = false;
-							for (WealthGroup wealthGroup3 : community2.getWealthgroup()) {
-								for (WealthGroupInterview wealthGroupInterview3 : wealthGroup3.getWealthGroupInterview()) {
-									if (wealthGroupInterview3.getStatus() == Status.Validated) {
-										isValidated = true;
-									}
+			Collection<LivelihoodZone> livelihoodZone2 = project.getLivelihoodZone();
 
-								}
-
-							}
-						}
-
-						if (isValidated) {
-							correctLZ += "'" + community.getSite().getLocationid() + "',";
-
-						}
-					}
+			for (LivelihoodZone livelihoodZone3 : livelihoodZone2) {
+				for (Site site2 : livelihoodZone3.getSite()) {
+					Efdutils.em("site = " + site2.getLocationdistrict() + " " + site2.getSubdistrict() + " "
+							+ site2.getLivelihoodZone().getLzname());
 				}
-
 			}
-
-			correctLZ = StringUtils.chop(correctLZ);
-			if (correctLZ.isEmpty()) {
-				addError("No Valid Communities for LivelihoodZone and Project");
-				return;
-
-			}
-			
-			
-			
-			
-			
+			Efdutils.em("allvals ");
 
 		} else if (!studyid.isEmpty()) {
 			// OIHM
@@ -120,27 +75,70 @@ public class GoModellingReport extends ViewBaseAction {
 
 		}
 
+		if (isOHEA) {
+
+			/*
+			 * get array of LZ for this project
+			 */
+
+			Collection<LivelihoodZone> lzs = project.getLivelihoodZone();
+
+			/*
+			 * for each lzs determine if community / site / wg /wgi is Valid
+			 */
+
+			for (LivelihoodZone lzs2 : lzs) {
+				for (Site site2 : lzs2.getSite()) {
+					for (Community community : site2.getCommunity()) {
+						for (WealthGroup wealthGroup : community.getWealthgroup()) {
+							for (WealthGroupInterview wealthGroupInterview : wealthGroup.getWealthGroupInterview()) {
+								Status status = wealthGroupInterview.getStatus();
+								if (status == Status.Validated) // add this to valid LZ / Site/ WG community list
+								{
+									Efdutils.em("valid lz = " + lzs2.getLzid());
+									lzid = lzs2.getLzid();
+									correctLZ += "'" + community.getSite().getLocationid() + "',";
+								}
+							}
+
+						}
+					}
+				}
+			}
+
+			correctLZ = StringUtils.chop(correctLZ);
+
+			if (correctLZ.isEmpty()) {
+				addError("No Valid Communities for LivelihoodZone and Project");
+
+				return;
+
+			}
+
+		}
+		
+		
 		showDialog();
 
-		getView().setModelName("CustomReportSpecListModelling");  // Note no CustomReport Spec in Modelling scenario
+		getView().setModelName("CustomReportSpecListModelling"); // Note no CustomReport Spec in Modelling scenario
 		setControllers("ModellingReports", "Dialog");
 
 		if (isOHEA) {
 			Efdutils.em("set OHEA LZ view");
+
 			getView().setViewName("livelihoodZone");
-			getView().setValue("livelihoodZone.project.id", projectid);
-			
-			getView().setValue("livelihoodZone.lzid", livelihoodZone.getLzid());
+			allValues = getView().getAllValues();
+			Efdutils.em("In Gomdellingreport ohea all vals s = " + allValues);
+
+			getView().setValue("livelihoodZone.lzid", lzid);
 
 			Tab tab = getView().getSubview("livelihoodZone.site").getCollectionTab();
 
 			String condition = tab.getBaseCondition() + " and ${locationid} in (" + correctLZ + ")";
 
 			tab.setBaseCondition(condition);
-			// Validated WGIs
-
-			getView().getRoot().refreshCollections();
 			
+
 		} else {
 
 			Efdutils.em("set OIHM Study view");
@@ -150,7 +148,7 @@ public class GoModellingReport extends ViewBaseAction {
 			getView().setValue("study.id", studyid);
 
 			Tab tab = getView().getSubview("study.household").getCollectionTab();
-			tab.setBaseCondition(tab.getBaseCondition() + " and ${status} = '4'");	
+			tab.setBaseCondition(tab.getBaseCondition() + " and ${status} = '4'");
 		}
 		getView().refreshCollections();
 	}

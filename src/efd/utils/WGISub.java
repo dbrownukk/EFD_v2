@@ -15,8 +15,7 @@ public class WGISub {
 	private Double wgiDI;
 	private int column;
 
-	public WGISub() {
-	}
+
 
 	public int getWgiid() {
 		return wgiid;
