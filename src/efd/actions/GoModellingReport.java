@@ -59,13 +59,7 @@ public class GoModellingReport extends ViewBaseAction {
 
 			Collection<LivelihoodZone> livelihoodZone2 = project.getLivelihoodZone();
 
-			for (LivelihoodZone livelihoodZone3 : livelihoodZone2) {
-				for (Site site2 : livelihoodZone3.getSite()) {
-					Efdutils.em("site = " + site2.getLocationdistrict() + " " + site2.getSubdistrict() + " "
-							+ site2.getLivelihoodZone().getLzname());
-				}
-			}
-			Efdutils.em("allvals ");
+			
 
 		} else if (!studyid.isEmpty()) {
 			// OIHM
@@ -127,8 +121,6 @@ public class GoModellingReport extends ViewBaseAction {
 			Efdutils.em("set OHEA LZ view");
 
 			getView().setViewName("livelihoodZone");
-			allValues = getView().getAllValues();
-			Efdutils.em("In Gomdellingreport ohea all vals s = " + allValues);
 
 			getView().setValue("livelihoodZone.lzid", lzid);
 

@@ -25,11 +25,11 @@ public class LivestockProducts extends Asset {
 
 	
 	@Column(name = "UnitsProduced", nullable = false)
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold")
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 
 	@Column(name = "PricePerUnit", precision = 10, scale = 2)
@@ -40,14 +40,14 @@ public class LivestockProducts extends Asset {
 	@Depends("unitsProduced,unitsSold,unitsOtherUse")
 	@Column(name = "UnitsConsumed")
 	public Double getUnitsConsumed(){
-		return(unitsProduced-unitsSold-unitsOtherUse);
+		return(getUnitsProduced()-getUnitsSold()-getUnitsOtherUse());
 	};
 	
 	
 	//@Column(name = "UnitsConsumed")
 	//private Double unitsConsumed;
 
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "UnitsOtherUse")
 	private Double unitsOtherUse;
 
@@ -96,13 +96,13 @@ public class LivestockProducts extends Asset {
 		this.livestockProduct = livestockProduct;
 	}
 	public Double getUnitsProduced() {
-		return unitsProduced;
+		return unitsProduced==null?0.0:unitsProduced;
 	}
 	public void setUnitsProduced(Double unitsProduced) {
 		this.unitsProduced = unitsProduced;
 	}
 	public Double getUnitsSold() {
-		return unitsSold;
+		return unitsSold  == null ? 0.0 :unitsSold;
 	}
 	public void setUnitsSold(Double unitsSold) {
 		this.unitsSold = unitsSold;
@@ -116,7 +116,7 @@ public class LivestockProducts extends Asset {
 
 	
 	public Double getUnitsOtherUse() {
-		return unitsOtherUse;
+		 return unitsOtherUse == null ? 0.0 :unitsOtherUse;
 	}
 	public void setUnitsOtherUse(Double unitsOtherUse) {
 		this.unitsOtherUse = unitsOtherUse;

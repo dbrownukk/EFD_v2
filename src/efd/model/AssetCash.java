@@ -22,12 +22,13 @@ public class AssetCash extends Asset {
 	@Column(name = "Amount")
 	@Depends("currencyEnteredAmount,exchangeRate")
 	public BigDecimal getAmount() {
-		return currencyEnteredAmount.multiply(exchangeRate);
+		return getCurrencyEnteredAmount().multiply(getExchangeRate());
+
 	}
 
 	@DisplaySize(value = 10)
 	@Positive
-	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
+	// @DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 	@Column(name = "CurrencyEnteredAmount")
 	private BigDecimal currencyEnteredAmount;
 
@@ -39,7 +40,7 @@ public class AssetCash extends Asset {
 	@Column(precision = 10, scale = 5)
 	@Digits(integer = 10, fraction = 5)
 	@Positive
-	@DefaultValueCalculator(ZeroBigDecimalCalculator.class)
+	// @DefaultValueCalculator(ZeroBigDecimalCalculator.class)
 
 	private BigDecimal exchangeRate;
 
@@ -68,7 +69,7 @@ public class AssetCash extends Asset {
 	}
 
 	public BigDecimal getCurrencyEnteredAmount() {
-		return currencyEnteredAmount;
+		return currencyEnteredAmount == null ? BigDecimal.ZERO : currencyEnteredAmount;
 	}
 
 	public void setCurrencyEnteredAmount(BigDecimal currencyEnteredAmount) {

@@ -13,8 +13,10 @@ public class WGI {
 	private WealthGroup wealthgroup;
 	private int wgiNumber;
 	private Double wgiDI;
+	public Double wgiDIAfterChangeScenario;
 	private Double wgiAE;
 	private Double wgiSOLC;
+	private Double wgiSOLCAfterChangeScenario;
 	private Collection<Category> category;
 	private ResourceType resourceType;
 	private ResourceSubType resourceSubType;
@@ -44,6 +46,22 @@ public class WGI {
 	private Double wfIncome;
 	private int numMales;
 	private int numFemales;
+	
+	
+	
+	
+	public Double getWgiDIAfterChangeScenario() {
+		return wgiDIAfterChangeScenario;
+	}
+	public void setWgiDIAfterChangeScenario(Double wgiDIAfterChangeScenario) {
+		this.wgiDIAfterChangeScenario = wgiDIAfterChangeScenario;
+	}
+	public Double getWgiSOLCAfterChangeScenario() {
+		return wgiSOLCAfterChangeScenario;
+	}
+	public void setWgiSOLCAfterChangeScenario(Double wgiSOLCAfterChangeScenario) {
+		this.wgiSOLCAfterChangeScenario = wgiSOLCAfterChangeScenario;
+	}
 	public Project getProject() {
 		return project;
 	}

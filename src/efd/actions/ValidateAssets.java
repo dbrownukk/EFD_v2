@@ -99,16 +99,38 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 
 			String wgiid = getView().getValueString("wgiid");
 			wgi = XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
-			if (wgi.getSpreadsheet().isEmpty()) {
-				addError("Upload completed Interview Spreadsheet before validating");
-				return;
-			} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Generated)) {
+			/*
+			 * 
+			 * See Issue #436
+			 * 
+			 * If no spreadsheet uploaded then ignore
+			 * 
+			 * 
+			 *
+			 * if (wgi.getSpreadsheet().isEmpty()) {
+			 * addError("Upload completed Interview Spreadsheet before validating"); return;
+			 * } else if
+			 * (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Generated)) {
+			 * addError("Cannot Validate Interview Spreadsheet - Upload and Parse Spreadsheet first "
+			 * ); return; } else if
+			 * (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Uploaded)) {
+			 * addError("Cannot Validate Interview Spreadsheet - Parse Spreadsheet first");
+			 * return; } else if
+			 * (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Validated)) {
+			 * addError("Cannot Validate Interview Spreadsheet Data - Already Validated");
+			 * return; }
+			 */
+
+			if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Generated)
+					&& !wgi.getSpreadsheet().isEmpty()) {
 				addError("Cannot Validate Interview Spreadsheet - Upload and Parse Spreadsheet first ");
 				return;
-			} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Uploaded)) {
+			} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Uploaded)
+					&& !wgi.getSpreadsheet().isEmpty()) {
 				addError("Cannot Validate Interview Spreadsheet - Parse Spreadsheet first");
 				return;
-			} else if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Validated)) {
+			}
+			if (wgi.getStatus().equals(efd.model.WealthGroupInterview.Status.Validated)) {
 				addError("Cannot Validate Interview Spreadsheet Data - Already Validated");
 				return;
 			}
@@ -188,7 +210,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 				landIsInvalid = true;
 				al.get(i).setStatus(Asset.Status.Invalid);
 
-			} else  {
+			} else {
 				al.get(i).setStatus(Asset.Status.Valid);
 
 			}
@@ -211,8 +233,8 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 				als.get(i).setStatus(Asset.Status.Invalid);
 				livestockIsInvalid = true;
 
-			} else  {
-				
+			} else {
+
 				als.get(i).setStatus(Asset.Status.Valid);
 			}
 
@@ -248,12 +270,12 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 			if (!(afs.get(i).getQuantity() >= 0)) {
 				afs.get(i).setStatus(Asset.Status.Invalid);
 				fsIsInvalid = true;
-				
+
 			} else if (afs.get(i).getResourceSubType() == null) {
 				fsIsInvalid = true;
 				afs.get(i).setStatus(Asset.Status.Invalid);
-				
-			} else  {
+
+			} else {
 				afs.get(i).setStatus(Asset.Status.Valid);
 			}
 
@@ -275,8 +297,8 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 
 			}
 
-			else  {
-				
+			else {
+
 				atree.get(i).setStatus(Asset.Status.Valid);
 			}
 
@@ -294,8 +316,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 
 			}
 
-			else 
-			{
+			else {
 				ac.get(i).setStatus(Asset.Status.Valid);
 			}
 		}
@@ -420,14 +441,12 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 		// FIXED Oct 2019
 		System.out.println("Emp 111");
 		for (i = 0; i < emp.size(); i++) {
-			
-			// legacy null check 
-			if(emp.get(i).getFoodPaymentUnitsPaidWork() == null)
-			{
+
+			// legacy null check
+			if (emp.get(i).getFoodPaymentUnitsPaidWork() == null) {
 				emp.get(i).setFoodPaymentUnitsPaidWork(0.00);
 			}
-			
-			
+
 			if ((emp.get(i).getPeopleCount() < 0) || (emp.get(i).getUnitsWorked() < 0)
 					|| (emp.get(i).getCashPaymentAmount() < 0) || (emp.get(i).getFoodPaymentUnitsPaidWork() < 0)) {
 				empIsInvalid = true;
@@ -489,7 +508,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 
 			}
 
-			else  {
+			else {
 				tran.get(i).setStatus(Asset.Status.Valid);
 			}
 
@@ -519,7 +538,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 
 			}
 
-			else  {
+			else {
 				wf.get(i).setStatus(Asset.Status.Valid);
 			}
 

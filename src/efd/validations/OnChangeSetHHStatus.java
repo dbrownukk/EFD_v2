@@ -58,59 +58,6 @@ public class OnChangeSetHHStatus extends OnChangePropertyBaseAction {
 			getView().setValue("status", hh.getStatus());
 		}
 		
-		
-	
-		
-		/*
-		 * 
-		 * 
-		 * System.out.println("in on change status hh");
-		 * removeActions("SetEditable.SetEditableHH");
-		 * 
-		 * 
-		 * EntityManager em = XPersistence.createManager();
-		 * 
-		 * Household hhint = (Household) getView().getEntity(); // Displayed WGI
-		 */
-		/* need to get original status value from database */
-		/*
-		 * String hhiid = hhint.getId();
-		 * 
-		 * 
-		 * Query querywgi = em.createQuery("select status from Household where id = '" +
-		 * hhiid + "'"); Object hhstatus = querywgi.getSingleResult();
-		 * 
-		 */
-		/*
-		 * If changed to Validated, disallow and reset to previous Need to use 'Validate
-		 * Asset Data to set to Validate
-		 */
-		/*
-		 * if (getNewValue().toString().equals("Validated") && hhstatus.toString() !=
-		 * "Validated") {
-		 * addError("To set Household to Validated run Validate Asset Data"); //
-		 * hhint.setStatus((Status) hhstatus); //getView().refresh(); }
-		 * 
-		 * if(hhint.getStatus() == (Status.Validated)) {
-		 * System.out.println("set to read only in On Change 3");
-		 * 
-		 * getView().setEditable(false); //getView().setViewName("ReadOnly");
-		 * //getView().displayAsDescriptionsListAndReferenceView();
-		 * addActions("SetEditable.SetEditableHH"); }
-		 * 
-		 * 
-		 * 
-		 * try { // not working - still have hex value
-		 * System.out.println("sub in change section = "+getView().getActiveSection());
-		 * //getView().setHidden("resourceSubType", true); } catch (Exception ex) {
-		 * System.out.println("Exception thrown  :" + ex); }
-		 * 
-		 * //getView().getSectionView(3).getAllValues().
-		 * 
-		 * 
-		 * em.close();
-		 * 
-		 */
 	}
 
 }

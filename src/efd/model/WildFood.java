@@ -31,11 +31,11 @@ public class WildFood extends Asset{
 	@NotNull
 	@Min(value = 0)
 	@Positive
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold", length = 6)
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 	
 	
@@ -56,7 +56,7 @@ public class WildFood extends Asset{
 	//private Double unitsConsumed;
 	
 	@Column(name = "OtherUse", length = 255)
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double otherUse;
 
 	@Column(name = "Market1", length = 50)
@@ -93,13 +93,13 @@ public class WildFood extends Asset{
 		this.wildFoodName = wildFoodName;
 	}
 	public Double getUnitsProduced() {
-		return unitsProduced;
+		return unitsProduced == null ? 0.0 :unitsProduced;
 	}
 	public void setUnitsProduced(Double unitsProduced) {
 		this.unitsProduced = unitsProduced;
 	}
 	public Double getUnitsSold() {
-		return unitsSold;
+		return unitsSold == null ? 0.0 :unitsSold;
 	}
 	public void setUnitsSold(Double unitsSold) {
 		this.unitsSold = unitsSold;
@@ -112,7 +112,7 @@ public class WildFood extends Asset{
 	}
 
 	public Double getOtherUse() {
-		return otherUse;
+		return otherUse== null ? 0.0 :otherUse;
 	}
 	public void setOtherUse(Double otherUse) {
 		this.otherUse = otherUse;

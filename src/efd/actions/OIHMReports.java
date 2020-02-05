@@ -912,7 +912,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 					errno = 104;
 					for (HouseholdMember householdMember : hh3.getHousehold().getHouseholdMember()) {
 						System.out.println("hhmember in SOLC = " + hh3.getHhNumber());
-						hhSOLC += calcHhmSolc(hh3, stdOfLivingElement);
+						hhSOLC += ModellingReports.calcHhmSolc(householdMember, stdOfLivingElement);   // Moved to ModellingReport
+					//	hhSOLC += calcHhmSolc(hh3, stdOfLivingElement);
 						errno = 105;
 					}
 
@@ -1879,40 +1880,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 		return cropTot;
 	}
 
-	/******************************************************************************************************************************************/
 
-	private Double calcHhmSolc(HH hh3, StdOfLivingElement stdL) {
-
-		int lowerAgeSOL = 0;
-		int upperAgeSOL = 0;
-		Gender genderSOL = null;
-
-		lowerAgeSOL = stdL.getAgeRangeLower();
-		upperAgeSOL = stdL.getAgeRangeUpper();
-		genderSOL = stdL.getGender();
-
-		errno = 1201;
-		for (HouseholdMember hhm : hh3.getHousehold().getHouseholdMember()) {
-			if (genderSOL.equals(Gender.Both) && (hhm.getAge() >= lowerAgeSOL) && (hhm.getAge() <= upperAgeSOL)) {
-				return (stdL.getCost() * stdL.getAmount());
-			}
-			errno = 1202;
-			if (genderSOL.equals(Gender.Male) && hhm.getGender().equals(Sex.Male) && (hhm.getAge() >= lowerAgeSOL)
-					&& (hhm.getAge() <= upperAgeSOL)) {
-				return (stdL.getCost() * stdL.getAmount());
-
-			}
-			errno = 1203;
-			if (genderSOL.equals(Gender.Female) && hhm.getGender().equals(Sex.Female) && (hhm.getAge() >= lowerAgeSOL)
-					&& (hhm.getAge() <= upperAgeSOL)) {
-				return (stdL.getCost() * stdL.getAmount());
-
-			}
-			errno = 1204;
-		}
-		errno = 1205;
-		return (0.0);
-	}
 
 	/******************************************************************************************************************************************/
 

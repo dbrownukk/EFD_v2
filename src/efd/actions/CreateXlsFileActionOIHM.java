@@ -320,10 +320,7 @@ public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardA
 		AnswerType answerType = null;
 		int hhrow = 2;
 		for (i = 0; i < configQuestionUseHHC.size(); i++) {
-			// em("HH Validation build for question
-			// "+configQuestionUseHHC.get(i).getConfigQuestion().getPrompt());
-			// em("HH Validation build for question
-			// "+configQuestionUseHHC.get(i).getConfigQuestion().getId());
+
 
 			answerType = configQuestionUseHHC.get(i).getConfigQuestion().getAnswerType();
 			level = configQuestionUseHHC.get(i).getConfigQuestion().getLevel();

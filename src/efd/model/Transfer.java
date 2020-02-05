@@ -26,6 +26,7 @@ public class Transfer extends Asset {
 
 	@Column(name = "TransferType", length = 50, nullable = false)
 	@OrderColumn
+	@Required
 	@DefaultValueCalculator(value = EnumCalculator.class, properties = {
 			@PropertyValue(name = "enumType", value = "efd.model.Transfer$TransferType"),
 			@PropertyValue(name = "value", value = "Food") })
@@ -57,11 +58,11 @@ public class Transfer extends Asset {
 	private String transferFoodOtherType;
 
 	@Column(name = "UnitesTransferred")
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsTransferred;
 
 	@Column(name = "UnitsSold")
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 
 	@Column(name = "PricePerUnit", precision = 10, scale = 2)
@@ -70,13 +71,13 @@ public class Transfer extends Asset {
 	private Double pricePerUnit;
 
 	@Column(name = "OtherUse", length = 255)
-	@DefaultValueCalculator(value = ZeroLongCalculator.class)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double otherUse;
 
 	@Depends("unitsTransferred,unitsSold,otherUse")
 	@Column(name = "UnitsConsumed")
 	public Double getUnitsConsumed() {
-		return (unitsTransferred - unitsSold - otherUse);
+		return (getUnitsTransferred() - getUnitsSold() - getOtherUse());
 	};
 	// @Column(name = "UnitsConsumed")
 	// private Double unitsConsumed;
@@ -175,7 +176,7 @@ public class Transfer extends Asset {
 	}
 
 	public Double getUnitsTransferred() {
-		return unitsTransferred;
+		return unitsTransferred == null ? 0.0 :unitsTransferred;
 	}
 
 	public void setUnitsTransferred(Double unitsTransferred) {
@@ -183,11 +184,11 @@ public class Transfer extends Asset {
 	}
 
 	public Double getUnitsSold() {
-		return unitsSold;
+		return unitsSold == null ? 0.0 :unitsSold;
 	}
 
 	public void setUnitsSold(Double unitsSold) {
-		this.unitsSold = unitsSold;
+		this.unitsSold  = unitsSold;
 	}
 
 	public Double getPricePerUnit() {
@@ -199,7 +200,7 @@ public class Transfer extends Asset {
 	}
 
 	public Double getOtherUse() {
-		return otherUse;
+		return otherUse == null ? 0.0 :otherUse;
 	}
 
 	public void setOtherUse(Double otherUse) {

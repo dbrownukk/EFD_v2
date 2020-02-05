@@ -81,7 +81,6 @@ public class Household extends EFDIdentifiable {
 	}
 
 	@Column(length = 45)
-	// @SearchKey
 	@DefaultValueCalculator(NullCalculator.class)
 	private String householdName;
 	/*************************************************************************************************/
