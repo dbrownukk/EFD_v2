@@ -5,14 +5,14 @@ import java.util.*;
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
-
+import org.openxava.calculators.*;
 
 import efd.validations.*;
 
 @View(members = "study, livelihoodZone")
 
-@View(name = "study", members = "study")
-@View(name = "livelihoodZone", members = "livelihoodZone")
+@View(name = "study", members = "modelType;study")
+@View(name = "livelihoodZone", members = "modelType;livelihoodZone")
 
 @Tab(
 properties="household.householdNumber,household.status",
@@ -44,6 +44,26 @@ public class CustomReportSpecListModelling {
 	@ReferenceView("FromReport")
 	
 	private LivelihoodZone livelihoodZone ;
+	
+	@Required
+	@DefaultValueCalculator(value = EnumCalculator.class, properties = {
+			@PropertyValue(name = "enumType", value = "efd.model.CustomReportSpecListModelling$ModelType"),
+			@PropertyValue(name = "value", value = "ChangeScenario") })
+	//@Editor(value="ValidValuesRadioButton")
+	private ModelType modelType;
+	public enum ModelType { ChangeScenario, CopingStrategy };
+	
+	
+	
+	
+
+	public ModelType getModelType() {
+		return modelType;
+	}
+
+	public void setModelType(ModelType modelType) {
+		this.modelType = modelType;
+	}
 
 	public Study getStudy() {
 		return study;

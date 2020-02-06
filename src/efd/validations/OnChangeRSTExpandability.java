@@ -28,7 +28,7 @@ public class OnChangeRSTExpandability extends OnChangePropertyBaseAction {
 
 		System.out.println("rst type = " + rst.getResourcetype().getResourcetypename());
 		String rtName = rst.getResourcetype().getResourcetypename();
-		if (rtName.equals("Livestock Sales")) {
+		if (rtName.contains("Livestock")) {
 			System.out.println("Livestock Sale ");
 			//getView().setHidden("expandabilityLimit", false);
 			//getView().setHidden("expandabilityIncreaseLimit", false);

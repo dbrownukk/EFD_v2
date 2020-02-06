@@ -31,19 +31,17 @@ public class GoModellingReport extends ViewBaseAction {
 	Site site = null;
 	Boolean isCorrectProject = false;
 	String correctLZ = "";
+	String previousCorrectLZ = "";
+	int lzcount = 0;
 
 	public void execute() throws Exception {
 
 		String lzid = "";
 
 		Map allValues = getView().getAllValues();
-		Efdutils.em("In Gomdellingreport all vals sss = " + allValues);
 
 		String projectid = getView().getValueString("project.projectid");
 		String studyid = getView().getValueString("study.id");
-
-		Efdutils.em("studyid = " + studyid);
-		Efdutils.em("projectid = " + projectid);
 
 		if (!projectid.isEmpty()) {
 			// OHEA
@@ -53,13 +51,7 @@ public class GoModellingReport extends ViewBaseAction {
 
 			project = XPersistence.getManager().find(Project.class, projectid);
 
-			Map allValues2 = getView().getAllValues();
-
-			Efdutils.em("allvals " + allValues);
-
 			Collection<LivelihoodZone> livelihoodZone2 = project.getLivelihoodZone();
-
-			
 
 		} else if (!studyid.isEmpty()) {
 			// OIHM
@@ -89,6 +81,7 @@ public class GoModellingReport extends ViewBaseAction {
 								Status status = wealthGroupInterview.getStatus();
 								if (status == Status.Validated) // add this to valid LZ / Site/ WG community list
 								{
+									lzcount++;
 									Efdutils.em("valid lz = " + lzs2.getLzid());
 									lzid = lzs2.getLzid();
 									correctLZ += "'" + community.getSite().getLocationid() + "',";
@@ -97,9 +90,17 @@ public class GoModellingReport extends ViewBaseAction {
 
 						}
 					}
+					if (lzcount < 3) { // Need at least 3 Valid WGIs in a Site
+						correctLZ = previousCorrectLZ;
+					}
+					previousCorrectLZ = correctLZ;
+
+					// Efdutils.em("site lzcount = " + lzcount);
 				}
+				// Efdutils.em("lz lzcount = " + lzcount);
 			}
 
+			// Efdutils.em("correctLZ = "+correctLZ);
 			correctLZ = StringUtils.chop(correctLZ);
 
 			if (correctLZ.isEmpty()) {
@@ -110,9 +111,9 @@ public class GoModellingReport extends ViewBaseAction {
 			}
 
 		}
-		
-		
+
 		showDialog();
+		getView().setTitle("Modelling Reports");
 
 		getView().setModelName("CustomReportSpecListModelling"); // Note no CustomReport Spec in Modelling scenario
 		setControllers("ModellingReports", "Dialog");
@@ -129,14 +130,13 @@ public class GoModellingReport extends ViewBaseAction {
 			String condition = tab.getBaseCondition() + " and ${locationid} in (" + correctLZ + ")";
 
 			tab.setBaseCondition(condition);
-			
 
 		} else {
 
-			Efdutils.em("set OIHM Study view");
+			// Efdutils.em("set OIHM Study view");
 			getView().setViewName("study");
 			allValues = getView().getAllValues();
-			Efdutils.em("In Gomdellingreport all vals s = " + allValues);
+			// Efdutils.em("In Gomdellingreport all vals s = " + allValues);
 			getView().setValue("study.id", studyid);
 
 			Tab tab = getView().getSubview("study.household").getCollectionTab();

@@ -13,9 +13,9 @@ import org.openxava.util.*;
 
 import efd.validations.*;
 
-@View(members = "ExpandabilityRule[#ruleName;ResourceSubType[appliedResourceSubType];Ruleset[studyRuleSet;communityRuleSet];sequence;expandabilityIncreaseLimit;expandabilityLimit]")
+@View(members = "ExpandabilityRule[#ruleName];Ruleset[studyRuleSet;communityRuleSet];ResourceSubType[appliedResourceSubType;sequence;expandabilityIncreaseLimit;expandabilityLimit]")
 
-@Tab(properties = "ruleName,sequence,expandabilityIncreaseLimit,expandabilityLimit,studyRuleSet.studyName,communityRuleSet.site.locationdistrict,appliedResourceSubType.resourcetypename")
+@Tab(properties = "ruleName,studyRuleSet.studyName,communityRuleSet.site.locationdistrict,appliedResourceSubType.resourcetypename,sequence,expandabilityIncreaseLimit,expandabilityLimit")
 
 @Entity
 

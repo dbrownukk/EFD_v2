@@ -16,7 +16,7 @@ import org.openxava.util.*;
 @View(name = "study", members = "study")
 @View(name = "livelihoodZone", members = "livelihoodZone")
 
-//@Tab(properties = "title,author,date,priceYieldVariations,study,project")
+@Tab(properties = "title,author,date,study,project,description")
 
 @Entity
 
