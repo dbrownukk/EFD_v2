@@ -1263,9 +1263,11 @@ public class ParseWGISpreadsheet extends CollectionBaseAction implements IForwar
 						// Handle the enum
 
 						System.out.println("Transfer 000 j l " + j + " " + l);
-
+						
 						at.setSource(cell[i][j][l++].getStringCellValue());
 
+						System.out.println("In Transfer Parse get type cell = "+cell[i][j][l].getStringCellValue());
+						
 						String upperCaseTransferType = upperCaseFirst(cell[i][j][l].getStringCellValue());
 
 						if (upperCaseTransferType.equals("Cash"))

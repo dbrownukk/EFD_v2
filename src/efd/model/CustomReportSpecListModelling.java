@@ -49,7 +49,7 @@ public class CustomReportSpecListModelling {
 	@DefaultValueCalculator(value = EnumCalculator.class, properties = {
 			@PropertyValue(name = "enumType", value = "efd.model.CustomReportSpecListModelling$ModelType"),
 			@PropertyValue(name = "value", value = "ChangeScenario") })
-	//@Editor(value="ValidValuesRadioButton")
+	@Editor(value="ValidValuesRadioButton")
 	private ModelType modelType;
 	public enum ModelType { ChangeScenario, CopingStrategy };
 	

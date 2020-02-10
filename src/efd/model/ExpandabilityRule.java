@@ -37,7 +37,7 @@ public class ExpandabilityRule extends EFDIdentifiable {
 
 	/*************************************************************************************************/
 	@Required
-	@Column(length = 45, nullable = false, unique = true)
+	@Column(length = 45, nullable = false)
 	private String ruleName;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -49,7 +49,7 @@ public class ExpandabilityRule extends EFDIdentifiable {
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@NoCreate
 	@NoModify
-	@DescriptionsList(descriptionProperties = "site.locationdistrict,site.subdistrict")
+	@DescriptionsList(descriptionProperties = "projectlz.projecttitle,site.locationdistrict,site.subdistrict")
 	private Community communityRuleSet;
 	/*************************************************************************************************/
 	@Required

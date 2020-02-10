@@ -18,6 +18,7 @@ package efd.actions;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -189,6 +190,8 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		Efdutils.em("modelType = " + model);
 		if (model == "CopingStrategy") {
 			isCopingStrategy = true;
+		} else {
+			isCopingStrategy = false;
 		}
 
 		Object communityId = null; // getPreviousView().getValue("communityid");
@@ -213,18 +216,15 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			for (int i = 0; i < selectedOnes.length; i++) {
 				Map<?, ?> key = selectedOnes[i];
 
-				
-				
 				String locidofsite = key.get("locationid").toString();
-				Efdutils.em("OHEA key = "+key);
-				Efdutils.em("OHEA locid from key  = "+locidofsite);
-				
-				//String subKey = key.toString().substring(12, 44);
+				Efdutils.em("OHEA key = " + key);
+				Efdutils.em("OHEA locid from key  = " + locidofsite);
+
+				// String subKey = key.toString().substring(12, 44);
 
 				site = XPersistence.getManager().find(Site.class, locidofsite);
 
 				Collection<Community> community3 = site.getCommunity();
-				
 
 				// add to array for Sites/Communities
 				Site s = new Site();
@@ -235,19 +235,16 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 				for (Community community2 : site.getCommunity()) {
 					countValidated = 0;
-					
-					if(isCopingStrategy) {
-						List<ExpandabilityRule> expandabilityRules = XPersistence.getManager()
-								.createQuery("from ExpandabilityRule where communityRuleSet = :communityRuleSet").setParameter("communityRuleSet", community2)
-								.getResultList();
+
+					if (isCopingStrategy) {
+						expandabilityRules = XPersistence.getManager().createQuery(
+								"from ExpandabilityRule where communityRuleSet = :communityRuleSet order by sequence")
+								.setParameter("communityRuleSet", community2).getResultList();
 						Efdutils.em("expandability rule is empty = " + expandabilityRules.isEmpty());
 						if (!expandabilityRules.isEmpty()) {
-						isCommunityHasExpandabilityRule=true;
+							isCommunityHasExpandabilityRule = true;
 						}
 					}
-						
-					
-					
 
 					Iterator<WealthGroup> wgIterator = community2.getWealthgroup().iterator();
 					while (wgIterator.hasNext()) {
@@ -287,6 +284,12 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 					}
 				}
 
+				if (!isCommunityHasExpandabilityRule && isCopingStrategy) {
+					addError("No Expandability Rules for selected Communities for Coping Strategy Report");
+					closeDialog();
+					return;
+				}
+
 			}
 
 			// Populate WGI array wgis - use dialog selected list if enter
@@ -317,7 +320,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			errno = 52;
 			// Calculate DI
 
-			calculateDI(); // uses wgi filtered array based on CRS definition
+			calculateDI(); 
 			System.out.println("done calc DI");
 			// calculateAE(); // Calculate the Adult equivalent
 			System.out.println("done calc AE");
@@ -328,8 +331,8 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 			if (isCopingStrategy) {
 				expandabilityRules = XPersistence.getManager()
-						.createQuery("from ExpandabilityRule where studyRuleSet = :study").setParameter("study", study)
-						.getResultList();
+						.createQuery("from ExpandabilityRule where studyRuleSet = :study order by sequence")
+						.setParameter("study", study).getResultList();
 				Efdutils.em("expandability rule is empty = " + expandabilityRules.isEmpty());
 				if (expandabilityRules.isEmpty()) {
 					addError("No Expandability Rules for Study in Coping Strategy Report");
@@ -632,7 +635,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		Exception e) {
 			// TODO Auto-generated catch block
-			addError("Error in DI Calculation " + e);
+			addWarning("Error in DI Calculation ");
 		}
 
 		// FIX for members
@@ -1151,10 +1154,12 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		String filename = reportTitle + Calendar.getInstance().getTime();
 		reportWB = new JxlsWorkbook(filename);
+		Boolean isCopingStrategy = true;
+		Boolean isnotCopingStrategy = false;
 
 		setStyles();
 
-		createHeaderPage(); // populates reportList
+		createHeaderPage(); // populates reportList and creates first worksheet
 
 		int ireportNumber = 0; // should be equal to the sheet number in workbook
 
@@ -1169,70 +1174,77 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 			switch (reportCode) {
 			case 410:
-
-				createOIHMDIreport(ireportNumber, report);
+				// HH DI Before & After Change Scenario
+				createOIHMDIreport(ireportNumber, report, isnotCopingStrategy);
 				break;
 			case 411:
-
-				createOIHMDIAfterSOLreport(ireportNumber, report);
+				// HH DI with StoL before & after Change Scenario
+				createOIHMDIAfterSOLreport(ireportNumber, report, isnotCopingStrategy);
 				break;
 			case 412:
-
-				createIncomereport(ireportNumber, report, "cash", OIHM);
+				// HH Cash Income before & after Change Scenario
+				createIncomereport(ireportNumber, report, "cash", OIHM, isnotCopingStrategy);
 				break;
 			case 413:
-
-				createIncomereport(ireportNumber, report, "food", OIHM);
+				// HH Food Income before & after Change Scenario
+				createIncomereport(ireportNumber, report, "food", OIHM, isnotCopingStrategy);
 				break;
 
 			case 414:
-
-				createIncomereport(ireportNumber, report, "cash", OHEA);
+				createIncomereport(ireportNumber, report, "cash", OHEA, isnotCopingStrategy);
 				// Report WG Cash Income before & after Change Scenario
 				break;
 
 			case 415:
-				createIncomereport(ireportNumber, report, "food", OHEA);
+				createIncomereport(ireportNumber, report, "food", OHEA, isnotCopingStrategy);
 				// Report WG Food Income before & after Change Scenario
 				break;
 
 			case 416:
-				createOHEADIAfterSOLreport(ireportNumber, report);
+				// WG DI with StoL before & after Change Scenario
+				createOHEADIAfterSOLreport(ireportNumber, report, isnotCopingStrategy);
 				break;
 			case 417:
-				createOHEADIreport(ireportNumber, report);
+				// WG DI before & after Change Scenario
+				createOHEADIreport(ireportNumber, report, isnotCopingStrategy);
 				break;
+
+			/*
+			 * Coping Strategy Reports
+			 * 
+			 */
+
 			case 418:
 				// Report HH DI after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createOIHMDIreport(ireportNumber, report, isCopingStrategy);
 				break;
 			case 419:
 				// Report HH DI with Stol after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createOIHMDIAfterSOLreport(ireportNumber, report, isCopingStrategy);
 				break;
 			case 420:
 				// Report HH Cash Income after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createIncomereport(ireportNumber, report, "cash", OIHM, isCopingStrategy);
 				break;
 			case 421:
 				// Report HH Food Income after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createIncomereport(ireportNumber, report, "food", OIHM, isCopingStrategy);
 				break;
 			case 422:
 				// Report WG Food Income after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createIncomereport(ireportNumber, report, "food", OHEA, isCopingStrategy);
 				break;
 			case 423:
 				// Report WG Cash Income after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createIncomereport(ireportNumber, report, "cash", OHEA, isCopingStrategy);
 				break;
 			case 424:
 				// Report WG DI with StoL after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createOHEADIAfterSOLreport(ireportNumber, report, isCopingStrategy);
 				break;
 			case 425:
 				// Report WG DI after Change Scenario with Coping Strategy
-				// createOHEADIreport(ireportNumber, report);
+				createOHEADIreport(ireportNumber, report, isCopingStrategy);
 				break;
 			}
 		}
@@ -1241,9 +1253,10 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 	}
 
 	/******************************************************************************************************************************************/
-	private void createOIHMDIreport(int isheet, Report report) {
+	private void createOIHMDIreport(int isheet, Report report, Boolean isCopingStrategy) {
 
 		int row = 1;
+		int col = 4;
 
 		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20);
 
@@ -1267,17 +1280,20 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			row++;
 
 		}
+
+		copingStrategyOutput(isheet, isCopingStrategy, 1, col);
+
 	}
 
 	/******************************************************************************************************************************************/
 
-	private void createOHEADIreport(int isheet, Report report) {
+	private void createOHEADIreport(int isheet, Report report, Boolean isCopingStrategy) {
 
 		int row = 2;
+		int col = 5;
 		int i = 0;
 		double hhSize = 0;
 
-		System.out.println("in 417 report ");
 		/*
 		 * Will need to revisit average total array if WGs per community increase
 		 */
@@ -1308,7 +1324,6 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 				List<WealthGroupInterview> wealthGroupInterview3 = orderedWealthgroups.get(i).getWealthGroupInterview();
 
-				// reportWB.getSheet(isheet).setValue(4, row, hhSize, textStyle);
 				reportWB.getSheet(isheet).setValue(3, row, wgi2.getWgiDI(), textStyle);
 				reportWB.getSheet(isheet).setValue(4, row, wgi2.wgiDIAfterChangeScenario, textStyle);
 
@@ -1316,7 +1331,118 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			}
 
 		}
-		errno = 3666;
+
+		copingStrategyOutput(isheet, isCopingStrategy, 1, col);
+
+	}
+
+	/******************************************************************************************************************************************/
+	/*
+	 * If Coping Strategy is set then print Rule name headers and perform calcs
+	 * 
+	 * 
+	 */
+	private void copingStrategyOutput(int isheet, Boolean isCopingStrategy, int row, int col) {
+
+		int startRow = row;
+		int startCol = col;
+		Double cashGain = 0.0;
+
+		if (!isCopingStrategy) {
+			return;
+		}
+
+		startCol = col;
+		/* Expandability Headings */
+		for (ExpandabilityRule expandabilityRule : expandabilityRules) {
+
+			reportWB.getSheet(isheet).setValue(startCol++, startRow, expandabilityRule.getRuleName(), boldTopStyle);
+
+		}
+		
+		/* Expandability Data */
+
+		if (isOIHM) {
+			System.out.println("Coping Strategy for OIHM ExpRule size = " + expandabilityRules.size());
+			for (ExpandabilityRule expandabilityRule : expandabilityRules) {
+				row=startRow+1;
+				for (HH hh2 : uniqueHousehold) {
+					cashGain = 0.0;
+					if (hh2.getHhDIAfterChangeScenario() > 0)
+
+					// If DI after change scenario is > 0 then use DI after change scenario,
+					// otherwise apply expandability rule if applicaable
+
+					{
+
+						reportWB.getSheet(isheet).setValue(col, row, hh2.getHhDIAfterChangeScenario(), numberd0);
+					} else // get check if expandability rule applies for this hh
+					{
+
+						List<Crop> cropCollection = hh2.getHousehold().getCrop().stream()
+						.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
+						
+						List<WildFood> wfCollection = hh2.getHousehold().getWildFood().stream()
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
+						
+						
+						//List<LivestockSales> lssCollection = hh2.getHousehold().getLivestockSales().stream()
+						//		.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
+								
+						List<LivestockProducts> lspCollection = hh2.getHousehold().getLivestockProducts().stream()
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
+						
+								
+						
+						if(cropCollection.size()>0)
+						 {
+							System.out.println("found a crop match ");
+							
+							for (Crop crop : cropCollection) {
+							
+								cashGain += (crop.getUnitsProduced() - crop.getUnitsSold()) * crop.getPricePerUnit();
+								System.out.println("exp match found = "+crop.getResourceSubType().getResourcetypename()+" "+cashGain);
+							}
+						} 
+						else if (wfCollection.size() >0) {
+							System.out.println("found a wf match ");
+						
+							for (WildFood wf : wfCollection) {
+							
+								cashGain += (wf.getUnitsProduced() - wf.getUnitsSold()) * wf.getPricePerUnit();
+								System.out.println("exp match found = "+wf.getResourceSubType().getResourcetypename()+" "+cashGain);
+							}
+						}
+						else if (lspCollection.size() >0) {
+							System.out.println("found a lss match ");
+						
+							for (LivestockProducts lsp : lspCollection) {
+							
+								cashGain += (lsp.getUnitsProduced() - lsp.getUnitsSold()) * lsp.getPricePerUnit();
+								System.out.println("exp match found = "+lsp.getResourceSubType().getResourcetypename()+" "+cashGain);
+							}
+					}
+						else {
+							cashGain = hh2.getHhDIAfterChangeScenario();
+						}
+						reportWB.getSheet(isheet).setValue(col, row, hh2.getHhDIAfterChangeScenario()+cashGain, numberd0);
+
+						
+
+					}
+					row++;
+				}
+				col++;
+			}
+
+		} else if (isOHEA) {
+			System.out.println("Coping Strategy for OHEA ExpRule size = " + expandabilityRules.size());
+
+			/* Does any WG have and RST in teh Expandability Rules? */
+
+			row++;
+
+		}
 
 	}
 
@@ -1335,7 +1461,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	/******************************************************************************************************************************************/
 
-	private void createOHEADIAfterSOLreport(int isheet, Report report) {
+	private void createOHEADIAfterSOLreport(int isheet, Report report, Boolean isCopingStrategy) {
 		int row = 1;
 		int i = 0;
 		double hhSOLC = 0.0;
@@ -1414,7 +1540,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	/******************************************************************************************************************************************/
 
-	private void createOIHMDIAfterSOLreport(int isheet, Report report) {
+	private void createOIHMDIAfterSOLreport(int isheet, Report report, Boolean isCopingStrategy) {
 		int row = 1;
 		Double hhSOLC = 0.0;
 
@@ -1478,7 +1604,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 	}
 
 	/******************************************************************************************************************************************/
-	private void createIncomereport(int isheet, Report report, String type, int model) {
+	private void createIncomereport(int isheet, Report report, String type, int model, Boolean isCopingStrategy) {
 		int row = 1;
 		// String type = "food" or "cash"
 		// Model OHEA or OIHM
@@ -1634,122 +1760,6 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 	/******************************************************************************************************************************************/
 
-	/******************************************************************************************************************************************/
-	private void createLandAssetreport(int isheet, Report report) {
-
-		int col = 4;
-		int datarow = 10;
-		int avgrow = 6;
-		double totalLand = 0.0;
-		int assetTypeCounter = 0;
-		int startRow = 4;
-
-		averageReset();
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 20, 20, 20, 20, 20, 20);
-		populateFirstThreeColumns(isheet, startRow);
-
-		reportWB.getSheet(isheet).setValue(1, 2, "Unit of Measure", boldTopStyle);
-
-		// get Default Area in use
-
-		Area areaMeasurement = project.getAreaMeasurement();
-
-		if (areaMeasurement == null) {
-			areaMeasurement = Area.Acre;
-		}
-
-		reportWB.getSheet(isheet).setValue(2, 2, areaMeasurement.toString(), textStyle);
-
-		errno = 2273;
-
-		// Populate hhLand array for matrix
-
-		numCommunities = uniqueCommunity.size(); // Used for averages
-
-		double thisAverageTotal = 0.0;
-
-		// Need all Land RST types that remain in wgi array
-		// wgiLandRST has array of unique LAND RST
-
-		List<WGI> wgiLandRST = wgi.stream().filter(p -> p.getLand() != null)
-				.filter(distinctByKey(p -> p.getLand().getResourceSubType())).collect(Collectors.toList());
-
-		List<WealthGroup> orderedWealthgroups2;
-
-		for (WGI wgi3 : wgiLandRST) {
-
-			String communityID = wgi3.getCommunity().getCommunityid();
-			reportWB.getSheet(isheet).setValue(col, 1, "Asset Category", boldTopStyle);
-			reportWB.getSheet(isheet).setValue(col, 2, "Land", textStyle);
-			reportWB.getSheet(isheet).setValue(col, 3, "Asset Type", boldTopStyle);
-			reportWB.getSheet(isheet).setValue(col, 4, wgi3.getLand().getResourceSubType().getResourcetypename(),
-					textStyle);
-
-			/* Now work through Communities and Wealthgroups for this Land RST */
-
-			for (WGI wgi2 : uniqueCommunity) {
-
-				// System.out.println("this community = " + wgi2.getSite().getLocationdistrict()
-				// + " "
-				// + wgi2.getSite().getSubdistrict());
-
-				orderedWealthgroups2 = wgi2.getCommunity().getWealthgroup().stream()
-						.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
-						.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
-
-				Iterator<WealthGroup> owgiter = orderedWealthgroups2.iterator();
-
-				int wgcount = 0;
-				while (owgiter.hasNext()) {
-					WealthGroup owgit = owgiter.next();
-					List<WealthGroupInterview> wealthGroupInterview = owgit.getWealthGroupInterview();
-					for (int i = 0; i < wealthGroupInterview.size(); i++) {
-						for (AssetLand assetLand : wealthGroupInterview.get(i).getAssetLand()) {
-							// System.out.println("test assetLand " +
-							// assetLand.getResourceSubType().getResourcetypename()
-							// + " " + wgi3.getResourceSubType().getResourcetypename());
-
-							if (assetLand.getResourceSubType() == wgi3.getResourceSubType()) {
-
-								totalLand += assetLand.getNumberOfUnits();
-
-							}
-
-						}
-
-						reportWB.getSheet(isheet).setValue(col, datarow, totalLand, textStyle);
-
-						averageTotal[wgcount][assetTypeCounter] = totalLand + averageTotal[wgcount][assetTypeCounter];
-
-						wgcount++;
-
-						totalLand = 0.0;
-						i++;
-						datarow++;
-					}
-
-				}
-
-			}
-
-			// print averages
-
-			for (int j = 0; j < 3; j++) {
-
-				reportWB.getSheet(isheet).setValue(col, avgrow + j,
-						averageTotal[j][assetTypeCounter] / uniqueCommunity.size(), numberStyle);
-
-			}
-
-			datarow = 10;
-			col++;
-			assetTypeCounter++;
-		}
-
-	}
-
-	/******************************************************************************************************************************************/
-
 	private void populateFirstThreeColumns(int isheet, int startRow) {
 		int row = startRow;
 		int wgrow;
@@ -1815,106 +1825,6 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			isDisplayWealthgroupDone = true;
 
 			row = wgrow;
-
-		}
-
-	}
-
-	/******************************************************************************************************************************************/
-
-	private void createLivestockAssetreport(int isheet, Report report) {
-		int col = 4;
-		int datarow = 10;
-		int avgrow = 6;
-		double totalLS = 0.0;
-		int assetTypeCounter = 0;
-
-		averageReset();
-
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 30, 20, 20, 20, 20, 20, 20, 20);
-
-		System.out.println("uc = " + uniqueCommunity.size());
-		int startRow = 4;
-		populateFirstThreeColumns(isheet, startRow);
-
-		// Populate hhLand array for matrix
-
-		numCommunities = uniqueCommunity.size(); // Used for averages
-
-		double thisAverageTotal = 0.0;
-
-		// Need all Livestock RST types that remain in wgi array
-		// wgiLSRST has array of unique LAND RST
-
-		List<WGI> wgiLSRST = wgi.stream().filter(p -> p.getLivestock() != null)
-				.filter(distinctByKey(p -> p.getLivestock().getResourceSubType())).collect(Collectors.toList());
-
-		List<WealthGroup> orderedWealthgroups2;
-
-		for (WGI wgi3 : wgiLSRST) {
-			String communityID = wgi3.getCommunity().getCommunityid();
-			reportWB.getSheet(isheet).setValue(col, 1, "Asset Category", boldTopStyle);
-			reportWB.getSheet(isheet).setValue(col, 2, "Livestock", textStyle);
-			reportWB.getSheet(isheet).setValue(col, 3, "Asset Type", boldTopStyle);
-			reportWB.getSheet(isheet).setValue(col, 4, wgi3.getLivestock().getResourceSubType().getResourcetypename(),
-					textStyle);
-
-			/* Now work through Communities and Wealthgroups for this Land RST */
-
-			for (WGI wgi2 : uniqueCommunity) {
-
-				// System.out.println("this community = " + wgi2.getSite().getLocationdistrict()
-				// + " "
-				// + wgi2.getSite().getSubdistrict());
-
-				orderedWealthgroups2 = wgi2.getCommunity().getWealthgroup().stream()
-						.filter(p -> p.getCommunity().getCommunityid() == wgi2.getCommunity().getCommunityid())
-						.sorted(Comparator.comparing(WealthGroup::getWgorder)).collect(Collectors.toList());
-
-				Iterator<WealthGroup> owgiter = orderedWealthgroups2.iterator();
-
-				int wgcount = 0;
-				while (owgiter.hasNext()) {
-					WealthGroup owgit = owgiter.next();
-					List<WealthGroupInterview> wealthGroupInterview = owgit.getWealthGroupInterview();
-					for (int i = 0; i < wealthGroupInterview.size(); i++) {
-						for (AssetLiveStock assetLivestock : wealthGroupInterview.get(i).getAssetLiveStock()) {
-
-							if (assetLivestock.getResourceSubType() == wgi3.getResourceSubType()) {
-
-								totalLS += assetLivestock.getNumberOwnedAtStart();
-
-							}
-
-						}
-
-						reportWB.getSheet(isheet).setValue(col, datarow, totalLS, textStyle);
-
-						averageTotal[wgcount][assetTypeCounter] = totalLS + averageTotal[wgcount][assetTypeCounter];
-
-						wgcount++;
-
-						totalLS = 0.0;
-						i++;
-						datarow++;
-					}
-
-				}
-
-			}
-
-			// print averages
-
-			for (int j = 0; j < 3; j++) {
-
-				reportWB.getSheet(isheet).setValue(col, avgrow + j,
-						averageTotal[j][assetTypeCounter] / uniqueCommunity.size(), numberStyle);
-
-			}
-
-			datarow = 10;
-			col++;
-			assetTypeCounter++;
 
 		}
 
@@ -2014,9 +1924,13 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 			} else if (type == "food") {
 
-				// wfTot += wf.getUnitsConsumed() *
-				// wf.getResourceSubType().getResourcesubtypekcal();
-				wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType()) * yieldChange;
+				Double production = yieldChange * wf.getUnitsProduced();
+
+				Double consumed = production - wf.getUnitsSold();
+
+				wfTot += consumed * findRSTKcal(wf.getResourceSubType());
+				// wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType()) *
+				// yieldChange;
 
 			}
 		}
@@ -2047,9 +1961,15 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			if (type == "cash") {
 				wfTot += wf.getUnitsSold() * wf.getPricePerUnit() * priceChange;
 			} else if (type == "food") {
-				// wfTot += wf.getUnitsConsumed() *
-				// wf.getResourceSubType().getResourcesubtypekcal();
-				wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType()) * yieldChange;
+
+				Double production = yieldChange * wf.getUnitsProduced();
+
+				Double consumed = production - wf.getUnitsSold();
+
+				wfTot += consumed * findRSTKcal(wf.getResourceSubType());
+
+				// wfTot += wf.getUnitsConsumed() * findRSTKcal(wf.getResourceSubType()) *
+				// yieldChange;
 			}
 		}
 		if (wfTot.isNaN())
@@ -2133,6 +2053,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 				}
 			} else if (type == "food" && tr.getTransferType().equals(TransferType.Food)
 					&& tr.getFoodResourceSubType() != null) {
+
 				trTot += tr.getUnitsConsumed() * findRSTKcal(tr.getFoodResourceSubType()) * tr.getPeopleReceiving()
 						* tr.getTimesReceived() * yieldChange;
 
@@ -2175,7 +2096,14 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 			else if (type == "food") {
 
-				lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType()) * yieldChange;
+				Double production = yieldChange * lsp.getUnitsProduced();
+
+				Double consumed = production - lsp.getUnitsSold();
+
+				lsTot += consumed * findRSTKcal(lsp.getResourceSubType());
+
+				// lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType()) *
+				// yieldChange;
 
 			}
 
@@ -2257,7 +2185,15 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 					priceChange = 1.0;
 					yieldChange = 1.0;
 				}
-				lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType()) * yieldChange;
+
+				Double production = yieldChange * lsp.getUnitsProduced();
+
+				Double consumed = production - lsp.getUnitsSold();
+
+				lsTot += consumed * findRSTKcal(lsp.getResourceSubType());
+
+				// lsTot += lsp.getUnitsConsumed() * findRSTKcal(lsp.getResourceSubType()) *
+				// yieldChange;
 			}
 		}
 
@@ -2625,7 +2561,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			System.out.println("done DI transfer calculation " + transfersTI);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			addError("Error in DI Calculation " + e);
+			addWarning("Error in WG DI Calculation ");
 		}
 
 		// FIX for members
@@ -2795,14 +2731,19 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		int col = 3;
 		String siteName = "";
 		String wgName = "";
+		Method modellingreports = null;
 
 		Efdutils.em("In Create Header Page for Coping Strategy ");
 		Efdutils.em("IS OHEA = " + isOHEA);
 		Efdutils.em("IS OIHM = " + isOIHM);
 
-		sheet[0] = reportWB.addSheet("Coping Strategy Summary");
+		if (isCopingStrategy)
+			sheet[0] = reportWB.addSheet("Coping Strategy Summary");
+		else
+			sheet[0] = reportWB.addSheet("Change Scenario Summary");
+
 		setSheetStyle(sheet[0]);
-		sheet[0].setColumnWidths(1, 22, 40, 30, 30, 30);
+		sheet[0].setColumnWidths(1, 22, 50, 30, 30, 30);
 
 		sheet[0].setValue(1, 1, "Date:", boldRStyle); // col,row
 		sheet[0].setValue(2, 1, new Date(), dateStyle);
@@ -2810,7 +2751,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		sheet[0].setValue(2, 2, "All Reports", textStyleLeft);
 		sheet[0].setValue(1, 4, "Reporting Currency:", boldRStyle);
 
-		sheet[0].setValue(1, 13, "Chage Scenario Title:", boldRStyle);
+		sheet[0].setValue(1, 13, "Change Scenario Title:", boldRStyle);
 		sheet[0].setValue(1, 14, "Change Scenario Author:", boldRStyle);
 		sheet[0].setValue(1, 15, "Change Scenario Description:", boldRStyle);
 
@@ -2850,8 +2791,12 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 				break;
 			}
 
-			reportList = XPersistence.getManager().createQuery("from Report where method = :method")
-					.setParameter("method", Method.MODELLINGOIHMSCENARIO).getResultList();
+			/* Which set of reports to Run */
+			if (isCopingStrategy) {
+				modellingreports = Method.MODELLINGOIHMCOPING;
+			} else {
+				modellingreports = Method.MODELLINGOIHMSCENARIO;
+			}
 
 		} else if (isOHEA) {
 			sheet[0].setValue(1, 3, "Project:", boldRStyle);
@@ -2859,8 +2804,12 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			sheet[0].setValue(3, STARTROW, "Community/Sites", boldRStyle);
 			sheet[0].setValue(4, STARTROW, "Wealthgroup", boldRStyle);
 
-			reportList = XPersistence.getManager().createQuery("from Report where method = :method")
-					.setParameter("method", Method.MODELLINGOHEASCENARIO).getResultList();
+			/* Which set of reports to Run */
+			if (isCopingStrategy) {
+				modellingreports = Method.MODELLINGOHEACOPING;
+			} else {
+				modellingreports = Method.MODELLINGOHEASCENARIO;
+			}
 
 			// Default reporting currency based on Currency for an LZ within this Project
 
@@ -2885,6 +2834,10 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			}
 
 		}
+
+		reportList = XPersistence.getManager().createQuery("from Report where method = :method")
+				.setParameter("method", modellingreports).getResultList();
+
 		sheet[0].setValue(2, STARTROW, "Reports", boldLStyle);
 
 		/* get list of reports for modelling data spreadsheet */

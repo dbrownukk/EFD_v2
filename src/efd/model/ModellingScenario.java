@@ -16,7 +16,7 @@ import org.openxava.util.*;
 @View(name = "study", members = "study")
 @View(name = "livelihoodZone", members = "livelihoodZone")
 
-@Tab(properties = "title,author,date,study,project,description")
+@Tab(properties = "title,author,date,study.studyName,project.projecttitle,description")
 
 @Entity
 
@@ -63,11 +63,13 @@ public class ModellingScenario extends EFDIdentifiable {
 	@NoCreate
 	@NoModify
 	@DescriptionsList(descriptionProperties = "studyName,referenceYear")
+	@SearchKey
 	private Study study;
 	/*************************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@NoCreate
 	@NoModify
+	@SearchKey
 	@DescriptionsList(descriptionProperties = "projecttitle")
 	private Project project;
 	/*************************************************************************************************/
