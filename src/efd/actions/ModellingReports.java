@@ -143,7 +143,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		System.out.println("In Run Modelling Reports ");
 		int countValidated = 0;
-		String selectionView;
+		String selectionView = "";
 		WealthGroupInterview wealthGroupInterview = null;
 		Site site = null;
 		int ddiTotPercent = 0;
@@ -168,7 +168,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		}
 
-		else {
+		else if (modellingScenario.getProject() != null){
 			isOHEA = true; // OHEA Community and LZ
 
 			selectionView = "livelihoodZone.site";
@@ -176,6 +176,12 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			project = modellingScenario.getProject();
 
 		}
+		else 
+		{
+			addError("No Project or Study in Modelling Scenario");
+			return;
+		}
+	
 
 		/*
 		 * Get Model Type - Change Scenario or Coping Strategy, though Coping Strategy
@@ -185,14 +191,21 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		 * alert if one has not been created
 		 * 
 		 */
-
+		
 		String model = getView().getValueString("modelType");
 		Efdutils.em("modelType = " + model);
 		if (model == "CopingStrategy") {
 			isCopingStrategy = true;
-		} else {
+		} else if (model == "ChangeScenario") {
 			isCopingStrategy = false;
 		}
+		else 
+		{
+			addError("Select Change Scenario or Coping Strategy Modelling");
+			return;
+			
+		}
+		
 
 		Object communityId = null; // getPreviousView().getValue("communityid");
 
@@ -209,7 +222,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		}
 
 		if (selectedOnes.length == 0) {
-			addError("Select at least one Community/Site");
+			addError("Select at least one Community or Site");
 			return;
 		} else if (selectedOnes.length != 0 && isOHEA) {
 			isSelectedSites = true; // One or more Site selected in dialog
@@ -320,7 +333,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			errno = 52;
 			// Calculate DI
 
-			calculateDI(); 
+			calculateDI();
 			System.out.println("done calc DI");
 			// calculateAE(); // Calculate the Adult equivalent
 			System.out.println("done calc AE");
@@ -458,9 +471,9 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 				// wgi2.getWealthgroup().setDefaultDI(wgiDI);
 
 			}
-			// uniqueWealthgroupInterview =
-			// hh.stream().filter(distinctByKey(WGI::getWealthgroupInterview))
-			// .sorted(Comparator.comparing(WGI::getWgiDI)).collect(Collectors.toList());
+			uniqueWealthgroupInterview =
+					wgi.stream().filter(distinctByKey(WGI::getWealthgroupInterview))
+		.sorted(Comparator.comparing(WGI::getWgiDI)).collect(Collectors.toList());
 		} else if (isOIHM) {
 			uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber()))
 					.collect(Collectors.toList());
@@ -1300,7 +1313,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 
 		averageReset();
 
-		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20);
+		reportWB.getSheet(isheet).setColumnWidths(1, 20, 20, 20, 20, 20, 20,20,20,20,20);
 
 		populateFirstThreeColumns(isheet, 1);
 
@@ -1348,6 +1361,9 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 		int startCol = col;
 		Double cashGain = 0.0;
 
+		Double priceChange;
+		Double yieldChange;
+
 		if (!isCopingStrategy) {
 			return;
 		}
@@ -1359,18 +1375,18 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			reportWB.getSheet(isheet).setValue(startCol++, startRow, expandabilityRule.getRuleName(), boldTopStyle);
 
 		}
-		
+
 		/* Expandability Data */
 
 		if (isOIHM) {
 			System.out.println("Coping Strategy for OIHM ExpRule size = " + expandabilityRules.size());
 			for (ExpandabilityRule expandabilityRule : expandabilityRules) {
-				row=startRow+1;
+				row = startRow + 1;
 				for (HH hh2 : uniqueHousehold) {
 					cashGain = 0.0;
 					if (hh2.getHhDIAfterChangeScenario() > 0)
 
-					// If DI after change scenario is > 0 then use DI after change scenario,
+					// If DI value after change scenario is > 0 then use DI after change scenario,
 					// otherwise apply expandability rule if applicaable
 
 					{
@@ -1380,54 +1396,33 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 					{
 
 						List<Crop> cropCollection = hh2.getHousehold().getCrop().stream()
-						.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
-						
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
+
 						List<WildFood> wfCollection = hh2.getHousehold().getWildFood().stream()
-								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
-						
-						
-						//List<LivestockSales> lssCollection = hh2.getHousehold().getLivestockSales().stream()
-						//		.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
-								
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
+
+						List<LivestockSales> lssCollection = hh2.getHousehold().getLivestockSales().stream()
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
+
 						List<LivestockProducts> lspCollection = hh2.getHousehold().getLivestockProducts().stream()
-								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType()).collect(Collectors.toList());
-						
-								
-						
-						if(cropCollection.size()>0)
-						 {
-							System.out.println("found a crop match ");
-							
-							for (Crop crop : cropCollection) {
-							
-								cashGain += (crop.getUnitsProduced() - crop.getUnitsSold()) * crop.getPricePerUnit();
-								System.out.println("exp match found = "+crop.getResourceSubType().getResourcetypename()+" "+cashGain);
-							}
-						} 
-						else if (wfCollection.size() >0) {
-							System.out.println("found a wf match ");
-						
-							for (WildFood wf : wfCollection) {
-							
-								cashGain += (wf.getUnitsProduced() - wf.getUnitsSold()) * wf.getPricePerUnit();
-								System.out.println("exp match found = "+wf.getResourceSubType().getResourcetypename()+" "+cashGain);
-							}
-						}
-						else if (lspCollection.size() >0) {
-							System.out.println("found a lss match ");
-						
-							for (LivestockProducts lsp : lspCollection) {
-							
-								cashGain += (lsp.getUnitsProduced() - lsp.getUnitsSold()) * lsp.getPricePerUnit();
-								System.out.println("exp match found = "+lsp.getResourceSubType().getResourcetypename()+" "+cashGain);
-							}
-					}
-						else {
-							cashGain = hh2.getHhDIAfterChangeScenario();
-						}
-						reportWB.getSheet(isheet).setValue(col, row, hh2.getHhDIAfterChangeScenario()+cashGain, numberd0);
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
 
 						
+						
+						cashGain = calcGain(cashGain, expandabilityRule, cropCollection, wfCollection, lssCollection,
+								lspCollection);
+						
+						
+
+						if(cashGain.compareTo(0.0) == 0 ) {
+							cashGain = hh2.getHhDIAfterChangeScenario();
+						}
+						reportWB.getSheet(isheet).setValue(col, row, hh2.getHhDIAfterChangeScenario() + cashGain,
+								numberd0);
 
 					}
 					row++;
@@ -1436,14 +1431,148 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			}
 
 		} else if (isOHEA) {
-			System.out.println("Coping Strategy for OHEA ExpRule size = " + expandabilityRules.size());
+			System.out.println("Coping Strategy for OHEA ExpRule size is = " + expandabilityRules.size());
 
 			/* Does any WG have and RST in teh Expandability Rules? */
 
-			row++;
+			for (ExpandabilityRule expandabilityRule : expandabilityRules) {
+				row = startRow + 1;
+				System.out.println("about to start  coping strategy wgi loop ");
+				for (WGI wgi : uniqueWealthgroupInterview) {
+					System.out.println("in coping strategy wgi loop ");
+					cashGain = 0.0;
+					if (wgi.getWgiDIAfterChangeScenario() > 0)
+
+					// If DI value after change scenario is > 0 then use DI after change scenario,
+					// otherwise apply expandability rule if applicaable
+
+					{
+
+						reportWB.getSheet(isheet).setValue(col, row, wgi.getWgiDIAfterChangeScenario(), numberd0);
+					} else // get check if expandability rule applies for this hh
+					{
+
+						List<Crop> cropCollection = wgi.getWealthgroupInterview().getCrop().stream()
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
+
+						List<WildFood> wfCollection = wgi.getWealthgroupInterview().getWildFood().stream()
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
+
+						List<LivestockSales> lssCollection = wgi.getWealthgroupInterview().getLivestockSales().stream()
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
+
+						List<LivestockProducts> lspCollection = wgi.getWealthgroupInterview().getLivestockProducts()
+								.stream()
+								.filter(p -> p.getResourceSubType() == expandabilityRule.getAppliedResourceSubType())
+								.collect(Collectors.toList());
+
+						cashGain = calcGain(cashGain, expandabilityRule, cropCollection, wfCollection, lssCollection,
+								lspCollection);
+
+						
+						
+			
+						if(cashGain.compareTo(0.0) == 0 ) {
+							cashGain = wgi.getWgiDIAfterChangeScenario();
+						}
+						System.out.println("about to output values for OHEA coping strategy");
+						reportWB.getSheet(isheet).setValue(col, row, wgi.getWgiDIAfterChangeScenario() + cashGain,
+								numberd0);
+
+					}
+					row++;
+				}
+				col++;
+			}
 
 		}
 
+	}
+	/******************************************************************************************************************************************/
+
+	private Double calcGain(Double cashGain, ExpandabilityRule expandabilityRule, List<Crop> cropCollection,
+			List<WildFood> wfCollection, List<LivestockSales> lssCollection, List<LivestockProducts> lspCollection) {
+		Double priceChange;
+		Double yieldChange;
+		if (cropCollection.size() > 0) {
+			System.out.println("found a crop match ");
+
+			for (Crop crop : cropCollection) {
+
+				cashGain += (crop.getUnitsProduced() - crop.getUnitsSold()) * crop.getPricePerUnit();
+				System.out.println("exp match found = "
+						+ crop.getResourceSubType().getResourcetypename() + " " + cashGain);
+
+				// Is there a Change Scenario for this crop? If so use the new Price
+
+				priceChange = priceYieldVariation(modellingScenario, crop.getResourceSubType(), PRICE);
+				yieldChange = priceYieldVariation(modellingScenario, crop.getResourceSubType(), YIELD);
+
+				cashGain += (crop.getUnitsProduced() - crop.getUnitsSold()) * crop.getPricePerUnit()
+						* priceChange;
+				System.out.println("exp match found = "
+						+ crop.getResourceSubType().getResourcetypename() + " " + cashGain);
+
+			}
+		} else if (wfCollection.size() > 0) {
+			System.out.println("found a wf match ");
+
+			for (WildFood wf : wfCollection) {
+
+				priceChange = priceYieldVariation(modellingScenario, wf.getResourceSubType(), PRICE);
+				yieldChange = priceYieldVariation(modellingScenario, wf.getResourceSubType(), YIELD);
+
+				cashGain += (wf.getUnitsProduced() - wf.getUnitsSold()) * wf.getPricePerUnit()
+						* priceChange;
+				System.out.println("exp match found = " + wf.getResourceSubType().getResourcetypename()
+						+ " " + cashGain);
+			}
+		} else if (lspCollection.size() > 0) {
+			System.out.println("found a lsp match ");
+
+			for (LivestockProducts lsp : lspCollection) {
+
+				priceChange = priceYieldVariation(modellingScenario, lsp.getResourceSubType(), PRICE);
+				yieldChange = priceYieldVariation(modellingScenario, lsp.getResourceSubType(), YIELD);
+
+				cashGain += (lsp.getUnitsProduced() - lsp.getUnitsSold()) * lsp.getPricePerUnit()
+						* priceChange;
+				System.out.println("exp match found = " + lsp.getResourceSubType().getResourcetypename()
+						+ " " + cashGain);
+			}
+		} else if (lssCollection.size() > 0) {
+			System.out.println("found a lss match ");
+
+			for (LivestockSales lss : lssCollection) {
+
+				// Expandability Increase Limit is 200%
+				// Expandability Limit = 50%
+
+				// lss.getUnitsSold() * expand
+
+				Double newSold = expandabilityRule.getExpandabilityIncreaseLimit() * lss.getUnitsSold();
+				Double increaseProdcution = expandabilityRule.getExpandabilityLimit()
+						* lss.getUnitsAtStartofYear();
+
+				/*
+				 * Need clarification on this - ref doc OHEA.OIHM Modelling 1.4
+				 * 
+				 */
+
+				priceChange = priceYieldVariation(modellingScenario, lss.getResourceSubType(), PRICE);
+				cashGain = (lss.getUnitsAtStartofYear() - lss.getUnitsSold()) * lss.getPricePerUnit()
+						* priceChange;
+
+				// cashGain += (lss.getUnitsProduced() - lss.getUnitsSold()) *
+				// lss.getPricePerUnit() * priceChange;
+				System.out.println("exp match found = " + lss.getResourceSubType().getResourcetypename()
+						+ " " + cashGain);
+			}
+		}
+		return cashGain;
 	}
 
 	/******************************************************************************************************************************************/
@@ -2743,7 +2872,7 @@ public class ModellingReports extends TabBaseAction implements IForwardAction, J
 			sheet[0] = reportWB.addSheet("Change Scenario Summary");
 
 		setSheetStyle(sheet[0]);
-		sheet[0].setColumnWidths(1, 22, 50, 30, 30, 30);
+		sheet[0].setColumnWidths(1, 30, 50, 30, 30, 30);
 
 		sheet[0].setValue(1, 1, "Date:", boldRStyle); // col,row
 		sheet[0].setValue(2, 1, new Date(), dateStyle);

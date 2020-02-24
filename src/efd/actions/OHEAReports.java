@@ -1736,7 +1736,9 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		Double wghhsize = 0.0;
 		Integer wghhsizeBD = 0;
+		System.out.println("avg number in Household before try = "+wealthGroupInterview.getWgAverageNumberInHH());
 		try {
+			System.out.println("avg number in Household = "+wealthGroupInterview.getWgAverageNumberInHH());
 			wghhsizeBD = wealthGroupInterview.getWgAverageNumberInHH();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -1749,7 +1751,8 @@ public class OHEAReports extends TabBaseAction implements IForwardAction, JxlsCo
 		} else {
 			wghhsize = 0.0;
 		}
-
+		
+		System.out.println("avg nos of hh after null check = " + wghhsizeBD);
 		// wealthGroupInterview.getWealthgroup().getWghhsize().intValue();
 
 		requiredCalories = wghhsize * energyNeed * 365.0;
