@@ -2,16 +2,13 @@ package efd.rest.controllers.v1;
 
 import efd.rest.api.v1.model.ProjectDTO;
 import efd.rest.services.ProjectService;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
@@ -44,17 +41,10 @@ public class ProjectControllerTest extends BaseIT{
 
         //mockMvc = MockMvcBuilders.standaloneSetup(projectController).build();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-                .apply(springSecurity)
                 .build();
     }
 
-    @Test
-    void projectSecurity() throws Exception {
-        ResultActions perform = mockMvc.perform(get("/api/v1/projects")
-                .with(httpBasic("user",
-                        "password"
-                ));
-    }
+
 
 
     @Test
