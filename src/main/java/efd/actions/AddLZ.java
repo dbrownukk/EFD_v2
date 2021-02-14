@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class AddLZ extends GoAddElementsToCollectionAction {
 

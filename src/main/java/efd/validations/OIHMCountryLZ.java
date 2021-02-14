@@ -5,7 +5,7 @@ import javax.inject.*;
 import org.openxava.util.*;
 import org.openxava.validators.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class OIHMCountryLZ implements IValidator {
 

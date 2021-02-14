@@ -5,7 +5,7 @@ import java.util.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 /*
  * Prevent Status change to Validated by User using LOV

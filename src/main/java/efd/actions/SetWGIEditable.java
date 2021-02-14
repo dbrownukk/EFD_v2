@@ -8,7 +8,7 @@ package efd.actions;
 import org.openxava.actions.*;
 import org.openxava.view.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 
 public class SetWGIEditable extends ViewBaseAction implements IAvailableAction {

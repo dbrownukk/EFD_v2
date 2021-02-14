@@ -4,11 +4,11 @@ package efd.rest.repositories;
     @Create 11/02/2021 09:48
 */
 
-import com.openxava.naviox.model.User;
+import efd.model.EfdUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User,String> {
-    Optional<User> findByName(String name);
+public interface UserRepository extends JpaRepository<EfdUser,String> {
+    Optional<EfdUser> findByName(String name);
 }

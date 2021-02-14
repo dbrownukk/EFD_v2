@@ -2,7 +2,7 @@ package efd.validations;
 
 import org.openxava.actions.*;
 
-import efd.rest.domain.model.ConfigQuestion.*;
+import efd.model.ConfigQuestion.*;
 
 public class OnChangeQuestionLevel extends OnChangePropertyBaseAction {
 

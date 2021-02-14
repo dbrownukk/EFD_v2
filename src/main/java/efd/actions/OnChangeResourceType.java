@@ -4,11 +4,11 @@ import java.util.*;
 
 import javax.inject.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class OnChangeResourceType extends OnChangePropertyBaseAction {
 

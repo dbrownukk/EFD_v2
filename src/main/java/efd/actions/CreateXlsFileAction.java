@@ -2,9 +2,9 @@ package efd.actions;
 
 /* Write XLS template for Community Interview */
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.WealthGroupInterview.Status;
-import efd.rest.domain.Project;
+import efd.model.*;
+import efd.model.WealthGroupInterview.Status;
+import efd.model.Project;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;

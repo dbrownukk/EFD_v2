@@ -3,8 +3,8 @@ package efd.actions;
 DRB 18/12/2020
  */
 
-import efd.rest.domain.model.CustomReportSpecOHEA;
-import efd.rest.domain.model.Report;
+import efd.model.CustomReportSpecOHEA;
+import efd.model.Report;
 import org.openxava.actions.SaveAction;
 import org.openxava.jpa.XPersistence;
 import org.openxava.model.MapFacade;

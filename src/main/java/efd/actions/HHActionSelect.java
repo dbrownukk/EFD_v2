@@ -5,7 +5,7 @@ import java.util.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class HHActionSelect extends OnSelectElementBaseAction {
 

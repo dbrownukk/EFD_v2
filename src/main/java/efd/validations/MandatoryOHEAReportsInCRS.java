@@ -3,7 +3,7 @@ package efd.validations;
 /* Validate that mandatory reports are in Custom Report Spec - See Reports - isMandatory */
 /* DRB 21/12/2020 */
 
-import efd.rest.domain.model.Report;
+import efd.model.Report;
 import org.openxava.util.Messages;
 import org.openxava.validators.IValidator;
 

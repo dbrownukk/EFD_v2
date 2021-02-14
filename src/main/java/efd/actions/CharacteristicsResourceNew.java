@@ -6,7 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class CharacteristicsResourceNew extends CreateNewElementInCollectionAction implements INavigationAction {
 

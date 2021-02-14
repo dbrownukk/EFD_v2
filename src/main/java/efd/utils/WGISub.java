@@ -1,7 +1,7 @@
 package efd.utils;
 
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class WGISub {
 	private int wgiid;

@@ -2,9 +2,9 @@
 
 package efd.actions;
 
-import efd.rest.domain.model.Asset.Status;
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.Transfer.TransferType;
+import efd.model.Asset.Status;
+import efd.model.*;
+import efd.model.Transfer.TransferType;
 import org.openxava.actions.CollectionBaseAction;
 import org.openxava.actions.IForwardAction;
 import org.openxava.jpa.XPersistence;

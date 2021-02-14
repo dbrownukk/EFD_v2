@@ -1,8 +1,8 @@
 package efd.utils;
 
-import efd.rest.domain.model.ExpandabilityRule;
-import efd.rest.domain.model.Household;
-import efd.rest.domain.model.WealthGroupInterview;
+import efd.model.ExpandabilityRule;
+import efd.model.Household;
+import efd.model.WealthGroupInterview;
 
 public final class ExpandabilityValues {
 

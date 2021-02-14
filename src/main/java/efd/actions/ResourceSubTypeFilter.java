@@ -2,7 +2,7 @@ package efd.actions;
 
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class ResourceSubTypeFilter extends  OnChangePropertyBaseAction   {
 

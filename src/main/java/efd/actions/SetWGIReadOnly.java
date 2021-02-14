@@ -5,7 +5,7 @@ package efd.actions;
 import org.openxava.actions.*;
 import org.openxava.view.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 /* Set Validated WGI to read only once status = Validated  */
 

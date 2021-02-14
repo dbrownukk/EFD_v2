@@ -1,7 +1,7 @@
 package efd.rest.api.v1.mapper;
 
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import efd.rest.api.v1.model.ProjectDTO;
 import org.junit.Test;
 

@@ -2,7 +2,7 @@ package efd.validations;
 
 import org.openxava.actions.*;
 
-import efd.rest.domain.model.Asset.*;
+import efd.model.Asset.*;
 
 public class OnChangeAssetStatus extends OnChangePropertyBaseAction {
 	public void execute() throws Exception {

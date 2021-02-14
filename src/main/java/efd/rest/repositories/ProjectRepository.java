@@ -1,7 +1,7 @@
 package efd.rest.repositories;
 
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

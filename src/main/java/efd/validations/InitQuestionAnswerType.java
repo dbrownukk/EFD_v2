@@ -3,7 +3,7 @@ package efd.validations;
 import org.openxava.actions.*;
 
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class InitQuestionAnswerType extends ViewBaseAction {
 	public void execute() throws Exception {

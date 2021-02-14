@@ -8,8 +8,8 @@ import java.util.*;
 
 import org.openxava.actions.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.Asset.*;
+import efd.model.*;
+import efd.model.Asset.*;
 
 /* Read XLS Community Interview  spreadsheet */
 

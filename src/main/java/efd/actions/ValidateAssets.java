@@ -2,15 +2,19 @@
 
 package efd.actions;
 
-import org.openxava.jpa.*;
 
-import java.util.*;
+import efd.model.*;
+import efd.model.Transfer.TransferType;
+import efd.model.Asset.Status;
+import org.openxava.actions.IForwardAction;
+import org.openxava.actions.ViewBaseAction;
+import org.openxava.jpa.XPersistence;
 
-import org.openxava.actions.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.Asset.*;
-import efd.rest.domain.model.Transfer.*;
+;
 
 /*Validate loaded spreadsheet data for HH and WGI */
 
@@ -173,15 +177,15 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 			/* Land Validations */
 
 			if (!(al.get(i).getNumberOfUnits() >= 0)) {
-				al.get(i).setStatus(Status.Invalid);
+				al.get(i).setStatus(Asset.Status.Invalid);
 				landIsInvalid = true;
 
 			} else if (al.get(i).getResourceSubType() == null) {
 				landIsInvalid = true;
-				al.get(i).setStatus(Status.Invalid);
+				al.get(i).setStatus(Asset.Status.Invalid);
 
 			} else {
-				al.get(i).setStatus(Status.Valid);
+				al.get(i).setStatus(Asset.Status.Valid);
 
 			}
 
@@ -191,7 +195,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 		for (i = 0; i < als.size(); i++) {
 
 			if (!(als.get(i).getNumberOwnedAtStart() >= 0)) {
-				als.get(i).setStatus(Status.Invalid);
+				als.get(i).setStatus(Asset.Status.Invalid);
 				livestockIsInvalid = true;
 
 			} else if (als.get(i).getResourceSubType() == null) {
@@ -478,7 +482,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 				tran.get(i).setStatus(Status.Invalid);
 				transIsInvalid = true;
 
-			} else if (tran.get(i).getTransferType() == TransferType.Cash
+			} else if (tran.get(i).getTransferType() == Transfer.TransferType.Cash
 					&& tran.get(i).getFoodResourceSubType() != null) {
 				transIsInvalid = true;
 				tran.get(i).setStatus(Status.Invalid);

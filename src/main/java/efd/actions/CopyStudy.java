@@ -8,8 +8,8 @@ import java.util.*;
 import org.apache.commons.beanutils.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.ConfigQuestion.*;
+import efd.model.*;
+import efd.model.ConfigQuestion.*;
 
 public class CopyStudy extends ViewBaseAction {
 

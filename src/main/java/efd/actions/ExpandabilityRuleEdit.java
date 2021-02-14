@@ -18,19 +18,19 @@ import java.util.OptionalDouble;
 import org.openxava.actions.EditElementInCollectionAction;
 import org.openxava.jpa.XPersistence;
 
-import efd.rest.domain.model.Community;
-import efd.rest.domain.model.Crop;
-import efd.rest.domain.model.Employment;
-import efd.rest.domain.model.Household;
-import efd.rest.domain.model.LivestockProducts;
-import efd.rest.domain.model.LivestockSales;
-import efd.rest.domain.model.ResourceSubType;
-import efd.rest.domain.model.Study;
-import efd.rest.domain.model.Transfer;
-import efd.rest.domain.model.WealthGroup;
-import efd.rest.domain.model.WealthGroupInterview;
-import efd.rest.domain.model.WealthGroupInterview.Status;
-import efd.rest.domain.model.WildFood;
+import efd.model.Community;
+import efd.model.Crop;
+import efd.model.Employment;
+import efd.model.Household;
+import efd.model.LivestockProducts;
+import efd.model.LivestockSales;
+import efd.model.ResourceSubType;
+import efd.model.Study;
+import efd.model.Transfer;
+import efd.model.WealthGroup;
+import efd.model.WealthGroupInterview;
+import efd.model.WealthGroupInterview.Status;
+import efd.model.WildFood;
 
 public class ExpandabilityRuleEdit extends EditElementInCollectionAction {
 	static int PRODUCED = 0;

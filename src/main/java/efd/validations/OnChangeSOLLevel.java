@@ -4,8 +4,8 @@ import javax.inject.*;
 
 import org.openxava.actions.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.ConfigQuestion.*;
+import efd.model.*;
+import efd.model.ConfigQuestion.*;
 
 public class OnChangeSOLLevel extends OnChangePropertyBaseAction {
 

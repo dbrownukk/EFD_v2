@@ -14,13 +14,13 @@ import org.openxava.jpa.XPersistence;
 import org.openxava.tab.Tab;
 import org.openxava.view.View;
 
-import efd.rest.domain.model.Community;
-import efd.rest.domain.model.LivelihoodZone;
-import efd.rest.domain.Project;
-import efd.rest.domain.model.Site;
-import efd.rest.domain.model.WealthGroup;
-import efd.rest.domain.model.WealthGroupInterview;
-import efd.rest.domain.model.WealthGroupInterview.Status;
+import efd.model.Community;
+import efd.model.LivelihoodZone;
+import efd.model.Project;
+import efd.model.Site;
+import efd.model.WealthGroup;
+import efd.model.WealthGroupInterview;
+import efd.model.WealthGroupInterview.Status;
 
 /**
  * @author DRB 14/4/2020 In Customer Report CustomReportSpecListModelling filter

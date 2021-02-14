@@ -9,7 +9,7 @@ import java.util.stream.*;
 
 import javax.persistence.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
         import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DataValidationConstraint.*;
@@ -19,8 +19,8 @@ import org.openxava.jpa.*;
 import org.openxava.util.jxls.*;
 import org.openxava.web.servlets.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.ConfigQuestion.*;
+import efd.model.*;
+import efd.model.ConfigQuestion.*;
 
 public class CreateXlsFileActionOIHM extends ViewBaseAction implements IForwardAction, JxlsConstants, IChainAction {
 

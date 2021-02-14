@@ -2,8 +2,8 @@ package efd.actions;
 
 import org.openxava.jpa.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.ConfigQuestion.*;
+import efd.model.*;
+import efd.model.ConfigQuestion.*;
 
 /**
  * create a dummy answer for study questions

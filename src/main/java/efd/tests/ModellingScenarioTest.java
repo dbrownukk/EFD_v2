@@ -7,9 +7,9 @@ import javax.persistence.Query;
 import org.openxava.jpa.XPersistence;
 import org.openxava.tests.ModuleTestBase;
 
-import efd.rest.domain.model.LivelihoodZone;
-import efd.rest.domain.Project;
-import efd.rest.domain.model.Study;
+import efd.model.LivelihoodZone;
+import efd.model.Project;
+import efd.model.Study;
 
 public class ModellingScenarioTest extends ModuleTestBase {
 

@@ -17,8 +17,8 @@ import org.openxava.jpa.*;
 import org.openxava.util.*;
 import org.openxava.util.jxls.*;
 import org.openxava.web.editors.*;
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.WealthGroupInterview.*;
+import efd.model.*;
+import efd.model.WealthGroupInterview.*;
 
 import org.apache.commons.lang3.*;
 import org.apache.poi.ss.usermodel.*;
@@ -773,7 +773,7 @@ public class ParseWGISpreadsheet extends CollectionBaseAction implements IForwar
 							afood.setStatus(Asset.Status.Valid);
 
 							// if (!checkSubTypeEntered(afood.getUnit(), rst))
-							// afood.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							// afood.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
 							afood.setStatus(Asset.Status.Invalid);
@@ -1493,7 +1493,7 @@ public class ParseWGISpreadsheet extends CollectionBaseAction implements IForwar
 						 * checkSubType(cell[i][j][0].getStringCellValue(),
 						 * rtype[4].getIdresourcetype())) != null) {
 						 * 
-						 * afp.setResourceSubType(rst); afp.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+						 * afp.setResourceSubType(rst); afp.setStatus(efd.model.Asset.Status.Valid);
 						 * 
 						 * }
 						 */

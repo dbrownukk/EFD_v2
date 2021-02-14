@@ -6,7 +6,7 @@ import net.sf.jasperreports.engine.*;
 
 import org.openxava.actions.*;
 import org.openxava.model.*;
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 
 /**

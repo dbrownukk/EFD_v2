@@ -4,13 +4,13 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.apache.commons.beanutils.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class MergeProject extends ViewBaseAction {
 

@@ -5,23 +5,28 @@ import efd.rest.services.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by jt on 9/26/17.
  */
 @RestController
-@RequestMapping("/api/v1/projects/")
+//@RequestMapping("/api/v1/projects/")
 public class ProjectController {
 
+
     private final ProjectService projectService;
+
+    @GetMapping("/")
+    public String home(){
+        return("<H1>EFD REST HOME</H1>");
+    }
 
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
 
-    @GetMapping
+    @GetMapping(value = "/api/v1/projects/")
     public ResponseEntity<ProjectListDTO> getallProjects(){
 
         return new ResponseEntity<ProjectListDTO>(

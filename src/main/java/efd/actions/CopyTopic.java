@@ -7,7 +7,7 @@ import java.util.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class CopyTopic extends ViewBaseAction {
 

@@ -3,7 +3,7 @@ package efd.actions;
 DRB 18/12/2020
  */
 
-import efd.rest.domain.model.Report;
+import efd.model.Report;
 import org.openxava.actions.RemoveSelectedInCollectionAction;
 import org.openxava.jpa.XPersistence;
 import org.openxava.model.MapFacade;

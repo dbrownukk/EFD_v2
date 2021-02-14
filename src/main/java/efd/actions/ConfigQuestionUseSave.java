@@ -3,8 +3,8 @@ package efd.actions;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.ConfigQuestion.*;
+import efd.model.*;
+import efd.model.ConfigQuestion.*;
 
 /* 
  * Create dummy answer on creation of question usage at Question Study level

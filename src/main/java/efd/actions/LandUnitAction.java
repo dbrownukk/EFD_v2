@@ -7,8 +7,8 @@ import java.util.*;
 
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
-import efd.rest.domain.model.*;
-import efd.rest.domain.Project.*;
+import efd.model.*;
+import efd.model.Project.*;
 
 public class LandUnitAction extends ViewBaseAction {
 

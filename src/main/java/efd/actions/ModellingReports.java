@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.apache.commons.lang.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -38,13 +38,13 @@ import org.openxava.tab.*;
 import org.openxava.util.jxls.*;
 import org.openxava.web.servlets.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.CustomReportSpecListModelling.*;
-import efd.rest.domain.model.HouseholdMember.*;
-import efd.rest.domain.model.Report.*;
-import efd.rest.domain.model.StdOfLivingElement.*;
-import efd.rest.domain.model.Transfer.*;
-import efd.rest.domain.model.WealthGroupInterview.*;
+import efd.model.*;
+import efd.model.CustomReportSpecListModelling.*;
+import efd.model.HouseholdMember.*;
+import efd.model.Report.*;
+import efd.model.StdOfLivingElement.*;
+import efd.model.Transfer.*;
+import efd.model.WealthGroupInterview.*;
 import efd.utils.*;
 
 public class ModellingReports extends TabBaseAction implements IForwardAction, JxlsConstants {

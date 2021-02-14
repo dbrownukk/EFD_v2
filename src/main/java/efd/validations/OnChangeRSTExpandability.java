@@ -13,7 +13,7 @@ import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
 import efd.actions.ExpandabilityRuleEdit;
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class OnChangeRSTExpandability extends OnChangePropertyBaseAction {
 	public void execute() throws Exception {

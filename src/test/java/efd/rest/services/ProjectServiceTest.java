@@ -1,7 +1,7 @@
 package efd.rest.services;
 
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import efd.rest.api.v1.mapper.ProjectMapper;
 import efd.rest.api.v1.model.ProjectDTO;
 import efd.rest.repositories.ProjectRepository;

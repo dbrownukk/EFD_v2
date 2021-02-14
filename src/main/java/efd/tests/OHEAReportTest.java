@@ -1,6 +1,6 @@
 package efd.tests;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.openxava.jpa.XPersistence;
 import org.openxava.tests.ModuleTestBase;
 

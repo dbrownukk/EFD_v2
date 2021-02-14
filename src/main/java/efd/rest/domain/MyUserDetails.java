@@ -4,16 +4,16 @@ package efd.rest.domain;
     @Create 11/02/2021 09:26
 */
 
-import com.openxava.naviox.model.User;
+import efd.model.EfdUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-
+@Service
 public class MyUserDetails implements UserDetails {
 
     private String userName;
@@ -21,29 +21,57 @@ public class MyUserDetails implements UserDetails {
     private boolean active;
     private List<GrantedAuthority> authorities;
 
+   // @Autowired
+   // private RoleRepository roleRepository;
+
+
+
     public MyUserDetails() {
     }
 
-    public MyUserDetails(User user) {
-        this.userName = user.getName();
-        this.password = user.getPassword();
-        this.authorities = Arrays.stream(user.getRoles().toString().split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-        this.active = user.isActive();
+    public MyUserDetails(EfdUser efduser) {
 
-        System.out.println("in MyUserDetails "+user.getName());
+
+
+        System.out.println("in MyUserDetails " + efduser.getName());
+
+        this.userName = efduser.getName();
+        this.password = efduser.getPassword();
+        //this.authorities = Arrays.stream(user.getRoles().toString().split(","))
+        //      .map(SimpleGrantedAuthority::new)
+        //    .collect(Collectors.toList());
+        this.active = efduser.isActive();
+
+
+
+        // this.getAuthorities()= Arrays.asList(new SimpleGrantedAuthority[]{new SimpleGrantedAuthority("User")});
+
+        //List<EfdRole> allRoles = roleRepository.findAllByOxusersName(userName);
+
+        //List<EfdRole> efdRoles = XPersistence.getManager().createQuery("from EfdRole").getResultList();
+        //for (EfdRole efdRole : efdRoles) {
+         //   System.out.println("roles = "+efdRole.getRolesName());
+        //}
+        //;
+
+        //for (EfdRole allRole : allRoles) {
+         //   System.out.println("roles = "+allRole.getRolesName());
+        //}
+        //;
 
     }
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+
+
+        return Arrays.asList(new SimpleGrantedAuthority("User"));
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return "pass";
     }
 
     @Override

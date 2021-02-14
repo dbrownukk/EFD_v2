@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.List;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;

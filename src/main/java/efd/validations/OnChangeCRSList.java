@@ -12,7 +12,7 @@ import org.openxava.tab.Tab;
 import org.openxava.util.XavaException;
 
 import efd.actions.GoOHEAReports;
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class OnChangeCRSList extends OnChangePropertyBaseAction {
 

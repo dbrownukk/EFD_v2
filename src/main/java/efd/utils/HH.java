@@ -2,7 +2,7 @@ package efd.utils;
 
 import java.util.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class HH {
 	private Household household;

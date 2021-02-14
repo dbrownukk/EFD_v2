@@ -9,14 +9,14 @@ package efd.actions;
 import java.util.*;
 import java.util.stream.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.apache.commons.lang3.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 import org.openxava.tab.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.WealthGroupInterview.*;
+import efd.model.*;
+import efd.model.WealthGroupInterview.*;
 import efd.utils.*;
 
 public class GoModellingReport extends ViewBaseAction {

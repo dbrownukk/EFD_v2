@@ -4,8 +4,8 @@ import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.WealthGroupInterview.*;
+import efd.model.*;
+import efd.model.WealthGroupInterview.*;
 
 /*
  * Prevent Status change to Validated by User using LOV

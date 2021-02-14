@@ -5,7 +5,7 @@ package efd.actions;
 import org.openxava.actions.*;
 import org.openxava.view.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 /* Read XLS Community Interview  spreadsheet */
 
@@ -16,7 +16,7 @@ public class ShowWGIEditButton extends ViewBaseAction {
 		WealthGroupInterview wgint = (WealthGroupInterview) getView().getEntity();
 		View view = getView();
 		/*
-		if(wgint.getStatus() == (efd.rest.domain.model.WealthGroupInterview.Status.Validated))
+		if(wgint.getStatus() == (efd.model.WealthGroupInterview.Status.Validated))
 		{System.out.println("Show WGI Edit button  ");
 			addActions("SetEditable.SetEditable");
 			return;

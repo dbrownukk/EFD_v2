@@ -20,12 +20,12 @@ public class OnChangeFileUpload extends OnChangePropertyBaseAction {
 		if (getNewValue() != null)
 		{
 			// No file uploaded 
-			getView().setValue("status", efd.rest.domain.model.WealthGroupInterview.Status.Uploaded);
+			getView().setValue("status", efd.model.WealthGroupInterview.Status.Uploaded);
 			
 		}
 		else
 		{
-			getView().setValue("status", efd.rest.domain.model.WealthGroupInterview.Status.Generated);
+			getView().setValue("status", efd.model.WealthGroupInterview.Status.Generated);
 		}
 		
 */		

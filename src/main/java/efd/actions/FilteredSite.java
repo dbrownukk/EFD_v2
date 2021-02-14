@@ -5,13 +5,13 @@ import java.util.List;
 import javax.inject.*;
 import javax.persistence.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.apache.commons.lang3.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 import org.openxava.util.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 /*
  * DRB Do not show existing Site in pick list 

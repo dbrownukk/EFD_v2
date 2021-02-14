@@ -7,7 +7,7 @@ import javax.persistence.Query;
 import org.openxava.jpa.XPersistence;
 import org.openxava.tests.ModuleTestBase;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 
 public class StudyTest extends ModuleTestBase {
 

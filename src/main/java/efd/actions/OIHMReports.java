@@ -26,11 +26,11 @@
 
 package efd.actions;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.model.HouseholdMember.Sex;
-import efd.rest.domain.Project.Area;
-import efd.rest.domain.model.StdOfLivingElement.StdLevel;
-import efd.rest.domain.model.WealthGroupInterview.Status;
+import efd.model.*;
+import efd.model.HouseholdMember.Sex;
+import efd.model.Project.Area;
+import efd.model.StdOfLivingElement.StdLevel;
+import efd.model.WealthGroupInterview.Status;
 import efd.utils.HH;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;

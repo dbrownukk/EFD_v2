@@ -15,7 +15,7 @@ import org.apache.commons.lang.*;
 import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class CustRepSpecAddAnswer extends GoAddElementsToCollectionAction {
 

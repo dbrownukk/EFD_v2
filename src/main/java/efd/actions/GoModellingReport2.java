@@ -8,7 +8,7 @@ package efd.actions;
 
 import java.util.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import org.openxava.actions.*;
 import org.openxava.tab.*;
 

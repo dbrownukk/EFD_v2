@@ -1,6 +1,6 @@
 package efd.utils;
 
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 public class QuantHousehold {
 	private Quantile quantile;

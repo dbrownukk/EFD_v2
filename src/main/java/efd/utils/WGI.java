@@ -2,8 +2,8 @@ package efd.utils;
 
 import java.util.*;
 
-import efd.rest.domain.model.*;
-import efd.rest.domain.Project;
+import efd.model.*;
+import efd.model.Project;
 
 public class WGI {
 	private Project project;

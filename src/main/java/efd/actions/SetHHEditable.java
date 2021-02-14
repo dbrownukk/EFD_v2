@@ -5,8 +5,8 @@ package efd.actions;
  * Set HH to editable to re-edit a Validated HH
  */
 
-import efd.rest.domain.model.Household;
-import efd.rest.domain.model.WealthGroupInterview;
+import efd.model.Household;
+import efd.model.WealthGroupInterview;
 import org.openxava.actions.IAvailableAction;
 import org.openxava.actions.ViewBaseAction;
 import org.openxava.view.View;

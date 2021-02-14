@@ -6,7 +6,7 @@ import javax.inject.*;
 
 import org.openxava.actions.*;
 
-import efd.rest.domain.model.WealthGroupInterview.*;
+import efd.model.WealthGroupInterview.*;
 
 /*
  * Extending existing Uploadfile 

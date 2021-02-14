@@ -45,37 +45,37 @@ import org.openxava.util.jxls.JxlsConstants;
 import org.openxava.web.editors.AttachedFile;
 import org.openxava.web.editors.IFilePersistor;
 
-import efd.rest.domain.model.AssetCash;
-import efd.rest.domain.model.AssetFoodStock;
-import efd.rest.domain.model.AssetLand;
-import efd.rest.domain.model.AssetLiveStock;
-import efd.rest.domain.model.AssetTradeable;
-import efd.rest.domain.model.AssetTree;
-import efd.rest.domain.model.Category;
-import efd.rest.domain.model.ConfigAnswer;
-import efd.rest.domain.model.ConfigQuestion.AnswerType;
-import efd.rest.domain.model.ConfigQuestion.Level;
-import efd.rest.domain.model.ConfigQuestionUse;
-import efd.rest.domain.model.Country;
-import efd.rest.domain.model.Crop;
-import efd.rest.domain.model.Employment;
-import efd.rest.domain.model.FoodPurchase;
-import efd.rest.domain.model.Household;
-import efd.rest.domain.model.HouseholdMember;
-import efd.rest.domain.model.HouseholdMember.Sex;
-import efd.rest.domain.model.HouseholdMember.YN;
-import efd.rest.domain.model.Inputs;
-import efd.rest.domain.model.LivelihoodZone;
-import efd.rest.domain.model.LivestockProducts;
-import efd.rest.domain.model.LivestockSales;
-import efd.rest.domain.model.LocalUnit;
-import efd.rest.domain.model.NonFoodPurchase;
-import efd.rest.domain.model.QuestionLOV;
-import efd.rest.domain.model.ResourceSubType;
-import efd.rest.domain.model.ResourceType;
-import efd.rest.domain.model.Transfer;
-import efd.rest.domain.model.WealthGroupInterview.Status;
-import efd.rest.domain.model.WildFood;
+import efd.model.AssetCash;
+import efd.model.AssetFoodStock;
+import efd.model.AssetLand;
+import efd.model.AssetLiveStock;
+import efd.model.AssetTradeable;
+import efd.model.AssetTree;
+import efd.model.Category;
+import efd.model.ConfigAnswer;
+import efd.model.ConfigQuestion.AnswerType;
+import efd.model.ConfigQuestion.Level;
+import efd.model.ConfigQuestionUse;
+import efd.model.Country;
+import efd.model.Crop;
+import efd.model.Employment;
+import efd.model.FoodPurchase;
+import efd.model.Household;
+import efd.model.HouseholdMember;
+import efd.model.HouseholdMember.Sex;
+import efd.model.HouseholdMember.YN;
+import efd.model.Inputs;
+import efd.model.LivelihoodZone;
+import efd.model.LivestockProducts;
+import efd.model.LivestockSales;
+import efd.model.LocalUnit;
+import efd.model.NonFoodPurchase;
+import efd.model.QuestionLOV;
+import efd.model.ResourceSubType;
+import efd.model.ResourceType;
+import efd.model.Transfer;
+import efd.model.WealthGroupInterview.Status;
+import efd.model.WildFood;
 
 public class ParseHHSpreadsheet extends CollectionBaseAction
 		implements IForwardAction, JxlsConstants, IFilePersistor, IJDBCAction, IChainAction {
@@ -1156,16 +1156,16 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							em("done al get = " + rst.getResourcetypename());
 
 							al.setResourceSubType(rst);
-							al.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							al.setStatus(efd.model.Asset.Status.Valid);
 							isCorrectRST = true;
 
 							/* Is Unit Entered Valid for this resource */
 							em("done al get 11 ");
 							if (!checkSubTypeEntered(al.getUnit(), rst))
-								al.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								al.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							al.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							al.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
 						// Was a Local Unit entered for this RST LZ combination?
@@ -1180,7 +1180,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								al.setLocalUnit(localUnit.getName());
 								al.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
 								if (isCorrectRST) { // Is the correct RST entered and valid
-									al.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									al.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
 						}
@@ -1216,12 +1216,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							// em("done als get = " + rst.getResourcetypename());
 
 							als.setResourceSubType(rst);
-							als.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							als.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(als.getUnit(), rst))
-								als.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								als.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							als.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							als.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						hhi.getAssetLiveStock().add(als);
 						// getView().refreshCollections();
@@ -1250,12 +1250,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							// em("done atrade get = " + rst.getResourcetypename());
 
 							atrade.setResourceSubType(rst);
-							atrade.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							atrade.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(atrade.getUnit(), rst))
-								atrade.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								atrade.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							atrade.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							atrade.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						hhi.getAssetTradeable().add(atrade);
 						// getView().refreshCollections();
@@ -1310,13 +1310,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								rst = rstfoodpurchase;
 
 							afood.setResourceSubType(rst);
-							afood.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							afood.setStatus(efd.model.Asset.Status.Valid);
 
 							// if (!checkSubTypeEntered(afood.getUnit(), rst))
-							// afood.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							// afood.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							afood.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							afood.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						hhi.getAssetFoodStock().add(afood);
 						// getView().refreshCollections();
@@ -1345,12 +1345,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							// em("done atree get = " + rst.getResourcetypename());
 
 							atree.setResourceSubType(rst);
-							atree.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							atree.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(atree.getUnit(), rst))
-								atree.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								atree.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							atree.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							atree.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						hhi.getAssetTree().add(atree);
 						// getView().refreshCollections();
@@ -1390,11 +1390,11 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								rst = checkSubType(cell[i][j][0].getStringCellValue(),
 										rtype[i].getIdresourcetype().toString());
 								em("in cash rst = " + rst);
-								acash.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+								acash.setStatus(efd.model.Asset.Status.Valid);
 								acash.setResourceSubType(rst);
 								break;
 							} else {
-								acash.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								acash.setStatus(efd.model.Asset.Status.Invalid);
 							}
 
 						}
@@ -1443,7 +1443,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 						if (acash.getExchangeRate().compareTo(BigDecimal.valueOf(0.0)) != 1) {
 
-							acash.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							acash.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
 						hhi.getAssetCash().add(acash);
@@ -1495,12 +1495,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 							acrop.setResourceSubType(rst);
 							isCorrectRST = true;
-							acrop.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							acrop.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(acrop.getUnit(), rst))
-								acrop.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								acrop.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							acrop.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							acrop.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
 						// Was a Local Unit entered for this RST LZ combination?
@@ -1515,7 +1515,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								acrop.setLocalUnit(localUnit.getName());
 								acrop.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
 								if (isCorrectRST) { // Is the correct RST entered and valid
-									acrop.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									acrop.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
 						}
@@ -1563,12 +1563,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							// em("done alss get = " + rst.getResourcetypename());
 
 							alss.setResourceSubType(rst);
-							alss.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							alss.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(alss.getUnit(), rst))
-								alss.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								alss.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							alss.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							alss.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						hhi.getLivestockSales().add(alss);
 						getView().refreshCollections();
@@ -1619,13 +1619,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							em("done alsp get = " + rst.getResourcetypename());
 
 							alsp.setResourceSubType(rst);
-							alsp.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							alsp.setStatus(efd.model.Asset.Status.Valid);
 							isCorrectRST = true;
 							if (!checkSubTypeEntered(alsp.getUnit(), rst))
-								alsp.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								alsp.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							alsp.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							alsp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
 						// Was a Local Unit entered for this RST LZ combination?
@@ -1641,7 +1641,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								alsp.setLocalUnit(localUnit.getName());
 								alsp.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
 								if (isCorrectRST) { // Is the correct RST entered and valid
-									alsp.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									alsp.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
 						}
@@ -1703,13 +1703,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							em("in emp  status is valid 1");
 							aemp.setResourceSubType(rst);
 
-							aemp.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							aemp.setStatus(efd.model.Asset.Status.Valid);
 							if (!checkSubTypeEntered(aemp.getUnit(), rst))
-								aemp.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								aemp.setStatus(efd.model.Asset.Status.Invalid);
 							em("in emp  status is invalid 1");
 						} else {
 
-							aemp.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							aemp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 						em("7");
 						// If there is a food payment then need to validate food payment rst
@@ -1726,16 +1726,16 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 									|| (rst = checkSubType(aemp.getFoodPaymentFoodType(),
 											rtype[ASSETFOOD].getIdresourcetype())) != null) {
 								aemp.setFoodResourceSubType(rst);
-								aemp.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+								aemp.setStatus(efd.model.Asset.Status.Valid);
 								isCorrectRST = true;
 							} else {
 								isCorrectRST = false;
-								aemp.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								aemp.setStatus(efd.model.Asset.Status.Invalid);
 							}
 							// Now need to check food unit is valid
 
 							if (!checkSubTypeEntered(aemp.getFoodPaymentUnit(), rst))
-								aemp.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								aemp.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
 						// Was a Local Unit entered for this FoodPayment RST LZ combination?
@@ -1751,7 +1751,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								aemp.setLocalUnit(localUnit.getName());
 								aemp.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
 								if (isCorrectRST) { // Is the correct RST entered and valid
-									aemp.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									aemp.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
 						}
@@ -1835,13 +1835,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								rtype[i].getIdresourcetype().toString())) != null) {
 
 							at.setResourceSubType(rst);
-							at.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							at.setStatus(efd.model.Asset.Status.Valid);
 							isCorrectRST = true;
 							if (!checkSubTypeEntered(at.getUnit(), rst))
-								at.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								at.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							at.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							at.setStatus(efd.model.Asset.Status.Invalid);
 
 						}
 
@@ -1866,12 +1866,12 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							{ // set FoodRST and check Unit entered
 
 								at.setFoodResourceSubType(rst);
-								at.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+								at.setStatus(efd.model.Asset.Status.Valid);
 								if (!checkSubTypeEntered(at.getUnit(), rst))
-									at.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+									at.setStatus(efd.model.Asset.Status.Invalid);
 
 							} else {
-								at.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								at.setStatus(efd.model.Asset.Status.Invalid);
 
 							}
 						}
@@ -1888,7 +1888,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								at.setLocalUnit(localUnit.getName());
 								at.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
 								if (isCorrectRST) { // Is the correct RST entered and valid
-									at.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									at.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
 						}
@@ -1934,13 +1934,13 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 							em("done wildfood get =  " + rst.getResourcetypename());
 
 							awf.setResourceSubType(rst);
-							awf.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+							awf.setStatus(efd.model.Asset.Status.Valid);
 							isCorrectRST = true;
 							if (!checkSubTypeEntered(awf.getUnit(), rst))
-								awf.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								awf.setStatus(efd.model.Asset.Status.Invalid);
 
 						} else {
-							awf.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+							awf.setStatus(efd.model.Asset.Status.Invalid);
 						}
 
 						// Was a Local Unit entered for this RST LZ combination?
@@ -1955,7 +1955,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								awf.setLocalUnit(localUnit.getName());
 								awf.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
 								if (isCorrectRST) { // Is the correct RST entered and valid
-									awf.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									awf.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
 						}
@@ -2028,7 +2028,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 								ins.setResourceSubType(rst);
 
-								ins.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+								ins.setStatus(efd.model.Asset.Status.Valid);
 
 								// Check if Resource 1/2/3 Used for are Valid
 
@@ -2037,24 +2037,24 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 
 								{
 									isCorrectRST = true;
-									ins.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									ins.setStatus(efd.model.Asset.Status.Valid);
 
 								}
 
 								else {
 									System.out.println("INPUTS Resources  invalid");
-									ins.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+									ins.setStatus(efd.model.Asset.Status.Invalid);
 								}
 
 								if (!checkSubTypeEntered(ins.getUnit(), rst)) {
 									System.out.println("INPUTS units invalid");
-									ins.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+									ins.setStatus(efd.model.Asset.Status.Invalid);
 
 								}
 
 							} else {
 								System.out.println("INPUTS ELSE invalid");
-								ins.setStatus(efd.rest.domain.model.Asset.Status.Invalid);
+								ins.setStatus(efd.model.Asset.Status.Invalid);
 
 							}
 
@@ -2072,7 +2072,7 @@ public class ParseHHSpreadsheet extends CollectionBaseAction
 								ins.setLocalUnit(localUnit.getName());
 								ins.setLocalUnitMultiplier(localUnit.getMultipleOfStandardMeasure());
 								if (isCorrectRST) { // Is the correct RST entered and valid
-									ins.setStatus(efd.rest.domain.model.Asset.Status.Valid);
+									ins.setStatus(efd.model.Asset.Status.Valid);
 								}
 							}
 						}

@@ -2,11 +2,11 @@ package efd.reports;
  
 import java.util.*;
 
-import efd.rest.domain.Project;
+import efd.model.Project;
 import net.sf.jasperreports.engine.*;
 
 import org.openxava.actions.*;
-import efd.rest.domain.model.*;
+import efd.model.*;
 
 
 /**
