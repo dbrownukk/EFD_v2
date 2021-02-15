@@ -1,5 +1,6 @@
 package efd.rest.config;
 
+import efd.rest.domain.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -7,7 +8,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /*
@@ -21,6 +21,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UserDetailsService userDetailsService;
+    private Object pw;
+
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -28,28 +30,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService);
     }
 
-    /*
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-              //  .antMatchers("/api/v1/**").hasRole("Rest")
-                .antMatchers("/api/v1/**").hasAnyRole()
-                  .antMatchers("/").permitAll()
-                .and().formLogin();
-    }
-     */
+
 
 
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/**").authenticated()
-           //     .antMatchers("/api/v1/**").hasAnyRole()
+                .antMatchers("/**").hasRole("ohea_user")
                 .and().formLogin();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-
+    public PasswordEncoder getPasswordEncoder() {
+       // String encodingId = "scrypt";
+       // Map<String, PasswordEncoder> encoders = new HashMap<>();
+       // encoders.put(encodingId, new SCryptPasswordEncoder());
+       // encoders.put("SHA-1", new MessageDigestPasswordEncoder("SHA-1"));
+       // return new DelegatingPasswordEncoder(encodingId, encoders);
+      //  return(new MessageDigestPasswordEncoder("SHA-1"));
+    return new MyUserDetails.PasswordEnconderEFD();
     }
 }
