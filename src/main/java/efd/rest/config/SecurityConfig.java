@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 /*
     @Author david
@@ -20,34 +21,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Autowired
-    UserDetailsService userDetailsService;
+    UserDetailsService userEFDDetailsService;
     private Object pw;
 
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         System.out.println("In auth config userdetails service ");
-        auth.userDetailsService(userDetailsService);
+        auth.userDetailsService(userEFDDetailsService);
     }
-
-
-
 
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/**").authenticated()
-                .antMatchers("/**").hasRole("ohea_user")
-                .and().formLogin();
+                .anyRequest().authenticated()
+                .antMatchers("/").permitAll()
+                .antMatchers("/api/v1/**").hasRole("API")
+                .and().formLogin()
+         .failureHandler(authenticationFailureHandler());
     }
 
     @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new CustomAuthenticationFailureHandler();
+    }
+
+
+    @Bean
     public PasswordEncoder getPasswordEncoder() {
-       // String encodingId = "scrypt";
-       // Map<String, PasswordEncoder> encoders = new HashMap<>();
-       // encoders.put(encodingId, new SCryptPasswordEncoder());
-       // encoders.put("SHA-1", new MessageDigestPasswordEncoder("SHA-1"));
-       // return new DelegatingPasswordEncoder(encodingId, encoders);
-      //  return(new MessageDigestPasswordEncoder("SHA-1"));
-    return new MyUserDetails.PasswordEnconderEFD();
+
+        return new MyUserDetails.PasswordEnconderEFD();
     }
 }

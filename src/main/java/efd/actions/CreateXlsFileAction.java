@@ -312,6 +312,7 @@ public class CreateXlsFileAction extends CollectionBaseAction implements IForwar
 
 		// DataFormat format = workbook.createDataFormat();
 
+
 		style.setDataFormat(HSSFDataFormat.getBuiltinFormat("2"));
 		style.setBorderBottom(CellStyle.BORDER_THIN);
 		style.setBorderTop(CellStyle.BORDER_THIN);

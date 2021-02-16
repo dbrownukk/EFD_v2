@@ -1,8 +1,6 @@
 package efd.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +9,6 @@ import javax.persistence.Table;
 
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "efdroles")
 public class EfdRole {

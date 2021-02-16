@@ -3,10 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>guru.springfamework</groupId>
-    <artifactId>spring5-mvc-rest</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+
 
     <name>spring5-mvc-rest</name>
     <description>Demo project for Spring Boot</description>
@@ -14,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.0.RELEASE</version>
+        <version>2.4.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -139,7 +136,7 @@
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <compilerArg>
-                               -Amapstruct.defaultComponentModel=spring
+                            -Amapstruct.defaultComponentModel=spring
                         </compilerArg>
                     </compilerArgs>
                 </configuration>

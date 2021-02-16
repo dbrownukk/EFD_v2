@@ -1,14 +1,12 @@
 package efd.model;
 
-import lombok.Getter;
+import com.openxava.naviox.model.Role;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Collection;
 
 @Entity
-@Getter
 @Table(name = "efdusers")
 public class EfdUser {
     @Id
@@ -84,4 +82,113 @@ public class EfdUser {
     @Column(name = "allowedIP")
     private String allowedIp;
 
+    @ManyToMany
+    @JoinTable( // Though we use default names because a JPA bug generating schema
+            name="OXUSERS_OXROLES",
+            joinColumns=
+            @JoinColumn(name="OXUSERS_NAME", referencedColumnName="NAME"),
+            inverseJoinColumns=
+            @JoinColumn(name="ROLES_NAME", referencedColumnName="NAME")
+    )
+    private Collection<Role> roles;
+
+    public String getName() {
+        return this.name;
+    }
+
+    public boolean isActive() {
+        return this.active;
+    }
+
+    public boolean isAuthenticateWithLdap() {
+        return this.authenticateWithLdap;
+    }
+
+    public Timestamp getBirthDate() {
+        return this.birthDate;
+    }
+
+    public Timestamp getCreationDate() {
+        return this.creationDate;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public Integer getFailedLoginAttempts() {
+        return this.failedLoginAttempts;
+    }
+
+    public String getFamilyName() {
+        return this.familyName;
+    }
+
+    public boolean isForceChangePassword() {
+        return this.forceChangePassword;
+    }
+
+    public String getGivenName() {
+        return this.givenName;
+    }
+
+    public String getJobTitle() {
+        return this.jobTitle;
+    }
+
+    public Timestamp getLastLoginDate() {
+        return this.lastLoginDate;
+    }
+
+    public Timestamp getLastPasswordChangeDate() {
+        return this.lastPasswordChangeDate;
+    }
+
+    public String getMiddleName() {
+        return this.middleName;
+    }
+
+    public String getNickName() {
+        return this.nickName;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public String getPasswordRecoveringCode() {
+        return this.passwordRecoveringCode;
+    }
+
+    public Timestamp getPasswordRecoveringDate() {
+        return this.passwordRecoveringDate;
+    }
+
+    public Timestamp getPrivacyPolicyAcceptanceDate() {
+        return this.privacyPolicyAcceptanceDate;
+    }
+
+    public String getRecentPassword1() {
+        return this.recentPassword1;
+    }
+
+    public String getRecentPassword2() {
+        return this.recentPassword2;
+    }
+
+    public String getRecentPassword3() {
+        return this.recentPassword3;
+    }
+
+    public String getRecentPassword4() {
+        return this.recentPassword4;
+    }
+
+    public String getAllowedIp() {
+        return this.allowedIp;
+    }
+
+    public Collection<Role> getRoles() {
+        return this.roles;
+    }
 }

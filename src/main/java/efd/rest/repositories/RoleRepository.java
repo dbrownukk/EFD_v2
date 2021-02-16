@@ -7,5 +7,10 @@ package efd.rest.repositories;
 import efd.model.EfdRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface RoleRepository extends JpaRepository<EfdRole,String> {
+    public List<EfdRole> findDistinctByOxusersName(String userName);
+
+
 }
