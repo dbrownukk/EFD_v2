@@ -6,9 +6,10 @@ package efd.rest.repositories;
 
 import efd.model.EfdUser;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.Optional;
-
+@RestResource(exported = false)
 public interface UserRepository extends JpaRepository<EfdUser,String> {
     Optional<EfdUser> findByName(String name);
 }

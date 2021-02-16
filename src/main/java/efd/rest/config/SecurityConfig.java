@@ -27,17 +27,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        System.out.println("In auth config userdetails service ");
         auth.userDetailsService(userEFDDetailsService);
     }
 
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .anyRequest().authenticated()
-                .antMatchers("/").permitAll()
-                .antMatchers("/api/v1/**").hasRole("API")
+                .antMatchers("/api/v1/**").hasRole("XX")
+                .antMatchers("/api/v1/**").authenticated()
+                //.antMatchers("/**").authenticated()
                 .and().formLogin()
-         .failureHandler(authenticationFailureHandler());
+                .failureHandler(authenticationFailureHandler());
     }
 
     @Bean

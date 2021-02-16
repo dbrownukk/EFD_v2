@@ -38,7 +38,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         System.out.println("myuserdetail user = " + myUserDetails.getUsername());
         System.out.println("myuserdetail password = " + myUserDetails.getPassword());
-
+        System.out.println("myuserdetail role = " + myUserDetails.getAuthorities());
 
 
         return myUserDetails;

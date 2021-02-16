@@ -1,14 +1,14 @@
 package efd.model;
 
-import java.util.*;
+import efd.validations.OnChangeProjectinModellingScenario;
+import org.openxava.annotations.*;
+import org.openxava.calculators.CurrentDateCalculator;
+import org.openxava.util.Dates;
+import org.openxava.util.XavaResources;
 
 import javax.persistence.*;
-
-import org.openxava.annotations.*;
-import org.openxava.calculators.*;
-import org.openxava.util.*;
-
-import efd.validations.OnChangeProjectinModellingScenario;
+import java.util.Collection;
+import java.util.Date;
 
 @View(members = "LivelihoodsModelling[#title;author;date;study;project,livelihoodZone];"
 		+ "PriceYieldVariations{priceYieldVariations},FoodSubstitution{foodSubstitution},Description{description}")

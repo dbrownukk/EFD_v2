@@ -1,12 +1,12 @@
 package efd.model;
 
-import java.util.*;
+import org.hibernate.validator.constraints.Range;
+import org.openxava.annotations.*;
+import org.openxava.util.XavaResources;
 
 import javax.persistence.*;
-
-import org.hibernate.validator.constraints.*;
-import org.openxava.annotations.*;
-import org.openxava.util.*;
+import java.util.Collection;
+import java.util.Date;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
@@ -40,7 +40,7 @@ import org.openxava.util.*;
 		uniqueConstraints = {
 				@UniqueConstraint(name = "studyrefyear", columnNames = { "studyName", "referenceYear" }) })
 
-public class Study extends EFDIdentifiable {
+public class Study extends EFDIdentifiable  {
 
 	@PrePersist
 	@PreUpdate
@@ -583,6 +583,8 @@ public class Study extends EFDIdentifiable {
 	public void setCharacteristicsResourceInputs(Collection<WGCharacteristicsResource> characteristicsResourceInputs) {
 		this.characteristicsResourceInputs = characteristicsResourceInputs;
 	}
+
+
 
 	/*************************************************************************************************/
 
