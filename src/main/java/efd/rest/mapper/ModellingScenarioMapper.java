@@ -3,6 +3,7 @@ package efd.rest.mapper;
 import efd.model.ModellingScenario;
 import efd.rest.domain.ModellingScenarioDto;
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 /*
     @Author david
@@ -11,7 +12,9 @@ import org.mapstruct.Mapper;
 @Mapper
 public interface ModellingScenarioMapper {
 
-ModellingScenarioDto modellingScenarioToModellingScenarionDto(ModellingScenario ms);
-ModellingScenario modellingScenarioDtoToModellingScenarion(ModellingScenarioDto msDto);
+    ModellingScenarioMapper INSTANCE = Mappers.getMapper(ModellingScenarioMapper.class);
+
+    ModellingScenarioDto modellingScenarioToModellingScenarionDto(ModellingScenario modellingScenario);
+    ModellingScenarioDto modellingScenarioDtoToModellingScenario(ModellingScenarioDto modellingScenarioDto);
 
 }

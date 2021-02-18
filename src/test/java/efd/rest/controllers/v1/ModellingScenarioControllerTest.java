@@ -5,9 +5,8 @@ import efd.rest.domain.ModellingScenarioDto;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,22 +15,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Author david
     @Create 16/02/2021 16:36
 */
-@WebMvcTest(ModellingScenarioController.class)
-class ModellingScenarioControllerTest {
+//@WebMvcTest(ModellingScenarioController.class)
+@SpringBootTest
+class ModellingScenarioControllerTest extends BaseIT{
 
-    private static final String TITLE = "Malawi north";
-    @Autowired
-    MockMvc mockMvc;
+    private static final String TITLE = "MicroNutrients";
+
 
     @Autowired
     ObjectMapper objectMapper;
 
     @Test
     void getModellingScenarioDtoByName() throws Exception {
-        String uri = "/api/v1/modellingscenario/"+"MSNAME";
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/modellingscenario/"+TITLE)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().is2xxSuccessful());
 
     }
 

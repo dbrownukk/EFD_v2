@@ -1,11 +1,12 @@
 package efd.model;
 
-import javax.persistence.*;
-import javax.persistence.Table;
-import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
-import org.openxava.calculators.*;
+import org.openxava.calculators.EnumCalculator;
+import org.openxava.calculators.ZeroLongCalculator;
+
+import javax.persistence.*;
+import javax.validation.constraints.Digits;
 
 @Embeddable
 
@@ -16,7 +17,7 @@ public class Transfer extends Asset {
 	@Column(name = "Official", columnDefinition="boolean default false")
 	@DisplaySize(15)
 	// @DefaultValueCalculator(value = FalseCalculator.class)
-	@Editor(value = "BooleanYesNoCombo")  
+	@Editor(value = "BooleanYesNoCombo")
 	private Boolean isOfficial;
 
 	@Column(name = "Source", length = 50)

@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Setter
 @Service
-public class MyUserDetails implements UserDetails {
+public class EfdUserDetails implements UserDetails {
 
 
     Collection<Role> roles;
@@ -36,10 +36,10 @@ public class MyUserDetails implements UserDetails {
     private boolean active;
     private List<GrantedAuthority> authorities;
     String sroles=""; // String of roles
-    public MyUserDetails() {
+    public EfdUserDetails() {
     }
 
-    public MyUserDetails(EfdUser efduser) {
+    public EfdUserDetails(EfdUser efduser) {
 
 
 

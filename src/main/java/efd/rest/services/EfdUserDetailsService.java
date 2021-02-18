@@ -8,7 +8,7 @@ package efd.rest.services;
 */
 
 import efd.model.EfdUser;
-import efd.rest.domain.MyUserDetails;
+import efd.rest.domain.EfdUserDetails;
 import efd.rest.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,16 +16,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class EfdUserDetailsService implements UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
 
 
-
+    @Transactional
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
 
@@ -34,12 +35,11 @@ public class MyUserDetailsService implements UserDetailsService {
 
         Optional<EfdUser> efdUser = userRepository.findByName((name));
         efdUser.orElseThrow(() -> new UsernameNotFoundException("Username " + name + "not found "));
-        MyUserDetails myUserDetails = efdUser.map(MyUserDetails::new).get();
+        EfdUserDetails myUserDetails = efdUser.map(EfdUserDetails::new).get();
 
         System.out.println("myuserdetail user = " + myUserDetails.getUsername());
         System.out.println("myuserdetail password = " + myUserDetails.getPassword());
-        System.out.println("myuserdetail role = " + myUserDetails.getAuthorities());
-
+        System.out.println("myuserdetail role = " + myUserDetails.getAuthorities().toString());
 
         return myUserDetails;
 

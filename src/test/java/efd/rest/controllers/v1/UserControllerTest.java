@@ -31,7 +31,7 @@ public class UserControllerTest {
 
     @Test
     public void testAll() throws Exception {
-        List<EfdRole> result = userController.all();
+        List<EfdRole> result = userController.roleAll();
         Assert.assertEquals(Arrays.<EfdRole>asList(new EfdRole()), result);
     }
 }

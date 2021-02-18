@@ -1,13 +1,11 @@
 package efd.rest.config;
 
-import efd.rest.domain.MyUserDetails;
-import org.springframework.beans.factory.annotation.Autowired;
+import efd.rest.domain.EfdUserDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
@@ -15,26 +13,30 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
     @Author david
     @Create 10/02/2021 12:05
 */
-
-@EnableWebSecurity
+@Slf4j
+@EnableWebSecurity(debug = false)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    @Autowired
-    UserDetailsService userEFDDetailsService;
+   // @Qualifier("efdUserDetailsService")
+   // @Autowired
+   // UserDetailsService userEFDDetailsService;
+
+
     private Object pw;
 
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userEFDDetailsService);
-    }
+  //  @Override
+  //  protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+  //      log.debug("In AuthManagerBuilder  ");
+  //      auth.userDetailsService(userEFDDetailsService);
+  //  }
 
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/api/v1/**").hasRole("XX")
-                .antMatchers("/api/v1/**").authenticated()
-                //.antMatchers("/**").authenticated()
+               // TODO Get Authority/Role restriction working
+                // .antMatchers("/api/v1/**").hasAnyAuthority("API","ROLE_API")
+                .antMatchers("/**").authenticated()
                 .and().formLogin()
                 .failureHandler(authenticationFailureHandler());
     }
@@ -48,6 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder getPasswordEncoder() {
 
-        return new MyUserDetails.PasswordEnconderEFD();
+        return new EfdUserDetails.PasswordEnconderEFD();
     }
 }

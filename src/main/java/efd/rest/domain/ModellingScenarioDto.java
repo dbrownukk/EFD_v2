@@ -1,12 +1,12 @@
 package efd.rest.domain;
 
-import efd.model.*;
+import efd.model.Project;
+import efd.model.Study;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
 import java.util.Date;
 
 /*
@@ -38,14 +38,14 @@ public class ModellingScenarioDto {
     private Project project;
 
 
-    private LivelihoodZone livelihoodZone;
+    //private LivelihoodZone livelihoodZone;
 
 
-    private Collection<PriceYieldVariation> priceYieldVariations;
+    //private Collection<PriceYieldVariation> priceYieldVariations;
 
 
-    private Collection<FoodSubstitution> foodSubstitution;
+    //private Collection<FoodSubstitution> foodSubstitution;
 
-    private String modelType;
+    //private String modelType;
 
 }
