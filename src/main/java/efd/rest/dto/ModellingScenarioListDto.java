@@ -1,4 +1,4 @@
-package efd.rest.domain;
+package efd.rest.dto;
 /*
     @Author david
     @Create 17/02/2021 16:38

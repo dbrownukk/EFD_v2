@@ -4,7 +4,7 @@ package efd.rest.services;
     @Create 17/02/2021 13:40
 */
 
-import efd.rest.domain.ModellingScenarioDto;
+import efd.rest.dto.ModellingScenarioDto;
 import efd.rest.mapper.ModellingScenarioMapper;
 import efd.rest.repositories.ModellingScenarioRepository;
 import lombok.extern.slf4j.Slf4j;

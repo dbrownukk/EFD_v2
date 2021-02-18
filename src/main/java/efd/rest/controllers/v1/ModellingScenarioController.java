@@ -1,7 +1,7 @@
 package efd.rest.controllers.v1;
 
-import efd.rest.domain.ModellingScenarioDto;
-import efd.rest.domain.ModellingScenarioListDto;
+import efd.rest.dto.ModellingScenarioDto;
+import efd.rest.dto.ModellingScenarioListDto;
 import efd.rest.services.ModellingScenarioService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
     @Author david
     @Create 16/02/2021 16:18
 */
+@SuppressWarnings("rawtypes")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/modellingscenario")

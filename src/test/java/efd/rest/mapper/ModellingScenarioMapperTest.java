@@ -1,7 +1,7 @@
 package efd.rest.mapper;
 
 import efd.model.ModellingScenario;
-import efd.rest.domain.ModellingScenarioDto;
+import efd.rest.dto.ModellingScenarioDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;

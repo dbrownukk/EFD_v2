@@ -1,7 +1,7 @@
 package efd.rest.controllers.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import efd.rest.domain.ModellingScenarioDto;
+import efd.rest.dto.ModellingScenarioDto;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

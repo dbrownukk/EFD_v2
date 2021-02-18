@@ -1,7 +1,7 @@
 package efd.rest.mapper;
 
 import efd.model.ModellingScenario;
-import efd.rest.domain.ModellingScenarioDto;
+import efd.rest.dto.ModellingScenarioDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

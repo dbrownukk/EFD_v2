@@ -1,4 +1,4 @@
-package efd.rest.domain;
+package efd.rest.dto;
 
 import efd.model.Project;
 import efd.model.Study;

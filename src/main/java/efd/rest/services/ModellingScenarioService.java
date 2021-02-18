@@ -4,7 +4,7 @@ package efd.rest.services;
     @Create 17/02/2021 13:38
 */
 
-import efd.rest.domain.ModellingScenarioDto;
+import efd.rest.dto.ModellingScenarioDto;
 
 import java.util.List;
 
