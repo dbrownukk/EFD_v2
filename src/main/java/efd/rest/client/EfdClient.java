@@ -1,6 +1,6 @@
 package efd.rest.client;
 
-import efd.rest.dto.ModellingScenarioDto;
+import efd.rest.dto.ModellingscenarioDTO;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
@@ -20,9 +20,9 @@ public class EfdClient {
     public EfdClient(RestTemplateBuilder restTemplateBuilder){
         this.restTemplate=restTemplateBuilder.build();
     }
-    public ModellingScenarioDto  getMSByTitle(String title){
+    public ModellingscenarioDTO getMSByTitle(String title){
         return restTemplate.getForObject(apihost+EFD_PATH_V1+"/modellingscenario/"+title,
-                ModellingScenarioDto.class);
+                ModellingscenarioDTO.class);
     }
 
 

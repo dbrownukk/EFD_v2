@@ -1,7 +1,7 @@
 package efd.rest.controllers.v1;
 
-import efd.rest.dto.ModellingScenarioDto;
 import efd.rest.dto.ModellingScenarioListDto;
+import efd.rest.dto.ModellingscenarioDTO;
 import efd.rest.services.ModellingScenarioService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
     @Author david
     @Create 16/02/2021 16:18
 */
-@SuppressWarnings("rawtypes")
+
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/modellingscenario")
@@ -27,12 +28,12 @@ public class ModellingScenarioController {
 
     @GetMapping({"/{title}"})
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ModellingScenarioDto>
+    public ResponseEntity<ModellingscenarioDTO>
         getModellingScenarioDtoByName(@PathVariable String title){
         this.title = title;
         log.debug("============ MS Title = "+title);
 
-        return new ResponseEntity<ModellingScenarioDto>
+        return new ResponseEntity<ModellingscenarioDTO>
                 (modellingScenarioService.getModellingScenarioByTitle(title), HttpStatus.OK);
     }
 
@@ -46,14 +47,14 @@ public class ModellingScenarioController {
 
     @PostMapping
     public ResponseEntity
-    saveNewModellingScenario(@RequestBody ModellingScenarioDto modellingScenarioDto){
+    saveNewModellingScenario(@RequestBody ModellingscenarioDTO modellingScenarioDto){
         // TODO Impl
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{name}")
     public ResponseEntity updateModellingScenario(@PathVariable("name") String name,
-                                                  @RequestBody ModellingScenarioDto modellingScenarioDto){
+                                                  @RequestBody ModellingscenarioDTO modellingScenarioDto){
         // TODO Impl
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

@@ -361,7 +361,19 @@ public class Study extends EFDIdentifiable  {
 	@SaveAction("ConfigAnswer.save")
 	@EditOnly
 	private Collection<ConfigAnswer> configAnswer;
-	/*************************************************************************************************/
+
+	@OneToMany(mappedBy = "study")
+	private Collection<ModellingScenario> modellingScenario;
+
+	public Collection<ModellingScenario> getModellingScenario() {
+		return modellingScenario;
+	}
+
+	public void setModellingScenario(Collection<ModellingScenario> modellingScenario) {
+		this.modellingScenario = modellingScenario;
+	}
+
+/*************************************************************************************************/
 
 	// @OneToMany(mappedBy="study")
 	// private Collection <ReportSpecUse> reportSpecUse;

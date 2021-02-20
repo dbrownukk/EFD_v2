@@ -1,6 +1,6 @@
 package efd.rest.client;
 
-import efd.rest.dto.ModellingScenarioDto;
+import efd.rest.dto.ModellingscenarioDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +19,7 @@ class EfdClientTest {
 
     @Test
     void getMSByTitle() {
-        ModellingScenarioDto dto = client.getMSByTitle("Malawi north");
+        ModellingscenarioDTO dto = client.getMSByTitle("Malawi north");
         assertNotNull(dto);
     }
 }

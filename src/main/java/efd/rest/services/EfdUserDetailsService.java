@@ -37,9 +37,9 @@ public class EfdUserDetailsService implements UserDetailsService {
         efdUser.orElseThrow(() -> new UsernameNotFoundException("Username " + name + "not found "));
         EfdUserDetails myUserDetails = efdUser.map(EfdUserDetails::new).get();
 
-        System.out.println("myuserdetail user = " + myUserDetails.getUsername());
-        System.out.println("myuserdetail password = " + myUserDetails.getPassword());
-        System.out.println("myuserdetail role = " + myUserDetails.getAuthorities().toString());
+       // System.out.println("myuserdetail user = " + myUserDetails.getUsername());
+       // System.out.println("myuserdetail password = " + myUserDetails.getPassword());
+       // System.out.println("myuserdetail role = " + myUserDetails.getAuthorities().toString());
 
         return myUserDetails;
 

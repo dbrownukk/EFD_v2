@@ -17,6 +17,6 @@ import java.util.List;
 @Builder
 public class ModellingScenarioListDto {
 
-    List<ModellingScenarioDto> modellingScenarioDtos;
+    List<ModellingscenarioDTO> modellingScenarioDtos;
 
 }

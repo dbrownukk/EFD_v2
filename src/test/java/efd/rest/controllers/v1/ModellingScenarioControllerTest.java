@@ -1,7 +1,7 @@
 package efd.rest.controllers.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import efd.rest.dto.ModellingScenarioDto;
+import efd.rest.dto.ModellingscenarioDTO;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ class ModellingScenarioControllerTest extends BaseIT{
     @SneakyThrows
     @Test
     void saveNewModellingScenario() {
-        ModellingScenarioDto modellingScenarioDto = ModellingScenarioDto.builder().build();
+        ModellingscenarioDTO modellingScenarioDto = ModellingscenarioDTO.builder().build();
         String modellingScenarioToJson = objectMapper.writeValueAsString(modellingScenarioDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/modellingscenario/")
@@ -51,7 +51,7 @@ class ModellingScenarioControllerTest extends BaseIT{
     @SneakyThrows
     @Test
     void updateModellingScenario() {
-        ModellingScenarioDto modellingScenarioDto = ModellingScenarioDto.builder().build();
+        ModellingscenarioDTO modellingScenarioDto = ModellingscenarioDTO.builder().build();
         String modellingScenarioToJson = objectMapper.writeValueAsString(modellingScenarioDto);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/modellingscenario/"+TITLE)

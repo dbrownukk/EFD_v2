@@ -4,15 +4,15 @@ package efd.rest.services;
     @Create 17/02/2021 13:38
 */
 
-import efd.rest.dto.ModellingScenarioDto;
+import efd.rest.dto.ModellingscenarioDTO;
 
 import java.util.List;
 
 
 public interface ModellingScenarioService {
-    List<ModellingScenarioDto> getAllModellingScenarios();
+    List<ModellingscenarioDTO> getAllModellingScenarios();
 
-    ModellingScenarioDto getModellingScenarioByTitle(String title);
+    ModellingscenarioDTO getModellingScenarioByTitle(String title);
 
 
 }

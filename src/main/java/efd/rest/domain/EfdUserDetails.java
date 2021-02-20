@@ -49,9 +49,7 @@ public class EfdUserDetails implements UserDetails {
         this.active = efduser.isActive();
         roles = efduser.getRoles();
 
-        for (Role role : roles) {
-            System.out.println("roles in myuserdetails = " + role.getName());
-        }
+
 
         Function<String,String> addQuotes = s -> "\"" + s + "\"";
 

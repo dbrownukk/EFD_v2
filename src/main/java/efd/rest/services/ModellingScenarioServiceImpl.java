@@ -4,7 +4,7 @@ package efd.rest.services;
     @Create 17/02/2021 13:40
 */
 
-import efd.rest.dto.ModellingScenarioDto;
+import efd.rest.dto.ModellingscenarioDTO;
 import efd.rest.mapper.ModellingScenarioMapper;
 import efd.rest.repositories.ModellingScenarioRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class ModellingScenarioServiceImpl implements ModellingScenarioService {
 
     @Override
     @Transactional
-    public List<ModellingScenarioDto> getAllModellingScenarios() {
+    public List<ModellingscenarioDTO> getAllModellingScenarios() {
         return modellingScenarioRepository.findAll()
                 .stream()
                 .map(modellingScenarioMapper::modellingScenarioToModellingScenarionDto)
@@ -38,7 +38,7 @@ public class ModellingScenarioServiceImpl implements ModellingScenarioService {
     }
 
     @Override
-    public ModellingScenarioDto getModellingScenarioByTitle(String title) {
+    public ModellingscenarioDTO getModellingScenarioByTitle(String title) {
         log.debug("============= In Service Implementation title = " + title);
 
         return modellingScenarioMapper.modellingScenarioToModellingScenarionDto(

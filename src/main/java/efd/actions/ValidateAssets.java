@@ -4,11 +4,8 @@ package efd.actions;
 
 
 import efd.model.*;
-import efd.model.Transfer.TransferType;
 import efd.model.Asset.Status;
-import org.openxava.actions.IForwardAction;
-import org.openxava.actions.ViewBaseAction;
-import org.openxava.jpa.XPersistence;
+import efd.model.Transfer.TransferType;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -18,7 +15,7 @@ import java.util.List;
 
 /*Validate loaded spreadsheet data for HH and WGI */
 
-public class ValidateAssets extends ViewBaseAction implements IForwardAction {
+public class ValidateAssets extends org.openxava.actions.ViewBaseAction implements org.openxava.actions.IForwardAction {
 
 	public void execute() throws Exception {
 
@@ -91,7 +88,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 			isWGI = true;
 
 			String wgiid = getView().getValueString("wgiid");
-			wgi = XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
+			wgi = org.openxava.jpa.XPersistence.getManager().find(WealthGroupInterview.class, wgiid);
 			if (wgi.getStatus().equals(WealthGroupInterview.Status.Validated)) {
 				addError("No Validation Required - Already Validated");
 				return;
@@ -123,7 +120,7 @@ public class ValidateAssets extends ViewBaseAction implements IForwardAction {
 			isHH = true;
 			String hhid = getView().getValueString("id");
 
-			hhi = XPersistence.getManager().find(Household.class, hhid);
+			hhi = org.openxava.jpa.XPersistence.getManager().find(Household.class, hhid);
 			// if (hhi.getSpreadsheet() == null) {
 			// addError("Upload completed Interview Spreadsheet before validating");
 			// return;
