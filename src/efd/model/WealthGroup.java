@@ -2,30 +2,27 @@ package efd.model;
 
 import java.math.*;
 import java.util.*;
+
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.*;
 
-import org.apache.commons.lang3.*;
-import org.hibernate.annotations.GenericGenerator;
-import org.hsqldb.persist.*;
+import org.hibernate.annotations.*;
+import org.hibernate.validator.constraints.Range;
 import org.openxava.annotations.*;
-import org.openxava.jpa.*;
-import org.openxava.util.*;
+import org.openxava.calculators.*;
 
-//import com.sun.corba.se.spi.orbutil.fsm.Guard.*;
+@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;this.community;wgorder;wgwives,wghhsize,wgpercent;wgpercenttotal];wgcharacteristicsresource"),
+		@View(name = "FromCommunity", members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder;wgwives,wghhsize,wgpercent];wgcharacteristicsresource"),
+		@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder;wgwives,wghhsize,wgpercent];wgcharacteristicsresource"),
+		@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
+		@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
+		@View(name = "SimpleWG", members = ";cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
+		@View(name = "ReportWG", members = "wealthGroupInterview") })
 
-import efd.validations.*;
-
-@Views({ @View(members = "Wealth_Group[# wgnameeng,wgnamelocal;this.community;wgorder,wgwives;wghhsize,wgpercent;wgpercenttotal];wgcharacteristicsresource"),
- 	@View(name = "FromCommunity",members = "Wealth_Group[# wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
-	@View(name = "SimpleWealthGroup", members = "Wealth_Group[# wgnamelocal,wgnameeng;wgorder,wgwives;wghhsize,wgpercent];wgcharacteristicsresource"),
-	@View(name = "SimpleCommunity", members = "cinterviewdate,cinterviewsequence,civf,civm,civparticpants"),
-	@View(name = "OriginalCommunity", members = "site;project;cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers"),
-	@View(name = "SimpleWG", members = ";cinterviewdate,cinterviewsequence,civf,civm,civparticipants,interviewers")
-	 })
-
-
-@Tab(editors = "List, Cards", properties = "community.site.subdistrict,wgnameeng,wgnamelocal;wgorder,wgwives;wghhsize,wgpercent+")
+@Tab(editors = "List, Cards", properties = "community.site.subdistrict,wgnameeng,wgnamelocal;wgorder;wghhsize,wgpercent+")
 
 @Entity
 
@@ -45,18 +42,16 @@ public class WealthGroup {
 			optional = false)
 	@NoFrame
 	@JoinColumn(name = "CommunityID")
-	@DescriptionsList(descriptionProperties = "site.locationdistrict", forViews="FromCommunity")
-	@ReferenceViews({
-	@ReferenceView(forViews="DEFAULT",value="FromWGCommunity")
-	})
+	@DescriptionsList(descriptionProperties = "site.locationdistrict", forViews = "FromCommunity")
+	@ReferenceViews({ @ReferenceView(forViews = "DEFAULT", value = "FromWGCommunity") })
 	private Community community;
 	// ----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy = "wealthgroup", cascade=CascadeType.REMOVE)
-	//@ElementCollection
-	//@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,resourcesubtype.resourcesubtypeunit")
+	@OneToMany(mappedBy = "wealthgroup", cascade = CascadeType.ALL)
+	@AddAction("")
+	// @ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,resourcesubtype.resourcesubtypeunit")
 	@ListProperties("resourcesubtype.resourcetype.resourcetypename,resourcesubtype.resourcetypename,wgresourceunit")
-	
+
 	private List<WGCharacteristicsResource> wgcharacteristicsresource;
 	// ----------------------------------------------------------------------------------------------//
 
@@ -69,6 +64,8 @@ public class WealthGroup {
 	private String wgnameeng;
 	// ----------------------------------------------------------------------------------------------//
 
+	@Required
+	@Range(min=1,max=3)
 	@Column(name = "WGOrder")
 	private int wgorder;
 	// ----------------------------------------------------------------------------------------------//
@@ -83,18 +80,26 @@ public class WealthGroup {
 	private BigDecimal wghhsize;
 	// ----------------------------------------------------------------------------------------------//
 
-
 	@Column(name = "WGPercent")
-	//@OnChange(OnChangeWgpercenttotal.class)
-	@Min(value = 1)
-	@Max(value = 100)
+	// @OnChange(OnChangeWgpercenttotal.class)
+	@Min(value = 1, message="Percent must be greater than 0")
+	@Max(value = 100,message="Percent maximum is 100")
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 
 	private int wgpercent;
 	// ----------------------------------------------------------------------------------------------//
+	@Transient
+	private double defaultDI;
+	@Transient
+	private double kcalReq;
+	@Transient
+	private double socialinclusionStol;
+	@Transient
+	private double survivalStol;
+	// ----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy = "wealthgroup", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy = "wealthgroup", cascade = CascadeType.ALL)
 	private List<WealthGroupInterview> wealthGroupInterview;
-	
 
 	public String getWgid() {
 		return wgid;
@@ -112,21 +117,13 @@ public class WealthGroup {
 		this.community = community;
 	}
 
-
-
-
-
-
-
 	public List<WGCharacteristicsResource> getWgcharacteristicsresource() {
 		return wgcharacteristicsresource;
 	}
 
-
 	public void setWgcharacteristicsresource(List<WGCharacteristicsResource> wgcharacteristicsresource) {
 		this.wgcharacteristicsresource = wgcharacteristicsresource;
 	}
-
 
 	public String getWgnamelocal() {
 		return wgnamelocal;
@@ -168,8 +165,6 @@ public class WealthGroup {
 		this.wghhsize = wghhsize;
 	}
 
-
-
 	public int getWgpercent() {
 		return wgpercent;
 	}
@@ -180,6 +175,50 @@ public class WealthGroup {
 
 
 
-	
+	public double getKcalReq() {
+		return kcalReq;
+	}
 
+	public void setKcalReq(double kcalReq) {
+		this.kcalReq = kcalReq;
+	}
+
+	public double getSocialinclusionStol() {
+		return socialinclusionStol;
+	}
+
+	public void setSocialinclusionStol(double socialinclusionStol) {
+		this.socialinclusionStol = socialinclusionStol;
+	}
+
+
+
+	public double getSurvivalStol() {
+		return survivalStol;
+	}
+
+	public void setSurvivalStol(double survivalStol) {
+		this.survivalStol = survivalStol;
+	}
+
+	public List<WealthGroupInterview> getWealthGroupInterview() {
+		return wealthGroupInterview;
+	}
+
+	public void setWealthGroupInterview(List<WealthGroupInterview> wealthGroupInterview) {
+		this.wealthGroupInterview = wealthGroupInterview;
+	}
+
+	public double getDefaultDI() {
+		return defaultDI;
+	}
+
+	public void setDefaultDI(double defaultDI) {
+		this.defaultDI = defaultDI;
+	}
+
+
+
+	
+	
 }

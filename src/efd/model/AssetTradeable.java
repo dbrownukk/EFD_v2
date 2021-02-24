@@ -9,6 +9,9 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+
+import efd.validations.*;
 
 
 
@@ -26,12 +29,15 @@ public class AssetTradeable extends Asset{
 
 	@Column(name = "NumberOwned", nullable=false )
 	@NotNull
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double numberOwned;
 
 	@Column(name = "PricePerUnit" )
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 	
 	@ManyToOne
+
 	@JoinColumn(name = "ResourceSubType")
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Tradeable%'")
 	private ResourceSubType resourceSubType;

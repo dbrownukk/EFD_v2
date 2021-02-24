@@ -1,29 +1,26 @@
 package efd.tests;
 
-import org.openxava.tests.*;
-import efd.model.*;
-
-import static org.openxava.jpa.XPersistence.*;
-
 import java.text.*;
 import java.util.*;
 
-import com.gargoylesoftware.htmlunit.*;
+import org.openxava.tests.ModuleTestBase;
+
 
 
 public class ProjectTest extends ModuleTestBase{
 
-	public ProjectTest(String nameTest) {
-		super(nameTest, "EFD_v2", "Project");
+	
+	public ProjectTest(String testName) {
+		super(testName, "IDAPS_Livelihoods_TESTING", "Project");
 		
 	}
 	
 	public void testCreateUpdateDeleteProject() throws Exception{
 		
-		Date date = new Date();
+	
 		
-		login("admin", "admin2018");
-		System.out.println("done login");
+		
+		
 		//Create
 		waitAJAX();
 		execute("CRUD.new");
@@ -33,19 +30,19 @@ public class ProjectTest extends ModuleTestBase{
 		setValue("pdate",getCurrentDate());
 		System.out.println("done Date");
 		waitAJAX();
-		setValue("altCurrency","GBP");
+		//setValue("altCurrency","GBP");
 		setValue("altExchangeRate","1.11");
 		setValue("notes","JUNIT Test Project Notes");
-		//waitAJAX();
+		waitAJAX();
 		execute("TypicalNotResetOnSave.save");
 
 		System.out.println("done save");
 		waitAJAX();
-		//assertMessage("Project created successfully");    // message on screen on success
+		assertMessage("Project created successfully");    // message on screen on success
 		assertNoErrors();
 		
 		//assertValue("projectitle","JUNIT Test Project");
-		
+		execute("CRUD.delete");
 		
 	}
 	

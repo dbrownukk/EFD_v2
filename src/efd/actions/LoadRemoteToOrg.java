@@ -16,7 +16,7 @@ import org.openxava.util.Files;
 
 import com.gargoylesoftware.htmlunit.*;
 import com.openxava.naviox.model.*;
-import com.openxava.naviox.util.*;
+
 
 import efd.model.*;
 import efd.utils.EfdPreferences;
@@ -60,9 +60,10 @@ public class LoadRemoteToOrg extends OnChangePropertyBaseAction implements IProc
 		//String exportFile = proj.getStageFile();
 		//System.out.println("project exp file   = " + exportFile);
 
-		String currentOrg = Organizations.getCurrent(getRequest());
+		
+	//	String currentOrg = Organizations.getCurrent(getRequest());
 		// url = url+"?org="+currentOrg;
-		System.out.println("Current org = " + currentOrg);
+		//System.out.println("Current org = " + currentOrg);
 		
 		try {
 			/****************************************************************************************/

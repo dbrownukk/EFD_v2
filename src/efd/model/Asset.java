@@ -1,20 +1,30 @@
 package efd.model;
 
+import javax.annotation.*;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 import efd.actions.*;
+import efd.validations.*;
 
-
+import efd.model.*;
 
 @MappedSuperclass
 
-// abstract public class Asset {
 public class Asset {
 
-
 	@Column(name = "Status", nullable = false)
+	@OnChange(OnChangeAssetStatus.class)
+	@DisplaySize(15)
+	@Required
+	@Editor(value = "ValidValuesCombo")//ValidValuesHorizontalRadioButton
+
+	@DefaultValueCalculator(value = EnumCalculator.class, properties = {
+			@PropertyValue(name = "enumType", value = "efd.model.Asset$Status"),
+			@PropertyValue(name = "value", value = "Invalid") })
 	private Status status;
 
 	public enum Status {
@@ -22,15 +32,47 @@ public class Asset {
 	}
 
 	/* Unit should be set to Nullable in Cash asset database table */
-	@DefaultValueCalculator(
-			value=org.openxava.calculators.StringCalculator.class,
-			properties={ @PropertyValue(name="string", value="?") }
-			)
+	@DefaultValueCalculator(value = efd.validations.UnitCalculator.class, properties = {
+			@PropertyValue(name = "string", value = "?") })
 	@Column(name = "Unit", length = 50, nullable = false)
-	@Required
+	// @Required
+	// @OnChange(OnChangeUnit.class)
+	@DisplaySize(10)
 	private String unit;
 
+	// Due to a Hibernate ddl generation bug am using localunit and localunit
+	// multiplier here instead of efd.model.LocalUnit
+
+	@Hidden
+	@Column(name = "LocalUnit", length = 32, nullable = true)
+	private String localUnit;
+
+	@Hidden
+	@Column(name = "LocalUnitMultiplier", nullable = true)
+	private Double localUnitMultiplier;
+
+	@Transient
 	
+	@DefaultValueCalculator(FalseCalculator.class)
+	private Boolean isFilteredOut;
+	
+	
+	
+	public String getLocalUnit() {
+		return localUnit;
+	}
+
+	public void setLocalUnit(String localUnit) {
+		this.localUnit = localUnit;
+	}
+
+	public Double getLocalUnitMultiplier() {
+		return localUnitMultiplier;
+	}
+
+	public void setLocalUnitMultiplier(Double localUnitMultiplier) {
+		this.localUnitMultiplier = localUnitMultiplier;
+	}
 
 	public Status getStatus() {
 		return status;
@@ -39,7 +81,6 @@ public class Asset {
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-
 
 	public String getUnit() {
 		return unit;
@@ -51,4 +92,25 @@ public class Asset {
 
 
 
+	/**
+	 * @return the isFilteredOut
+	 */
+	public Boolean getIsFilteredOut() {
+		//return isFilteredOut==null?false:isFilteredOut;
+		return isFilteredOut;
+	}
+
+	/**
+	 * @param isFilteredOut the isFilteredOut to set
+	 */
+	public void setIsFilteredOut(Boolean isFilteredOut) {
+		this.isFilteredOut = isFilteredOut;
+	}
+
+
+	
+	
+
+	
+	
 }

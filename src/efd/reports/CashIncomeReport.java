@@ -20,7 +20,7 @@ import efd.model.*;
  *
  * Uses JasperReports. <br>
  *
- * @author David Brown from emple Javier Paniza
+ * @author David Brown from example Javier Paniza
  */
 public class CashIncomeReport extends JasperReportBaseAction {             
     

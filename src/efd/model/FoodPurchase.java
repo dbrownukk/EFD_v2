@@ -6,6 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 @Embeddable
 
@@ -15,21 +16,23 @@ import org.openxava.annotations.*;
 public class FoodPurchase extends Asset{
 
 
-	@Column(name = "FoodTypeEnteredName", length = 50, nullable=false)
-	@Required
+	@Column(name = "FoodTypeEnteredName", length = 50, nullable=true)
+	//@Required
 	private String foodTypeTypeEnteredName;
 	
 	@Column(name = "UnitsPurchased", nullable=false )
 	//@Required
-	@NotNull
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsPurchased;
 
 	@Column(name = "PricePerUnit" ,precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
+	
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} in ('Crops','Wild Foods','Livestock Products','Food Purchase','Food Stocks')")
 	private ResourceSubType resourceSubType;
 	

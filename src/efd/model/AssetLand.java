@@ -4,34 +4,38 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
-
+import org.openxava.calculators.*;
 
 import efd.model.Asset.*;
-
-
+import efd.model.Project.*;
 
 @Embeddable
 
-
 @Table(name = "assetland")
 
-public class AssetLand extends Asset{
-	
-	
-	
-	
-	
+public class AssetLand extends Asset {
+
+	@PrePersist
+
+	private void preSetUnit() { // set as default Acre 
+
+		System.out.println("in prepersist assetland ");
+		this.setUnit("Acre");
+		System.out.println("done prepersist assetland ");
+	}
+
 	@Column(name = "LandTypeEnteredName", length = 50)
 	private String landTypeEnteredName;
 
-	@Column(name = "NumberofUnits", nullable=false )
+	@Column(name = "NumberofUnits", nullable = false)
 	@NotNull
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double numberOfUnits;
-	
-	
-	@ManyToOne(fetch=FetchType.LAZY)
+
+	@ManyToOne(fetch = FetchType.LAZY)
+
 	@JoinColumn(name = "ResourceSubType")
-	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename}='Land'")
+	@DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename}='Land'")
 
 	private ResourceSubType resourceSubType;
 
@@ -57,15 +61,6 @@ public class AssetLand extends Asset{
 
 	public void setResourceSubType(ResourceSubType resourceSubType) {
 		this.resourceSubType = resourceSubType;
-	}	
-
-
-
-
-
-
-
-
-
+	}
 
 }

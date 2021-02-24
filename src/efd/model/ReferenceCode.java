@@ -10,7 +10,7 @@ import org.openxava.model.*;
 
 @Entity
 
-public class ReferenceCode extends Identifiable {
+public class ReferenceCode extends EFDIdentifiable {
 
 	@Column(name = "referenceType", nullable = false)
 	@Required

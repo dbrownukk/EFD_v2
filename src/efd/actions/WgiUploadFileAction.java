@@ -13,24 +13,15 @@ import org.openxava.web.editors.*;
 import efd.model.WealthGroupInterview.*;
 
 /*
- * Extending existing Uploadfile does not work - thus copying code...
+ * Extending existing Uploadfile 
  * 
-public class WgiUploadFileAction extends UploadFileAction {
-
-	
-	public void execute() throws Exception {
-		
-	System.out.println("in wgi uploadfile");	
-	execute();
-	}
-	}
+ * Extended so that WGI and Household use same upload code
+ * 
 */
 
-//public class WgiUploadFileAction extends ViewBaseAction implements INavigationAction, IProcessLoadedFileAction {
-public class WgiUploadFileAction extends UploadFileAction implements IChainAction {
+public class WgiUploadFileAction extends LoadAttachedFileAction implements IChainAction {
+//public class WgiUploadFileAction extends UploadFileAction { // implements IChainAction {
 
-
-	
 	@SuppressWarnings("rawtypes")
 	private List fileItems;
 
@@ -38,75 +29,36 @@ public class WgiUploadFileAction extends UploadFileAction implements IChainActio
 	private String newFileProperty;
 
 	public void execute() throws Exception {
-		
-		
-		/*
-		Iterator<?> it = getFileItems().iterator();
-		while (it.hasNext()) {
-			FileItem fi = (FileItem) it.next();
-			if (!Is.emptyString(fi.getName())) {
-				AttachedFile file = new AttachedFile();
-				file.setName(fi.getName());
-				file.setData(fi.get());
-				FilePersistorFactory.getInstance().save(file);
-				getPreviousView().setValue(getNewFileProperty(), file.getId());
-			
-				break;
-			}
-		}
-		closeDialog();
-		 */
+
+		System.out.println("in wgi upload");
+
 		super.execute();
-	
-		
-		
-		System.out.println("model = "+getView().getModelName());
-		if(getView().getModelName().equals("WealthGroupInterview"))
-			getView().setValue("status",efd.model.WealthGroupInterview.Status.Uploaded);
-		
-		
-		
-		
-		// Remove confusion of whether or not file upload is in database or not - no longer requires a Save
-		//XPersistence.commit();
-		
-	}
-/*
-	@SuppressWarnings("rawtypes")
-	public List getFileItems() {
-		return fileItems;
-	}
 
-	@SuppressWarnings("rawtypes")
-	public void setFileItems(List fileItems) {
-		this.fileItems = fileItems;
-	}
+		System.out.println("model = " + getView().getModelName());
+		if (getView().getModelName().equals("WealthGroupInterview")) {
+			getView().setValue("status", efd.model.WealthGroupInterview.Status.Uploaded);
+			System.out.println("in wgi upload 11");
+			
 
-	public String[] getNextControllers() throws Exception {
-		return PREVIOUS_CONTROLLERS;
+		} else if (getView().getModelName().equals("Household")) {
+			getView().setValue("status", efd.model.WealthGroupInterview.Status.Uploaded);
+			System.out.println("in wgi upload 22");
+			
+		}
 	}
-
-	public String getCustomView() throws Exception {
-		return PREVIOUS_VIEW;
-	}
-
-	public String getNewFileProperty() {
-		return newFileProperty;
-	}
-
-	public void setNewFileProperty(String newFileProperty) {
-		this.newFileProperty = newFileProperty;
-	}
-
-*/
 
 	@Override
 	public String getNextAction() throws Exception {
 		// TODO Auto-generated method stub
-		System.out.println("In Save of ichain for file upload" );
-		if(getView().getModelName().equals("WealthGroupInterview"))
-			return "TypicalNotResetOnSave.save";
-		return null;
-	}
+		return "TypicalNotResetOnSave.save";
+	} 
 
+	/*
+	 * @Override public String getNextAction() throws Exception {
+	 * 
+	 * System.out.println("In Save of ichain for file upload" );
+	 * if(getView().getModelName().equals("WealthGroupInterview") ||
+	 * getView().getModelName().equals("Household")) return
+	 * "TypicalNotResetOnSave.save"; return null; }
+	 */
 }

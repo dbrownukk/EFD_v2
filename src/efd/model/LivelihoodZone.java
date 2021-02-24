@@ -8,11 +8,13 @@ import org.openxava.annotations.*;
 
 
 
-@Views({ @View(members="Livelihood_Zone[lzname;country;lzzonemap]"),
-		@View(name = "UpdateLZ", members = "Livelihood Zone[lzname,country,project,site]"),
-		@View(name = "CreateLZ", members = "Livelihood Zone[lzname;country;lzzonemap]"),
+@Views({ @View(members="LivelihoodZone[lzname;country;lzzonemap]"),
+		@View(name = "UpdateLZ", members = "LivelihoodZone[lzname,country,project,site]"),
+		@View(name = "CreateLZ", members = "LivelihoodZone[lzname;country;lzzonemap]"),
 		@View(name = "SimpleLZ", members = "lzname,country;lzzonemap"),
-		@View(name = "SimpleLZnomap", members = "lzname,country") 
+		@View(name = "SimpleLZnomap", members = "lzname,country") ,
+		@View(name = "FromReport", members = "site") ,
+		@View(name = "FromLocalUnit", members = "LivelihoodZone[lzname,project]")
 })
 
 @Tab(properties = "lzname,country.description,country.isocountrycode,country.currency,lzzonemap")
@@ -56,7 +58,7 @@ public class LivelihoodZone  {
 	@ReferenceView(forViews="DEFAULT",value="FullCountry")
 	})
 	
-	@DescriptionsList
+	@DescriptionsList(descriptionProperties="description,currency")
 	private Country country;
 	
 
@@ -67,16 +69,33 @@ public class LivelihoodZone  {
 	@Stereotype("IMAGE")
 	private byte[] lzzonemap;
 
-	@OneToMany(mappedBy = "livelihoodZone")
+	@OneToMany(mappedBy = "livelihoodZone",cascade = CascadeType.REMOVE)
 	@NewAction("")
 	@NoCreate
 	@ListProperties("locationdistrict,subdistrict,gpslocation")
+	@XOrderBy("livelihoodZone.lzname desc")
+	@ListProperties(forViews="FromReport",value= "livelihoodZone.lzname, locationdistrict,subdistrict")
 	@CollectionView("LZSite")
+	//@SearchListCondition(value="${project} = ${this.project}", forViews = "FromReport")
 	private Collection<Site> site;
-
+	
 	@ManyToMany(mappedBy = "livelihoodZone")
-	// @ListProperties("projecttitle,pdate")
+	//@ListProperties(forViews="FromLocalUnit",value="projecttitle,pdate")
 	private Collection<Project> project;
+	
+	
+	@Version
+	private Integer version;
+	
+	
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
 
 	public String getLzid() {
 		return lzid;
@@ -127,7 +146,5 @@ public class LivelihoodZone  {
 	}
 
 
-
-	/* Get / set */
 
 }

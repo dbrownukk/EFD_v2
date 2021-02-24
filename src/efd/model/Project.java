@@ -3,12 +3,15 @@ package efd.model;
 import java.math.*;
 import java.text.*;
 import java.util.*;
+
+import javax.inject.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.apache.commons.lang.time.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.*;
+
 import org.openxava.annotations.*;
 import org.openxava.annotations.NewAction;
 import org.openxava.annotations.Tab;
@@ -26,39 +29,49 @@ import com.openxava.naviox.model.*;
 
 import efd.actions.*;
 import efd.model.Asset.*;
-
+import efd.validations.*;
 
 import org.openxava.tab.*;
 
 @Entity
 
 @Views({ @View(members = "Project[#projecttitle,pdate;"
-		+ "altCurrency,altExchangeRate;donor,funder,notes];livelihoodZone;"),
+		+ "altCurrency,altExchangeRate,areaMeasurement;donor,funder];Notes[notes];livelihoodZone;"),
 		@View(name = "Proj", members = "Project[projecttitle,pdate,altCurrency,altExchangeRate];livelihoodZone"),
+		@View(name = "ReportProj", members = "livelihoodZone"),
 		@View(name = "NewLZ", members = "Project[projecttitle,pdate];livelihoodZone;community"),
 		@View(name = "SimpleProject", members = "projecttitle,pdate"),
+		@View(name = "StudyProject", members = "Project[#projecttitle,pdate;altCurrency,altExchangeRate;donor,funder,notes]"),
 		@View(name = "NewlineProject", members = "projecttitle;pdate") })
 
 // model is OHEA or OIHM
-@Tab(filter = ProjectModelFilter.class, properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", baseCondition = "${model} = ?")
+// No longer required - Projects cross OHEA and OIHM 
+//@Tab(filter = ProjectModelFilter.class, properties = "projecttitle,pdate,altCurrency.description,altExchangeRate", baseCondition = "${model} = ?")
+@Tab(properties = "projecttitle,pdate,altCurrency.description,altExchangeRate")
+
 
 @Table(name = "Project")
+
+
 public class Project {
+
 
 	@PrePersist
 	@PreUpdate
-	private void modelset() {
+	private void checkExchangeRate() {
 
-		System.out.println("model in proj = " + getTheModel().toString());
+		/* in Project persist/update check if ALt currency used - needs an alt exc rate  */
+				
+				
+		if(this.getAltCurrency()!=null && this.getAltExchangeRate() == null)
+		{
+			System.out.println("Need to stop update");
+		throw new javax.validation.ValidationException(
+				XavaResources.getString("If Alternate Currency set, enter an Exchange rate to use"));
+		}
 
-		String userName = Users.getCurrent();
-		User user = User.find(userName);
-
-		if (user.hasRole("oihm_user"))
-			this.model = "OIHM";
-		else if (user.hasRole("ohea_user"))
-			this.model = "OHEA";
 	}
+	
 
 	@Id
 	@Hidden
@@ -72,6 +85,7 @@ public class Project {
 	@Column(name = "ProjectTitle", length = 255, unique = true)
 	// @OnChange(value = LoadRemoteToOrg.class)
 	@Required
+	@SearchKey
 	private String projecttitle;
 
 	/***********************************************************************************************/
@@ -83,6 +97,7 @@ public class Project {
 	/***********************************************************************************************/
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = true)
+	@JoinColumn(name = "alt_currency_idcountry" )
 	@NoModify
 	@NoCreate
 	@DescriptionsList(descriptionProperties = "currency")
@@ -100,23 +115,40 @@ public class Project {
 	// @NewAction(forViews="DEFAULT", value="LivelihoodZone.new LZ"), /* Check
 	// projectid is not empty */
 	// })
-	@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */
-	// @AddAction("LivelihoodZone.add")
+	
+	
+	//@AddAction("LivelihoodZone.add") /* Remember Bug for NewAction and ManyToMany */
+	
+	
 	@NewAction("ManyToMany.new")
 	@ManyToMany
 	@JoinTable(name = "projectlz", joinColumns = @JoinColumn(name = "Project", referencedColumnName = "ProjectID", nullable = false), inverseJoinColumns = @JoinColumn(name = "LZ", referencedColumnName = "LZID", nullable = false), uniqueConstraints = @UniqueConstraint(columnNames = {
 			"Project", "LZ" }))
 	@ListProperties("lzname,country.description,country.currency,lzzonemap")
 	@CollectionView("SimpleLZ")
+	@RowAction("LivelihoodZone.Report")
 	private Collection<LivelihoodZone> livelihoodZone;
+	/***********************************************************************************************/
 
+	
+	
 	/***********************************************************************************************/
 	@Stereotype("FILES")
 	@Column(length = 32, name = "Notes")
 	private String notes;
 
-	@Version
-	private Integer version;
+	
+	/*
+	 * 
+	 * Versioning fails with ManyToMany - raising bug 
+	 * 
+	 * Removed all custom actions and views and fails
+	 * 
+	 * Create proj, save, add LZ and get error - another user has updated this record
+	 * 
+	 */
+	//@Version
+	//private Integer version;
 
 	@DefaultValueCalculator(StringCalculator.class)
 	private String donor;
@@ -144,10 +176,34 @@ public class Project {
 	}
 
 	/***********************************************************************************************/
+	@Column(name = "Area", nullable = true)
+	@Required
+	private Area areaMeasurement;
 
+	public enum Area {
+		Acre, Hectare
+	}
+	/***********************************************************************************************/
+
+	
+	
 	public String getProjectid() {
 		return projectid;
 	}
+
+
+
+	public Area getAreaMeasurement() {
+		return areaMeasurement;
+	}
+
+
+
+	public void setAreaMeasurement(Area areaMeasurement) {
+		this.areaMeasurement = areaMeasurement;
+	}
+
+
 
 	public String getModel() {
 		return model;
@@ -157,13 +213,7 @@ public class Project {
 		this.model = model;
 	}
 
-	public Integer getVersion() {
-		return version;
-	}
 
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
 
 	public String getDonor() {
 		return donor;
@@ -218,7 +268,7 @@ public class Project {
 	}
 
 	public BigDecimal getAltExchangeRate() {
-		return altExchangeRate;
+		return altExchangeRate  == null?BigDecimal.ZERO:altExchangeRate;
 	}
 
 	public void setAltExchangeRate(BigDecimal altExchangeRate) {

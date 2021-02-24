@@ -1,32 +1,152 @@
 <?xml version = "1.0" encoding = "ISO-8859-1"?><!DOCTYPE application SYSTEM "dtds/application.dtd">
-<application name="EFD_HM">	<!-- A default module for each entity is assumed with the controllers on 
+
+
+
+
+<application name="IDAPS_Livelihoods_TESTING">	<!-- A default module for each entity is assumed with the controllers on 
 		<default-module/> -->
 	<default-module>
 		<controller name="EFD_HM" />
-	</default-module>	<!-- <module name="Reports"> </module> -->
-	<module name="WealthGroupInterview">
-		<env-var name="XAVA_SEARCH_ACTION" value="CRUD.searchExecutingOnChange"/>
-		<model name="WealthGroupInterview" />
-		<controller name="ParseSpreadsheet" />
-		<controller name="ChartList" />
-		<controller name="ReportList" />
-		<!-- 
-		<controller name="SetReadOnly"/>		
-		<controller name="SetEditable"/>	
-		-->
-	</module>	
-	
-		<module name="Project">
+	</default-module>
+
+
+
+	<module name="Project">
 		<model name="Project" />
+		<controller name="TypicalNotResetOnSave" />
 		<controller name="ProjectReports" />
 		<controller name="RemoteDatabaseDump" />
 		<controller name="LoadRemoteToStage" />
-		<controller name="MergeProject" /> 
-		</module>	
-		
+		<controller name="MergeProject" />
+	</module>
 
-		
-		
-		
-		
+	<!-- Duplicate modules for menu tree -->
+
+	<module name="OHEAReporting">
+		<model name="Reporting" />
+		<controller name="Reporting" />
+	</module>
+
+	<module name="OIHMReporting">
+		<model name="CustomReportSpecList" />
+		<controller name="OIHMReports" />
+	</module>
+
+	<module name="PriceYieldVariation">
+		<model name="PriceYieldVariation" />
+		<controller name="PriceYieldVariation" />
+	</module>
+
+	<module name="Study2">
+		<model name="Study" />
+		<controller name="EFD_HM" />
+		<controller name="Study" />
+		<controller name="GoOIHMReports" />
+	</module>
+
+	<module name="WealthgroupInterview2">
+		<model name="WealthGroupInterview" />
+		<controller name="WealthGroupInterview" />
+	</module>
+
+	<module name="Community2">
+		<model name="Community" />
+		<controller name="Community" />
+	</module>
+
+	<module name="ResourceSubType2">
+		<env-var name="NUTRITIONMENU" value="false" />
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchByViewKey" />
+		<model name="ResourceSubType" />
+		<controller name="ResourceSubType" />
+	</module>
+
+
+	<module name="ResourceSubType">
+		<env-var name="NUTRITIONMENU" value="true" />
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchByViewKey" />
+		<model name="ResourceSubType" />
+		<tab name="fromNutrientsMenu" />
+		<controller name="ResourceSubType" />
+	</module>
+
+	<!-- Duplicate modules for menu tree -->
+
+	<module name="OHEAReport" label="OHEAReport">
+		<model name="Reporting" />
+		<controller name="Reporting" />
+	</module>
+
+
+
+	<module name="Study">
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchByViewKey" />
+		<model name="Study" />
+		<controller name="TypicalNotResetOnSave" />
+		<controller name="Study" />
+		<controller name="GoCopyStudy" />
+		<controller name="GoCopyinTopicQuestions" />
+		<controller name="GoOIHMReports" />
+	</module>
+
+	<module name="Household">
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
+		<model name="Household" />
+		<controller name="Household" />
+	</module>
+
+	<module name="ConfigQuestion">
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
+		<model name="ConfigQuestion" />
+		<controller name="ConfigQuestion" />
+	</module>
+
+	<module name="MicroNutrientLevel">
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
+		<model name="MicroNutrientLevel" />
+		<controller name="EFD_HM" />
+	</module>
+
+
+
+
+
+
+
+	<module name="ModellingScenario">
+		<model name="ModellingScenario" />
+		<!-- <controller name="TypicalNotResetOnSave" /> -->
+		<controller name="ModellingScenario" />
+		<controller name="GoModellingReport" />
+	</module>
+
+
+
+
+	<module name="ResourceType">
+		<env-var name="XAVA_SEARCH_ACTION"
+			value="CRUD.searchExecutingOnChange" />
+		<model name="ResourceType" />
+		<controller name="TypicalNotResetOnSave" />
+	</module>
+
+	<module name="ShowFile">
+		<model name="ShowFile" />
+		<controller name="ShowFile" />
+	</module>
+
+
+
+
+
+	<!-- <module name="LivelihoodZone"> <model name="LivelihoodZone" /> <controller 
+		name="TypicalNotResetOnSave" /> <controller name="GoOHEAReports" /> </module> -->
+
+
 </application>

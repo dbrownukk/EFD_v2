@@ -14,7 +14,12 @@ public class ResourceSubTypeFilter extends  OnChangePropertyBaseAction   {
 
 	public void execute() throws Exception {
 		
-		  /* Note that these run the risk of being changed in ResourceType Table
+		  /* NOT USED
+		   * 
+		   * 
+		   * 
+		   * 
+		   * Note that these run the risk of being changed in ResourceType Table
 		   * Current WealtgGroupInterview Tabs
 		   *     
 		   * 0 Livestock

@@ -7,7 +7,7 @@ import org.openxava.actions.*;
 
 public class OnChangeRSTkcal extends OnChangePropertyBaseAction {
 	public void execute() throws Exception {
-
+		System.out.println("in OnChangeRSTKcal");
 		if (getView().getValueInt("resourcesubtypekcal") == 0)
 			return;
 

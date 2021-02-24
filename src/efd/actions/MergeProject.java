@@ -9,7 +9,7 @@ import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
 import com.openxava.naviox.model.*;
-import com.openxava.naviox.util.*;
+
 
 import efd.model.*;
 
@@ -32,7 +32,7 @@ public class MergeProject extends ViewBaseAction {
 			String defaultSchema = XPersistence.getDefaultSchema();
 			System.out.println("in merge ");
 
-			String currentOrg = Organizations.getCurrent(getRequest());
+			//String currentOrg = Organizations.getCurrent(getRequest());
 
 			System.out.println("Create new proj");
 

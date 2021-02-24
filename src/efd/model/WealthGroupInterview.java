@@ -1,13 +1,23 @@
 package efd.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.time.*;
 
+import org.apache.commons.fileupload.*;
+import org.openxava.actions.*;
+
+import javax.annotation.*;
 import javax.persistence.*;
+import javax.validation.constraints.*;
+
+import org.apache.commons.fileupload.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.*;
 
-
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 import org.openxava.filters.*;
 import org.openxava.util.*;
 
@@ -15,27 +25,29 @@ import com.openxava.naviox.model.*;
 
 import efd.validations.*;
 import efd.model.*;
+import efd.utils.*;
 
-@Views({ @View(members = "Wealth_Group_Interview[# wealthgroup" + ";wgInterviewNumber" + ",wgInterviewers"
+@Views({ @View(members = "Wealth_Group_Interview[#wealthgroup" + ";wgInterviewNumber" + ",wgInterviewers"
 		+ ",wgIntervieweesCount" + ";wgFemaleIVees" + ",wgMaleIVees" + ",wgAverageNumberInHH" + ";wgYearType"
-		+ ",wgInterviewDate," + "notes ;spreadsheet" + ",status]" + "Assets{" + ";Land{assetLand}"
-		+ ";LiveStock{assetLiveStock}" + ";Tradeable{assetTradeable}" + ";FoodStock{assetFoodStock}"
-		+ ";Trees{assetTree}" + ";Cash{assetCash}" + "}" + ";Crops{crop}" + ";LiveStockSales{livestockSales}"
-		+ ";LiveStockProducts{livestockProducts}" + ";Employment{employment}" + ";Transfer{transfer}"
-		+ ";WildFood{wildFood}" + ";FoodPurchase{foodPurchase}" + ";NonFoodPurchase{nonFoodPurchase}"),
-	@View(name="ReadOnly",members = "Wealth_Group_Interview[# wealthgroup" + ";wgInterviewNumber" + ",wgInterviewers"
-			+ ",wgIntervieweesCount" + ";wgFemaleIVees" + ",wgMaleIVees" + ",wgAverageNumberInHH" + ";wgYearType"
-			+ ",wgInterviewDate," + "notes ;spreadsheet" + ",status]" + "Assets{" + ";Land{assetLand}"
-			+ ";LiveStock{assetLiveStock}" + ";Tradeable{assetTradeable}" + ";FoodStock{assetFoodStock}"
-			+ ";Trees{assetTree}" + ";Cash{assetCash}" + "}" + ";Crops{crop}" + ";LiveStockSales{livestockSales}"
-			+ ";LiveStockProducts{livestockProducts}" + ";Employment{employment}" + ";Transfer{transfer}"
-			+ ";WildFood{wildFood}" + ";FoodPurchase{foodPurchase}" + ";NonFoodPurchase{nonFoodPurchase}"),
+		+ ",wgInterviewDate, status ;spreadsheet]" + "Assets{" + ";Land{assetLand}" + ";LiveStock{assetLiveStock}"
+		+ ";Tradeable{assetTradeable}" + ";FoodStock{assetFoodStock}" + ";Trees{assetTree}" + ";Cash{assetCash}" + "}"
+		+ ";Crops{crop}" + ";LiveStockSales{livestockSales}" + ";LiveStockProducts{livestockProducts}"
+		+ ";Employment{employment}" + ";Transfer{transfer}" + ";WildFood{wildFood}" + ";FoodPurchase{foodPurchase}"
+		+ ";NonFoodPurchase{nonFoodPurchase}"),
+		@View(name = "ReadOnly", members = "Wealth_Group_Interview[# wealthgroup" + ";wgInterviewNumber"
+				+ ",wgInterviewers" + ",wgIntervieweesCount" + ";wgFemaleIVees" + ",wgMaleIVees"
+				+ ",wgAverageNumberInHH" + ";wgYearType" + ",wgInterviewDate," + "notes ;spreadsheet" + ",status]"
+				+ "Assets{" + ";Land{assetLand}" + ";LiveStock{assetLiveStock}" + ";Tradeable{assetTradeable}"
+				+ ";FoodStock{assetFoodStock}" + ";Trees{assetTree}" + ";Cash{assetCash}" + "}" + ";Crops{crop}"
+				+ ";LiveStockSales{livestockSales}" + ";LiveStockProducts{livestockProducts}"
+				+ ";Employment{employment}" + ";Transfer{transfer}" + ";WildFood{wildFood}"
+				+ ";FoodPurchase{foodPurchase}" + ";NonFoodPurchase{nonFoodPurchase}"),
 		@View(name = "wg", members = "wealthgroup") })
 
 @Tabs({ @Tab(editors = "List, Detail", properties = "wealthgroup.community.projectlz.projecttitle,wealthgroup.community.site.livelihoodZone.lzname, "
 		+ "wealthgroup.community.site.locationdistrict, wealthgroup.community.site.subdistrict, wealthgroup.wgnameeng,status,wgInterviewNumber,"
 		+ "wgInterviewers,wgIntervieweesCount,wgFemaleIVees,"
-		+ "wgMaleIVees,wgAverageNumberInHH,wgYearType,wgInterviewDate", defaultOrder = "${wealthgroup.community.projectlz.projecttitle}"
+		+ "wgMaleIVees,wgAverageNumberInHH,wgYearType,wgInterviewDate,wealthGroup.wgorder", defaultOrder = "${wealthgroup.community.projectlz.projecttitle}"
 				+ ",${wealthgroup.community.site.livelihoodZone.lzname}"
 				+ ",${wealthgroup.community.site.locationdistrict}" + ",${wealthgroup.community.site.subdistrict}"
 				+ ",${wealthgroup.wgnameeng}"),
@@ -43,7 +55,7 @@ import efd.model.*;
 				+ "wealthgroup.community.site.locationdistrict, wealthgroup.community.site.subdistrict, wealthgroup.wgnameeng,status,wgInterviewNumber,"
 				+ "wgInterviewers,wgIntervieweesCount,wgFemaleIVees,"
 				+ "wgMaleIVees,wgAverageNumberInHH,wgYearType,wgInterviewDate")
-		//baseCondition="from Organization e, in (e.users) u where u.name = ?")
+		// baseCondition="from Organization e, in (e.users) u where u.name = ?")
 })
 
 @Entity
@@ -53,28 +65,20 @@ import efd.model.*;
 public class WealthGroupInterview {
 
 	/*
-	 * Do not allow updates when set to Validated - unless an Admin 
+	 * Do not allow updates when set to Validated - unless an Admin
 	 */
-	
-	/*
-	@PreUpdate
-	private  void verifyNotValidated() {
-		
-		User user = User.find(Users.getCurrent());
-		
-		if(user.hasRole("admin"))
-		{
-		System.out.println("User is an admin");
-		return;
-		}
 
-		if (status == WealthGroupInterview.Status.Validated) {
-			Messages errors = new Messages();
-			errors.add("Cannot update Validated Wealthgroup");
-			throw new org.openxava.validators.ValidationException(errors);
-		}
-	}
-	*/
+	/*
+	 * @PreUpdate private void verifyNotValidated() {
+	 * 
+	 * User user = User.find(Users.getCurrent());
+	 * 
+	 * if(user.hasRole("admin")) { System.out.println("User is an admin"); return; }
+	 * 
+	 * if (status == WealthGroupInterview.Status.Validated) { Messages errors = new
+	 * Messages(); errors.add("Cannot update Validated Wealthgroup"); throw new
+	 * org.openxava.validators.ValidationException(errors); } }
+	 */
 
 	// ----------------------------------------------------------------------------------------------//
 
@@ -88,23 +92,32 @@ public class WealthGroupInterview {
 
 	@Column(name = "WGInterviewNumber", nullable = false)
 	@Required
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgInterviewNumber;
 
 	@Column(name = "WGInterviewers", nullable = false)
 	@Required
 	private String wgInterviewers;
 
-	@Column(name = "WGIntervieweesCount", nullable = false)
-	@Required
-	private Integer wgIntervieweesCount;
+	@Depends("wgFemaleIVees, wgMaleIVees")
+	public Integer getWgIntervieweesCount() {
+		return (wgFemaleIVees + wgMaleIVees);
+	}
 
 	@Column(name = "WGFemaleIVees")
+	@PositiveOrZero
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgFemaleIVees;
 
 	@Column(name = "WGMaleIVees")
+	@PositiveOrZero
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgMaleIVees;
 
 	@Column(name = "WGAverageNumberInHH")
+	// @Positive temp change while fixing data
+	@Required
+	@DefaultValueCalculator(ZeroIntegerCalculator.class)
 	private Integer wgAverageNumberInHH;
 
 	@Column(name = "WGYearType")
@@ -115,8 +128,6 @@ public class WealthGroupInterview {
 	@Stereotype("DATE")
 	private Date wgInterviewDate;
 
-	// @Editor("ValidValuesRadioButton")
-	// @ReadOnly
 	@OnChange(value = OnChangeSetWGIStatus.class)
 	@Column(name = "WGIStatus")
 	@Required // removes the blank
@@ -134,34 +145,37 @@ public class WealthGroupInterview {
 	@ReadOnly
 	@NoCreate
 	@SearchKey
+
 	@DescriptionsList(descriptionProperties = "community.site.livelihoodZone.lzname,community.site.locationdistrict,community.site.subdistrict,wgnameeng")
 	private WealthGroup wealthgroup;
 
 	@Stereotype("FILE")
 	@Column(length = 32, name = "WGISpreadsheet")
+	// @OnChange(OnChangeFileUpload.class) // set status to uploaded after file
+	// upload and spreadsheet not null -- ONLY 1 OnChange per view..
 	private String spreadsheet;
-	
+
 	@Stereotype("FILES")
 	@Column(length = 32, name = "Notes")
 	private String notes;
-	
 
 	/* Collections of resource elements */
-	
+
 	@ElementCollection
-	// Workaround from Javier https://sourceforge.net/p/openxava/discussion/419690/thread/b6535530de/
+	// Workaround from Javier
+	// https://sourceforge.net/p/openxava/discussion/419690/thread/b6535530de/
 
 	@ListProperties("status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
-	
-	
-	//@ListsProperties({
-	//	@ListProperties(forViews="ReadOnly", value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit"),
-	//	@ListProperties(forViews="DEFAULT",value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
-	//})
-	private Collection<AssetLiveStock> assetLiveStock;	
-	
 
-	@ElementCollection 
+	// @ListsProperties({
+	// @ListProperties(forViews="ReadOnly",
+	// value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit"),
+	// @ListProperties(forViews="DEFAULT",value="status,resourceSubType.resourcetypename,liveStockTypeEnteredName,unit,numberOwnedAtStart,pricePerUnit")
+	// })
+	private Collection<AssetLiveStock> assetLiveStock;
+
+	@ElementCollection
+
 	@ListProperties("status,resourceSubType.resourcetypename, landTypeEnteredName,unit,numberOfUnits")
 	private Collection<AssetLand> assetLand;
 
@@ -178,11 +192,11 @@ public class WealthGroupInterview {
 	private Collection<AssetTree> assetTree;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType.resourcetypename,currencyEnteredName,amount")
+	@ListProperties("status, resourceSubType.resourcetypename,currencyEnteredName,currencyEnteredAmount,exchangeRate,amount")
 	private Collection<AssetCash> assetCash;
 
 	@ElementCollection
-	@ListProperties("status, resourceSubType.resourcetypename,cropType,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status, resourceSubType.resourcetypename,cropType,unit,unitsProduced, unitsSold,unitsOtherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Crop> crop;
 
@@ -192,23 +206,33 @@ public class WealthGroupInterview {
 	private Collection<LivestockSales> livestockSales;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType.resourcetypename, livestockType,livestockProduct,unit,unitsProduced, unitsSold,pricePerUnit,unitsConsumed,unitsOtherUse"
+	@ListProperties("status,resourceSubType.resourcetypename, livestockType,livestockProduct,unit,unitsProduced, unitsSold,unitsOtherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<LivestockProducts> livestockProducts;
 
 	@ElementCollection
+
+	// @CollectionTable(uniqueConstraints= {
+	// @UniqueConstraint(name = "unique_type", columnNames = {
+	// "WealthGroupInterview_WGIID", "ResourceSubType"}) })
+
 	@ListProperties("status, resourceSubType.resourcetypename,employmentName,peopleCount,unitsWorked,unit,cashPaymentAmount,foodResourceSubType.resourcetypename,foodPaymentFoodType,foodPaymentUnit,foodPaymentUnitsPaidWork"
 			+ ",workLocation1,percentWorkLocation1,workLocation2,percentWorkLocation2,workLocation3,percentWorkLocation3")
 	private Collection<Employment> employment;
 
 	@ElementCollection
+	// @ListProperties("status,resourceSubType.resourcetypename, isOfficial,
+	// source,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType.resourcetypename,transferFoodOtherType,"
+	// + " unit, unitsTransferred,unitsSold,otherUse,unitsConsumed,pricePerUnit"
+	// +
+	// ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	@ListProperties("status,resourceSubType.resourcetypename, isOfficial,source,transferType,peopleReceiving,timesReceived,cashTransferAmount,foodResourceSubType.resourcetypename,transferFoodOtherType,"
-			+ " unit, unitsTransferred,unitsSold,pricePerUnit,otherUse,unitsConsumed"
+			+ " unit, unitsTransferred,unitsSold,otherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<Transfer> transfer;
 
 	@ElementCollection
-	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,pricePerUnit,unitsConsumed,otherUse"
+	@ListProperties("status,resourceSubType.resourcetypename,wildFoodName,unit,unitsProduced,unitsSold,otherUse,unitsConsumed,pricePerUnit"
 			+ ",market1,percentTradeMarket1,market2,percentTradeMarket2,market3,percentTradeMarket3")
 	private Collection<WildFood> wildFood;
 
@@ -219,6 +243,108 @@ public class WealthGroupInterview {
 	@ElementCollection
 	@ListProperties("status,resourceSubType.resourcetypename,itemPurchased,unit,unitsPurchased,pricePerUnit")
 	private Collection<NonFoodPurchase> nonFoodPurchase;
+
+	@Transient
+	private Double ddiKCalValue;
+	@Transient
+	private Double ddiPriceValue;
+	@Transient
+	private Double totalIncome;
+	@Transient
+	private Double totalIncomeAfterChangeScenario;
+	@Transient
+	private Double totalOutput;
+	@Transient
+	private Double totalOutputAfterChangeScenario;
+	@Transient
+	private Double dIAfterChangeScenario;
+	@Transient
+	private Double dI;
+	@Transient
+	private Collection<ExpandabilityRule> expandabilityRule;
+
+	@Transient
+	private double wgiShortFall;
+
+	public double getWgiShortFall() {
+		return wgiShortFall;
+	}
+
+	public void setWgiShortFall(double wgiShortFall) {
+		this.wgiShortFall = wgiShortFall;
+	}
+
+	public Collection<ExpandabilityRule> getExpandabilityRule() {
+		return expandabilityRule;
+	}
+
+	public void setExpandabilityRule(Collection<ExpandabilityRule> expandabilityRule) {
+		this.expandabilityRule = expandabilityRule;
+	}
+
+	public Double getDdiKCalValue() {
+		return ddiKCalValue == null ? 0.0 : ddiKCalValue;
+	}
+
+	public void setDdiKCalValue(Double ddiKCalValue) {
+		this.ddiKCalValue = ddiKCalValue;
+	}
+
+	public Double getDdiPriceValue() {
+		return ddiPriceValue == null ? 0.0 : ddiPriceValue;
+	}
+
+	public void setDdiPriceValue(Double ddiPriceValue) {
+		this.ddiPriceValue = ddiPriceValue;
+	}
+
+	public Double getTotalIncome() {
+		return totalIncome == null ? 0.0 : totalIncome;
+	}
+
+	public void setTotalIncome(Double totalIncome) {
+		this.totalIncome = totalIncome;
+	}
+
+	public Double getTotalIncomeAfterChangeScenario() {
+		return totalIncomeAfterChangeScenario == null ? 0.0 : totalIncomeAfterChangeScenario;
+	}
+
+	public void setTotalIncomeAfterChangeScenario(Double totalIncomeAfterChangeScenario) {
+		this.totalIncomeAfterChangeScenario = totalIncomeAfterChangeScenario;
+	}
+
+	public Double getTotalOutput() {
+		return totalOutput == null ? 0.0 : totalOutput;
+	}
+
+	public void setTotalOutput(Double totalOutput) {
+		this.totalOutput = totalOutput;
+	}
+
+	public Double getTotalOutputAfterChangeScenario() {
+		return totalOutputAfterChangeScenario == null ? 0.0 : totalOutputAfterChangeScenario;
+	}
+
+	public void setTotalOutputAfterChangeScenario(Double totalOutputAfterChangeScenario) {
+		this.totalOutputAfterChangeScenario = totalOutputAfterChangeScenario;
+	}
+
+	public Double getdIAfterChangeScenario() {
+		return dIAfterChangeScenario == null ? 0.0 : dIAfterChangeScenario;
+	}
+
+	public void setdIAfterChangeScenario(Double dIAfterChangeScenario) {
+		this.dIAfterChangeScenario = dIAfterChangeScenario;
+	}
+
+	public Double getdI() {
+		return dI == null ? 0.0 : dI;
+	}
+
+	public void setdI(Double dI) {
+		this.dI = dI;
+	}
 
 	public String getWgiid() {
 		return wgiid;
@@ -244,14 +370,6 @@ public class WealthGroupInterview {
 		this.wgInterviewers = wgInterviewers;
 	}
 
-	public Integer getWgIntervieweesCount() {
-		return wgIntervieweesCount;
-	}
-
-	public void setWgIntervieweesCount(Integer wgIntervieweesCount) {
-		this.wgIntervieweesCount = wgIntervieweesCount;
-	}
-
 	public Integer getWgFemaleIVees() {
 		return wgFemaleIVees;
 	}
@@ -269,7 +387,7 @@ public class WealthGroupInterview {
 	}
 
 	public Integer getWgAverageNumberInHH() {
-		return wgAverageNumberInHH;
+		return wgAverageNumberInHH == null ? 0 : wgAverageNumberInHH;
 	}
 
 	public void setWgAverageNumberInHH(Integer wgAverageNumberInHH) {
@@ -309,7 +427,7 @@ public class WealthGroupInterview {
 	}
 
 	public String getSpreadsheet() {
-		return spreadsheet;
+		return spreadsheet == null ? "" : spreadsheet;
 	}
 
 	public void setSpreadsheet(String spreadsheet) {
@@ -435,5 +553,56 @@ public class WealthGroupInterview {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
+	
+	/*
+	 * 
+	 * List all ResourceSubTypes used in Modelling (crop,lsp,lss,transfers,emp,wildfood)
+	 * in this WealthgroupInterview 
+	 * 
+	 */
+	@Transient
+	public Collection<ResourceSubType> getRSTsForWGI() {
+		List<ResourceSubType> collect = getCrop().stream().map(p -> p.getResourceSubType())
+				.collect((Collectors.toList()));
+		
+		
+		collect.addAll(getEmployment().stream().map(p -> p.getFoodResourceSubType())
+		.collect((Collectors.toList())));
+		
+		collect.addAll(getEmployment().stream().map(p -> p.getResourceSubType())
+		.collect((Collectors.toList())));
+		
+		collect.addAll(getLivestockProducts().stream().map(p -> p.getResourceSubType())
+				.collect((Collectors.toList())));
+		
+		collect.addAll(getLivestockSales().stream().map(p -> p.getResourceSubType())
+				.collect((Collectors.toList())));		
+		
+		collect.addAll(getTransfer().stream().map(p -> p.getFoodResourceSubType())
+				.collect((Collectors.toList())));
+		
+		collect.addAll(getTransfer().stream().map(p -> p.getResourceSubType())
+				.collect((Collectors.toList())));
+		
+		collect.addAll(getWildFood().stream().map(p -> p.getResourceSubType())
+				.collect((Collectors.toList())));
+		
+		List<ResourceSubType> collect2 = collect.stream()
+		.distinct()
+		.filter(p -> p != null)
+		.collect(Collectors.toList());
+		
+		
+		//collect2.stream().forEach(p ->
+		//System.out.println("rst in wgi = "+p.getResourcetypename())
+		//);
+		
+		return(collect2);
+		
+		
+		
+	}	
+	
+	
 
 }

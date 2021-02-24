@@ -6,6 +6,9 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+
+import efd.utils.ZeroDoubleCalculator;
 
 /*
 @Views({
@@ -24,24 +27,31 @@ public class WildFood extends Asset{
 
 	@Column(name = "WildFoodName", length = 50)
 	private String wildFoodName;
+	
 
 	@Column(name = "UnitsProduced", length = 6)
 	@NotNull
-	@Min(value = 0)
+	//@Min(value = 0)
+	@Positive
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsProduced;
 
 	@Column(name = "UnitsSold", length = 6)
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double unitsSold;
 	
 	
 	@Column(name = "PricePerUnit",precision=10, scale=2)
 	@Digits(integer=10,fraction=2)
+	
+	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 
 	@Depends("unitsProduced,unitsSold,otherUse")
 	@Column(name = "UnitsConsumed")
 	public Double getUnitsConsumed(){
-		return(unitsProduced-unitsSold-otherUse);
+		//return(unitsProduced-unitsSold-otherUse);
+		return(getUnitsProduced()-getUnitsSold()-getOtherUse());
 	};
 	
 	
@@ -49,28 +59,33 @@ public class WildFood extends Asset{
 	//private Double unitsConsumed;
 	
 	@Column(name = "OtherUse", length = 255)
+	//@DefaultValueCalculator(value = ZeroDoubleCalculator.class)
 	private Double otherUse;
 
 	@Column(name = "Market1", length = 50)
 	private String market1;
 	@Column(name = "PercentTradeMarket1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentTradeMarket1;
 	
 	@Column(name = "Market2", length = 50)
 	private String market2;
 	@Column(name = "PercentTradeMarket2", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentTradeMarket2;
 	
 	@Column(name = "Market3", length = 50)
 	private String market3;
 	@Column(name = "PercentTradeMarket3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double percentTradeMarket3;
 	
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
+	
 	@DescriptionsList(descriptionProperties="resourcetypename,resourcesubtypeunit", condition="${resourcetype.resourcetypename} like '%Wild Food%'")
 	private ResourceSubType resourceSubType;
 	
@@ -81,26 +96,26 @@ public class WildFood extends Asset{
 		this.wildFoodName = wildFoodName;
 	}
 	public Double getUnitsProduced() {
-		return unitsProduced;
+		return unitsProduced == null ? 0.0 :unitsProduced;
 	}
 	public void setUnitsProduced(Double unitsProduced) {
 		this.unitsProduced = unitsProduced;
 	}
 	public Double getUnitsSold() {
-		return unitsSold;
+		return unitsSold == null ? 0.0 :unitsSold;
 	}
 	public void setUnitsSold(Double unitsSold) {
 		this.unitsSold = unitsSold;
 	}
 	public Double getPricePerUnit() {
-		return pricePerUnit;
+		return pricePerUnit == null ? 0.0 :pricePerUnit;
 	}
 	public void setPricePerUnit(Double pricePerUnit) {
 		this.pricePerUnit = pricePerUnit;
 	}
 
 	public Double getOtherUse() {
-		return otherUse;
+		return otherUse== null ? 0.0 :otherUse;
 	}
 	public void setOtherUse(Double otherUse) {
 		this.otherUse = otherUse;
@@ -147,6 +162,7 @@ public class WildFood extends Asset{
 	public void setResourceSubType(ResourceSubType resourceSubType) {
 		this.resourceSubType = resourceSubType;
 	}
+
 	
 	
 

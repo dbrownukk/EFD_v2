@@ -33,10 +33,28 @@ public class ResourceType {
 	private String resourcetypename;
 	//----------------------------------------------------------------------------------------------//
 
-	@OneToMany(mappedBy="resourcetype",cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="resourcetype") //,cascade=CascadeType.REMOVE)
 	@ListProperties("resourcetypename;resourcesubtypesynonym;resourcesubtypeunit;resourcesubtypekcal")
 	private Collection<ResourceSubType> resourcesubtype;
 	//----------------------------------------------------------------------------------------------//
+
+	@ManyToMany
+	@NewAction("")
+	private Collection<CustomReportSpec> customReportSpecs;
+	
+	@Hidden
+	private String availableInNutrientsMenu;
+	
+	
+	
+	
+	public String getAvailableInNutrientsMenu() {
+		return availableInNutrientsMenu;
+	}
+
+	public void setAvailableInNutrientsMenu(String availableInNutrientsMenu) {
+		this.availableInNutrientsMenu = availableInNutrientsMenu;
+	}
 
 	public String getIdresourcetype() {
 		return idresourcetype;
@@ -61,5 +79,15 @@ public class ResourceType {
 	public void setResourcesubtype(Collection<ResourceSubType> resourcesubtype) {
 		this.resourcesubtype = resourcesubtype;
 	}
+
+	public Collection<CustomReportSpec> getCustomReportSpecs() {
+		return customReportSpecs;
+	}
+
+	public void setCustomReportSpecs(Collection<CustomReportSpec> customReportSpecs) {
+		this.customReportSpecs = customReportSpecs;
+	}
+
+
 	
 }

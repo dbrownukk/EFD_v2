@@ -21,6 +21,12 @@ public class XMySQL5Dialect extends MySQL5Dialect {
                 return null;
             }
         }
+
+		@Override
+		protected String doExtractConstraintName(SQLException arg0) throws NumberFormatException {
+			// TODO Auto-generated method stub
+			return null;
+		}
     };
  
     @Override

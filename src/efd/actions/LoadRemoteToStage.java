@@ -9,7 +9,6 @@ import org.openxava.actions.*;
 import org.openxava.jpa.*;
 
 import com.openxava.naviox.model.*;
-import com.openxava.naviox.util.*;
 
 import efd.model.*;
 import efd.utils.EfdPreferences;
@@ -27,9 +26,9 @@ public class LoadRemoteToStage extends ViewBaseAction  {
 		System.out.printf("in execute url = " + url);
 		/* upload.php takes the exported data file and adds to efd_remote_stage */
 
-		String currentOrg = Organizations.getCurrent(getRequest());
-		url = url + "?org=" + currentOrg;
-		System.out.println("Current org = " + currentOrg);
+		//String currentOrg = Organizations.getCurrent(getRequest());
+		//url = url + "?org=" + currentOrg;
+		//System.out.println("Current org = " + currentOrg);
 		System.out.println("URL = "+url);
 		HttpURLConnection connection = null;
 		try {
