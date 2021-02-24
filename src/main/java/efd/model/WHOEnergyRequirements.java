@@ -1,9 +1,15 @@
 package efd.model;
 
+import java.util.*;
+
 import javax.persistence.*;
 
+import org.openxava.annotations.*;
 import org.openxava.jpa.*;
 import org.openxava.model.*;
+
+import efd.actions.*;
+import efd.validations.*;
 
 /*
  * 

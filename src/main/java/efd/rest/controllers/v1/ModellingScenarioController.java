@@ -6,6 +6,7 @@ import efd.rest.services.ModellingScenarioService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /*
@@ -47,14 +48,14 @@ public class ModellingScenarioController {
 
     @PostMapping
     public ResponseEntity
-    saveNewModellingScenario(@RequestBody ModellingscenarioDTO modellingScenarioDto){
+    saveNewModellingScenario(@RequestBody @Validated ModellingscenarioDTO modellingScenarioDto){
         // TODO Impl
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{name}")
     public ResponseEntity updateModellingScenario(@PathVariable("name") String name,
-                                                  @RequestBody ModellingscenarioDTO modellingScenarioDto){
+                                                  @RequestBody @Validated  ModellingscenarioDTO modellingScenarioDto){
         // TODO Impl
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

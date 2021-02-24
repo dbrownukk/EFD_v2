@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import org.openxava.annotations.AddAction;
 import org.openxava.annotations.ListProperties;
+import org.openxava.annotations.NoCreate;
+import org.openxava.annotations.NoModify;
 import org.openxava.annotations.Required;
 import org.openxava.annotations.Tab;
 import org.openxava.annotations.View;

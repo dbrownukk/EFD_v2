@@ -1,11 +1,15 @@
 package efd.model;
 
-import efd.model.ConfigQuestion.Level;
-import efd.validations.OnChangeQuestionUseLevel;
-import org.openxava.annotations.*;
+import java.util.*;
 
 import javax.persistence.*;
-import java.util.Collection;
+
+import org.openxava.annotations.*;
+import org.openxava.jpa.*;
+import org.openxava.util.*;
+
+import efd.model.ConfigQuestion.*;
+import efd.validations.*;
 
 @Views({ @View(members = "QuestionUse[study,configQuestion]"),
 		@View(name = "fromRSU", members = "configQuestion,configAnswer") })
@@ -14,8 +18,8 @@ import java.util.Collection;
 
 @Entity
 
-//@Table(name = "ConfigQuestionUse", uniqueConstraints = @UniqueConstraint(name = "configUseQuestion", columnNames = {
-//		"study_ID", "configQuestion_ID" }))
+@Table(name = "ConfigQuestionUse", uniqueConstraints = @UniqueConstraint(name = "configUseQuestion", columnNames = {
+		"study_ID", "configQuestion_ID" }))
 
 public class ConfigQuestionUse extends EFDIdentifiable {
 

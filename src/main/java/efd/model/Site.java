@@ -1,12 +1,20 @@
 package efd.model;
 
-import com.openxava.naviox.model.User;
-import org.hibernate.annotations.GenericGenerator;
-import org.openxava.annotations.*;
-import org.openxava.util.Users;
+import java.util.*;
 
 import javax.persistence.*;
-import java.util.Collection;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.*;
+import org.openxava.annotations.*;
+import org.openxava.util.*;
+
+import com.openxava.naviox.model.*;
+
+import efd.validations.*;
+import efd.actions.*;
 
 @Views({ @View(members = "Site[#livelihoodZone;locationdistrict;subdistrict;gpslocation]"),
 		@View(name = "SimpleSite", members = "locationdistrict;subdistrict;gpslocation;livelihoodZone"),

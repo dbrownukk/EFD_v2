@@ -1,17 +1,21 @@
 package efd.model;
 
-import efd.validations.OnChangeRSTExpandability;
-import org.openxava.annotations.*;
-import org.openxava.calculators.ZeroIntegerCalculator;
-import org.openxava.calculators.ZeroLongCalculator;
-import org.openxava.jpa.XPersistence;
-import org.openxava.util.XavaResources;
+import java.math.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import javax.persistence.*;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import javax.validation.constraints.*;
+
+import org.hibernate.validator.constraints.*;
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+import org.openxava.jpa.XPersistence;
+import org.openxava.util.*;
+
+import efd.validations.*;
 
 @View(members = "ExpandabilityRule[#ruleName];Ruleset[studyRuleSet;communityRuleSet];ResourceSubType[appliedResourceSubType;sequence;expandabilityIncreaseLimit;expandabilityLimit]")
 @View(name = "fromCommunity", members = "ExpandabilityRule[#ruleName];ResourceSubType[#appliedResourceSubType;sequence,averageUnitsProduced;expandabilityIncreaseLimit,averageUnitsSold;expandabilityLimit,averagePerCentConsumedRepresents],modelType")
@@ -21,12 +25,12 @@ import java.util.stream.Collectors;
 
 @Entity
 
-//@Table(name = "ExpandabilityRule", uniqueConstraints = {
-//		@UniqueConstraint(name = "expandabilityRuleStudy", columnNames = { "ruleName", "studyRuleSet_ID" }),
-//		@UniqueConstraint(name = "expandabilityRuleCommunity", columnNames = { "ruleName", "communityRuleSet_CID" }),
-//		@UniqueConstraint(name = "expandabilitySequenceStudy", columnNames = { "studyRuleSet_ID", "sequence" }),
-//		@UniqueConstraint(name = "expandabilitySequenceCommunity", columnNames = { "communityRuleSet_CID",
-//				"sequence" }) })
+@Table(name = "ExpandabilityRule", uniqueConstraints = {
+		@UniqueConstraint(name = "expandabilityRuleStudy", columnNames = { "ruleName", "studyRuleSet_ID" }),
+		@UniqueConstraint(name = "expandabilityRuleCommunity", columnNames = { "ruleName", "communityRuleSet_CID" }),
+		@UniqueConstraint(name = "expandabilitySequenceStudy", columnNames = { "studyRuleSet_ID", "sequence" }),
+		@UniqueConstraint(name = "expandabilitySequenceCommunity", columnNames = { "communityRuleSet_CID",
+				"sequence" }) })
 public class ExpandabilityRule extends EFDIdentifiable {
 
 	@PrePersist

@@ -4,14 +4,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.persistence.*;
-//import javax.validation.constraints.*;
+
 import javax.validation.constraints.*;
+
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.openxava.annotations.*;
 import org.openxava.jpa.XPersistence;
 import org.openxava.model.*;
+
+import static java.util.Collections.*;
 
 @Views({ @View(members = "specName,Report{report},Category{category},ResourceType{resourceType},ResourceSubType{resourceSubType}"),
 		@View(name = "rst", members = "specName,rType,report,resourceSubType"),

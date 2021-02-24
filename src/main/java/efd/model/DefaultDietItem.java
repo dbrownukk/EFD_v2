@@ -1,6 +1,7 @@
 package efd.model;
 
 import java.math.*;
+import java.util.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -9,6 +10,8 @@ import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.util.*;
+
+import efd.model.ConfigQuestion.*;
 
 @View(members = "DefaultDietItem[resourcesubtype;percentage,unitPrice]")
 

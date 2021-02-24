@@ -6,6 +6,9 @@ import javax.validation.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 
+import efd.model.Asset.*;
+import efd.model.Project.*;
+
 @Embeddable
 
 @Table(name = "assetland")

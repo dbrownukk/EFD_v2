@@ -1,20 +1,26 @@
 package efd.model;
 
+import java.util.*;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.openxava.actions.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.jpa.*;
 import org.openxava.model.*;
 
+import efd.actions.*;
+import efd.validations.*;
+
 @View(members = "Quantile[#name,percentage,sequence]")
 
-//@Table(name = "Quantile",
-//uniqueConstraints = {
-//		@UniqueConstraint(name = "unique_quantile", columnNames = { "customReportSpec_id","name" }),
-//		@UniqueConstraint(name ="unique_sequence",columnNames= {"customReportSpec_id","sequence"})
-//		})
+@Table(name = "Quantile",
+uniqueConstraints = {
+		@UniqueConstraint(name = "unique_quantile", columnNames = { "customReportSpec_id","name" }),
+		@UniqueConstraint(name ="unique_sequence",columnNames= {"customReportSpec_id","sequence"})
+		})
 
 
 @Tab(properties="name,sequence, percentage+")

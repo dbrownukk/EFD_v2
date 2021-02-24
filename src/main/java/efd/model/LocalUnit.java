@@ -1,11 +1,13 @@
 package efd.model;
 
-import efd.validations.ZeroDoubleCalculator;
-import org.openxava.annotations.*;
-import org.openxava.model.Identifiable;
-
 import javax.persistence.*;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
+
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+import org.openxava.model.*;
+
+import efd.validations.*;
 
 
 
@@ -16,10 +18,10 @@ import javax.validation.constraints.Positive;
 
 
 
-//@Table(
-//uniqueConstraints = {
-//		@UniqueConstraint(name = "unique_localunit", columnNames = { "name","resourceSubType_IDResourceSubType","livelihoodZone_LZID" })
-//		})
+@Table(
+uniqueConstraints = {
+		@UniqueConstraint(name = "unique_localunit", columnNames = { "name","resourceSubType_IDResourceSubType","livelihoodZone_LZID" })
+		})
 
 
 

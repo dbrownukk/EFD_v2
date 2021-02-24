@@ -1,16 +1,23 @@
 package efd.model;
 
+import java.math.*;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.*;
 
 import org.hibernate.annotations.*;
+import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 
+import efd.actions.*;
+import efd.model.Asset.Status;
 import efd.validations.*;
 
 @Entity
@@ -58,7 +65,7 @@ public class Community {
 	@Stereotype("DATE")
 	@Column(name = "CInterviewDate")
 
-	private Date cinterviewdate;
+	private java.util.Date cinterviewdate;
 	// ----------------------------------------------------------------------------------------------//
 
 	@OneToMany(mappedBy = "community", cascade = CascadeType.ALL)
@@ -234,7 +241,7 @@ public class Community {
 				for (WealthGroup wg : getWealthgroup()) {
 					if (wg.getWgorder() == i+1) {
 						for (WealthGroupInterview wgi : wg.getWealthGroupInterview()) {
-							if (wgi.getStatus() == WealthGroupInterview.Status.Validated) {
+							if (wgi.getStatus() == efd.model.WealthGroupInterview.Status.Validated) {
 								ret[i]++;
 							}
 						}
@@ -269,12 +276,12 @@ public class Community {
 	/* #598 */
 	@Stereotype("DATE")
 	@DefaultValueCalculator(value = CurrentDateCalculator.class)
-	private Date referenceYearStartDate;
+	private java.util.Date referenceYearStartDate;
 	
 	
 	@Stereotype("DATE")
 	@DefaultValueCalculator(value = CurrentDateCalculator.class)
-	private Date referenceYearEndDate;
+	private java.util.Date referenceYearEndDate;
 	
 
 	/* Dont autogen getters and setters as civparticipants is calculated */
@@ -289,28 +296,28 @@ public class Community {
 	/**
 	 * @return the referenceYearStartDate
 	 */
-	public Date getReferenceYearStartDate() {
+	public java.util.Date getReferenceYearStartDate() {
 		return referenceYearStartDate;
 	}
 
 	/**
 	 * @param referenceYearStartDate the referenceYearStartDate to set
 	 */
-	public void setReferenceYearStartDate(Date referenceYearStartDate) {
+	public void setReferenceYearStartDate(java.util.Date referenceYearStartDate) {
 		this.referenceYearStartDate = referenceYearStartDate;
 	}
 
 	/**
 	 * @return the referenceYearEndDate
 	 */
-	public Date getReferenceYearEndDate() {
+	public java.util.Date getReferenceYearEndDate() {
 		return referenceYearEndDate;
 	}
 
 	/**
 	 * @param referenceYearEndDate the referenceYearEndDate to set
 	 */
-	public void setReferenceYearEndDate(Date referenceYearEndDate) {
+	public void setReferenceYearEndDate(java.util.Date referenceYearEndDate) {
 		this.referenceYearEndDate = referenceYearEndDate;
 	}
 
@@ -366,11 +373,11 @@ public class Community {
 		this.cinterviewsequence = cinterviewsequence;
 	}
 
-	public Date getCinterviewdate() {
+	public java.util.Date getCinterviewdate() {
 		return cinterviewdate;
 	}
 
-	public void setCinterviewdate(Date cinterviewdate) {
+	public void setCinterviewdate(java.util.Date cinterviewdate) {
 		this.cinterviewdate = cinterviewdate;
 	}
 

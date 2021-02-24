@@ -1,13 +1,16 @@
 package efd.model;
 /* List of available reports runnable from OHEA or OIHM */
 
+import java.util.*;
+
+import javax.persistence.*;
+
+import org.hibernate.type.TrueFalseType;
+import org.hibernate.type.YesNoType;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.openxava.annotations.*;
 import org.openxava.jpa.XPersistence;
-import org.openxava.model.Identifiable;
-
-import javax.persistence.*;
-import java.util.Collection;
+import org.openxava.model.*;
 
 @View(members = "name, code, method,visualisationSpreadsheet")
 @View(name = "FromCRS",members = "DownloadVisualisationSpreadsheet[name;visualisationSpreadsheet]")

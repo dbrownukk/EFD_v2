@@ -1,11 +1,12 @@
 package efd.model;
 
-import efd.validations.OnChangeCRSList;
+import java.util.*;
+
+import javax.persistence.*;
+
 import org.openxava.annotations.*;
 
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.Collection;
+import efd.validations.*;
 
 @View(members = "customReportSpec;livelihoodZone;visreports")
 

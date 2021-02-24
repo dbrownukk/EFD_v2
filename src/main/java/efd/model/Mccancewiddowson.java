@@ -1,15 +1,21 @@
 package efd.model;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import org.openxava.annotations.DisplaySize;
+import org.openxava.annotations.NoFrame;
+import org.openxava.annotations.SearchKey;
 import org.openxava.annotations.View;
+import org.openxava.model.Identifiable;
 
 /**
  * The persistent class for the mccancewiddowsons database table.

@@ -1,9 +1,9 @@
 package efd.model;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.openxava.annotations.*;
-
 import javax.persistence.*;
+
+import org.hibernate.annotations.*;
+import org.openxava.annotations.*;
 
 /**
  * Base class for defining entities with a UUID id. <p>
@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class EFDIdentifiable {
 	
 	@Id
-	@org.openxava.annotations.Hidden
+	@Hidden
 	@GeneratedValue(generator = "system-uuid") 
 
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
@@ -26,7 +26,7 @@ public class EFDIdentifiable {
 	@Version
 	private Integer version;
 
-	@org.openxava.annotations.Stereotype("FILES")
+	@Stereotype("FILES")
 	@Column(length = 32, name = "Notes")
 	private String notes;
 	

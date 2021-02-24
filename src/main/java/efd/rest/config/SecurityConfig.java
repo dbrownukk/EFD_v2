@@ -14,22 +14,17 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
     @Create 10/02/2021 12:05
 */
 @Configuration
-@EnableWebSecurity(debug = false)
+@EnableWebSecurity(debug = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     protected void configure(HttpSecurity http) throws Exception {
        http.httpBasic().and().authorizeRequests()
-        // http.authorizeRequests()
-       // .antMatchers( "/v2/api-docs", "/swagger-resources/**", "/configuration/ui","/configuration/security", "/swagger-ui.html").permitAll()
-               // TODO Get Authority/Role restriction working
-              //  .antMatchers("/swagger-ui/")
-            //  .antMatchers("/api/v1/**").hasAnyRole("API","ROLE_API")
-                .antMatchers("/**").authenticated().and()
+               .antMatchers("/**").authenticated().and()
+       // TODO Get Authority/Role restriction working
                 .formLogin()
                 .failureHandler(authenticationFailureHandler());
     }
-
     @Bean
     public AuthenticationFailureHandler authenticationFailureHandler() {
         return new CustomAuthenticationFailureHandler();
@@ -38,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-
-        return new EfdUserDetails.PasswordEnconderEFD();
+        System.out.println("get encoded password in Security Config");
+        return new EfdUserDetails.PasswordEncoderEfd();
     }
 }

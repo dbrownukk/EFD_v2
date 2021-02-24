@@ -7,6 +7,8 @@ import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.openxava.annotations.*;
 
+import com.openxava.naviox.model.*;
+
 
 @Views({
 	 @View(members="resourcetypename;resourcesubtype"),

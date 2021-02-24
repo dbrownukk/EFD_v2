@@ -1,15 +1,35 @@
 package efd.model;
 
+import java.util.Collection;
+
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.UniqueConstraint;
 
+import org.openxava.annotations.CollectionView;
+import org.openxava.annotations.Condition;
+import org.openxava.annotations.Depends;
 import org.openxava.annotations.DescriptionsList;
+import org.openxava.annotations.ListProperties;
+import org.openxava.annotations.NewAction;
 import org.openxava.annotations.NoCreate;
+import org.openxava.annotations.NoFrame;
 import org.openxava.annotations.NoModify;
+import org.openxava.annotations.OnChange;
+import org.openxava.annotations.ReadOnly;
 import org.openxava.annotations.ReferenceView;
+import org.openxava.annotations.RemoveAction;
 import org.openxava.annotations.Required;
+import org.openxava.annotations.RowAction;
+import org.openxava.annotations.SearchAction;
+import org.openxava.annotations.SearchListCondition;
 import org.openxava.annotations.View;
+
+import efd.validations.OnChangeClearCommunity;
+import efd.validations.OnChangeRefreshReporting;
 
 @View(members = "project")
 

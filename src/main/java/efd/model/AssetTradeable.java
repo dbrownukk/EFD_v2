@@ -1,5 +1,7 @@
 package efd.model;
 
+import java.math.*;
+
 /* Asset Other Tradeable */
 
 
@@ -8,6 +10,9 @@ import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
+
+import efd.validations.*;
+
 
 
 @Embeddable

@@ -2,6 +2,7 @@ package efd.model;
 
 import java.math.*;
 
+import javax.inject.*;
 import javax.persistence.*;
 
 import org.hibernate.annotations.GenericGenerator;

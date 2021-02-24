@@ -1,14 +1,17 @@
 package efd.model;
 
-import efd.validations.OnChangeProjectinModellingScenario;
-import org.openxava.annotations.*;
-import org.openxava.calculators.CurrentDateCalculator;
-import org.openxava.util.Dates;
-import org.openxava.util.XavaResources;
+import java.math.*;
+import java.util.*;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
+import javax.validation.constraints.*;
+
+import org.hibernate.validator.constraints.*;
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+import org.openxava.util.*;
+
+import efd.validations.OnChangeProjectinModellingScenario;
 
 @View(members = "LivelihoodsModelling[#title;author;date;study;project,livelihoodZone];"
 		+ "PriceYieldVariations{priceYieldVariations},FoodSubstitution{foodSubstitution},Description{description}")
@@ -105,7 +108,7 @@ public class ModellingScenario extends EFDIdentifiable {
 	@Column(name = "Date")
 	@Required
 	@DefaultValueCalculator(CurrentDateCalculator.class)
-	private Date date;
+	private java.util.Date date;
 	/*************************************************************************************************/
 	@Column(name = "Description", length = 255)
 	@Stereotype("MEMO")
@@ -207,11 +210,11 @@ public class ModellingScenario extends EFDIdentifiable {
 		this.author = author;
 	}
 
-	public Date getDate() {
+	public java.util.Date getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(java.util.Date date) {
 		this.date = date;
 	}
 

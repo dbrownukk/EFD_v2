@@ -5,6 +5,7 @@
 package efd.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 import org.openxava.util.XavaResources;

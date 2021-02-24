@@ -6,6 +6,7 @@ package efd.model;
 import javax.persistence.*;
 
 import org.openxava.annotations.*;
+import org.openxava.model.*;
 
 @Entity
 

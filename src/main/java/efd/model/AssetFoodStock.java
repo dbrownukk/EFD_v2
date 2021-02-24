@@ -1,9 +1,16 @@
 package efd.model;
 
+import java.math.*;
+
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
+
+import efd.model.Asset.Status;
+import efd.model.WealthGroupInterview.*;
+
 
 
 @Embeddable

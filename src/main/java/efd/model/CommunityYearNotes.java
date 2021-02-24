@@ -1,12 +1,19 @@
 package efd.model;
 
+import java.time.*;
+
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.*;
 
 import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
+
+import efd.actions.*;
+import efd.validations.*;
 
 
 @View(members="year;yearMessage,notes")

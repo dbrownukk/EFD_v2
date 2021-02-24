@@ -4,6 +4,7 @@ package efd.rest.domain;
     @Create 11/02/2021 09:26
 
     Authority done in MyUserDetailsService
+    Calcs password for authentication
 
 */
 
@@ -42,12 +43,18 @@ public class EfdUserDetails implements UserDetails {
     public EfdUserDetails(EfdUser efduser) {
 
 
+        System.out.println("efduserdetails username = "+efduser.getName());
+        System.out.println("efduserdetails pw = "+efduser.getPassword());
+      //  System.out.println("efduserdetails isactive = "+efduser.isActive());
+        System.out.println("efduserdetails roles = "+efduser.getRoles());
 
 
         this.userName = efduser.getName();
         this.password = efduser.getPassword();
-        this.active = efduser.isActive();
+      //  this.active = efduser.isActive();   // problem with return 'Y' instead of boolean
         roles = efduser.getRoles();
+
+
 
 
 
@@ -60,7 +67,7 @@ public class EfdUserDetails implements UserDetails {
 
 
         // PasswordEncoder encoder = createDelegatingPasswordEncoder();
-        PasswordEncoder encoder = new PasswordEnconderEFD();
+        PasswordEncoder encoder = new PasswordEncoderEfd();
 
         this.password = efduser.getPassword();
 
@@ -86,7 +93,7 @@ public class EfdUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return active;
+        return true;
     }
 
     @Override
@@ -101,10 +108,10 @@ public class EfdUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return active;
+        return true;
     }
 
-    public static class PasswordEnconderEFD implements PasswordEncoder {
+    public static class PasswordEncoderEfd implements PasswordEncoder {
         @Override
         public String encode(CharSequence charSequence) {
             System.out.println("passwordencodeefd input = " + charSequence);
@@ -130,6 +137,7 @@ public class EfdUserDetails implements UserDetails {
         @Override
         public boolean matches(CharSequence charSequence, String source) {
 
+            System.out.println("doing match");
             String encoded = encode(charSequence);
 
 

@@ -1,5 +1,7 @@
 package efd.model;
 
+import java.math.*;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 

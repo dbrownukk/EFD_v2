@@ -1,10 +1,11 @@
 package efd.model;
 
-import org.openxava.annotations.*;
-import org.openxava.model.Identifiable;
+import java.util.*;
 
 import javax.persistence.*;
-import java.util.Collection;
+
+import org.openxava.annotations.*;
+import org.openxava.model.*;
 
 @View(members = "Category[#categoryName,study,resourceSubType]")
 @Tab(properties = "categoryName, study.studyName")

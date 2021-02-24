@@ -1,14 +1,16 @@
 package efd.model;
 
-import efd.validations.OnChangeAssetStatus;
-import efd.validations.UnitCalculator;
-import org.openxava.annotations.*;
-import org.openxava.calculators.EnumCalculator;
-import org.openxava.calculators.FalseCalculator;
+import javax.annotation.*;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+
+import efd.actions.*;
+import efd.validations.*;
+
+import efd.model.*;
 
 @MappedSuperclass
 
@@ -30,7 +32,7 @@ public class Asset {
 	}
 
 	/* Unit should be set to Nullable in Cash asset database table */
-	@DefaultValueCalculator(value = UnitCalculator.class, properties = {
+	@DefaultValueCalculator(value = efd.validations.UnitCalculator.class, properties = {
 			@PropertyValue(name = "string", value = "?") })
 	@Column(name = "Unit", length = 50, nullable = false)
 	// @Required

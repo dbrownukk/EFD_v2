@@ -1,5 +1,11 @@
 package efd.model;
 
+import java.util.*;
+
+import javax.persistence.*;
+
+import org.openxava.annotations.*;
+
 public class StudyList {
 
 	

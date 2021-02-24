@@ -1,6 +1,9 @@
 package efd.model;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

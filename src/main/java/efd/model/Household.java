@@ -6,10 +6,15 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.constraints.Positive;
 
+import org.apache.commons.collections4.Get;
+import org.apache.poi.util.*;
+import org.hibernate.engine.spi.ExecuteUpdateResultCheckStyle;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
 import org.openxava.jpa.*;
+import org.openxava.util.*;
 
+import efd.actions.*;
 import efd.model.ConfigQuestion.Level;
 import efd.model.WealthGroupInterview.*;
 import efd.validations.*;
@@ -170,7 +175,7 @@ public class Household extends EFDIdentifiable {
 	/*************************************************************************************************/
 	@Stereotype("DATE")
 	@Column(name = "InterviewDate")
-	private Date interviewDate;
+	private java.util.Date interviewDate;
 	/*************************************************************************************************/
 	@Column(name = "Interviewers", length = 45)
 	private String interviewers;
@@ -517,11 +522,11 @@ public class Household extends EFDIdentifiable {
 		this.inputs = inputs;
 	}
 
-	public Date getInterviewDate() {
+	public java.util.Date getInterviewDate() {
 		return interviewDate;
 	}
 
-	public void setInterviewDate(Date interviewDate) {
+	public void setInterviewDate(java.util.Date interviewDate) {
 		this.interviewDate = interviewDate;
 	}
 

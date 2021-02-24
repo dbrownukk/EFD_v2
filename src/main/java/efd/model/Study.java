@@ -1,12 +1,16 @@
 package efd.model;
 
-import org.hibernate.validator.constraints.Range;
-import org.openxava.annotations.*;
-import org.openxava.util.XavaResources;
+import java.math.*;
+import java.util.*;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
+import javax.validation.constraints.*;
+
+import org.hibernate.validator.constraints.*;
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
+import org.openxava.filters.*;
+import org.openxava.util.*;
 
 //@View(members = "Study[#studyName,referenceYear,startDate,endDate;description,altCurrency,altExchangeRate]")
 
@@ -40,7 +44,7 @@ import java.util.Date;
 		uniqueConstraints = {
 				@UniqueConstraint(name = "studyrefyear", columnNames = { "studyName", "referenceYear" }) })
 
-public class Study extends EFDIdentifiable  {
+public class Study extends EFDIdentifiable {
 
 	@PrePersist
 	@PreUpdate
@@ -69,11 +73,11 @@ public class Study extends EFDIdentifiable  {
 	/*************************************************************************************************/
 	@Stereotype("DATE")
 	@Column(name = "startDate")
-	private Date startDate;
+	private java.util.Date startDate;
 	/*************************************************************************************************/
 	@Stereotype("DATE")
 	@Column(name = "endDate")
-	private Date endDate;
+	private java.util.Date endDate;
 	/*************************************************************************************************/
 	@Required
 	@Range(min = 1960, max = 2050)
@@ -361,19 +365,7 @@ public class Study extends EFDIdentifiable  {
 	@SaveAction("ConfigAnswer.save")
 	@EditOnly
 	private Collection<ConfigAnswer> configAnswer;
-
-	@OneToMany(mappedBy = "study")
-	private Collection<ModellingScenario> modellingScenario;
-
-	public Collection<ModellingScenario> getModellingScenario() {
-		return modellingScenario;
-	}
-
-	public void setModellingScenario(Collection<ModellingScenario> modellingScenario) {
-		this.modellingScenario = modellingScenario;
-	}
-
-/*************************************************************************************************/
+	/*************************************************************************************************/
 
 	// @OneToMany(mappedBy="study")
 	// private Collection <ReportSpecUse> reportSpecUse;
@@ -404,19 +396,19 @@ public class Study extends EFDIdentifiable  {
 		this.studyName = studyName;
 	}
 
-	public Date getStartDate() {
+	public java.util.Date getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(java.util.Date startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public java.util.Date getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(java.util.Date endDate) {
 		this.endDate = endDate;
 	}
 
@@ -595,8 +587,6 @@ public class Study extends EFDIdentifiable  {
 	public void setCharacteristicsResourceInputs(Collection<WGCharacteristicsResource> characteristicsResourceInputs) {
 		this.characteristicsResourceInputs = characteristicsResourceInputs;
 	}
-
-
 
 	/*************************************************************************************************/
 

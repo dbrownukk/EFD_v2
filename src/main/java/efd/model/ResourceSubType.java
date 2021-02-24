@@ -23,6 +23,7 @@ import org.openxava.annotations.NewAction;
 import org.openxava.annotations.NoCreate;
 import org.openxava.annotations.NoModify;
 import org.openxava.annotations.OnChange;
+import org.openxava.annotations.ReadOnly;
 import org.openxava.annotations.ReferenceView;
 import org.openxava.annotations.Required;
 import org.openxava.annotations.Tab;

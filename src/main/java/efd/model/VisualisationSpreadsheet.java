@@ -10,8 +10,12 @@
 package efd.model;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 
+import org.hibernate.annotations.OnDelete;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.openxava.*;
+import org.openxava.annotations.NoModify;
 import org.openxava.annotations.Required;
 import org.openxava.annotations.Stereotype;
 import org.openxava.annotations.View;

@@ -1,15 +1,14 @@
 package com.openxava.naviox.model;
 
-import org.apache.commons.lang.StringUtils;
-import org.openxava.annotations.Stereotype;
-import org.openxava.annotations.Tab;
-import org.openxava.jpa.XPersistence;
-import org.openxava.model.Identifiable;
-import org.openxava.util.Users;
+import java.util.*;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.Map;
+
+import org.apache.commons.lang.*;
+import org.openxava.annotations.*;
+import org.openxava.jpa.*;
+import org.openxava.model.*;
+import org.openxava.util.*;
 
 /**
  * 

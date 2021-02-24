@@ -1,4 +1,5 @@
 package efd.model;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import javax.persistence.Column;
@@ -9,14 +10,20 @@ import javax.persistence.Column;
  */
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.hibernate.annotations.OnDelete;
 import org.openxava.annotations.DefaultValueCalculator;
 import org.openxava.annotations.ListProperties;
+import org.openxava.annotations.NoCreate;
+import org.openxava.annotations.NoModify;
+import org.openxava.annotations.ReadOnly;
 import org.openxava.annotations.Tab;
 import org.openxava.annotations.View;
 import org.openxava.calculators.ZeroBigDecimalCalculator;
+import org.openxava.model.Identifiable;
 
 @View(members="name;rda;microNutrientLevel;rdaUnit")
 @View(name="frommnl",members="name,rda;rdaUnit")

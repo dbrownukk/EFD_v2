@@ -1,7 +1,13 @@
 package efd.model;
 
+import javax.annotation.*;
 import javax.persistence.*;
-import javax.validation.constraints.Digits;
+import javax.persistence.Table;
+import javax.validation.constraints.*;
+
+import org.hibernate.annotations.*;
+import org.openxava.annotations.*;
+import org.openxava.calculators.*;
 
 @Embeddable
 
@@ -10,9 +16,9 @@ import javax.validation.constraints.Digits;
 public class Transfer extends Asset {
 
 	@Column(name = "Official", columnDefinition="boolean default false")
-	@org.openxava.annotations.DisplaySize(15)
+	@DisplaySize(15)
 	// @DefaultValueCalculator(value = FalseCalculator.class)
-	@org.openxava.annotations.Editor(value = "BooleanYesNoCombo")
+	@Editor(value = "BooleanYesNoCombo")  
 	private Boolean isOfficial;
 
 	@Column(name = "Source", length = 50)
@@ -20,10 +26,10 @@ public class Transfer extends Asset {
 
 	@Column(name = "TransferType", length = 50, nullable = false)
 	@OrderColumn
-	@org.openxava.annotations.Required
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.EnumCalculator.class, properties = {
-			@org.openxava.annotations.PropertyValue(name = "enumType", value = "efd.model.Transfer$TransferType"),
-			@org.openxava.annotations.PropertyValue(name = "value", value = "Food") })
+	@Required
+	@DefaultValueCalculator(value = EnumCalculator.class, properties = {
+			@PropertyValue(name = "enumType", value = "efd.model.Transfer$TransferType"),
+			@PropertyValue(name = "value", value = "Food") })
 	private TransferType transferType;
 
 	public enum TransferType {
@@ -31,21 +37,21 @@ public class Transfer extends Asset {
 	}
 
 	@Column(name = "PeopleReceiving")
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double peopleReceiving;
 
 	@Column(name = "TimesReceived")
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double timesReceived;
 
 	@Column(name = "CashTransferAmount", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double cashTransferAmount;
 
 	@ManyToOne
 	@JoinColumn(name = "FoodResourceSubType")
-	@org.openxava.annotations.DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops','Livestock','Livestock Products','Other Tradeable Goods')")
+	@DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename} in  ('Food Purchase','Wild Foods','Crops','Livestock','Livestock Products','Other Tradeable Goods')")
 	private ResourceSubType foodResourceSubType;
 
 	@Column(name = "TransferFoodOtherType", length = 50)
@@ -61,14 +67,14 @@ public class Transfer extends Asset {
 
 	@Column(name = "PricePerUnit", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double pricePerUnit;
 
 	@Column(name = "OtherUse", length = 255)
 	//@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	private Double otherUse;
 
-	@org.openxava.annotations.Depends("unitsTransferred,unitsSold,otherUse")
+	@Depends("unitsTransferred,unitsSold,otherUse")
 	@Column(name = "UnitsConsumed")
 	public Double getUnitsConsumed() {
 		return (getUnitsTransferred() - getUnitsSold() - getOtherUse());
@@ -79,7 +85,7 @@ public class Transfer extends Asset {
 	@Column(name = "Market1", length = 50)
 	private String market1;
 
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "PercentTradeMarket1", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private Double percentTradeMarket1;
@@ -87,7 +93,7 @@ public class Transfer extends Asset {
 	@Column(name = "Market2", length = 50)
 	private String market2;
 
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "PercentTradeMarket2", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private Double percentTradeMarket2;
@@ -95,14 +101,14 @@ public class Transfer extends Asset {
 	@Column(name = "Market3", length = 50)
 	private String market3;
 
-	@org.openxava.annotations.DefaultValueCalculator(value = org.openxava.calculators.ZeroLongCalculator.class)
+	@DefaultValueCalculator(value = ZeroLongCalculator.class)
 	@Column(name = "PercentTradeMarket3", precision = 10, scale = 2)
 	@Digits(integer = 10, fraction = 2)
 	private Double percentTradeMarket3;
 
 	@ManyToOne
 	@JoinColumn(name = "ResourceSubType")
-	@org.openxava.annotations.DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename} like '%Transfer%'")
+	@DescriptionsList(descriptionProperties = "resourcetypename,resourcesubtypeunit", condition = "${resourcetype.resourcetypename} like '%Transfer%'")
 	private ResourceSubType resourceSubType;
 
 	public Boolean getIsOfficial() {

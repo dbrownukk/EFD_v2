@@ -3,11 +3,15 @@ package efd.model;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 import org.hibernate.validator.constraints.*;
 import org.openxava.annotations.*;
 import org.openxava.calculators.*;
+import org.openxava.util.*;
 
+import efd.model.Asset.*;
+import efd.model.HouseholdMember.*;
 import efd.validations.*;
 
 @Views({ @View(members = "Question[#topic,prompt,hint;level,answerType,gender,notes;questionLOVType;Ranges[#ageRangeLower,ageRangeUpper;"

@@ -1,21 +1,37 @@
 package efd.model;
 
 import java.math.*;
+import java.text.*;
 import java.util.*;
 
+import javax.inject.*;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import org.apache.commons.lang.time.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.*;
 
 import org.openxava.annotations.*;
 import org.openxava.annotations.NewAction;
 import org.openxava.annotations.Tab;
 import org.openxava.calculators.*;
+import org.openxava.validators.*;
+import org.openxava.actions.*;
 
+import org.openxava.jpa.*;
+import org.openxava.model.*;
 import org.openxava.util.*;
+import org.openxava.util.jxls.*;
+import org.openxava.web.servlets.*;
 
 import com.openxava.naviox.model.*;
+
+import efd.actions.*;
+import efd.model.Asset.*;
+import efd.validations.*;
+
+import org.openxava.tab.*;
 
 @Entity
 
@@ -76,10 +92,9 @@ public class Project {
 	@Stereotype("DATE")
 	@Column(name = "PDate")
 	@Required
-	private Date pdate;
+	private java.util.Date pdate;
 
 	/***********************************************************************************************/
-
 	@ManyToOne(fetch = FetchType.LAZY, // The reference is loaded on demand
 			optional = true)
 	@JoinColumn(name = "alt_currency_idcountry" )
@@ -228,11 +243,11 @@ public class Project {
 		this.projecttitle = projecttitle;
 	}
 
-	public Date getPdate() {
+	public java.util.Date getPdate() {
 		return pdate;
 	}
 
-	public void setPdate(Date pdate) {
+	public void setPdate(java.util.Date pdate) {
 		this.pdate = pdate;
 	}
 
