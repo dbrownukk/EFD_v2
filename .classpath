@@ -8,13 +8,12 @@
 	<classpathentry kind="src" path="xava"/>
 	<classpathentry kind="src" path="/OpenXava"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Addons"/>
+	<classpathentry kind="lib" path="E:/Software/apache-tomcat-9.0.26-windows-x64/apache-tomcat-9.0.26/lib/mysql-connector-java-5.1.47.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
-			<attribute name="module" value="true"/>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="E:/Software/apache-tomcat-9.0.26-windows-x64/apache-tomcat-9.0.26/lib/mysql-connector-java-5.1.47.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>

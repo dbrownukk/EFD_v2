@@ -4,6 +4,8 @@
  */
 package efd.actions;
 
+import org.apache.poi.ss.usermodel.CellStyle;
+
 /* Common base routines for IDAPS Reporting */
 
 import org.openxava.actions.TabBaseAction;
@@ -20,6 +22,7 @@ abstract public class BaseReporting extends TabBaseAction implements JxlsConstan
 	JxlsStyle borderStyle = null;
 	JxlsStyle textStyle = null;
 	JxlsStyle textStyleLeft = null;
+	JxlsStyle textStyleRight = null;
 	JxlsStyle dateStyle = null;
 	JxlsStyle numberStyle = null;
 	JxlsStyle f1Style = null;
@@ -29,6 +32,13 @@ abstract public class BaseReporting extends TabBaseAction implements JxlsConstan
 	JxlsStyle numberYellowStyle = null;
 	JxlsStyle numberGreenStyle = null;
 	JxlsSheet[] sheet = new JxlsSheet[NUMBER_OF_REPORTS];
+	
+
+	CellStyle style = null;
+	CellStyle vstyle = null;
+	CellStyle datestyle = null;
+	CellStyle cnumberStyle = null;
+	
 	
 	private String floatFormat = "##########0.00";
 	
@@ -43,6 +53,7 @@ abstract public class BaseReporting extends TabBaseAction implements JxlsConstan
 				BORDER_THIN);
 		textStyle = reportWB.addStyle(TEXT).setAlign(RIGHT);
 		textStyleLeft = reportWB.addStyle(TEXT).setAlign(LEFT);
+		textStyleRight = reportWB.addStyle(TEXT).setAlign(RIGHT);
 		textStyleBlue = reportWB.addStyle(TEXT).setAlign(LEFT).setTextColor(BLUE);
 
 		reportWB.setDateFormat("dd/MM/yyyy");
@@ -57,6 +68,7 @@ abstract public class BaseReporting extends TabBaseAction implements JxlsConstan
 		numberYellowStyle = reportWB.addStyle(FLOAT).setAlign(RIGHT).setCellColor(LIGHT_YELLOW);
 
 		numberd2 = reportWB.addStyle(INTEGER);
+		
 		f1Style = reportWB.addStyle("0.0");
 
 	}

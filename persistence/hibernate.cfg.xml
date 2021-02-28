@@ -12,16 +12,11 @@ persistence.xml.
 <hibernate-configuration>
 	<session-factory>
 
-		<!-- Tomcat + Hypersonic -->		<property name="hibernate.connection.datasource">java://comp/env/jdbc/EFD_HMDS</property>		<property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
+		<!-- Tomcat + Mysql -->		<property name="hibernate.connection.datasource">java://comp/env/jdbc/IDAPS_Livelihoods_TESTINGDS</property>		<property name="hibernate.dialect">org.hibernate.dialect.XMySQL5Dialect</property>
 		<property name="hibernate.jdbc.use_get_generated_keys">false</property>		
 		<property name="hibernate.show_sql">false</property>		<property name="hibernate.connection.release_mode">after_transaction</property>
 				
-		<!-- WebSphere + AS/400 
-		<property name="hibernate.connection.datasource">jdbc/EFD_v2DS</property>
-		<property name="hibernate.dialect">org.hibernate.dialect.DB2400Dialect</property>
-		<property name="hibernate.jdbc.use_get_generated_keys">false</property>		
-		<property name="hibernate.show_sql">false</property>		<property name="hibernate.connection.release_mode">after_transaction</property>		
-		-->
+
 		
 		<!-- GalleryImage is needed only if you uses IMAGES_GALLERY/GALERIA_IMAGENES stereotype -->
 		<mapping resource="GalleryImage.hbm.xml"/>

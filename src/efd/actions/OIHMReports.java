@@ -40,7 +40,6 @@ import org.openxava.actions.IForwardAction;
 import org.openxava.actions.TabBaseAction;
 import org.openxava.jpa.XPersistence;
 import org.openxava.tab.Tab;
-import org.openxava.util.XavaException;
 import org.openxava.util.jxls.JxlsConstants;
 import org.openxava.util.jxls.JxlsSheet;
 import org.openxava.util.jxls.JxlsStyle;
@@ -98,6 +97,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	private List<Household> selectedHouseholds = new ArrayList<Household>();
 	private List<DefaultDietItem> defaultDietItems; // At Study not Household level
 	private String forwardURI = null;
+	private ModellingScenario modellingScenario=null;
 
 	/******************************************************************************************************************************************/
 
@@ -323,7 +323,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 		for (HH hh2 : uniqueHousehold) {
 
-			hh2.setHhDI(ModellingReports.householdDI(hh2.getHousehold(), false, defaultDietItems));
+			hh2.setHhDI(ModellingReports.householdDI(hh2.getHousehold(), false, defaultDietItems,modellingScenario));
 
 		}
 		uniqueHousehold = hh.stream().filter(distinctByKey(p -> p.getHousehold().getHouseholdNumber())) // Now sort
@@ -1102,21 +1102,21 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			errno = 2264;
 			for (HH hh3 : uniqueHousehold) {
 
-				cropIncome = ModellingReports.calcCropIncome(hh3.getHousehold().getCrop(), type, false, false, false);
+				cropIncome = ModellingReports.calcCropIncome(hh3.getHousehold().getCrop(), type, false, false, false, modellingScenario);
 				/* change to Modelling funcs drb 30/11/2020 */
 				empIncome = ModellingReports.calcEmpIncome(hh3.getHousehold().getEmployment(), type, false, false,
-						false);
+						false,modellingScenario );
 
 				// lsIncome = calcLSIncome(hh3, type);
 
 				lsIncome = ModellingReports.calcLSP(hh3.getHousehold().getLivestockProducts(), type, false, false,
-						false);
-				lsIncome += ModellingReports.calcLSS(hh3.getHousehold().getLivestockSales(), type, false);
+						false,modellingScenario);
+				lsIncome += ModellingReports.calcLSS(hh3.getHousehold().getLivestockSales(), type, false,modellingScenario );
 
 				// trIncome = calcTransIncome(hh3, type);
 				trIncome = ModellingReports.calcTransIncome(hh3.getHousehold().getTransfer(), type, false, false,
-						false);
-				wfIncome = ModellingReports.calcWFIncome(hh3.getHousehold().getWildFood(), type, false, false, false);
+						false,modellingScenario );
+				wfIncome = ModellingReports.calcWFIncome(hh3.getHousehold().getWildFood(), type, false, false, false,modellingScenario );
 
 				hh3.setCropIncome(cropIncome);
 				hh3.setEmpIncome(empIncome);
@@ -1190,19 +1190,19 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			errno = 2265;
 			for (HH hh2 : uniqueHousehold) {
 
-				cropIncome = ModellingReports.calcCropIncome(hh2.getHousehold().getCrop(), type, false, false, false);
+				cropIncome = ModellingReports.calcCropIncome(hh2.getHousehold().getCrop(), type, false, false, false,modellingScenario );
 				empIncome = ModellingReports.calcEmpIncome(hh2.getHousehold().getEmployment(), type, false, false,
-						false);
+						false,modellingScenario );
 
 				// lsIncome = calcLSIncome(hh2, type);
 
 				lsIncome = ModellingReports.calcLSP(hh2.getHousehold().getLivestockProducts(), type, false, false,
-						false);
-				lsIncome += ModellingReports.calcLSS(hh2.getHousehold().getLivestockSales(), type, false);
+						false,modellingScenario );
+				lsIncome += ModellingReports.calcLSS(hh2.getHousehold().getLivestockSales(), type, false,modellingScenario );
 
 				trIncome = ModellingReports.calcTransIncome(hh2.getHousehold().getTransfer(), type, false, false,
-						false);
-				wfIncome = ModellingReports.calcWFIncome(hh2.getHousehold().getWildFood(), type, false, false, false);
+						false,modellingScenario );
+				wfIncome = ModellingReports.calcWFIncome(hh2.getHousehold().getWildFood(), type, false, false, false,modellingScenario );
 
 				reportWB.getSheet(isheet).setValue(1, row, hh2.getHhNumber(), textStyle);
 				reportWB.getSheet(isheet).setValue(2, row, cropIncome, textStyle);

@@ -14,32 +14,19 @@ package efd.actions;
 import java.util.Collection;
 import java.util.Map;
 import java.util.OptionalDouble;
-import java.util.stream.Stream;
 
-import org.apache.poi.util.Units;
+import efd.model.*;
 import org.openxava.actions.EditElementInCollectionAction;
 import org.openxava.jpa.XPersistence;
 
-import efd.actions.ParseHHSpreadsheet.QandA;
-import efd.model.Community;
-import efd.model.Crop;
-import efd.model.Employment;
-import efd.model.Household;
-import efd.model.LivestockProducts;
-import efd.model.LivestockSales;
-import efd.model.ResourceSubType;
-import efd.model.Study;
-import efd.model.Transfer;
-import efd.model.WealthGroup;
-import efd.model.WealthGroupInterview;
 import efd.model.WealthGroupInterview.Status;
-import efd.model.WildFood;
 
 public class ExpandabilityRuleEdit extends EditElementInCollectionAction {
 	static int PRODUCED = 0;
 	static int SOLD = 1;
 	static int AVGOFPERCENTCONSUMED = 2;
 	static int TOTAL = 3;
+	private static ModellingScenario modellingScenario;
 
 	public void execute() throws Exception {
 
@@ -287,12 +274,12 @@ public class ExpandabilityRuleEdit extends EditElementInCollectionAction {
 		/* Need total KCal for this WGI/HH */
 
 		/* Get total Food income and use to find Average percent consumed represents */
-		Double totalKcal = ModellingReports.calcCropIncome(crop, type, false, false, isOHEA)
-				+ ModellingReports.calcLSP(livestockProducts, type, false, false, isOHEA)
-				+ ModellingReports.calcLSS(livestockSales, type, isOHEA)
-				+ ModellingReports.calcTransIncome(transfer, type, false, false, isOHEA)
-				+ ModellingReports.calcWFIncome(wildFood, type, false, false, isOHEA)
-				+ ModellingReports.calcEmpIncome(employment, type, false, false, isOHEA);
+		Double totalKcal = ModellingReports.calcCropIncome(crop, type, false, false, isOHEA, modellingScenario)
+				+ ModellingReports.calcLSP(livestockProducts, type, false, false, isOHEA,modellingScenario )
+				+ ModellingReports.calcLSS(livestockSales, type, isOHEA,modellingScenario )
+				+ ModellingReports.calcTransIncome(transfer, type, false, false, isOHEA,modellingScenario )
+				+ ModellingReports.calcWFIncome(wildFood, type, false, false, isOHEA, modellingScenario)
+				+ ModellingReports.calcEmpIncome(employment, type, false, false, isOHEA,modellingScenario );
 
 		units[TOTAL] = OptionalDouble.of(totalKcal);
 

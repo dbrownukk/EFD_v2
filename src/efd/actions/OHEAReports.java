@@ -26,14 +26,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import efd.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.openxava.actions.IForwardAction;
-import org.openxava.actions.TabBaseAction;
 import org.openxava.jpa.XPersistence;
-import org.openxava.model.MapFacade;
 import org.openxava.tab.Tab;
 import org.openxava.util.jxls.JxlsConstants;
 import org.openxava.util.jxls.JxlsSheet;
@@ -41,45 +39,12 @@ import org.openxava.util.jxls.JxlsStyle;
 import org.openxava.util.jxls.JxlsWorkbook;
 import org.openxava.web.servlets.ReportXLSServlet;
 
-import efd.model.AssetCash;
-import efd.model.AssetFoodStock;
-import efd.model.AssetLand;
-import efd.model.AssetLiveStock;
-import efd.model.AssetTradeable;
-import efd.model.AssetTree;
-import efd.model.Category;
-import efd.model.Community;
-import efd.model.Crop;
-import efd.model.CustomReportSpecOHEA;
-import efd.model.DefaultDietItem;
-import efd.model.Employment;
-import efd.model.Household;
 import efd.model.HouseholdMember.Sex;
-import efd.model.Inputs;
-import efd.model.LivelihoodZone;
-import efd.model.LivestockProducts;
-import efd.model.LivestockSales;
-import efd.model.MCCWFoodSource;
-import efd.model.MicroNutrient;
-import efd.model.MicroNutrientLevel;
-import efd.model.NutrientCount;
-import efd.model.Project;
 import efd.model.Project.Area;
-import efd.model.Quantile;
-import efd.model.Report;
-import efd.model.ResourceSubType;
-import efd.model.ResourceType;
-import efd.model.Site;
-import efd.model.StdOfLivingElement;
 import efd.model.StdOfLivingElement.StdLevel;
-import efd.model.Transfer;
 import efd.model.Transfer.TransferType;
-import efd.model.WealthGroup;
-import efd.model.WealthGroupInterview;
 import efd.model.WealthGroupInterview.Status;
-import efd.model.WildFood;
 import efd.utils.Efdutils;
-import efd.utils.HH;
 import efd.utils.WGI;
 
 public class OHEAReports extends BaseReporting implements IForwardAction, JxlsConstants {
@@ -155,6 +120,7 @@ public class OHEAReports extends BaseReporting implements IForwardAction, JxlsCo
 
 	
 	private WealthGroup wealthgroup;
+	private ModellingScenario modellingScenario;
 
 	/******************************************************************************************************************************************/
 	@Override
@@ -397,7 +363,7 @@ public class OHEAReports extends BaseReporting implements IForwardAction, JxlsCo
 		double wgiDI = 0.0;
 		for (WealthGroupInterview wgi2 : wgiList) {
 
-			wgiDI = ModellingReports.wealthgroupInterviewDI(wgi2, false);
+			wgiDI = ModellingReports.wealthgroupInterviewDI(wgi2, false,modellingScenario );
 
 			wgi2.getWealthgroup().setDefaultDI(wgiDI);
 
@@ -2151,7 +2117,7 @@ public class OHEAReports extends BaseReporting implements IForwardAction, JxlsCo
 	/******************************************************************************************************************************************/
 	/* Convert to Kgs */
 	public static double calcMNYearRDA(MicroNutrient microNutrient, double mnYearRDA) {
-		if (microNutrient.getRdaUnit() == "µg") {
+		if (microNutrient.getRdaUnit() == "ï¿½g") {
 
 			mnYearRDA = mnYearRDA / 1000000000; // in kgs
 		} else if (microNutrient.getRdaUnit() == "mg") {

@@ -106,7 +106,7 @@ public class GoModellingReport extends ViewBaseAction {
 					}
 					previousCorrectLoc = correctLoc;
 
-					Efdutils.em("site lzcount in site loop = " + lzcount);
+
 				}
 				// Efdutils.em("lz lzcount in LZ loop= " + lzcount);
 			}
@@ -127,7 +127,8 @@ public class GoModellingReport extends ViewBaseAction {
 		getView().setTitle("Livelihoods Modelling Reports");
 
 		getView().setModelName("CustomReportSpecListModelling"); // Note no CustomReport Spec in Modelling scenario
-		setControllers("ModellingReports", "Dialog");
+		//setControllers("ModellingReports", "Dialog");
+		setControllers("RunModellingReports", "Dialog");
 
 		if (isOHEA) {
 			/* dedupe */
@@ -147,7 +148,7 @@ public class GoModellingReport extends ViewBaseAction {
 			}
 			locidList = locidList.substring(0, locidList.length() - 1);
 
-			Efdutils.em("set OHEA LZ view");
+
 
 			getView().setViewName("livelihoodZone");
 

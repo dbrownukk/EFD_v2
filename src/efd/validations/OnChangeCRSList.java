@@ -88,8 +88,7 @@ public class OnChangeCRSList extends OnChangePropertyBaseAction {
 					for (ResourceSubType resourceSubType : household.getRSTsForHH()) {
 
 						rstsInCRS.stream().filter(p -> p.equals(resourceSubType)).forEach(p -> {
-							System.out.println(
-									"match for " + p.getResourcetypename() + " " + household.getHouseholdNumber());
+
 							hhList.add(household);
 						});
 					}
@@ -117,10 +116,10 @@ public class OnChangeCRSList extends OnChangePropertyBaseAction {
 
 			} else // No OIHM filtering of HHs
 			{
-				System.out.println();
+
 				tab = getView().getSubview("study.household").getCollectionTab();
 
-				System.out.println("tab base cond = " + tab.getBaseCondition());
+
 
 				tab.setBaseCondition("${study.id} = ? and ${status} = '4'"); // Validated
 				getView().refreshCollections();
