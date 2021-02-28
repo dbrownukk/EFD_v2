@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
     @Create 10/02/2021 12:05
 */
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
