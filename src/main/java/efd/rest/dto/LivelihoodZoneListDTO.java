@@ -10,8 +10,8 @@ import java.util.List;
  */
 @Data
 @AllArgsConstructor
-public class ProjectListDTO {
+public class LivelihoodZoneListDTO {
 
-    List<ProjectDTO> projects;
+    List<LivelihoodZoneDTO> livelihoodZones;
 
 }

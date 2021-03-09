@@ -1197,7 +1197,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                         correctLoc = previousCorrectLoc;
                     }
                     previousCorrectLoc = correctLoc;
-                  //  sites.add(site2);
 
                 }
 
@@ -1220,7 +1219,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                     selectedOnes[i] = new HashMap();
                     selectedOnes[i].putAll(map);
 
-                    System.out.println("done array create == "+i+" " + selectedOnes[i].get("locationid"));
+
                 }
 
 
@@ -1228,8 +1227,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
 
         }
-
-
 
 
         /* Populate local price yield variation for this Study/Project */

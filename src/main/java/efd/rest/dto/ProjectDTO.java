@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * Created by jt on 9/24/17.
+ * Created by david on 03/03/2021.
  */
 @Data
 public class ProjectDTO {
