@@ -8,12 +8,14 @@
  */
 package efd.actions;
 
+import org.openxava.actions.IForwardAction;
+import org.openxava.jpa.XPersistence;
+import org.openxava.tab.Tab;
+
 import efd.model.CustomReportSpecListModelling;
 import efd.model.ModellingScenario;
 import lombok.Getter;
 import lombok.Setter;
-import org.openxava.actions.IForwardAction;
-import org.openxava.jpa.XPersistence;
 
 
 public @Setter
@@ -33,9 +35,16 @@ class RunModellingReports extends BaseReporting implements IForwardAction {
         CustomReportSpecListModelling.ModelType model = (CustomReportSpecListModelling.ModelType) getView().getValue("modelType");
         ModellingScenario modellingScenario = XPersistence.getManager().find(ModellingScenario.class, modellingScenarioId);
 
+		modellingReports.setTargetTab(getTab());
+        
+
         //OIHM
         if (modellingScenario.getStudy() != null) {
-            modellingReports.setTargetTab(getView().getSubview(STUDY_HOUSEHOLD).getCollectionTab());
+        	
+			Tab collectionTab = getView().getSubview(STUDY_HOUSEHOLD).getCollectionTab();
+
+			modellingReports.setTargetTab(collectionTab);
+
             //OHEA
         } else if (modellingScenario.getProject() != null) {
             modellingReports.setTargetTab(getView().getSubview(LIVELIHOOD_ZONE_SITE).getCollectionTab());
@@ -49,8 +58,13 @@ class RunModellingReports extends BaseReporting implements IForwardAction {
             addError("Select at least one Household or Village");
             return;
         }
-        modellingReports.setSession(getRequest().getSession());
+
+		modellingReports.setSession(getRequest().getSession());
+
+		System.out.println("session in run rep = " + modellingReports.getSession());
+
         modellingReports.setModellingScenarioId(modellingScenarioId);
+
         modellingReports.setModelType(model); //  ChangeScenario, CopingStrategy
 
         modellingReports.execute();
@@ -79,4 +93,5 @@ class RunModellingReports extends BaseReporting implements IForwardAction {
             return false;
         return true;
     }
+
 }

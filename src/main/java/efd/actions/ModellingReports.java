@@ -51,9 +51,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
-public @Getter
-@Setter
+public @Setter
+@Getter
 class ModellingReports extends BaseReporting implements JxlsConstants {
 
     static final int NUMBER_OF_REPORTS = 15;
@@ -90,7 +89,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
     List<MicroNutrient> nutrients = XPersistence.getManager().createQuery("from MicroNutrient order by Name")
             .getResultList();
     ArrayList<NutrientCount> overallNutrientCount = new ArrayList<NutrientCount>();
-    // Note that assuming 1:1 WG:WGI
+    ; // Note that assuming 1:1 WG:WGI
     ArrayList<NutrientCount> totalNutrientCount = new ArrayList<NutrientCount>();
     ArrayList<NutrientCount> totalNutrientCountFoodSubstitution = new ArrayList<NutrientCount>();
     List<WGI> orderedQuantSeq = null;
@@ -111,17 +110,22 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
     ModelType modelType;
     ExpandabilityValues expval = null;
     double[] hhSize = {0.0, 0.0, 0.0};
+
+    Tab targetTab;
+
     int numCommunities = 0;
     Double[][] averageTotal = new Double[3][NUMBEROFAVERAGES];
     HttpSession session;
-    //private String selectionView;
+    // private String model;
+    JxlsWorkbook report;
+    // private String selectionView;
     private Community community = null;
     private LivelihoodZone livelihoodZone = null;
     private Project project = null;
     private Project ihmProject = null;
     private Study study = null;
     private ModellingScenario modellingScenario;
-    private List<Report> reportList = new ArrayList<>();
+    private List<Report> reportList;
     private List<Site> selectedSites = new ArrayList<>();
     // ArrayList<ArrayList<Double>> averageTotal = new
     // ArrayList<>(NUMBEROFAVERAGES);
@@ -130,13 +134,10 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
     private String floatFormat = "##########0.00";
     private String integerFormat = "##############";
     private String modellingScenarioId;
-    //private String model;
-    private Tab targetTab;
-    private JxlsWorkbook report;
-
 
     /******************************************************************************************************************************************/
-    static Double householdDI(Household household, Boolean isChangeScenario, List<DefaultDietItem> defaultDietItems, ModellingScenario modellingScenario) {
+    static Double householdDI(Household household, Boolean isChangeScenario, List<DefaultDietItem> defaultDietItems,
+                              ModellingScenario modellingScenario) {
 
         /*
          * Disposable Income (DI) = Total Income (TI) - Cost of covering Shortfall (SF)
@@ -190,16 +191,18 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
             if (household.getWildFood().size() > 0) {
 
-                wildfoodsTI = calcWFIncome(household.getWildFood(), CASH, isChangeScenario,
-                        false, false, modellingScenario);
-                wildfoodsOP = calcWFIncome(household.getWildFood(), FOOD, isChangeScenario,
-                        false, false, modellingScenario);
+                wildfoodsTI = calcWFIncome(household.getWildFood(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                wildfoodsOP = calcWFIncome(household.getWildFood(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
             if (household.getLivestockProducts().size() > 0) {
 
-                lspTI = calcLSP(household.getLivestockProducts(), CASH, isChangeScenario, false, false, modellingScenario);
-                lspOP = calcLSP(household.getLivestockProducts(), FOOD, isChangeScenario, false, false, modellingScenario);
+                lspTI = calcLSP(household.getLivestockProducts(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                lspOP = calcLSP(household.getLivestockProducts(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
             if (household.getLivestockSales().size() > 0) {
@@ -210,14 +213,18 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             }
             if (household.getEmployment().size() > 0) {
 
-                employmentTI = calcEmpIncome(household.getEmployment(), CASH, isChangeScenario, false, false, modellingScenario);
-                employmentOP = calcEmpIncome(household.getEmployment(), FOOD, isChangeScenario, false, false, modellingScenario);
+                employmentTI = calcEmpIncome(household.getEmployment(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                employmentOP = calcEmpIncome(household.getEmployment(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
             if (household.getTransfer().size() > 0) {
 
-                transfersTI = calcTransIncome(household.getTransfer(), CASH, isChangeScenario, false, false, modellingScenario);
-                transfersOP = calcTransIncome(household.getTransfer(), FOOD, isChangeScenario, false, false, modellingScenario);
+                transfersTI = calcTransIncome(household.getTransfer(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                transfersOP = calcTransIncome(household.getTransfer(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
 
@@ -359,7 +366,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
     /******************************************************************************************************************************************/
 
-    public static Double wealthgroupInterviewDI(WealthGroupInterview wealthGroupInterview, Boolean isChangeScenario, ModellingScenario modellingScenario) {
+    public static Double wealthgroupInterviewDI(WealthGroupInterview wealthGroupInterview, Boolean isChangeScenario,
+                                                ModellingScenario modellingScenario) {
 
         /*
          * Disposable Income (DI) = Total Income (TI) - Cost of covering Shortfall (SF)
@@ -405,20 +413,26 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
         try {
             if (!wealthGroupInterview.getCrop().isEmpty()) {
 
-                cropTI = calcCropIncome(wealthGroupInterview.getCrop(), CASH, isChangeScenario, false, false, modellingScenario);
-                cropOP = calcCropIncome(wealthGroupInterview.getCrop(), FOOD, isChangeScenario, false, false, modellingScenario);
+                cropTI = calcCropIncome(wealthGroupInterview.getCrop(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                cropOP = calcCropIncome(wealthGroupInterview.getCrop(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
             }
 
             if (!wealthGroupInterview.getWildFood().isEmpty()) {
 
-                wildfoodsTI = calcWFIncome(wealthGroupInterview.getWildFood(), CASH, isChangeScenario, false, false, modellingScenario);
-                wildfoodsOP = calcWFIncome(wealthGroupInterview.getWildFood(), FOOD, isChangeScenario, false, false, modellingScenario);
+                wildfoodsTI = calcWFIncome(wealthGroupInterview.getWildFood(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                wildfoodsOP = calcWFIncome(wealthGroupInterview.getWildFood(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
             if (!wealthGroupInterview.getLivestockProducts().isEmpty()) {
 
-                lspTI = calcLSP(wealthGroupInterview.getLivestockProducts(), CASH, isChangeScenario, false, false, modellingScenario);
-                lspOP = calcLSP(wealthGroupInterview.getLivestockProducts(), FOOD, isChangeScenario, false, false, modellingScenario);
+                lspTI = calcLSP(wealthGroupInterview.getLivestockProducts(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                lspOP = calcLSP(wealthGroupInterview.getLivestockProducts(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
             if (!wealthGroupInterview.getLivestockSales().isEmpty()) {
@@ -429,18 +443,18 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             }
             if (!wealthGroupInterview.getEmployment().isEmpty()) {
 
-                employmentTI = calcEmpIncome(wealthGroupInterview.getEmployment(), CASH, isChangeScenario, false,
-                        false, modellingScenario);
-                employmentOP = calcEmpIncome(wealthGroupInterview.getEmployment(), FOOD, isChangeScenario, false,
-                        false, modellingScenario);
+                employmentTI = calcEmpIncome(wealthGroupInterview.getEmployment(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                employmentOP = calcEmpIncome(wealthGroupInterview.getEmployment(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
             if (!wealthGroupInterview.getTransfer().isEmpty()) {
 
-                transfersTI = calcTransIncome(wealthGroupInterview.getTransfer(), CASH, isChangeScenario,
-                        false, false, modellingScenario);
-                transfersOP = calcTransIncome(wealthGroupInterview.getTransfer(), FOOD, isChangeScenario,
-                        false, false, modellingScenario);
+                transfersTI = calcTransIncome(wealthGroupInterview.getTransfer(), CASH, isChangeScenario, false, false,
+                        modellingScenario);
+                transfersOP = calcTransIncome(wealthGroupInterview.getTransfer(), FOOD, isChangeScenario, false, false,
+                        modellingScenario);
 
             }
 
@@ -599,7 +613,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
     }
 
     /******************************************************************************************************************************************/
-    private static ResourceSubType calcRSTforFoodSubstitution(ResourceSubType rst, Boolean isFoodSubstitution, ModellingScenario modellingScenario) {
+    private static ResourceSubType calcRSTforFoodSubstitution(ResourceSubType rst, Boolean isFoodSubstitution,
+                                                              ModellingScenario modellingScenario) {
         /* Has this RST been substituted in model scenario ? */
 
         final ResourceSubType rstfinal = rst;
@@ -856,7 +871,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
     /******************************************************************************************************************************************/
 
-    public static Double calcLSS(Collection<LivestockSales> lss, String type, Boolean isAfterChangeScenario, ModellingScenario modellingScenario) {
+    public static Double calcLSS(Collection<LivestockSales> lss, String type, Boolean isAfterChangeScenario,
+                                 ModellingScenario modellingScenario) {
 
         Double yieldChange = 0.0;
         Double priceChange = 0.0;
@@ -1077,7 +1093,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
     public void execute() throws Exception {
 
-
         System.out.println("In Run Modelling Reports ");
         int countValidated = 0;
 
@@ -1090,11 +1105,10 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
          * Get Change Scenario Details
          *
          */
-        //modellingScenarioId = getPreviousView().getValueString("id");
-        //modellingScenario = (ModellingScenario) XPersistence.getManager().find(ModellingScenario.class, this.getModellingScenarioId());
+        // modellingScenarioId = getPreviousView().getValueString("id");
+        modellingScenario = XPersistence.getManager().find(ModellingScenario.class, modellingScenarioId);
 
-
-        Efdutils.em("Mod scenario = " + modellingScenario.getTitle() + " " + getModellingScenarioId());
+        Efdutils.em("Mod scenario = " + modellingScenario.getTitle() + " " + modellingScenarioId);
 
         if (modellingScenario.getStudy() != null) {
             isOIHM = true;
@@ -1102,10 +1116,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
         } else if (modellingScenario.getProject() != null) {
             isOIHM = false;
             isOHEA = true;
-        } else {
-            addError("No Project or Study set in Modelling Scenario");
         }
-
 
         /*
          * Get Model Type - Change Scenario or Coping Strategy, though Coping Strategy
@@ -1116,7 +1127,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
          *
          */
 
-        //model = getView().getValueString("modelType");
+        // model = getView().getValueString("modelType");
 
         if (getModelType().equals(ModelType.CopingStrategy)) {
             isCopingStrategy = true;
@@ -1130,12 +1141,16 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
         Object communityId = null; // getPreviousView().getValue("communityid");
 
-        //targetTab = getView().getSubview(get()).getCollectionTab();
+        // targetTab = getView().getSubview(get()).getCollectionTab();
 
-        // init Map array
+        //Map[] selectedOnes = getTargetTab().getSelectedKeys();
 
-        // TODO FIX Size to be size needed for selectones i.e. all sites
+        // targetTab = getView().getSubview(get()).getCollectionTab();
+
         Map[] selectedOnes = new Map[0];
+
+
+
 
         try {
             selectedOnes = getTargetTab().getSelectedKeys();
@@ -1153,60 +1168,60 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 List<String> lzidList = new ArrayList<String>();
                 List<String> locList = new ArrayList<String>();
 
-                Collection<LivelihoodZone> lzs = modellingScenario.getProject().getLivelihoodZone();
-                for (LivelihoodZone lzs2 : lzs) {
-                    for (Site site2 : lzs2.getSite()) {
-                        for (Community community : site2.getCommunity()) {
-                            lzcount = 0; //reset valid wg count #591
-                            for (WealthGroup wealthGroup : community.getWealthgroup()) {
-                                for (WealthGroupInterview wealthGroupInterview3 : wealthGroup.getWealthGroupInterview()) {
-                                    status = wealthGroupInterview3.getStatus();
-                                    if (status == Status.Validated) // add this to valid LZ / Site/ WG community list
-                                    {
-                                        lzcount++;
-                                        // Efdutils.em("valid lz = " + lzs2.getLzid());
-                                        lzid += "'" + lzs2.getLzid() + "',";
+                List<String> sitearray = new ArrayList<String>();
 
-                                        correctLoc += "'" + community.getSite().getLocationid() + "',";
+                LivelihoodZone lz = modellingScenario.getLivelihoodZone();
 
-                                        lzidList.add(lzs2.getLzid());
-                                        locList.add(community.getSite().getLocationid());
+                for (Site site2 : lz.getSite()) {
+                    for (Community community : site2.getCommunity()) {
+                        lzcount = 0; //reset valid wg count #591
+                        for (WealthGroup wealthGroup : community.getWealthgroup()) {
+                            for (WealthGroupInterview wealthGroupInterview3 : wealthGroup.getWealthGroupInterview()) {
+                                if (wealthGroupInterview3.getStatus() == Status.Validated) // add this to valid LZ / Site/ WG community list
+                                {
+                                    lzcount++;
+                                    // Efdutils.em("valid lz = " + lzs2.getLzid());
+                                    lzid += "'" + lz.getLzid() + "',";
 
-                                    }
+                                    correctLoc += "'" + community.getSite().getLocationid() + "',";
+
+                                    lzidList.add(lz.getLzid());
+                                    locList.add(community.getSite().getLocationid());
+
                                 }
-
                             }
-                        }
-                        if (lzcount < 3) { // Need at least 3 Valid WGIs in a Site
-                            correctLoc = previousCorrectLoc;
-                        }
-                        previousCorrectLoc = correctLoc;
-                        sites.add(site2);
 
+                        }
                     }
-                    Efdutils.em("lz lzcount in LZ loop= " + lzcount);
-                    for (String s : locList) {
-                        System.out.println("site = " + s);
+                    if (lzcount < 3) { // Need at least 3 Valid WGIs in a Site
+                        correctLoc = previousCorrectLoc;
                     }
+                    previousCorrectLoc = correctLoc;
+                  //  sites.add(site2);
 
-                    //======================================================================================================
                 }
+
+
+                //======================================================================================================
+
+                // Java 9 convert to single statement
+                Map<String, List<String>> collect = locList.stream().collect(Collectors.groupingBy(p -> p.toString()));
+                // only process where validated wg >2
+                List<Map.Entry<String, List<String>>> locs = collect.entrySet().stream().filter(p -> p.getValue().size()>2).collect(Collectors.toList());
 
 
                 Map<String, String> map = new HashMap<>();
                 //map.put("locationid",locList.get(0));
 
-                selectedOnes = new Map[locList.size()];
-                for (int i = 0; i < locList.size(); i++) {
-                    map.put("locationid", locList.get(i));
+                selectedOnes = new Map[locs.size()];
+                for (int i = 0; i < locs.size(); i++) {
+                    map.put("locationid", locs.get(i).getKey());
 
                     selectedOnes[i] = new HashMap();
                     selectedOnes[i].putAll(map);
 
+                    System.out.println("done array create == "+i+" " + selectedOnes[i].get("locationid"));
                 }
-
-
-                System.out.println("done array create == " + selectedOnes[0].get("locationid"));
 
 
             }
@@ -1214,8 +1229,10 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
         }
 
-        /* Populate local price yield variation for this Study/Project */
 
+
+
+        /* Populate local price yield variation for this Study/Project */
 
         for (PriceYieldVariation priceYieldVariation : modellingScenario.getPriceYieldVariations()) {
             priceYieldVariations.add(priceYieldVariation);
@@ -1234,23 +1251,14 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
             project = modellingScenario.getProject();
 
-
             for (int i = 0; i < selectedOnes.length; i++) {
                 Map<?, ?> key = selectedOnes[i];
 
                 String locidofsite = key.get("locationid").toString();
 
+                // String subKey = key.toString().substring(12, 44);
 
-                //try {
-                //  site = XPersistence.getManager().find(Site.class, locidofsite);
-                //} catch (Exception e) {
-                //e.printStackTrace();
-
-                // Need JPA Get from Spring 5
-                List<Site> siteCollect = sites.stream().filter(p -> p.getLocationid() == locidofsite).collect(Collectors.toList());
-
-                site = siteCollect.get(0);             //}
-
+                site = XPersistence.getManager().find(Site.class, locidofsite);
 
                 livelihoodZone = site.getLivelihoodZone();
 
@@ -1339,7 +1347,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
                 if (!isCommunityHasExpandabilityRule && isCopingStrategy) {
 
-
                     addError("No Expandability Rules for selected Communities for Coping Strategy Report");
                     closeDialog();
                     return;
@@ -1407,7 +1414,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 Map<?, ?> key = selectedOnes[i];
 
                 // TODO
-                //Map<?, ?> membersNames = getView().getSubview("study.household").getMembersNames();
+                // Map<?, ?> membersNames =
+                // getView().getSubview("study.household").getMembersNames();
 
                 String subKey = key.toString().substring(4, 36);
 
@@ -1426,7 +1434,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
                 selectedHouseholds.add(singleHHSelected);
             }
-
 
             defaultDietItems = (List<DefaultDietItem>) study.getDefaultDietItem();
             List<Household> households = XPersistence.getManager()
@@ -1471,12 +1478,10 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             System.out.println("report = " + report);
             System.out.println("session " + ReportXLSServlet.SESSION_XLS_REPORT);
 
-
-
             //session.setAttribute(ReportXLSServlet.SESSION_XLS_REPORT, report);
             errno = 56;
             System.out.println("session done  " + errno);
-            //  setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis());
+            // setForwardURI("/xava/report.xls?time=" + System.currentTimeMillis());
             errno = 57;
         } catch (Exception e) {
             addError(e + " Errno = " + errno);
@@ -1484,7 +1489,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             return;
         }
 
-        //closeDialog();
+        // closeDialog();
 
     }
 
@@ -1531,7 +1536,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 wgi2.getWealthgroupInterview().setdI(wgiDI);
 
                 isChangeScenario = true;
-                Double wgiDIacs = wealthgroupInterviewDI(wgi2.getWealthgroupInterview(), isChangeScenario, modellingScenario);
+                Double wgiDIacs = wealthgroupInterviewDI(wgi2.getWealthgroupInterview(), isChangeScenario,
+                        modellingScenario);
                 wgi2.setWgiDIAfterChangeScenario(wgiDIacs);
                 wgi2.getWealthgroupInterview().setdIAfterChangeScenario(wgiDIacs);
 
@@ -1560,7 +1566,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 isChangeScenario = false;
                 hh2.setHhDI(householdDI(hh2.getHousehold(), isChangeScenario, defaultDietItems, modellingScenario));
                 isChangeScenario = true;
-                hh2.setHhDIAfterChangeScenario(householdDI(hh2.getHousehold(), isChangeScenario, defaultDietItems, modellingScenario));
+                hh2.setHhDIAfterChangeScenario(
+                        householdDI(hh2.getHousehold(), isChangeScenario, defaultDietItems, modellingScenario));
 
                 /* change to use household transient */
                 hh2.getHousehold().setdIAfterChangeScenario(hh2.getHhDIAfterChangeScenario());
@@ -1792,7 +1799,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
         e.setWildfood(wildfood);
         e.setCrop(crop);
         e.setCash(cash);
-
 
         hh.add(e);
 
@@ -2096,7 +2102,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
         Boolean isCopingStrategy = true;
         Boolean isnotCopingStrategy = false;
 
-
         createHeaderPage(); // populates reportList and creates first worksheet
 
         int ireportNumber = 0; // should be equal to the sheet number in workbook
@@ -2237,37 +2242,16 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 prevCashGain = 0.0;
                 Double prevHHOSolAfterChangeScenario = hh2.getHhDIAfterChangeScenario();
                 for (ExpandabilityRule expandabilityRule : expandabilityRules) {
-                    // #527
-                    // if (prevHHOSolAfterChangeScenario > 0)
 
-                    // If DI value after change scenario is > 0 then use DI after change scenario,
-                    // otherwise apply expandability rule if applicaable
-
-                    // {
-
-                    // reportWB.getSheet(isheet).setValue(col, row, prevHHOSolAfterChangeScenario,
-                    // numberd2);
-                    // } else {
                     prevCashGain = cashGain;
 
-                    System.out.println("In 418 DI report ");
-                    System.out.println("type = " + type);
-                    System.out.println("exp rule = " + expandabilityRule.getAppliedResourceSubType().getResourcetypename());
-                    System.out.println("prev cash gain = " + prevCashGain);
-                    System.out.println("cash gain pre calc = " + cashGain);
 
                     cashGain = expandabilityGain(expandabilityRule, hh2.getHousehold(), type);
-                    System.out.println("cash gain post calc = " + cashGain);
-                    System.out.println("prevHHSolAfterChangeScenario  = " + prevHHOSolAfterChangeScenario);
+
                     totalCashGain = prevCashGain + cashGain;
 
-                    reportWB.getSheet(isheet).setValue(col, row,
-                            // prevHHOSolAfterChangeScenario + totalCashGain
-                            prevHHOSolAfterChangeScenario + cashGain,
-                            // -
-                            // hh2.getHousehold().getExpandabilityRule().getExpandabilityCostOfDeficitPurchase(),
-                            numberd2);
-                    // prevHHOSolAfterChangeScenario += totalCashGain;
+                    reportWB.getSheet(isheet).setValue(col, row, prevHHOSolAfterChangeScenario + cashGain, numberd2);
+
                     prevHHOSolAfterChangeScenario += cashGain;
                     // }
 
@@ -2288,18 +2272,9 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
         int row = 2;
         int col = 5;
-        int i = 0;
-        double hhSize = 0;
-        Double cashGain = 0.0;
-        Double prevCashGain = 0.0;
-        Double totalCashGain = 0.0;
+
         String type = "cash";
-        int counter = 0;
-        double thisDI = 0.0;
-        double thisDIAfterChangeScenario = 0.0;
-        int numberOfAverages = 0;
-        int averageCounter = 0;
-        ArrayList<WGI> averageWGIs = new ArrayList<>();
+
 
         /*
          * Will need to revisit average total array if WGs per community increase
@@ -2636,18 +2611,16 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 priceChange = priceYieldVariation(modellingScenario, rst, PRICE);
                 yieldChange = priceYieldVariation(modellingScenario, rst, YIELD);
 
-
                 if (type == "cash") {
 
-                    gain += ((crop.getUnitsProduced() * yieldChange)
-                            - (crop.getUnitsSold() * yieldChange)) * (crop.getPricePerUnit() * priceChange);
-
+                    gain += ((crop.getUnitsProduced() * yieldChange) - (crop.getUnitsSold() * yieldChange))
+                            * (crop.getPricePerUnit() * priceChange);
 
                 } else if (type == "food") {
                     gain += ((crop.getUnitsProduced() * yieldChange) - (crop.getUnitsSold() * yieldChange))
                             * findRSTKcal(crop.getResourceSubType());
                 }
-                System.out.println("crop exp gain =   = " + gain);
+
             }
         } else if (wfCollection.size() > 0) {
 
@@ -2685,7 +2658,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             System.out.println("in transcollection ");
             for (Transfer trans : transCollection) {
 
-
                 if (trans.getTransferType() == TransferType.Food) {
                     priceChange = priceYieldVariation(modellingScenario, trans.getFoodResourceSubType(), PRICE);
                 } else {
@@ -2695,10 +2667,10 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
                 if (type == "cash") {
 
-					/* #566
-					gain += ((trans.getUnitsTransferred() * yieldChange) - (trans.getUnitsSold() * priceChange))
-							* trans.getPricePerUnit() * priceChange;
-							* */
+                    /*
+                     * #566 gain += ((trans.getUnitsTransferred() * yieldChange) -
+                     * (trans.getUnitsSold() * priceChange)) trans.getPricePerUnit() * priceChange;
+                     */
                     gain += ((trans.getUnitsTransferred() * yieldChange) - (trans.getUnitsSold() * yieldChange))
                             * trans.getPricePerUnit() * priceChange;
 
@@ -2864,50 +2836,15 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 Double prevHHOSolAfterChangeScenario = hh2.getHhDIAfterChangeScenario() - hh2.getHhSOLC();
                 for (ExpandabilityRule expandabilityRule : expandabilityRules) {
 
-                    // #527 - print all changes not just until +ve
-                    // if (prevHHOSolAfterChangeScenario > 0)
 
-                    // If DI value after change scenario is > 0 then use DI after change scenario,
-                    // otherwise apply expandability rule if applicaable
-
-                    // {
-
-                    // reportWB.getSheet(isheet).setValue(col, row, prevHHOSolAfterChangeScenario,
-                    // numberd2);
-                    // } else {
-
-                    System.out.println("Exp Rule = " + expandabilityRule.getAppliedResourceSubType().getResourcetypename());
                     prevCashGain = cashGain;
                     cashGain = expandabilityGain(expandabilityRule, hh2.getHousehold(), type);
                     totalCashGain = prevCashGain + cashGain;
 
-                    /*
-                     * #515
-                     *
-                     * Why subtracting hh2.getHousehold().getExpandabilityRule().
-                     * getExpandabilityCostOfDeficitPurchase()
-                     *
-                     *
-                     * reportWB.getSheet(isheet).setValue(col, row, prevHHOSolAfterChangeScenario +
-                     * totalCashGain - hh2.getHousehold().getExpandabilityRule().
-                     * getExpandabilityCostOfDeficitPurchase(), numberd2);
-                     */
-                    /*
-                     * #527 change totalGain to cashGain
-                     */
-                    // reportWB.getSheet(isheet).setValue(col, row, prevHHOSolAfterChangeScenario +
-                    // totalCashGain,
-                    // numberd2);
 
                     reportWB.getSheet(isheet).setValue(col, row, prevHHOSolAfterChangeScenario + cashGain, numberd2);
 
-                    // reportWB.getSheet(isheet).setValue(col, row, prevHHOSolAfterChangeScenario +
-                    // totalCashGain
-                    // -
-                    // hh2.getHousehold().getExpandabilityRule().getExpandabilityCostOfDeficitPurchase(),
-                    // numberd2);
-                    // #527
-                    // prevHHOSolAfterChangeScenario += totalCashGain;
+
                     prevHHOSolAfterChangeScenario += cashGain;
                     // }
 
@@ -2959,7 +2896,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
         int row = 1;
         int kcalrow = 2;
         ArrayList<WealthGroup> listWealthgroup = new ArrayList<>();
-        int[] wgCounter = {0, 0, 0};
+        int wgCounter[] = {0, 0, 0};
         int nrow = 2;
         double totalFoodubstitutionNutrient = 0.0;
 
@@ -3341,7 +3278,9 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
     /******************************************************************************************************************************************/
 
+    // Not WgOrder can be HHNumber
     private void calcSubFood(int wgOrder, double hhSize, ResourceSubType rst, double unitsConsumed) {
+
         MCCWFoodSource thisMccwFoodSource;
         ResourceSubType substitutionFoodrst;
 
@@ -3390,13 +3329,9 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
     /******************************************************************************************************************************************/
 
-    private void calcHHNutrients(int isheet, int col, int row, List<HH> hh) {
+    private void calcHHNutrients(List<HH> hh) {
 
-        int numberOfHHs = hh.size();
-        double houseavgsize = 0.0;
         MCCWFoodSource thisMccwFoodSource;
-
-        ResourceSubType substitutionFoodrst = null;
 
         for (int k = 0; k < hh.size(); k++) {
 
@@ -3407,6 +3342,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             for (Crop crop2 : hh2.getHousehold().getCrop()) {
 
                 calcSubFood(hhNumber, sizeHH, crop2.getResourceSubType(), crop2.getUnitsConsumed());
+                thisMccwFoodSource = getMccWincludeSyn(crop2.getResourceSubType());
+                populateNutrientArray(thisMccwFoodSource, hhNumber, sizeHH, crop2.getUnitsConsumed());
 
             }
 
@@ -3422,8 +3359,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
                 thisMccwFoodSource = getMccWincludeSyn(tr.getResourceSubType());
 
-                // populateNutrientArray(thisMccwFoodSource, hhNumber, sizeHH,
-                // tr.getUnitsConsumed());
+                populateNutrientArray(thisMccwFoodSource, hhNumber, sizeHH, tr.getUnitsConsumed());
             }
 
             for (Employment emp : hh2.getHousehold().getEmployment()) {
@@ -3431,8 +3367,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
                 thisMccwFoodSource = getMccWincludeSyn(emp.getResourceSubType());
 
-                // populateNutrientArray(thisMccwFoodSource, hhNumber, sizeHH,
-                // emp.getPeopleCount() * emp.getFoodPaymentUnitsPaidWork());
+                populateNutrientArray(thisMccwFoodSource, hhNumber, sizeHH,
+                        emp.getPeopleCount() * emp.getFoodPaymentUnitsPaidWork());
             }
 
             for (WildFood wf : hh2.getHousehold().getWildFood()) {
@@ -3440,8 +3376,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
                 thisMccwFoodSource = getMccWincludeSyn(wf.getResourceSubType());
 
-                // populateNutrientArray(thisMccwFoodSource, hhNumber, sizeHH,
-                // wf.getUnitsConsumed());
+                populateNutrientArray(thisMccwFoodSource, hhNumber, sizeHH, wf.getUnitsConsumed());
             }
 
         }
@@ -3490,6 +3425,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             /* add DDI nutrients to nutrients array */
             defaultDietItems = (List<DefaultDietItem>) hh.getHousehold().getStudy().getDefaultDietItem();
 
+
             for (DefaultDietItem defaultDietItem : defaultDietItems) {
                 /* how many calories needed of this RST */
                 double calsNeeded = defaultDietItem.getCalsNeededofThisDDI();
@@ -3526,8 +3462,12 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
         }
 
+        System.out.println("size of array in MODELLING rep = " + totalNutrientCount.size());
+
         /* Populate nutrientsCount array for use in report */
-        calcHHNutrients(isheet, col, 0, uniqueHousehold);
+        calcHHNutrients(uniqueHousehold);
+
+
 
         /* Now output report */
 
@@ -3541,6 +3481,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 double totalNutrient = calcHHNutrientFromArray(microNutrient, hh.getHhNumber(), false,
                         totalNutrientCount);
 
+
                 double totalFoodubstitutionNutrient = calcHHNutrientFromArray(microNutrient, hh.getHhNumber(), false,
                         totalNutrientCountFoodSubstitution);
 
@@ -3550,9 +3491,11 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 /* TODO */
 
                 int hhSize = hh.getHousehold().getHouseholdMember().size();
+
                 double mnYearRDA = microNutrient.getRda() * hhSize * 365;
 
                 mnYearRDA = calcMNYearRDA(microNutrient, mnYearRDA);
+
 
                 // divide by wgCounter to get average - normally will be 1.
 
@@ -3561,14 +3504,10 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 double nutrientPercent = 100 * totalNutrient / mnYearRDA;
                 double foodSubNutrientPercent = 100 * (totalFoodubstitutionNutrient / mnYearRDA);
 
-                System.out.println("ihm nutrient 1 = " + nutrientPercent);
-                System.out.println("ihm nutrient 2 = " + foodSubNutrientPercent);
 
+                reportWB.getSheet(isheet).setValue(3 + (2 * j), row, nutrientPercent, numberStyle);
 
-                reportWB.getSheet(isheet).setValue(2 + (2 * j), row, nutrientPercent, numberStyle);
-
-                reportWB.getSheet(isheet).setValue(3 + (2 * j), row, foodSubNutrientPercent,
-                        numberStyle);
+                reportWB.getSheet(isheet).setValue(2 + (2 * j), row, foodSubNutrientPercent, numberStyle);
             }
             row++;
         }
@@ -3668,12 +3607,17 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                  */
 
                 try {
-                    cropIncome = calcCropIncome(hh2.getHousehold().getCrop(), type, false, false, false, modellingScenario);
-                    empIncome = calcEmpIncome(hh2.getHousehold().getEmployment(), type, false, false, false, modellingScenario);
-                    lspIncome = calcLSP(hh2.getHousehold().getLivestockProducts(), type, false, false, false, modellingScenario);
+                    cropIncome = calcCropIncome(hh2.getHousehold().getCrop(), type, false, false, false,
+                            modellingScenario);
+                    empIncome = calcEmpIncome(hh2.getHousehold().getEmployment(), type, false, false, false,
+                            modellingScenario);
+                    lspIncome = calcLSP(hh2.getHousehold().getLivestockProducts(), type, false, false, false,
+                            modellingScenario);
                     lssIncome = calcLSS(hh2.getHousehold().getLivestockSales(), type, false, modellingScenario);
-                    trIncome = calcTransIncome(hh2.getHousehold().getTransfer(), type, false, false, false, modellingScenario);
-                    wfIncome = calcWFIncome(hh2.getHousehold().getWildFood(), type, false, false, false, modellingScenario);
+                    trIncome = calcTransIncome(hh2.getHousehold().getTransfer(), type, false, false, false,
+                            modellingScenario);
+                    wfIncome = calcWFIncome(hh2.getHousehold().getWildFood(), type, false, false, false,
+                            modellingScenario);
 
                     isAfterChangeScenario = true;
                     acsCropIncome = calcCropIncome(hh2.getHousehold().getCrop(), type, isAfterChangeScenario,
@@ -3682,7 +3626,8 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                             isFoodSubstitution, false, modellingScenario);
                     acsLspIncome = calcLSP(hh2.getHousehold().getLivestockProducts(), type, isAfterChangeScenario,
                             isFoodSubstitution, false, modellingScenario);
-                    acsLssIncome = calcLSS(hh2.getHousehold().getLivestockSales(), type, isAfterChangeScenario, modellingScenario);
+                    acsLssIncome = calcLSS(hh2.getHousehold().getLivestockSales(), type, isAfterChangeScenario,
+                            modellingScenario);
 
                     acsTrIncome = calcTransIncome(hh2.getHousehold().getTransfer(), type, isAfterChangeScenario,
                             isFoodSubstitution, false, modellingScenario);
@@ -4082,8 +4027,6 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
         String siteName = "";
         String wgName = "";
         Method modellingreports = null;
-        String strModellingReports = null;
-        int iModellingReports=0;
 
         Efdutils.em("In Create Header Page for Coping Strategy ");
         Efdutils.em("IS OHEA = " + isOHEA);
@@ -4117,7 +4060,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
         sheet[0].setValue(2, 13, modellingScenario.getTitle(), textStyleLeft);
         sheet[0].setValue(2, 14, modellingScenario.getAuthor(), textStyleLeft);
         sheet[0].setValue(2, 15, modellingScenario.getDescription(), textStyleLeft);
-        Efdutils.em("createheader = " + 10001);
+
         if (isOIHM) {
             sheet[0].setValue(1, 3, "Study:", boldRStyle);
             sheet[0].setValue(2, 3, study.getStudyName() + " " + study.getReferenceYear(), textStyleLeft);
@@ -4163,23 +4106,15 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             }
 
         } else if (isOHEA) {
-            Efdutils.em("createheader = " + 10009);
             sheet[0].setValue(1, 3, "Project:", boldRStyle);
             sheet[0].setValue(2, 3, project.getProjecttitle(), textStyleLeft);
             sheet[0].setValue(3, STARTROW, "Community/Sites", boldRStyle);
             sheet[0].setValue(4, STARTROW, "Wealthgroup", boldRStyle);
 
             /* Which set of reports to Run */
-           // TODO Figure out why enum not working in query with Spring 5 and JPA - works ok in OX
             if (isCopingStrategy) {
-             //   reportList = XPersistence.getManager().createQuery("from Report where code > 6 and method = 5").getResultList();
-             //   iModellingReports=4;
-             //   strModellingReports="MODELLINGOHEACOPING";
                 modellingreports = Method.MODELLINGOHEACOPING;
             } else {
-              //  reportList = XPersistence.getManager().createQuery("from Report where code > 6 and method = 3").getResultList();
-              //  iModellingReports=5;
-              //  strModellingReports="MODELLINGOHEASCENARIO";
                 modellingreports = Method.MODELLINGOHEASCENARIO;
             }
 
@@ -4193,18 +4128,12 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
             i = STARTROW + 1;
             printAllSitesNames(sheet[0], i, col, true);
-            Efdutils.em("createheader = " + 10010);
+
         }
         /* Note code 1-6 are visualisation spreadsheets */
-        Efdutils.em("createheader = " + 10011);
+        reportList = XPersistence.getManager().createQuery("from Report where method = :method and code > 6")
+                .setParameter("method", modellingreports).getResultList();
 
-         reportList = XPersistence.getManager().createQuery("from Report where method = :method and code > 6")
-                    .setParameter("method", modellingreports).getResultList();
-         //   reportList = XPersistence.getManager().createQuery("from Report where code > 6 and method = :method")
-           //         .setParameter("method",iModellingReports).getResultList();
-
-
-        Efdutils.em("createheader = " + 10012);
         sheet[0].setValue(2, STARTROW, "Reports", boldLStyle);
 
         /* get list of reports for modelling data spreadsheet */
@@ -4213,20 +4142,13 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
         i = STARTROW + 1;
 
-        for (Report report : reportList) {
-            System.out.println("reprt = "+report.getName());
-        }
-
-
-        if (modellingreports.equals(Method.MODELLINGOHEACOPING)
-                || modellingreports.equals(Method.MODELLINGOHEASCENARIO)) {
-            System.out.println("about to do report ordering");
+        if (modellingreports.equals(modellingreports.MODELLINGOHEACOPING)
+                || modellingreports.equals(modellingreports.MODELLINGOHEASCENARIO)) {
             reportList.sort(Comparator.comparingInt(Report::getCode).reversed());
-            System.out.println("done report ordering");
         } else {
             reportList.sort(Comparator.comparingInt(Report::getCode));
         }
-        Efdutils.em("createheader = " + 10013);
+
         for (Report report : reportList) {
             sheet[0].setValue(2, i, report.getName(), textStyleLeft);
             sheet[i - 3] = reportWB.addSheet(report.getCode() + " " + report.getName());
@@ -4235,7 +4157,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
             i++;
         }
-        Efdutils.em("createheader = " + 10014);
+
         errno = 1108;
         int row = 18;
         /* Print Change Scenario and Food Substitutions */
@@ -4254,7 +4176,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
             sheet[0].setValue(2, row++, foodSubstitution2.getCurrentFood().getResourcetypename() + " replaced by "
                     + foodSubstitution2.getSubstitutionFood().getResourcetypename(), textStyleLeft);
         }
-        Efdutils.em("createheader = " + 10015);
+
         if (isCopingStrategy) {
             sheet[0].setValue(1, row, "Coping Strategy", boldRStyle);
             sheet[0].setValue(2, row++, "(Resource,Exp. Increase Limit, Exp. Limit)", boldLStyle);
@@ -4276,7 +4198,7 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
         for (Site site : sites) {
             siteName = site.getLocationdistrict() + " " + site.getSubdistrict();
-            sheet2.setValue(col, i, siteName, textStyleRight);
+            ((JxlsSheet) sheet2).setValue(col, i, siteName, textStyleRight);
             for (Community community2 : site.getCommunity()) {
 
                 i = printWGName(sheet2, i, col, community2, 1); // Check if WGOrder present 1,2,3 more than 4 not
@@ -4308,10 +4230,10 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 wgName = wgName + "*";
             }
 
-            sheet2.setValue(col + 1, i, wgName, textStyleRight);
+            ((JxlsSheet) sheet2).setValue(col + 1, i, wgName, textStyleRight);
             i++;
         } else {
-            sheet2.setValue(col + 1, i, " - ", textStyleRight);
+            ((JxlsSheet) sheet2).setValue(col + 1, i, " - ", textStyleRight);
             i++;
         }
         return i;
@@ -4326,25 +4248,25 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
 
     /******************************************************************************************************************************************/
 
-    //@Override
-    //public String getForwardURI() {
-    //    return forwardURI;
-    //}
+    // @Override
+    // public String getForwardURI() {
+    // return forwardURI;
+    // }
 
     /******************************************************************************************************************************************/
 
-    //public void setForwardURI(String forwardURI) {
-    //    this.forwardURI = forwardURI;
-    //}
+    // public void setForwardURI(String forwardURI) {
+    // this.forwardURI = forwardURI;
+    // }
 
     /******************************************************************************************************************************************/
 
-    //@Override
-    //public boolean inNewWindow() {
-    //  if (forwardURI == null)
-    //     return false;
+    // @Override
+    // public boolean inNewWindow() {
+    // if (forwardURI == null)
+    // return false;
     // return true;
-    //}
+    // }
 
     /******************************************************************************************************************************************/
     /*
@@ -4411,4 +4333,75 @@ class ModellingReports extends BaseReporting implements JxlsConstants {
                 .mapToDouble(p -> p.getWealthgroupInterview().getWgAverageNumberInHH()).average();
 
     }
+
+    /**
+     * @return the targetTab
+     */
+    public Tab getTargetTab() {
+        return targetTab;
+    }
+
+    /**
+     * @param targetTab the targetTab to set
+     */
+    public void setTargetTab(Tab targetTab) {
+        this.targetTab = targetTab;
+    }
+
+    /**
+     * @return the modelType
+     */
+    public ModelType getModelType() {
+        return modelType;
+    }
+
+    /**
+     * @param modelType the modelType to set
+     */
+    public void setModelType(ModelType modelType) {
+        this.modelType = modelType;
+    }
+
+    /**
+     * @return the session
+     */
+    public HttpSession getSession() {
+        return session;
+    }
+
+    /**
+     * @param session the session to set
+     */
+    public void setSession(HttpSession session) {
+        this.session = session;
+    }
+
+    /**
+     * @return the modellingScenario
+     */
+    public ModellingScenario getModellingScenario() {
+        return modellingScenario;
+    }
+
+    /**
+     * @param modellingScenario the modellingScenario to set
+     */
+    public void setModellingScenario(ModellingScenario modellingScenario) {
+        this.modellingScenario = modellingScenario;
+    }
+
+    /**
+     * @return the modellingScenarioId
+     */
+    public String getModellingScenarioId() {
+        return modellingScenarioId;
+    }
+
+    /**
+     * @param modellingScenarioId the modellingScenarioId to set
+     */
+    public void setModellingScenarioId(String modellingScenarioId) {
+        this.modellingScenarioId = modellingScenarioId;
+    }
+
 }

@@ -26,12 +26,27 @@
 
 package efd.actions;
 
-import efd.model.*;
-import efd.model.HouseholdMember.Sex;
-import efd.model.Project.Area;
-import efd.model.StdOfLivingElement.StdLevel;
-import efd.model.WealthGroupInterview.Status;
-import efd.utils.HH;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EmptyStackException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -46,12 +61,43 @@ import org.openxava.util.jxls.JxlsStyle;
 import org.openxava.util.jxls.JxlsWorkbook;
 import org.openxava.web.servlets.ReportXLSServlet;
 
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import efd.model.AssetCash;
+import efd.model.AssetFoodStock;
+import efd.model.AssetLand;
+import efd.model.AssetLiveStock;
+import efd.model.AssetTradeable;
+import efd.model.AssetTree;
+import efd.model.Category;
+import efd.model.ConfigAnswer;
+import efd.model.Crop;
+import efd.model.CustomReportSpec;
+import efd.model.DefaultDietItem;
+import efd.model.Employment;
+import efd.model.Household;
+import efd.model.HouseholdMember;
+import efd.model.HouseholdMember.Sex;
+import efd.model.Inputs;
+import efd.model.LivelihoodZone;
+import efd.model.LivestockProducts;
+import efd.model.LivestockSales;
+import efd.model.MCCWFoodSource;
+import efd.model.MicroNutrient;
+import efd.model.MicroNutrientLevel;
+import efd.model.ModellingScenario;
+import efd.model.NutrientCount;
+import efd.model.Project.Area;
+import efd.model.Quantile;
+import efd.model.Report;
+import efd.model.ResourceSubType;
+import efd.model.ResourceType;
+import efd.model.StdOfLivingElement;
+import efd.model.StdOfLivingElement.StdLevel;
+import efd.model.Study;
+import efd.model.Transfer;
+import efd.model.WHOEnergyRequirements;
+import efd.model.WealthGroupInterview.Status;
+import efd.model.WildFood;
+import efd.utils.HH;
 
 public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsConstants {
 
@@ -71,7 +117,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	ArrayList<HH> hhSelected = new ArrayList<>();
 	ArrayList<QuantHousehold> quanthh = new ArrayList<>();
 	List<MicroNutrient> nutrients = XPersistence.getManager().createQuery("from MicroNutrient").getResultList();
-	ArrayList<NutrientCount> totalWGNutrientCount = new ArrayList<NutrientCount>();
+	ArrayList<NutrientCount> totalHHNutrientCount = new ArrayList<NutrientCount>();
 	List<HH> orderedQuantSeq = null;
 	Map<Integer, Double> quantAvg = null;
 	JxlsStyle boldRStyle = null;
@@ -1822,8 +1868,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 			/* Calculation */
 
-			/* populate totalWGNutrientCount */
-			totalWGNutrientCount = calcOIHMNutrient(uniqueHousehold);
+			/* populate totalHHNutrientCount */
+			totalHHNutrientCount = calcOIHMNutrient(uniqueHousehold);
 
 			orderedQuantSeq = uniqueHousehold.stream().sorted(Comparator.comparing(HH::getQuantSeq))
 					.collect(Collectors.toList());
@@ -1843,7 +1889,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				col = 3;
 
 				/* Get average HHM Count in this quantile */
-				OptionalDouble averageHHNumberInThisQuantile = totalWGNutrientCount.stream()
+				OptionalDouble averageHHNumberInThisQuantile = totalHHNutrientCount.stream()
 						.filter(p -> listHH.contains(p.getHhNumber())).mapToDouble(p -> p.getAverageNumberInHousehold())
 						.average();
 
@@ -1851,7 +1897,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 					final int q = j;
 					microNutrient = nutrients.get(j);
 
-					OptionalDouble averageForNutrient = totalWGNutrientCount.stream()
+					OptionalDouble averageForNutrient = totalHHNutrientCount.stream()
 							.filter(p -> listHH.contains(p.getHhNumber())).filter(p -> p.getMn() == nutrients.get(q))
 							.mapToDouble(p -> p.getMnAmount()).average();
 
@@ -1874,8 +1920,8 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 				row++;
 			}
 
-			/* populate totalWGNutrientCount */
-			totalWGNutrientCount = calcOIHMNutrient(uniqueHousehold);
+			/* populate totalHHNutrientCount */
+			totalHHNutrientCount = calcOIHMNutrient(uniqueHousehold);
 
 			col = 2;
 
@@ -1893,23 +1939,19 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 					mnYearRDA = OHEAReports.calcMNYearRDA(microNutrient, mnYearRDA); // Calc g,mg divisor
 
-					/*
-					 * totalWGNutrientCount.stream().filter(p -> p.getMn() == nutrients.get(k))
-					 * .filter(p -> p.getHhNumber() == hh3.getHhNumber()) .forEach(p ->
-					 * System.out.println("totalWGNutrientCount for mnSum calc = " + p.getHhNumber()
-					 * + " " + p.getMn().getName() + " " + p.getAverageNumberInHousehold() + " " +
-					 * p.getMnAmount()));
-					 */
-					double mnSum = totalWGNutrientCount.stream().filter(p -> p.getMn() == nutrients.get(k))
+					double mnSum = totalHHNutrientCount.stream().filter(p -> p.getMn() == nutrients.get(k))
 							.filter(p -> p.getHhNumber() == hh3.getHhNumber()).mapToDouble(p -> p.getMnAmount()).sum();
+
+					
+
 
 					Double mnSumPercent = 100 * (mnSum / mnYearRDA);
 					if (mnSumPercent.isNaN())
 						mnSumPercent = 0.0;
 
-					System.out.println("mnSum in oihm nutrient rep  = " + mnSumPercent);
+
 					reportWB.getSheet(isheet).setValue(col, row, mnSumPercent, numberStyle);
-					System.out.println("printed mnSum in oihm nutrient rep  = " + mnSumPercent);
+
 
 					row++;
 				}
@@ -1924,12 +1966,14 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 	/* populate array with hh and nutrient values - used when calculatng totals */
 	private ArrayList<NutrientCount> calcOIHMNutrient(List<HH> thisUniqueHousehold) {
 
-		ArrayList<NutrientCount> thisTotalWGNutrientCount = new ArrayList<NutrientCount>();
+		ArrayList<NutrientCount> thisTotalHHNutrientCount = new ArrayList<NutrientCount>();
 
 		MCCWFoodSource thisMccwFoodSource;
 		for (HH hh2 : thisUniqueHousehold) {
 
 			defaultDietItems = (List<DefaultDietItem>) hh2.getHousehold().getStudy().getDefaultDietItem();
+
+
 
 			/* Calc DDI effect */
 
@@ -1957,27 +2001,26 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 						double mnLevel = NumberUtils.toDouble(mnl.getMnLevel()) * kgNeeded * -1.0;
 						errno = 4373_4;
 
-						/* Same for all WG as DDI is property of Community */
-						for (int k = 1; k < 4; k++) {
 
-							/* Note that wealthgroup and avgnumberinH not set in the NutrientCount array */
 
 							NutrientCount thismn = new NutrientCount();
 							thismn.setMn(mnl.getMicroNutrient());
 							thismn.setMnAmount(mnLevel);
 
-							thismn.setWgOrder(k);
+							thismn.setHhNumber(hh2.getHhNumber());
+							// thismn.setWgOrder(k);
 
 							thismn.setDDI(true);
 
-							thisTotalWGNutrientCount.add(thismn);
+							thisTotalHHNutrientCount.add(thismn);
 
-						}
 
 					}
 
 				}
 			}
+
+
 
 			if (hh2.getHousehold().getCrop().size() > 0) {
 
@@ -1988,7 +2031,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 					if (thisMccwFoodSource != null) {
 
 						for (MicroNutrientLevel mn : thisMccwFoodSource.getMicroNutrientLevel()) {
-							thisTotalWGNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
+							thisTotalHHNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
 									hh2.getHousehold().getHHMCount(), crop2.getUnitsConsumed(), mn));
 						}
 					}
@@ -2005,7 +2048,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 
 						for (MicroNutrientLevel mn : thisMccwFoodSource.getMicroNutrientLevel()) {
 
-							thisTotalWGNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
+							thisTotalHHNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
 									hh2.getHousehold().getHHMCount(), lsp.getUnitsConsumed(), mn));
 
 						}
@@ -2021,7 +2064,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 					if (thisMccwFoodSource != null) {
 
 						for (MicroNutrientLevel mn : thisMccwFoodSource.getMicroNutrientLevel()) {
-							thisTotalWGNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
+							thisTotalHHNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
 									hh2.getHousehold().getHHMCount(), tr.getUnitsConsumed(), mn));
 
 						}
@@ -2037,7 +2080,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 					if (thisMccwFoodSource != null) {
 
 						for (MicroNutrientLevel mn : thisMccwFoodSource.getMicroNutrientLevel()) {
-							thisTotalWGNutrientCount
+							thisTotalHHNutrientCount
 									.add(populateNutrientSource(hh2.getHhNumber(), hh2.getHousehold().getHHMCount(),
 											emp.getPeopleCount() * emp.getFoodPaymentUnitsPaidWork(), mn));
 
@@ -2054,7 +2097,7 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 					if (thisMccwFoodSource != null) {
 
 						for (MicroNutrientLevel mn : thisMccwFoodSource.getMicroNutrientLevel()) {
-							thisTotalWGNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
+							thisTotalHHNutrientCount.add(populateNutrientSource(hh2.getHhNumber(),
 									hh2.getHousehold().getHHMCount(), wf.getUnitsConsumed(), mn));
 
 						}
@@ -2063,7 +2106,9 @@ public class OIHMReports extends TabBaseAction implements IForwardAction, JxlsCo
 			}
 
 		}
-		return (thisTotalWGNutrientCount);
+
+		errno = 45052;
+		return (thisTotalHHNutrientCount);
 	}
 
 	/******************************************************************************************************************************************/

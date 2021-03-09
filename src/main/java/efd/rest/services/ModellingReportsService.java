@@ -22,36 +22,42 @@ import java.io.ByteArrayOutputStream;
 @RequiredArgsConstructor
 @Service
 public class ModellingReportsService {
+    private final ModellingScenarioRepository modellingScenarioRepository;
     JxlsWorkbook report;
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    private final ModellingScenarioRepository modellingScenarioRepository;
 
-    public byte[] runModReports(final String title) throws Exception {
+
+
+
+    public byte[] runModReports(final String title, boolean copingStrategy) throws Exception {
 
         Project project = new Project();
         Study study = new Study();
 
         ModellingScenario ms = modellingScenarioRepository.findByTitle(title);
 
-        System.out.println("ms = "+ms.getTitle());
-
-        //System.out.println("MSByTitle = "+byTitle.getTitle());
-
-        //ModellingscenarioDTO modellingscenarioDTO = modellingScenarioMapper.modellingScenarioToModellingScenarionDto(
-          //      modellingScenarioRepository.findByTitle("Katakwi - OHEA"));
-
-
         ModellingReports modellingReports = new ModellingReports();
 
         modellingReports.setModellingScenarioId(ms.getId());
+
+        System.out.println("modelling type = " + ms.getModelType());
+
         modellingReports.setModelType(CustomReportSpecListModelling.ModelType.ChangeScenario); //  ChangeScenario, CopingStrategy
+
+        if(copingStrategy){
+            modellingReports.setModelType(CustomReportSpecListModelling.ModelType.CopingStrategy);
+        }
+        else
+        {
+            modellingReports.setModelType(CustomReportSpecListModelling.ModelType.ChangeScenario);
+        }
 
         modellingReports.setModellingScenario(ms);
 
 
-      //  project = XPersistence.getManager().find(Project.class, projectId);
+        //  project = XPersistence.getManager().find(Project.class, projectId);
         System.out.println("done find ");
-        System.out.println("project = "+ms.getProject().getProjecttitle());
+        System.out.println("project = " + ms.getProject().getProjecttitle());
         //modellingReports.setProject(project);
 
         HttpSession getHttpSession = null;
@@ -64,9 +70,8 @@ public class ModellingReportsService {
 
         report = modellingReports.getReport();
 
-        System.out.println("reportback in runrep  = "+report);
 
-
+        System.out.println("report = " + report);
 
         try {
             report.write(bos);
@@ -76,13 +81,11 @@ public class ModellingReportsService {
         byte[] bytes = bos.toByteArray();
 
 
-       return bytes;
+        return bytes;
 
-        //return report;
-
-
-       // return ("ran runModReports");
 
     }
+
+
 
 }
